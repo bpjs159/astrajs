@@ -1,0 +1,302 @@
+/**
+ * @astrajs/core — Reactive Store (Proxy-based Fine-Grained Reactivity)
+ *
+ * ## Architecture
+ *
+ * Instead of re-rendering entire component trees (VDOM diffing), AstraJS tracks
+ * dependencies at the *property* level via ES6 Proxies. Each property access during
+ * an `effect()` or `memo()` scope is recorded. When a property is mutated, only the
+ * specific DOM bindings or effects that depend on that property are updated — O(1).
+ *
+ * ## Dependency Graph
+ *
+ * ```
+ * store.count ──→ [effectA, textNodeBinding]
+ * store.name  ──→ [effectB]
+ * store.user.firstName ──→ [effectC, attrBinding]
+ * ```
+ *
+ * Nested objects are automatically wrapped in proxies (lazy, on access).
+ *
+ * ## Integration with the Compiler
+ *
+ * The Vite AST plugin transforms JSX expressions like:
+ * ```tsx
+ * <span>{counter.count}</span>
+ * ```
+ * Into:
+ * ```ts
+ * const el = document.createElement('span');
+ * const textNode = document.createTextNode('');
+ * el.appendChild(textNode);
+ * bindText(textNode, () => String(counter.count));
+ * ```
+ *
+ * The `bindText` call creates an effect that updates the TextNode's `.data`
+ * property whenever `counter.count` changes — without touching anything else.
+ */
+
+import type { StoreOptions } from '../index.js';
+
+// ─── Global Tracking State ───────────────────────────────────────────────────
+
+/**
+ * Stack of currently executing tracking scopes (effects/memos).
+ * Stack-based to support nested effects.
+ */
+let currentTracker: (() => void) | null = null;
+
+/**
+ * Global dependency map: property path → Set of subscriber callbacks.
+ *
+ * Key format: We use a WeakMap keyed by the raw target object, then a
+ * Map from property name to Set of subscriber functions.
+ *
+ *   rawDeps: WeakMap<object, Map<string | symbol, Set<() => void>>>
+ */
+const rawDeps = new WeakMap<object, Map<string | symbol, Set<() => void>>>();
+
+/**
+ * Map from raw object to its proxy wrapper (for unwrapping).
+ */
+const rawToProxy = new WeakMap<object, object>();
+
+/**
+ * Map from proxy to its raw object (for internal lookups).
+ */
+const proxyToRaw = new WeakMap<object, object>();
+
+/**
+ * Whether we're currently inside a batch. When batched, notifications are
+ * queued rather than executed immediately.
+ */
+let batchDepth = 0;
+const pendingNotifications = new Set<() => void>();
+
+// ─── Tracker Context ─────────────────────────────────────────────────────────
+
+/**
+ * Retrieves the currently active tracking function (effect/memo),
+ * if one is executing.
+ */
+export function getCurrentTracker(): (() => void) | null {
+  return currentTracker;
+}
+
+/**
+ * Sets the current tracker. Used internally by effect() and memo().
+ */
+export function setCurrentTracker(tracker: (() => void) | null): void {
+  currentTracker = tracker;
+}
+
+// ─── Dependency Management ───────────────────────────────────────────────────
+
+/**
+ * Records that the current tracker depends on `raw[prop]`.
+ * Called from the Proxy's `get` trap.
+ */
+export function track(raw: object, prop: string | symbol): void {
+  if (!currentTracker) return;
+
+  let propMap = rawDeps.get(raw);
+  if (!propMap) {
+    propMap = new Map();
+    rawDeps.set(raw, propMap);
+  }
+
+  let subscribers = propMap.get(prop);
+  if (!subscribers) {
+    subscribers = new Set();
+    propMap.set(prop, subscribers);
+  }
+
+  subscribers.add(currentTracker);
+}
+
+/**
+ * Notifies all subscribers that depend on `raw[prop]` that the value changed.
+ * Called from the Proxy's `set` trap.
+ */
+export function trigger(raw: object, prop: string | symbol): void {
+  const propMap = rawDeps.get(raw);
+  if (!propMap) return;
+
+  const subscribers = propMap.get(prop);
+  if (!subscribers || subscribers.size === 0) return;
+
+  if (batchDepth > 0) {
+    // Queue for batch flush
+    for (const sub of subscribers) {
+      pendingNotifications.add(sub);
+    }
+  } else {
+    // Execute immediately
+    for (const sub of subscribers) {
+      sub();
+    }
+  }
+}
+
+// ─── Batch Processing ────────────────────────────────────────────────────────
+
+/**
+ * Flushes all pending notifications collected during a batch.
+ */
+function flushPending(): void {
+  for (const sub of pendingNotifications) {
+    sub();
+  }
+  pendingNotifications.clear();
+}
+
+// ─── Proxy Factory ───────────────────────────────────────────────────────────
+
+/**
+ * Wraps a plain object in a reactive Proxy.
+ *
+ * - `get` trap: records dependency if inside a tracker, and recursively
+ *   wraps nested objects/arrays in proxies (lazy).
+ * - `set` trap: updates the raw value, notifies subscribers.
+ * - `deleteProperty` trap: notifies subscribers and removes the key.
+ *
+ * @param raw — The plain object to make reactive.
+ * @returns A Proxy wrapping `raw` with reactive get/set traps.
+ */
+function createReactiveProxy<T extends object>(raw: T): T {
+  // If already proxied, return existing proxy
+  const existing = rawToProxy.get(raw);
+  if (existing) return existing as T;
+
+  const handler: ProxyHandler<object> = {
+    get(target: object, prop: string | symbol, receiver: object): unknown {
+      // Track dependency for the current effect/memo
+      track(target, prop);
+
+      const value = Reflect.get(target, prop, receiver);
+
+      // Lazy deep proxy: wrap nested objects/arrays on access
+      if (value !== null && typeof value === 'object' && !ArrayBuffer.isView(value)) {
+        // Check if already proxied
+        const existingProxy = rawToProxy.get(value);
+        if (existingProxy) return existingProxy;
+
+        // Recursively wrap
+        return createReactiveProxy(value as object);
+      }
+
+      return value;
+    },
+
+    set(target: object, prop: string | symbol, value: unknown, receiver: object): boolean {
+      const oldValue = Reflect.get(target, prop, receiver);
+
+      // If the value hasn't changed, skip notification
+      if (oldValue === value) return true;
+
+      const result = Reflect.set(target, prop, value, receiver);
+
+      // Notify subscribers
+      trigger(target, prop);
+
+      return result;
+    },
+
+    deleteProperty(target: object, prop: string | symbol): boolean {
+      const had = Object.prototype.hasOwnProperty.call(target, prop);
+      const result = Reflect.deleteProperty(target, prop);
+
+      if (had) {
+        trigger(target, prop);
+      }
+
+      return result;
+    },
+
+    // Support for array methods: ensure array mutations trigger correctly
+    // The `ownKeys` and `has` traps don't need explicit track/trigger since
+    // they are used by Object.keys/in which don't create reactive deps by default.
+  };
+
+  const proxy = new Proxy(raw, handler);
+
+  // Register mappings
+  rawToProxy.set(raw, proxy);
+  proxyToRaw.set(proxy, raw);
+
+  return proxy as T;
+}
+
+// ─── Public API: store() ─────────────────────────────────────────────────────
+
+// ─── Batch Management (exported for effect.ts) ──────────────────────────────
+
+/**
+ * Begins a batching scope. All subsequent trigger() calls are queued.
+ */
+export function _beginBatch(): void {
+  batchDepth++;
+}
+
+/**
+ * Ends a batching scope. If the outermost batch ends, flushes all pending
+ * notifications in a single synchronous cycle.
+ */
+export function _endBatch(): void {
+  batchDepth--;
+  if (batchDepth === 0) {
+    flushPending();
+  }
+}
+
+// ─── Public API: store() ─────────────────────────────────────────────────────
+
+/**
+ * Creates a reactive store from an initial state object.
+ *
+ * The returned proxy tracks property-level access and mutation. When used
+ * inside `effect()` or `memo()`, each accessed property creates a dependency.
+ * When mutated, only the exact subscribers for that property are notified.
+ *
+ * @typeParam T — The shape of the state (fully inferred).
+ * @param initialState — The seed object. Must be a plain object.
+ * @param _options — Optional configuration (reserved for SSR rehydration, SWR).
+ * @returns A reactive proxy over `initialState`.
+ *
+ * @example
+ * ```ts
+ * const state = store({ count: 0, user: { name: 'Alice' } });
+ * state.count++;           // Triggers count subscribers only
+ * state.user.name = 'Bob'; // Triggers user.name subscribers only
+ * ```
+ */
+export function store<T extends object>(
+  initialState: T,
+  _options?: StoreOptions
+): T {
+  if (typeof initialState !== 'object' || initialState === null) {
+    throw new TypeError(
+      `[AstraJS] store() expects a plain object, received ${typeof initialState}`
+    );
+  }
+
+  return createReactiveProxy(initialState);
+}
+
+/**
+ * Given a reactive proxy, returns the underlying raw (unwrapped) object.
+ * Useful for serialization (SSR, `astra-data`) or comparison.
+ */
+export function toRaw<T extends object>(proxy: T): T {
+  const raw = proxyToRaw.get(proxy);
+  return (raw as T) ?? proxy;
+}
+
+/**
+ * Given a raw object, returns its reactive proxy if one exists.
+ * Returns the raw object if it's not proxied.
+ */
+export function toProxy<T extends object>(raw: T): T {
+  const proxy = rawToProxy.get(raw);
+  return (proxy as T) ?? raw;
+}

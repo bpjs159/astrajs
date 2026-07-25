@@ -1,0 +1,1 @@
+{"name":"03-forms","private":true,"type":"module","scripts":{"dev":"vite","build":"vite build"},"dependencies":{"@astrajs/core":"workspace:*"},"devDependencies":{"vite":"^5.4.0","typescript":"^5.5.0"}}

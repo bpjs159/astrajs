@@ -1,0 +1,1 @@
+{"extends":"../../../tsconfig.base.json","compilerOptions":{"composite":true,"outDir":"./dist","rootDir":"./src","jsx":"react-jsx","jsxImportSource":"@astrajs/core","baseUrl":".","paths":{"@astrajs/core":["../../../packages/core/src"],"@astrajs/compiler":["../../../packages/compiler/src"]}},"include":["src"]}

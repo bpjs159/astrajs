@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>01 — Simple State · AstraJS</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: system-ui, sans-serif; background: #0f172a; color: #e2e8f0;
+           display:flex; align-items:center; justify-content:center; min-height:100vh; }
+    .card { background: #1e293b; border-radius: 16px; padding: 40px; text-align: center;
+            border: 1px solid #334155; min-width: 340px; }
+    h1 { font-size: 2rem; margin-bottom: 8px; }
+    .count { font-size: 5rem; font-weight: 800; color: #818cf8; margin: 20px 0; }
+    .buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    button { padding: 12px 24px; border: none; border-radius: 10px; font-size: 1rem;
+             font-weight: 600; cursor: pointer; transition: all .15s; }
+    .btn-inc { background: #6366f1; color: #fff; }
+    .btn-inc:hover { background: #4f46e5; transform: scale(1.05); }
+    .btn-dec { background: #ef4444; color: #fff; }
+    .btn-dec:hover { background: #dc2626; transform: scale(1.05); }
+    .btn-reset { background: #334155; color: #cbd5e1; }
+    .btn-reset:hover { background: #475569; }
+    .hint { margin-top: 24px; font-size: .8rem; color: #64748b; }
+    .hint code { background: #334155; padding: 2px 6px; border-radius: 4px; color: #818cf8; }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>

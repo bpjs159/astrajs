@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>02 — Global State · AstraJS</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: system-ui, sans-serif; background: #0f172a; color: #e2e8f0; min-height:100vh; }
+    .shell { max-width: 720px; margin: 0 auto; padding: 40px 20px; }
+    h1 { font-size: 2rem; margin-bottom: 4px; text-align:center; }
+    .subtitle { text-align:center; color: #64748b; margin-bottom: 32px; font-size: .9rem; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 24px; }
+    .card h3 { font-size: 1rem; color: #94a3b8; margin-bottom: 12px; }
+    .value { font-size: 2.5rem; font-weight: 800; color: #818cf8; }
+    button { padding: 8px 18px; border: none; border-radius: 8px; font-weight: 600;
+             font-size: .85rem; cursor: pointer; transition: all .15s; margin: 4px; }
+    .btn-up { background: #6366f1; color:#fff; }
+    .btn-up:hover { background:#4f46e5; }
+    .btn-down { background: #ef4444; color:#fff; }
+    .btn-down:hover { background:#dc2626; }
+    .total-box { grid-column: 1 / -1; text-align: center; padding: 32px;
+                 background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 14px; }
+    .total-box .value { color: #fff; font-size: 3.5rem; }
+    .total-box h3 { color: rgba(255,255,255,.7); }
+    .hint { grid-column: 1/-1; text-align:center; font-size: .8rem; color: #64748b; }
+    .hint code { background:#334155; padding:2px 6px; border-radius:4px; color:#818cf8; }
+  </style>
+</head>
+<body>
+  <div id="app" class="shell"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>
