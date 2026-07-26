@@ -5,22 +5,26 @@
   "type": "module",
   "exports": {
     ".": {
+      "development": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./vite": {
+      "development": "./src/compiler/index.ts",
       "types": "./dist/compiler/index.d.ts",
       "import": "./dist/compiler/index.js",
       "default": "./dist/compiler/index.js"
     },
     "./jsx-runtime": {
-      "import": "./dist/jsx-runtime.js",
-      "default": "./dist/jsx-runtime.js"
+      "development": "./src/jsx-runtime.ts",
+      "import": "./src/jsx-runtime.ts",
+      "default": "./src/jsx-runtime.ts"
     },
     "./jsx-dev-runtime": {
-      "import": "./dist/jsx-dev-runtime.js",
-      "default": "./dist/jsx-dev-runtime.js"
+      "development": "./src/jsx-dev-runtime.ts",
+      "import": "./src/jsx-dev-runtime.ts",
+      "default": "./src/jsx-dev-runtime.ts"
     }
   },
   "typesVersions": {

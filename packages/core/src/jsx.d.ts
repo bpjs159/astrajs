@@ -185,7 +185,7 @@ declare namespace JSX {
     // --- View Transitions ---
     style?: Partial<CSSStyleDeclaration> & { 'view-transition-name'?: string };
 
-    // --- Event Handlers ---
+    // --- Event Handlers (DOM style) ---
     onclick?: (event: MouseEvent) => void;
     onsubmit?: (event: SubmitEvent) => void;
     oninput?: (event: Event) => void;
@@ -195,8 +195,20 @@ declare namespace JSX {
     onkeydown?: (event: KeyboardEvent) => void;
     onkeyup?: (event: KeyboardEvent) => void;
 
+    // --- Event Handlers (React style — normalized by JSX runtime) ---
+    onClick?: (event: MouseEvent) => void;
+    onSubmit?: (event: SubmitEvent) => void;
+    onInput?: (event: Event) => void;
+    onChange?: (event: Event) => void;
+    onFocus?: (event: FocusEvent) => void;
+    onBlur?: (event: FocusEvent) => void;
+    onKeyDown?: (event: KeyboardEvent) => void;
+    onKeyUp?: (event: KeyboardEvent) => void;
+    onMouseEnter?: (event: MouseEvent) => void;
+    onMouseLeave?: (event: MouseEvent) => void;
+
     // --- Children ---
-    children?: JSX.Element | string | number | boolean | null | undefined | readonly JSX.Element[];
+    children?: JSX.Element | string | number | boolean | null | undefined | readonly (JSX.Element | string | number)[];
   }
 
   interface AnchorHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -572,7 +584,7 @@ declare namespace JSX {
      * - null/undefined/false (rendered as nothing)
      * - An array of any of the above (for loops)
      */
-    type Child = JSX.Element | string | number | boolean | null | undefined | readonly JSX.Element[];
+    type Child = JSX.Element | string | number | boolean | null | undefined | readonly (JSX.Element | string | number)[];
     type Children = Child;
   }
 }

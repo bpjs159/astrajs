@@ -17,17 +17,10 @@
  *   }
  * }
  * ```
- *
- * Or in Vite:
- * ```ts
- * import { defineConfig } from 'vite';
- * import astra from '@astrajs/core/vite';
- * export default defineConfig({ plugins: [astra()] });
- * ```
  */
 
 // Re-export public API for convenience
-export { store, toRaw, toProxy } from './runtime/store.js';
+export { store, toRaw, toProxy, captureReactiveExpression, STORE_SYMBOL } from './runtime/store.js';
 export { effect, memo, batch, untrack } from './runtime/effect.js';
 export {
   bindText,
@@ -38,32 +31,25 @@ export {
   bindList,
 } from './runtime/dom.js';
 
+import { captureReactiveExpression, STORE_SYMBOL } from './runtime/store.js';
+import { effect } from './runtime/effect.js';
+import { bindText } from './runtime/dom.js';
+
 // ─── JSX Factory ─────────────────────────────────────────────────────────────
 
-/**
- * JSX child value — anything that can appear as a child in JSX.
- */
 type JSXChild = Node | string | number | boolean | null | undefined | JSXChild[];
 
-/**
- * Flattens JSX children recursively. Arrays are flattened, falsy values
- * (except 0 and '') are filtered out.
- */
 function flattenChildren(children: JSXChild): (Node | string | number)[] {
-  if (children === null || children === undefined || children === false) {
-    return [];
-  }
-  if (Array.isArray(children)) {
-    return children.flatMap(flattenChildren);
-  }
-  if (children === true) {
-    return [];
-  }
+  if (children === null || children === undefined || children === false) return [];
+  if (Array.isArray(children)) return children.flatMap(flattenChildren);
+  if (children === true) return [];
   return [children as Node | string | number];
 }
 
 /**
- * Appends children to a parent element. Strings/numbers become TextNodes.
+ * Appends children to a parent element.
+ * Strings/numbers become TextNodes with AUTO reactive binding
+ * if the value came from a store access.
  */
 function appendChildren(
   parent: HTMLElement | DocumentFragment,
@@ -73,6 +59,11 @@ function appendChildren(
   for (const child of flat) {
     if (child instanceof Node) {
       parent.appendChild(child);
+    } else if (typeof child === 'function') {
+      // Reactive getter: create TextNode + bindText
+      const tn = document.createTextNode('');
+      bindText(tn, child as () => string);
+      parent.appendChild(tn);
     } else {
       parent.appendChild(document.createTextNode(String(child)));
     }
@@ -81,15 +72,7 @@ function appendChildren(
 
 /**
  * Sets attributes/properties on a DOM element from JSX props.
- *
- * Special handling:
- * - `class` / `className` → `el.className`
- * - `style` (object) → `Object.assign(el.style, ...)`
- * - `on*` event handlers → `el.addEventListener`
- * - `astra-data` → `el.setAttribute` (serialized state)
- * - `astra-on:*` → `el.setAttribute` (resumable events)
- * - `ref` → calls the ref function with the element
- * - Everything else → `el.setAttribute`
+ * Handles both DOM events (onclick) and React-style (onClick).
  */
 function setProps(
   el: HTMLElement,
@@ -105,17 +88,17 @@ function setProps(
     } else if (key === 'style' && typeof value === 'object' && value !== null) {
       Object.assign(el.style, value);
     } else if (key === 'ref') {
-      if (typeof value === 'function') {
-        (value as (el: HTMLElement) => void)(el);
-      }
+      if (typeof value === 'function') (value as (el: HTMLElement) => void)(el);
     } else if (key.startsWith('on') && typeof value === 'function') {
-      const event = key.slice(2).toLowerCase();
+      // Normalize: onClick → click, onChange → change, etc.
+      let event = key.slice(2);
+      // Convert camelCase to lowercase: onChange → change, onInput → input
+      if (event !== event.toLowerCase()) {
+        event = event.replace(/[A-Z]/g, (c) => c.toLowerCase());
+      }
       el.addEventListener(event, value as EventListener);
     } else if (key === 'astra-data') {
-      el.setAttribute(
-        'astra-data',
-        typeof value === 'string' ? value : JSON.stringify(value)
-      );
+      el.setAttribute('astra-data', typeof value === 'string' ? value : JSON.stringify(value));
     } else if (key.startsWith('astra-on:')) {
       el.setAttribute(key, String(value));
     } else if (key === 'htmlFor') {
@@ -123,7 +106,7 @@ function setProps(
     } else if (value === true) {
       el.setAttribute(key, '');
     } else if (value === false || value === null) {
-      // Don't set falsy boolean attributes
+      // Skip falsy boolean attrs
     } else {
       el.setAttribute(key, String(value));
     }
@@ -132,12 +115,6 @@ function setProps(
 
 /**
  * The `jsx` factory — creates a DOM element from JSX.
- *
- * Called by TypeScript/Vite when processing `<div prop={value}>...</div>`.
- *
- * @param type — The tag name (string) or component function.
- * @param props — Props object (including `children`).
- * @param _key — Optional key for list reconciliation (unused in runtime).
  */
 export function jsx(
   type: string | ((props: Record<string, unknown>) => JSX.Element),
@@ -146,16 +123,13 @@ export function jsx(
 ): JSX.Element {
   const allProps = props ?? ({} as Record<string, unknown>);
 
-  // Component function
   if (typeof type === 'function') {
     return type(allProps);
   }
 
-  // Intrinsic element (HTML tag)
   const el = document.createElement(type);
   setProps(el, allProps);
 
-  // Append children
   if ('children' in allProps) {
     appendChildren(el, allProps.children as JSXChild);
   }
@@ -163,10 +137,6 @@ export function jsx(
   return el;
 }
 
-/**
- * The `jsxs` factory — same as `jsx` but for static children lists
- * (compiler optimization hint). In AstraJS they behave identically.
- */
 export function jsxs(
   type: string | ((props: Record<string, unknown>) => JSX.Element),
   props: Record<string, unknown> | null,
@@ -175,14 +145,8 @@ export function jsxs(
   return jsx(type, props, _key);
 }
 
-/**
- * Creates a DocumentFragment from JSX children.
- * Used by the compiler for fragments (`<>...</>`).
- */
 export function Fragment(props: { children?: JSXChild }): DocumentFragment {
   const fragment = document.createDocumentFragment();
-  if (props.children !== undefined) {
-    appendChildren(fragment, props.children);
-  }
+  if (props.children !== undefined) appendChildren(fragment, props.children);
   return fragment;
 }

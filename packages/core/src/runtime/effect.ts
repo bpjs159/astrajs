@@ -44,10 +44,11 @@ const effectStack: Array<{ fn: () => void | (() => void); cleanup: (() => void) 
  * ```
  */
 export function effect(fn: () => void | (() => void)): void {
+  const entry = { fn: () => {}, cleanup: null as (() => void) | null };
+
   const run = (): void => {
     // Clean up previous run's cleanup
-    const entry = effectStack[effectStack.length - 1];
-    if (entry?.cleanup) {
+    if (entry.cleanup) {
       entry.cleanup();
       entry.cleanup = null;
     }
@@ -58,7 +59,7 @@ export function effect(fn: () => void | (() => void)): void {
 
     try {
       const cleanup = fn();
-      if (typeof cleanup === 'function' && entry) {
+      if (typeof cleanup === 'function') {
         entry.cleanup = cleanup;
       }
     } finally {
@@ -66,7 +67,7 @@ export function effect(fn: () => void | (() => void)): void {
     }
   };
 
-  const entry = { fn: run, cleanup: null };
+  entry.fn = run;
   effectStack.push(entry);
 
   // Execute immediately to collect dependencies

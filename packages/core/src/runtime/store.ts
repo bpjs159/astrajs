@@ -47,6 +47,52 @@ import type { StoreOptions } from '../index.js';
 let currentTracker: (() => void) | null = null;
 
 /**
+ * When a reactive store property is accessed during JSX evaluation,
+ * we capture the access path so the JSX runtime can auto-create
+ * a reactive binding (bindText/bindAttr) without compiler transforms.
+ *
+ * This is what makes `{ui.valor}` work transparently in JSX.
+ */
+let lastReactiveGetter: (() => string) | null = null;
+let reactiveAccessDetected = false;
+
+/** Symbol to mark store proxies — detectable by JSX runtime */
+export const STORE_SYMBOL: unique symbol = Symbol('astra-store');
+
+/**
+ * Runs a getter and returns whether it accessed any reactive store.
+ * If reactive, wraps it in a bindText-compatible getter.
+ */
+export function captureReactiveExpression<T>(fn: () => T): {
+  value: T;
+  isReactive: boolean;
+  getter: (() => string) | null;
+} {
+  reactiveAccessDetected = false;
+  lastReactiveGetter = null;
+
+  const prevTracker = currentTracker;
+  // Set a temporary tracker that captures the access
+  const tempTracker = () => {};
+  currentTracker = tempTracker;
+
+  let value: T;
+  try {
+    value = fn();
+  } finally {
+    currentTracker = prevTracker;
+  }
+
+  // If we detected a store access during evaluation,
+  // fn itself IS the getter (re-running it would get the latest value)
+  return {
+    value,
+    isReactive: reactiveAccessDetected,
+    getter: reactiveAccessDetected ? (() => String(fn())) : null,
+  };
+}
+
+/**
  * Global dependency map: property path → Set of subscriber callbacks.
  *
  * Key format: We use a WeakMap keyed by the raw target object, then a
@@ -170,8 +216,14 @@ function createReactiveProxy<T extends object>(raw: T): T {
 
   const handler: ProxyHandler<object> = {
     get(target: object, prop: string | symbol, receiver: object): unknown {
+      // Flag that a reactive store was accessed (for JSX auto-binding)
+      reactiveAccessDetected = true;
+
       // Track dependency for the current effect/memo
       track(target, prop);
+
+      // Expose the store marker symbol
+      if (prop === STORE_SYMBOL) return true;
 
       const value = Reflect.get(target, prop, receiver);
 
@@ -249,26 +301,33 @@ export function _endBatch(): void {
   }
 }
 
+// ─── Component Store Caching ─────────────────────────────────────────────────
+
+/**
+ * When a `component()` wrapper is active, it sets these globals so
+ * `store()` calls inside the component reuse the same proxy across
+ * re-renders. This keeps event handlers connected to the same instance.
+ */
+let _componentCache: Map<string, object> | null = null;
+let _componentKeyGen: (() => number) | null = null;
+
+export function setComponentCache(
+  cache: Map<string, object>,
+  keyGen: () => number
+): void {
+  _componentCache = cache;
+  _componentKeyGen = keyGen;
+}
+
+export function clearComponentCache(): void {
+  _componentCache = null;
+  _componentKeyGen = null;
+}
+
 // ─── Public API: store() ─────────────────────────────────────────────────────
 
 /**
  * Creates a reactive store from an initial state object.
- *
- * The returned proxy tracks property-level access and mutation. When used
- * inside `effect()` or `memo()`, each accessed property creates a dependency.
- * When mutated, only the exact subscribers for that property are notified.
- *
- * @typeParam T — The shape of the state (fully inferred).
- * @param initialState — The seed object. Must be a plain object.
- * @param _options — Optional configuration (reserved for SSR rehydration, SWR).
- * @returns A reactive proxy over `initialState`.
- *
- * @example
- * ```ts
- * const state = store({ count: 0, user: { name: 'Alice' } });
- * state.count++;           // Triggers count subscribers only
- * state.user.name = 'Bob'; // Triggers user.name subscribers only
- * ```
  */
 export function store<T extends object>(
   initialState: T,
@@ -278,6 +337,16 @@ export function store<T extends object>(
     throw new TypeError(
       `[AstraJS] store() expects a plain object, received ${typeof initialState}`
     );
+  }
+
+  // If inside a component() wrapper, reuse cached store instance
+  if (_componentCache && _componentKeyGen) {
+    const cacheKey = _options?.key ?? `__astra_auto_${_componentKeyGen()}`;
+    const cached = _componentCache.get(cacheKey);
+    if (cached) return cached as T;
+    const proxy = createReactiveProxy(initialState);
+    _componentCache.set(cacheKey, proxy);
+    return proxy;
   }
 
   return createReactiveProxy(initialState);

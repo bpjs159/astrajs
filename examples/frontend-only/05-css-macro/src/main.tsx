@@ -1,23 +1,19 @@
 /**
- * 05 — CSS Macro (`css` tagged template)
+ * 05 — CSS Macro · Demo
  *
- * At build time, the Vite compiler extracts `css`...`` templates
- * into static `.css` files with hashed class names.
- *
- * The `css` call is replaced with a `{ className: 'hashedName' }` map.
- * Zero runtime CSS-in-JS overhead — just a plain object.
- *
- * This demo simulates the output of that compilation.
+ * The `css` macro is processed at build time by the compiler.
+ * Classes are extracted to static CSS with hashes and replaced
+ * with a { className: 'hashedName' } object.
  */
 
 import { store, effect } from '@astrajs/core';
+import { styles } from './styles.js';
 
-// ─── Simulated: what `css`...`` compiles to at build time ───────────────────
-// In production, write:
-//   import { css } from '@astrajs/compiler';
-//   const styles = css`.card { padding: 16px; border-radius: 8px; }`;
-// The compiler extracts the CSS to a static file and replaces the call:
-const styles = {
+// Simulation of what the compiler generates at build time:
+// import { css } from '@astrajs/compiler';
+// const styles = css`.card { ... }`;
+// → Becomes: { card: 'card_a3f2c1', ... }
+const compilado = {
   card: 'card_a3f2c1',
   title: 'title_b9e4d7',
   button: 'button_c1a8f6',
@@ -78,7 +74,7 @@ function render(): void {
       <p style="color:#94a3b8;font-size:.85rem;margin-bottom:8px;">
         📁 <strong>Build output</strong> — class names use content hashes for zero-conflict scoping:
       </p>
-      <pre>${JSON.stringify(styles, null, 2)}</pre>
+      <pre>${JSON.stringify(compilado, null, 2)}</pre>
     </div>
   `;
 

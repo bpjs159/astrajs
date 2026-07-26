@@ -1,1 +1,18 @@
-{"extends":"../../../tsconfig.base.json","compilerOptions":{"composite":true,"outDir":"./dist","rootDir":"./src","jsx":"react-jsx","jsxImportSource":"@astrajs/core","baseUrl":".","paths":{"@astrajs/core":["../../../packages/core/src"],"@astrajs/router":["../../../packages/router/src"]}},"include":["src"]}
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "@astrajs/core",
+    "ignoreDeprecations": "6.0",
+    "rootDir": "../../..", "baseUrl": ".",
+    "paths": {
+      "@astrajs/core": ["../../../packages/core/src"],
+      "@astrajs/core/jsx-runtime": ["../../../packages/core/src/jsx-runtime"],
+      "@astrajs/router": ["../../../packages/router/src"]
+    }
+  },
+  "include": [
+    "src",
+    "../../../packages/core/src/jsx.d.ts"
+  ]
+}

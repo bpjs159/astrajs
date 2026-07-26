@@ -29,6 +29,10 @@ export {
   store,
   toRaw,
   toProxy,
+  STORE_SYMBOL,
+  captureReactiveExpression,
+  setComponentCache,
+  clearComponentCache,
 } from './runtime/store.js';
 
 export {
@@ -46,6 +50,9 @@ export {
   bindValue,
   bindList,
 } from './runtime/dom.js';
+
+// Component wrapper
+export { component } from './runtime/component.js';
 
 // ─── Public Types ────────────────────────────────────────────────────────────
 

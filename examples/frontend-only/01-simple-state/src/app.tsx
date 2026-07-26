@@ -1,0 +1,31 @@
+/**
+ * 01 — Simple State · App Entry
+ *
+ * Handles DOM mounting and global styles.
+ * The Counter component stays clean in main.tsx.
+ */
+
+import { Counter } from './main.js';
+
+// Global styles (scoped to this example)
+const style = document.createElement('style');
+style.textContent = `
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: system-ui, sans-serif; background: #0f172a; color: #e2e8f0;
+         display:flex; align-items:center; justify-content:center; min-height:100vh; }
+  .box { background: #1e293b; border: 1px solid #334155; border-radius: 16px;
+          padding: 40px; text-align: center; min-width: 340px; }
+  h2 { font-size: 1.8rem; font-weight: 600; margin-bottom: 20px; }
+  h2 strong { color: #818cf8; font-size: 2.2rem; }
+  .buttons { display: flex; gap: 12px; justify-content: center; }
+  button { padding: 12px 28px; border: none; border-radius: 10px; font-size: 1rem;
+           font-weight: 600; cursor: pointer; transition: all .15s; color: #fff; }
+  button:first-of-type { background: #ef4444; }
+  button:first-of-type:hover { background: #dc2626; transform: scale(1.05); }
+  button:last-of-type { background: #6366f1; }
+  button:last-of-type:hover { background: #4f46e5; transform: scale(1.05); }
+`;
+document.head.appendChild(style);
+
+// Mount
+document.getElementById('app')!.appendChild(Counter({}));
