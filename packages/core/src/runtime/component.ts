@@ -24,7 +24,7 @@
  */
 
 import { effect } from './effect.js';
-import { setComponentCache, clearComponentCache } from './store.js';
+import { setComponentCache, clearComponentCache, isBindingUpdate } from './store.js';
 import { flushMountCallbacks, triggerUnmount, hasPendingMountCallbacks } from './lifecycle.js';
 
 /**
@@ -42,19 +42,22 @@ export function component<P extends Record<string, unknown>>(
     let storeCounter = 0;
 
     effect(() => {
-      // Trigger unmount on old children before replacing
-      while (wrapper.firstChild) {
-        const child = wrapper.firstChild;
-        if (child instanceof HTMLElement) triggerUnmount(child);
-        child.remove();
-      }
+      if (isBindingUpdate()) return;
+
+      // Snapshot old children (before replaceChildren removes them)
+      const oldNodes = Array.from(wrapper.childNodes);
 
       storeCounter = 0;
       setComponentCache(storeCache, () => storeCounter++);
       const newRoot = fn(props);
       clearComponentCache();
 
-      wrapper.appendChild(newRoot);
+      // Atomic swap: remove old + add new in one paint
+      wrapper.replaceChildren(newRoot as Node);
+
+      for (const n of oldNodes) {
+        if (n instanceof HTMLElement) triggerUnmount(n);
+      }
 
       // Flush any onMount callbacks collected during render
       if (hasPendingMountCallbacks()) {

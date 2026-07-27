@@ -55,8 +55,51 @@ let currentTracker: (() => void) | null = null;
  */
 let reactiveAccessDetected = false;
 
+/**
+ * Set to `true` during a `bindValue` two-way binding update.
+ * When the user types in an input backed by `value={store.prop}`,
+ * the store change triggers the component effect — but we must
+ * skip re-rendering because the input already has the correct value
+ * in the DOM. Re-rendering would create a new input and lose focus.
+ */
+let _isBindingUpdate = false;
+
+/** Returns true if a store mutation originated from a bindValue input event. */
+export function isBindingUpdate(): boolean {
+  return _isBindingUpdate;
+}
+
+/** Marks the start/end of a bindValue two-way binding update. */
+export function setBindingUpdate(value: boolean): void {
+  _isBindingUpdate = value;
+}
+
 /** Symbol to mark store proxies — detectable by JSX runtime */
 export const STORE_SYMBOL: unique symbol = Symbol('astra-store');
+
+/**
+ * Tracks the last reactive store property access.
+ * Used by the JSX runtime to auto-bind `value={store.prop}` on inputs
+ * without requiring a manual `onInput` handler.
+ *
+ * When the user writes:
+ * ```tsx
+ * <input value={ui.password} />
+ * ```
+ * The JSX runtime detects that `ui.password` came from a store and
+ * automatically sets up two-way binding (store ↔ DOM).
+ */
+let lastReactiveAccess: { raw: object; proxy: object; prop: string } | null = null;
+
+/** Returns the last captured store property access, or null. */
+export function getLastReactiveAccess(): { raw: object; proxy: object; prop: string } | null {
+  return lastReactiveAccess;
+}
+
+/** Clears the captured store access (called after processing to avoid stale reads). */
+export function clearLastReactiveAccess(): void {
+  lastReactiveAccess = null;
+}
 
 /**
  * Runs a getter and returns whether it accessed any reactive store.
@@ -222,6 +265,12 @@ function createReactiveProxy<T extends object>(raw: T): T {
 
       // Expose the store marker symbol
       if (prop === STORE_SYMBOL) return true;
+
+      // Record the last store property access for JSX auto-bind
+      // (e.g., <input value={ui.password} /> auto-creates two-way binding)
+      if (typeof prop === 'string' && prop !== 'constructor') {
+        lastReactiveAccess = { raw: target, proxy: receiver as object, prop };
+      }
 
       const value = Reflect.get(target, prop, receiver);
 

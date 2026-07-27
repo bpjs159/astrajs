@@ -71,6 +71,9 @@ importers:
       '@astrajs/core':
         specifier: workspace:*
         version: link:../../../packages/core
+      '@astrajs/form':
+        specifier: workspace:*
+        version: link:../../../packages/form
     devDependencies:
       typescript:
         specifier: ^5.5.0
@@ -229,6 +232,16 @@ importers:
       vitest:
         specifier: ^2.0.0
         version: 2.1.9(jsdom@29.1.1)
+
+  packages/form:
+    dependencies:
+      '@astrajs/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
 
   packages/router:
     dependencies:

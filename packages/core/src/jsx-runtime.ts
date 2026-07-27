@@ -20,7 +20,7 @@
  */
 
 // Re-export public API for convenience
-export { store, toRaw, toProxy, captureReactiveExpression, STORE_SYMBOL } from './runtime/store.js';
+export { store, toRaw, toProxy, captureReactiveExpression, STORE_SYMBOL, getLastReactiveAccess, clearLastReactiveAccess } from './runtime/store.js';
 export { effect, memo, batch, untrack } from './runtime/effect.js';
 export {
   bindText,
@@ -31,7 +31,8 @@ export {
   bindList,
 } from './runtime/dom.js';
 
-import { bindText } from './runtime/dom.js';
+import { bindText, bindValue } from './runtime/dom.js';
+import { getLastReactiveAccess, clearLastReactiveAccess } from './runtime/store.js';
 
 // ─── JSX Factory ─────────────────────────────────────────────────────────────
 
@@ -78,8 +79,34 @@ function setProps(
 ): void {
   if (!props) return;
 
+  // ── Auto-bind detection ──────────────────────────────────────────
+  // If the developer writes <input value={ui.password} /> without an
+  // explicit onInput, we detect the store access and create a two-way
+  // binding automatically. If onInput IS provided, it takes precedence.
+  const tag = el.tagName.toLowerCase();
+  const isFormControl = tag === 'input' || tag === 'textarea' || tag === 'select';
+  const hasExplicitInput = Object.keys(props).some(
+    k => (k === 'onInput' || k === 'oninput' || k === 'onChange' || k === 'onchange') && typeof props[k] === 'function'
+  );
+
   for (const [key, value] of Object.entries(props)) {
     if (key === 'children' || value === undefined) continue;
+
+    // ── Auto value binding ─────────────────────────────────────────
+    // Detects <input value={store.prop} /> and sets up two-way binding.
+    if (key === 'value' && isFormControl && !hasExplicitInput) {
+      const access = getLastReactiveAccess();
+      if (access) {
+        const proxy = access.proxy as Record<string, unknown>;
+        bindValue(
+          el as HTMLInputElement,
+          () => String(Reflect.get(access.raw, access.prop)),
+          (v: string) => { proxy[access.prop] = v; }
+        );
+        clearLastReactiveAccess();
+        continue;
+      }
+    }
 
     if (key === 'class' || key === 'className') {
       el.className = String(value ?? '');
@@ -87,6 +114,13 @@ function setProps(
       Object.assign(el.style, value);
     } else if (key === 'ref') {
       if (typeof value === 'function') (value as (el: HTMLElement) => void)(el);
+    } else if (key === 'controller' && typeof value === 'object' && value !== null) {
+      // Directive: <form controller={formController}> — wires up form metadata.
+      // Duck-type check: the controller exposes an _attach method.
+      const controller = value as Record<string, unknown>;
+      if (typeof controller._attach === 'function') {
+        (controller._attach as (el: HTMLElement) => void)(el);
+      }
     } else if (key.startsWith('on') && typeof value === 'function') {
       // Normalize: onClick → click, onChange → change, etc.
       let event = key.slice(2);
@@ -102,8 +136,11 @@ function setProps(
     } else if (key === 'htmlFor') {
       el.setAttribute('for', String(value));
     } else if (key === 'validate' && typeof value === 'function') {
-      // Deferred: installed after the element is in the DOM (see jsx())
+      // Deferred: installed after children are appended (see jsx())
       (el as any).__astraValidate = value;
+    } else if (key === 'minLength' || key === 'maxLength') {
+      // Map JSX camelCase to native lowercase attribute (minlength, maxlength)
+      el.setAttribute(key.toLowerCase(), String(value));
     } else if (value === true) {
       el.setAttribute(key, '');
     } else if (value === false || value === null) {
@@ -115,102 +152,61 @@ function setProps(
 }
 
 // ─── Per-input validate runtime ─────────────────────────────────────────────
+//
+//  ASTRAJS PHILOSOPHY: We delegate to the WEB PLATFORM.
+//
+//  The `validate={fn}` prop is transformed by the AST into a native
+//  `input.addEventListener('input', ...)` that calls `fn` and passes
+//  the result to `input.setCustomValidity()`.
+//
+//  This means:
+//  - The browser's Constraint Validation API handles submit blocking.
+//  - `form.checkValidity()` / `form.reportValidity()` work natively.
+//  - CSS `input:invalid` pseudo-class works automatically.
+//  - No manual error state, no effect(), no ui.errors.
+//
 
-/** Map: input element → validate function. */
-const _validators = new WeakMap<
-  HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement,
-  (value: string) => string | true | Promise<string | true>
->();
+/** Debounce timers per input (for async validators only). */
+const _validateTimers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
 
-/** Map: form element → set of validated inputs inside it. */
-const _formInputs = new WeakMap<
-  HTMLFormElement,
-  Set<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
->();
+const VALIDATE_DEBOUNCE_MS = 300;
 
-/** Debounce timers per input. */
-const _timers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
-
-const DEBOUNCE_MS = 300;
-
-/** Clear error visual state on an input. */
-function clearInputError(el: HTMLElement): void {
-  el.removeAttribute('data-astra-error');
-  el.removeAttribute('aria-invalid');
-  el.classList.remove('astra-invalid');
-}
-
-/** Set error visual state on an input. */
-function setInputError(el: HTMLElement, message: string): void {
-  el.setAttribute('data-astra-error', message);
-  el.setAttribute('aria-invalid', 'true');
-  el.classList.add('astra-invalid');
-}
-
-/** Register an input with its nearest parent form and set up debounced validation. */
+/**
+ * Installs a validate function on an input element.
+ * Called by setProps when it encounters `validate={fn}`.
+ */
 function installInputValidator(
   input: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement,
   validateFn: (value: string) => string | true | Promise<string | true>
 ): void {
-  _validators.set(input, validateFn);
-
-  // Find the nearest parent form
-  const form = input.closest('form');
-  if (form) {
-    let set = _formInputs.get(form);
-    if (!set) {
-      set = new Set();
-      _formInputs.set(form, set);
-      installFormGuard(form);
-    }
-    set.add(input);
-  }
-
-  // Debounced input listener
+  // Debounced input listener → calls setCustomValidity()
   input.addEventListener('input', () => {
-    const timer = _timers.get(input);
+    const timer = _validateTimers.get(input);
     if (timer) clearTimeout(timer);
-    _timers.set(
+
+    _validateTimers.set(
       input,
       setTimeout(async () => {
-        const result = await validateFn(input.value);
-        if (result === true) {
-          clearInputError(input);
-        } else {
-          setInputError(input, result);
+        try {
+          const result = await validateFn(input.value);
+          if (result === true) {
+            // Clear custom validity → browser falls back to native validation
+            input.setCustomValidity('');
+          } else {
+            // Set custom error → browser treats input as :invalid
+            input.setCustomValidity(typeof result === 'string' ? result : 'Invalid');
+          }
+        } catch {
+          // If the validator throws, clear so the input isn't stuck
+          input.setCustomValidity('');
         }
-      }, DEBOUNCE_MS)
+      }, VALIDATE_DEBOUNCE_MS)
     );
   });
-}
 
-/** Add a submit guard to a form that blocks submission if any input has errors. */
-function installFormGuard(form: HTMLFormElement): void {
-  form.addEventListener('submit', async (e: SubmitEvent) => {
-    const inputs = _formInputs.get(form);
-    if (!inputs || inputs.size === 0) return;
-
-    // Run ALL validators (including async ones) before deciding
-    const results = await Promise.all(
-      [...inputs].map(async (input) => {
-        const fn = _validators.get(input);
-        if (!fn) return { input, ok: true as const };
-        const result = await fn(input.value);
-        return { input, ok: result === true ? (true as const) : (false as const), error: result === true ? undefined : result };
-      })
-    );
-
-    const failures = results.filter((r) => !r.ok);
-    if (failures.length > 0) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      // Highlight all failing inputs
-      for (const f of failures) {
-        setInputError(f.input as HTMLElement, f.error ?? 'Invalid');
-      }
-    }
-    // If all passed, let the event proceed to the user's onSubmit handler
-  }, { capture: true });
+  // Also run immediately so the initial state is validated.
+  // Do NOT bubble — would trigger form controller refresh during render.
+  input.dispatchEvent(new Event('input'));
 }
 
 /** Called after setProps to finalize validate on inputs. */

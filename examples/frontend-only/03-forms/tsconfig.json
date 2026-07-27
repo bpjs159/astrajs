@@ -11,7 +11,7 @@
       "@astrajs/validation": ["../../../packages/validation/src"],
       "@astrajs/compiler/css": ["../../../packages/compiler/src/css"],
       "@astrajs/compiler": ["../../../packages/compiler/src"],
-      "@astrajs/schema": ["../../../packages/schema/src"]
+      "@astrajs/form": ["../../../packages/form/src"],
     }
   },
   "include": [

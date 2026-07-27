@@ -17,7 +17,7 @@ declare namespace JSX {
    * AstraJS JSX elements are real, live DOM nodes — not virtual representations.
    * This is the foundation of Zero-VDOM: components return physical DOM.
    */
-  type Element = HTMLElement | DocumentFragment;
+  type Element = HTMLElement | DocumentFragment | false | null | undefined;
 
   /**
    * Children can be any renderable value.
@@ -240,11 +240,16 @@ declare namespace JSX {
     disabled?: boolean;
     required?: boolean;
     checked?: boolean;
+    /** Native HTML5 constraint: minimum string length (maps to `minlength` attribute). */
+    minLength?: number;
+    /** Native HTML5 constraint: maximum string length (maps to `maxlength` attribute). */
+    maxLength?: number;
     /**
      * Inline async validator.
      * Return `true` if valid, or a string error message if invalid.
-     * Supports async (server checks, DB lookups) and sync (cross-field comparison).
-     * Automatically debounced. Errors are set as `data-astra-error` on the element.
+     * The AST transforms this into `input.setCustomValidity()` so the
+     * browser's native Constraint Validation API handles submit blocking,
+     * `input:invalid` CSS, and `form.checkValidity()`.
      */
     validate?: (value: string) => string | true | Promise<string | true>;
   }
@@ -275,9 +280,11 @@ declare namespace JSX {
   interface FormHTMLAttributes<T> extends HTMLAttributes<T> {
     action?: string;
     method?: 'get' | 'post';
+    /** Attaches a form metadata controller from @astrajs/form. */
+    controller?: object;
     /**
      * Called on validation failure with a map of field→error messages.
-     * Only active when astra-schema is present on the form.
+     * Used with `astra-schema` on the form element.
      */
     onError?: (errors: Record<string, string>) => void;
     /**
@@ -303,6 +310,8 @@ declare namespace JSX {
     placeholder?: string;
     disabled?: boolean;
     required?: boolean;
+    minLength?: number;
+    maxLength?: number;
     /** Inline async validator — same contract as input.validate. */
     validate?: (value: string) => string | true | Promise<string | true>;
   }

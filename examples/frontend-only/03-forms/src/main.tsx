@@ -1,89 +1,135 @@
 /**
- * 03 — Per-Input validate()
+ * 03 — @astrajs/form Controller
  *
- * Cada input define su propia validación inline:
- * - Async: chequea el servidor (debounce automático)
- * - Cross-field: compara contra otro campo del store
- * - Sync: reglas simples como min length o email
+ * Data layer:  @astrajs/core store (ui.email, ui.password…)
+ * Meta layer:  @astrajs/form controller (errors, touched, isDirty…)
+ * Validation:  Browser Constraint Validation API + setCustomValidity()
  *
- * El form intercepta el submit: si algún validate() falla, se bloquea.
- * Si todos pasan, tu onSubmit se ejecuta normalmente.
+ * Cero efectos. Cero reimplementación de validación.
  */
 import { component, store } from '@astrajs/core';
-import { isEmail, isRequired, minLength, all } from '@astrajs/core/validation';
+import { form } from '@astrajs/form';
 
-// Simulación de "base de datos" de usuarios existentes
 const takenUsernames = new Set(['admin', 'root', 'test']);
 
 export const Form = component(() => {
-  const ui = store({ username: '', email: '', password: '', confirm: '', success: false });
+  // ── Data (pure values) ──────────────────────────────────────────
+  const ui = store({
+    username: '',
+    email: '',
+    password: '',
+    confirm: '',
+    success: false,
+    isSubmitting: false,
+    submitCount: 0,
+  });
+
+  // ── Metadata (errors, touched, isDirty…) — READ-ONLY ─────────────
+  const formCtrl = form();
+
+  const handleSubmit = (e: SubmitEvent) => {
+    e.preventDefault();
+    ui.submitCount++;
+    if (!formCtrl.isValid) {
+      formCtrl.focusFirstError();
+      return;
+    }
+    ui.isSubmitting = true;
+    // Simulate API call
+    setTimeout(() => {
+      ui.isSubmitting = false;
+      ui.success = true;
+      formCtrl.reset();
+      setTimeout(() => { ui.success = false; }, 3000);
+    }, 800);
+  };
 
   return (
     <div class="form-card">
-      <h1>Per-Input Validation</h1>
-      <p class="subtitle">Async · Cross-Field · Sync — usando @astrajs/validation</p>
+      <h1>@astrajs/form</h1>
+      <p class="subtitle">Data + Metadata + Native Validation</p>
 
-      <form onSubmit={(e: SubmitEvent) => {
-        e.preventDefault();
-        ui.success = true;
-        setTimeout(() => { ui.success = false; }, 3000);
-      }}>
+      <form controller={formCtrl} onSubmit={handleSubmit}>
+        {/* ── Error box — only shows touched fields ── */}
+        <>{(() => {
+          const touchedErrors = Object.entries(formCtrl.errors).filter(
+            ([field]) => formCtrl.touched[field]
+          );
+          return touchedErrors.length > 0 ? (
+            <div class="error-summary">
+              <strong>Errors ({touchedErrors.length})</strong>
+              <ul>
+                {touchedErrors.map(([field, code]) => (
+                  <li><code>{field}</code> — {code}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null;
+        })()}</>
+
         <div class="field">
           <label>
             Username
             <span class="badge badge-async">async</span>
-            <span class="badge badge-compose">composed</span>
           </label>
           <input
             name="username"
             type="text"
+            required
+            minLength={3}
             placeholder="Pick a username"
             value={ui.username}
-            onInput={(e) => ui.username = (e.target as HTMLInputElement).value}
-            validate={all([
-              isRequired,
-              minLength(3),
-              async (val: string) => {
-                await new Promise(r => setTimeout(r, 500));
-                return takenUsernames.has(val.toLowerCase())
-                  ? 'Username already taken'
-                  : true;
-              },
-            ])}
+            validate={async (val: string) => {
+              await new Promise(r => setTimeout(r, 500));
+              return takenUsernames.has(val.toLowerCase())
+                ? 'Username already taken'
+                : true;
+            }}
           />
-          <p class="error-msg" data-error-for="username" />
+          {formCtrl.touched.username && formCtrl.errors.username === 'required' && (
+            <p class="error-msg">Required</p>
+          )}
+          {formCtrl.touched.username && formCtrl.errors.username === 'minlength' && (
+            <p class="error-msg">At least 3 characters</p>
+          )}
+          {formCtrl.errors.username && formCtrl.errors.username !== 'required' && formCtrl.errors.username !== 'minlength' && (
+            <p class="error-msg">{formCtrl.errors.username}</p>
+          )}
         </div>
 
         <div class="field">
-          <label>
-            Email
-            <span class="badge badge-module">validator</span>
-          </label>
+          <label>Email</label>
           <input
             name="email"
             type="email"
+            required
             placeholder="you@example.com"
             value={ui.email}
-            onInput={(e) => ui.email = (e.target as HTMLInputElement).value}
-            validate={all([isRequired, isEmail])}
           />
-          <p class="error-msg" data-error-for="email" />
+          {formCtrl.touched.email && formCtrl.errors.email === 'required' && (
+            <p class="error-msg">Required</p>
+          )}
+          {formCtrl.touched.email && formCtrl.errors.email === 'type' && (
+            <p class="error-msg">Invalid email format</p>
+          )}
         </div>
 
         <div class="field">
-          <label>
-            Password
-            <span class="badge badge-module">validator</span>
-          </label>
+          <label>Password</label>
           <input
             name="password"
             type="password"
+            required
+            minLength={6}
             placeholder="Min 6 characters"
             value={ui.password}
-            onInput={(e) => ui.password = (e.target as HTMLInputElement).value}
-            validate={all([isRequired, minLength(6)])}
           />
-          <p class="error-msg" data-error-for="password" />
+          {formCtrl.touched.password && formCtrl.errors.password === 'required' && (
+            <p class="error-msg">Required</p>
+          )}
+          {formCtrl.touched.password && formCtrl.errors.password === 'minlength' && (
+            <p class="error-msg">At least 6 characters</p>
+          )}
         </div>
 
         <div class="field">
@@ -94,31 +140,40 @@ export const Form = component(() => {
           <input
             name="confirm"
             type="password"
+            required
             placeholder="Repeat password"
             value={ui.confirm}
-            onInput={(e) => ui.confirm = (e.target as HTMLInputElement).value}
             validate={(val: string) =>
               val === ui.password ? true : 'Passwords do not match'
             }
           />
-          <p class="error-msg" data-error-for="confirm" />
+          {formCtrl.touched.confirm && formCtrl.errors.confirm && (
+            <p class="error-msg">{formCtrl.errors.confirm}</p>
+          )}
         </div>
 
-        <button class="btn-submit" type="submit">Create Account</button>
+        <button
+          class="btn-submit"
+          type="submit"
+          disabled={!formCtrl.isDirty || ui.isSubmitting}
+        >
+          {ui.isSubmitting ? 'Creating…' : 'Create Account'}
+        </button>
 
-        {ui.success ? <div class="success">Account created!</div> : <></>}
+        <>{ui.success ? <div class="success">Account created!</div> : <></>}</>
       </form>
 
       <div class="live-preview">
         <h3>How it works</h3>
-        <div class="preview-item"><span><code>all([isRequired, minLength(3), async…])</code></span><span class="badge badge-compose">Composed · Async</span></div>
-        <div class="preview-item"><span><code>all([isRequired, isEmail])</code></span><span class="badge badge-module">Validation module</span></div>
-        <div class="preview-item"><span><code>all([isRequired, minLength(6)])</code></span><span>Factory validator</span></div>
-        <div class="preview-item"><span>Cross-field</span><span>Inline compare</span></div>
-        <div class="preview-item"><span>Form submit</span><span>Blocked until all pass</span></div>
+        <div class="preview-item"><span><code>controller={'{formCtrl}'}</code></span><span class="badge badge-auto">Auto-wired</span></div>
+        <div class="preview-item"><span><code>formCtrl.errors.email</code></span><span>Error codes (i18n-safe)</span></div>
+        <div class="preview-item"><span><code>formCtrl.touched.email</code></span><span>Show after blur</span></div>
+        <div class="preview-item"><span><code>formCtrl.isDirty</code></span><span>Button disabled</span></div>
+        <div class="preview-item"><span><code>ui.isSubmitting</code></span><span>Loading state (store)</span></div>
+        <div class="preview-item"><span><code>ui.submitCount</code></span><span>Attempts (store)</span></div>
+        <div class="preview-item"><span><code>formCtrl.focusFirstError()</code></span><span>Scroll to error</span></div>
       </div>
     </div>
   );
 });
-
 

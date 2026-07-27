@@ -31,6 +31,10 @@ export {
   toProxy,
   STORE_SYMBOL,
   captureReactiveExpression,
+  getLastReactiveAccess,
+  clearLastReactiveAccess,
+  isBindingUpdate,
+  setBindingUpdate,
   setComponentCache,
   clearComponentCache,
 } from './runtime/store.js';

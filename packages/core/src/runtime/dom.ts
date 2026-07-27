@@ -14,6 +14,7 @@
  */
 
 import { effect } from './effect.js';
+import { setBindingUpdate } from './store.js';
 
 /**
  * Binds a TextNode's `.data` (or `.textContent`) to a reactive expression.
@@ -120,7 +121,12 @@ export function bindValue(
 
   if (setter) {
     const handler = (): void => {
+      // Mark this mutation as coming from a DOM input binding.
+      // This prevents the component() wrapper from re-rendering
+      // and replacing the input element (which would lose focus).
+      setBindingUpdate(true);
       setter(el.value);
+      setBindingUpdate(false);
     };
     el.addEventListener('input', handler);
     // Store for potential cleanup
