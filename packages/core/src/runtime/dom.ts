@@ -124,7 +124,7 @@ export function bindValue(
     };
     el.addEventListener('input', handler);
     // Store for potential cleanup
-    (el as Record<string, unknown>).__astra_value_handler = handler;
+    (el as unknown as Record<string, unknown>).__astra_value_handler = handler;
   }
 }
 
@@ -148,7 +148,6 @@ export function bindList<T>(
   render: (item: T, index: number) => HTMLElement | DocumentFragment,
   keyFn?: (item: T, index: number) => string | number
 ): void {
-  let prevItems: readonly T[] = [];
   // Map from key to DOM node
   const nodeMap = new Map<string | number, ChildNode>();
 
@@ -182,7 +181,7 @@ export function bindList<T>(
         // New item — render and store
         const rendered = render(item, i);
         node = rendered instanceof DocumentFragment
-          ? rendered.firstChild ?? rendered
+          ? (rendered.firstChild ?? rendered) as ChildNode
           : rendered;
         if (node) {
           nodeMap.set(key, node);
@@ -197,7 +196,5 @@ export function bindList<T>(
     // Replace all children at once (single DOM operation)
     el.textContent = '';
     el.appendChild(fragment);
-
-    prevItems = nextItems;
   });
 }

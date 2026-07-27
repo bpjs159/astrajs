@@ -25,10 +25,12 @@
 
 import { effect } from './effect.js';
 import { setComponentCache, clearComponentCache } from './store.js';
+import { flushMountCallbacks, triggerUnmount, hasPendingMountCallbacks } from './lifecycle.js';
 
 /**
  * Wraps a component function so JSX expressions referencing
  * reactive stores auto-update the DOM when the store changes.
+ * Also wires up `onMount`/unmount lifecycle hooks.
  */
 export function component<P extends Record<string, unknown>>(
   fn: (props: P) => JSX.Element
@@ -40,12 +42,24 @@ export function component<P extends Record<string, unknown>>(
     let storeCounter = 0;
 
     effect(() => {
+      // Trigger unmount on old children before replacing
+      while (wrapper.firstChild) {
+        const child = wrapper.firstChild;
+        if (child instanceof HTMLElement) triggerUnmount(child);
+        child.remove();
+      }
+
       storeCounter = 0;
       setComponentCache(storeCache, () => storeCounter++);
       const newRoot = fn(props);
       clearComponentCache();
-      while (wrapper.firstChild) wrapper.firstChild.remove();
+
       wrapper.appendChild(newRoot);
+
+      // Flush any onMount callbacks collected during render
+      if (hasPendingMountCallbacks()) {
+        flushMountCallbacks(wrapper);
+      }
     });
 
     return wrapper as JSX.Element;

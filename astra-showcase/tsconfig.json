@@ -7,8 +7,6 @@
     "jsx": "react-jsx",
     "jsxImportSource": "@astrajs/core",
     "types": [],
-    "baseUrl": ".",
-    "ignoreDeprecations": "6.0",
     "paths": {
       "@astrajs/core": ["../packages/core/src"],
       "@astrajs/core/jsx-runtime": ["../packages/core/src/jsx-runtime"],

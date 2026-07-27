@@ -10,6 +10,12 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./validation": {
+      "development": "./src/validation.ts",
+      "types": "./dist/validation.d.ts",
+      "import": "./dist/validation.js",
+      "default": "./dist/validation.js"
+    },
     "./vite": {
       "development": "./src/compiler/index.ts",
       "types": "./dist/compiler/index.d.ts",
@@ -30,6 +36,7 @@
   "typesVersions": {
     "*": {
       "*": ["./dist/index.d.ts"],
+      "validation": ["./dist/validation.d.ts"],
       "vite": ["./dist/compiler/index.d.ts"]
     }
   },
@@ -46,7 +53,9 @@
     "clean": "rm -rf dist",
     "test": "vitest run"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@astrajs/validation": "workspace:*"
+  },
   "devDependencies": {
     "typescript": "^5.5.0",
     "vitest": "^2.0.0"

@@ -54,6 +54,9 @@ export {
 // Component wrapper
 export { component } from './runtime/component.js';
 
+// Lifecycle
+export { onMount } from './runtime/lifecycle.js';
+
 // ─── Public Types ────────────────────────────────────────────────────────────
 
 /**
@@ -78,8 +81,8 @@ export interface StoreOptions {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type StoreState<T> = T extends { [Symbol.iterator]?: any }
   ? never
-  : T extends ReturnType<typeof import('./runtime/store.js').store<infer U>>
-    ? U
+  : T extends object
+    ? T
     : never;
 
 /**

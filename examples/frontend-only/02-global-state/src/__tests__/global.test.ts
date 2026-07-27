@@ -1,16 +1,21 @@
 import { describe, it, expect } from 'vitest';
-import { appStore, LikesDislikes } from '../main.js';
+import { appStore, total } from '../store.js';
+import { LikesDislikes } from '../likes.js';
+import { TotalBox } from '../total.js';
 
 describe('Global State', () => {
-  it('appStore starts with all values at 0', () => {
-    expect(appStore.likes).toBe(0);
-    expect(appStore.dislikes).toBe(0);
-    expect(appStore.comments).toBe(0);
+  it('appStore is shared — mutations affect total', () => {
+    appStore.likes = 5;
+    appStore.dislikes = 2;
+    appStore.comments = 3;
+    expect(total()).toBe(10);
+    appStore.likes = 0; appStore.dislikes = 0; appStore.comments = 0;
   });
 
-  it('appStore mutations work reactively', () => {
-    appStore.likes = 5;
-    expect(appStore.likes).toBe(5);
-    appStore.likes = 0; // reset
+  it('components are importable', () => {
+    const a = LikesDislikes({});
+    const b = TotalBox({});
+    expect(a).toBeInstanceOf(HTMLElement);
+    expect(b).toBeInstanceOf(HTMLElement);
   });
 });

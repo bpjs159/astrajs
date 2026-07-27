@@ -3,11 +3,12 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "@astrajs/core",
-    "ignoreDeprecations": "6.0",
-    "rootDir": "../../..", "baseUrl": ".",
+    "rootDir": "../../..",
     "paths": {
       "@astrajs/core": ["../../../packages/core/src"],
-      "@astrajs/core/jsx-runtime": ["../../../packages/core/src/jsx-runtime"]
+      "@astrajs/core/jsx-runtime": ["../../../packages/core/src/jsx-runtime"],
+      "@astrajs/compiler/css": ["../../../packages/compiler/src/css"],
+      "@astrajs/compiler": ["../../../packages/compiler/src"]
     }
   },
   "include": [

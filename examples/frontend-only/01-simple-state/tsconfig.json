@@ -3,8 +3,6 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "@astrajs/core",
-    "ignoreDeprecations": "6.0",
-    "baseUrl": ".",
     "rootDir": "../../..",
     "noEmit": true,
     "paths": {

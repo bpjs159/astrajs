@@ -137,6 +137,19 @@ importers:
         specifier: ^5.4.0
         version: 5.4.21
 
+  examples/frontend-only/08-lifecycle:
+    dependencies:
+      '@astrajs/core':
+        specifier: workspace:*
+        version: link:../../../packages/core
+    devDependencies:
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
+      vite:
+        specifier: ^5.4.0
+        version: 5.4.21
+
   examples/fullstack-ssr/01-server-dynamic:
     dependencies:
       '@astrajs/core':
@@ -205,6 +218,10 @@ importers:
         version: 2.1.9(jsdom@29.1.1)
 
   packages/core:
+    dependencies:
+      '@astrajs/validation':
+        specifier: workspace:*
+        version: link:../validation
     devDependencies:
       typescript:
         specifier: ^5.5.0
@@ -225,6 +242,12 @@ importers:
       vitest:
         specifier: ^2.0.0
         version: 2.1.9(jsdom@29.1.1)
+
+  packages/schema:
+    dependencies:
+      '@astrajs/core':
+        specifier: workspace:*
+        version: link:../core
 
   packages/server:
     dependencies:
@@ -257,6 +280,12 @@ importers:
       vitest:
         specifier: ^2.0.0
         version: 2.1.9(jsdom@29.1.1)
+
+  packages/validation:
+    devDependencies:
+      typescript:
+        specifier: ^5.5.0
+        version: 5.9.3
 
 packages:
 

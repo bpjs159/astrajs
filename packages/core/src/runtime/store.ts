@@ -53,7 +53,6 @@ let currentTracker: (() => void) | null = null;
  *
  * This is what makes `{ui.valor}` work transparently in JSX.
  */
-let lastReactiveGetter: (() => string) | null = null;
 let reactiveAccessDetected = false;
 
 /** Symbol to mark store proxies — detectable by JSX runtime */
@@ -69,7 +68,6 @@ export function captureReactiveExpression<T>(fn: () => T): {
   getter: (() => string) | null;
 } {
   reactiveAccessDetected = false;
-  lastReactiveGetter = null;
 
   const prevTracker = currentTracker;
   // Set a temporary tracker that captures the access
