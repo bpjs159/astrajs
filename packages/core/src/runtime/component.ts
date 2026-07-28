@@ -23,7 +23,11 @@
  */
 
 import { setComponentCache, clearComponentCache } from './store.js';
-import { flushMountCallbacks, hasPendingMountCallbacks } from './lifecycle.js';
+import {
+  flushMountCallbacks,
+  hasPendingMountCallbacks,
+  setCurrentWrapper,
+} from './lifecycle.js';
 
 export function component<P extends Record<string, unknown>>(
   fn: (props: P) => JSX.Element
@@ -37,14 +41,20 @@ export function component<P extends Record<string, unknown>>(
     // ZERO-VDOM: Execute fn ONCE to build the initial DOM.
     // store() calls are cached so the same proxy is reused if
     // the component is re-invoked (e.g., inside a dynamic() block).
+    //
+    // Set this wrapper as the current lifecycle context so mounted()
+    // calls register against it. If the wrapper is never connected,
+    // its callbacks are simply never flushed (no cross-contamination).
     setComponentCache(storeCache, () => storeCounter++);
+    const prevWrapper = setCurrentWrapper(wrapper);
     const root = fn(props);
+    setCurrentWrapper(prevWrapper);
     clearComponentCache();
 
     wrapper.appendChild(root as Node);
 
     // Fire mount callbacks after the wrapper enters the live DOM.
-    if (hasPendingMountCallbacks()) {
+    if (hasPendingMountCallbacks(wrapper)) {
       queueMicrotask(() => {
         if (wrapper.isConnected) {
           flushMountCallbacks(wrapper);

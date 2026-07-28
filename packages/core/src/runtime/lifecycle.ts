@@ -18,14 +18,23 @@ type UnmountCallback = () => void;
 
 interface LifecycleEntry {
   callback: MountCallback;
-  /** The component wrapper element this is bound to. */
-  element: HTMLElement | null;
 }
 
-/** Pending callbacks waiting for DOM attachment. */
-let pendingCallbacks: LifecycleEntry[] = [];
+/**
+ * Pending mount callbacks, keyed by component wrapper element.
+ * Each component instance owns its callbacks — no cross-contamination
+ * when a component is created but never connected to the DOM.
+ */
+const pendingByWrapper = new Map<HTMLElement, LifecycleEntry[]>();
 
-/** Active cleanup functions, keyed by element (via data attribute index). */
+/**
+ * The currently executing component wrapper.
+ * Set by `component()` before calling `fn(props)`, restored after.
+ * `mounted()` registers callbacks against this wrapper.
+ */
+let _currentWrapper: HTMLElement | null = null;
+
+/** Active cleanup functions, keyed by element. */
 const activeCleanups = new Map<HTMLElement, UnmountCallback>();
 
 /** Single shared MutationObserver for detecting element removal. */
@@ -91,27 +100,58 @@ getObserver();
  * ```
  */
 export function mounted(fn: MountCallback): void {
-  pendingCallbacks.push({ callback: fn, element: null });
+  if (!_currentWrapper) {
+    // No active component wrapper — this is a programming error.
+    // mounted() must be called synchronously inside a component() function.
+    return;
+  }
+  let entries = pendingByWrapper.get(_currentWrapper);
+  if (!entries) {
+    entries = [];
+    pendingByWrapper.set(_currentWrapper, entries);
+  }
+  entries.push({ callback: fn });
+}
+
+/**
+ * Sets the current component wrapper. Called by `component()` before
+ * executing the component function, so `mounted()` calls register
+ * against the correct wrapper.
+ *
+ * Returns the previous wrapper so it can be restored (stack-based).
+ */
+export function setCurrentWrapper(wrapper: HTMLElement): HTMLElement | null {
+  const prev = _currentWrapper;
+  _currentWrapper = wrapper;
+  return prev;
+}
+
+/**
+ * Returns whether the given wrapper has pending mount callbacks.
+ */
+export function hasPendingMountCallbacks(wrapper: HTMLElement): boolean {
+  const entries = pendingByWrapper.get(wrapper);
+  return entries !== undefined && entries.length > 0;
 }
 
 /**
  * Flushes pending mount callbacks for a given wrapper element.
  * Called internally by `component()` after appending to the DOM.
  *
- * @param wrapper — The component's root wrapper element.
+ * Only callbacks registered against this specific wrapper are fired —
+ * callbacks from sibling components or from never-connected wrappers
+ * are unaffected.
  */
 /** Track which wrappers have already fired mount callbacks. */
 const _mountedWrappers = new WeakSet<HTMLElement>();
 
 export function flushMountCallbacks(wrapper: HTMLElement): void {
-  if (_mountedWrappers.has(wrapper)) {
-    pendingCallbacks = [];
-    return;
-  }
+  if (_mountedWrappers.has(wrapper)) return;
   _mountedWrappers.add(wrapper);
 
-  const callbacks = pendingCallbacks;
-  pendingCallbacks = [];
+  const callbacks = pendingByWrapper.get(wrapper);
+  if (!callbacks || callbacks.length === 0) return;
+  pendingByWrapper.delete(wrapper);
 
   // Defer so the wrapper is in the DOM when callbacks fire.
   // In the Zero-VDOM architecture, mount callbacks can safely modify
@@ -119,7 +159,6 @@ export function flushMountCallbacks(wrapper: HTMLElement): void {
   // (O(1) surgical DOM updates), not a full component re-render.
   queueMicrotask(() => {
     for (const entry of callbacks) {
-      entry.element = wrapper;
       const cleanup = entry.callback();
       if (typeof cleanup === 'function') {
         wrapper.setAttribute('data-astra-lifecycle', '');
@@ -150,12 +189,4 @@ export function triggerUnmount(element: HTMLElement): void {
       activeCleanups.delete(el as HTMLElement);
     }
   });
-}
-
-/**
- * Returns whether there are pending mount callbacks.
- * Used internally by `component()` to decide whether to flush.
- */
-export function hasPendingMountCallbacks(): boolean {
-  return pendingCallbacks.length > 0;
 }
