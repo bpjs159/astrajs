@@ -375,6 +375,204 @@ export function autoWrapDynamic(
   return { code: result, needsDynamic };
 }
 
+// ─── Auto-Memoization Transformer ────────────────────────────────────────────
+
+/**
+ * Auto-wraps derived arrow functions with `memo()` for automatic
+ * lazy evaluation and caching. The developer writes plain arrow functions;
+ * the compiler injects `memo()` invisibly.
+ *
+ * ## Transformation
+ *
+ * **Input:**
+ * ```ts
+ * const total = () => ui.x + ui.y;
+ * ```
+ *
+ * **Output (AST-injected):**
+ * ```ts
+ * import { memo } from '@astrajs/core';
+ * const total = memo(() => ui.x + ui.y);
+ * ```
+ *
+ * ## Detection Heuristic
+ *
+ * A variable declaration is eligible for auto-memoization when:
+ * 1. It's initialized with an arrow function (`() => expr`)
+ * 2. The arrow body references at least one reactive store variable
+ * 3. It's NOT already wrapped in `memo(...)`
+ * 4. It's NOT an event handler (name starts with `on` or `handle`)
+ * 5. The arrow body is a single expression (not a block with statements)
+ *
+ * Arrow functions with block bodies (`() => { ... }`) are NOT memoized
+ * automatically because they may contain side effects.
+ *
+ * @param source  — The full source code of a .tsx/.jsx file.
+ * @param reactiveVars — Set of variable names from `store()` declarations.
+ * @returns Transformed source with `memo()` wrappers injected.
+ */
+export function autoMemoDerivedFunctions(
+  source: string,
+  reactiveVars: Set<string>
+): { code: string; needsMemo: boolean } {
+  let needsMemo = false;
+
+  const sourceFile = ts.createSourceFile(
+    '__astra_memo.tsx',
+    source,
+    ts.ScriptTarget.Latest,
+    /* setParentNodes */ true,
+    ts.ScriptKind.TSX
+  );
+
+  // Collect replacements (start, end, newText) — applied in reverse order
+  const replacements: Array<{ start: number; end: number; text: string }> = [];
+
+  /**
+   * Returns true if the given range falls inside an existing replacement.
+   */
+  function isInsideExisting(start: number, end: number): boolean {
+    for (const r of replacements) {
+      if (start >= r.start && end <= r.end) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Checks whether the expression references any reactive store variable.
+   * Walks the AST subtree looking for identifiers matching known store vars.
+   */
+  function referencesReactiveVar(node: ts.Node): boolean {
+    let found = false;
+    function check(n: ts.Node): void {
+      if (found) return;
+      if (ts.isIdentifier(n) && reactiveVars.has(n.text)) {
+        found = true;
+        return;
+      }
+      ts.forEachChild(n, check);
+    }
+    check(node);
+    return found;
+  }
+
+  /**
+   * Returns true if the node is a call to `memo(...)`.
+   */
+  function isAlreadyMemo(node: ts.Node): boolean {
+    if (ts.isCallExpression(node)) {
+      const callee = node.expression;
+      if (ts.isIdentifier(callee) && callee.text === 'memo') {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Returns true if the variable name looks like an event handler.
+   * Event handlers should NOT be memoized (they have side effects).
+   */
+  function isEventHandler(name: string): boolean {
+    return /^(on|handle)[A-Z]/.test(name) || name.startsWith('on');
+  }
+
+  function visit(node: ts.Node): void {
+    // ── Variable declaration: const name = () => expr ──────────────────
+    if (ts.isVariableDeclaration(node)) {
+      const decl = node as ts.VariableDeclaration;
+      const initializer = decl.initializer;
+      const name = decl.name;
+
+      // Only process named variables (not destructuring patterns)
+      if (!ts.isIdentifier(name)) {
+        ts.forEachChild(node, visit);
+        return;
+      }
+
+      const varName = name.text;
+
+      // Skip event handlers
+      if (isEventHandler(varName)) {
+        ts.forEachChild(node, visit);
+        return;
+      }
+
+      // Must have an initializer
+      if (!initializer) {
+        ts.forEachChild(node, visit);
+        return;
+      }
+
+      // Must be an arrow function
+      if (!ts.isArrowFunction(initializer)) {
+        ts.forEachChild(node, visit);
+        return;
+      }
+
+      // Skip if already wrapped in memo()
+      if (isAlreadyMemo(initializer)) {
+        ts.forEachChild(node, visit);
+        return;
+      }
+
+      const arrowFn = initializer as ts.ArrowFunction;
+
+      // Only memoize expression-body arrows: () => expr
+      // Block-body arrows () => { ... } may have side effects
+      if (!ts.isConciseBody(arrowFn)) {
+        ts.forEachChild(node, visit);
+        return;
+      }
+
+      // Check if the body references reactive store variables
+      const body = arrowFn.body;
+      if (!body) {
+        ts.forEachChild(node, visit);
+        return;
+      }
+
+      if (!referencesReactiveVar(body)) {
+        ts.forEachChild(node, visit);
+        return;
+      }
+
+      // Get the source text of the arrow function
+      const start = initializer.getStart(sourceFile);
+      const end = initializer.getEnd();
+
+      if (isInsideExisting(start, end)) {
+        ts.forEachChild(node, visit);
+        return;
+      }
+
+      const arrowText = initializer.getText(sourceFile);
+
+      replacements.push({
+        start,
+        end,
+        text: `memo(${arrowText})`,
+      });
+      needsMemo = true;
+
+      ts.forEachChild(node, visit);
+      return;
+    }
+
+    ts.forEachChild(node, visit);
+  }
+
+  visit(sourceFile);
+
+  // Apply replacements from end to start to preserve offsets
+  let result = source;
+  for (const r of replacements.sort((a, b) => b.start - a.start)) {
+    result = result.slice(0, r.start) + r.text + result.slice(r.end);
+  }
+
+  return { code: result, needsMemo };
+}
+
 // ─── JSX → DOM Code Generator ────────────────────────────────────────────────
 
 /**

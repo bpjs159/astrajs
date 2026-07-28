@@ -1,7 +1,7 @@
 /**
  * @astrajs/compiler — Transformers Barrel
  */
-export { transformJSX } from './jsx.js';
+export { transformJSX, autoWrapDynamic, autoMemoDerivedFunctions } from './jsx.js';
 export type { JSXTransformResult } from './jsx.js';
 
 export { transformCSS } from './css.js';

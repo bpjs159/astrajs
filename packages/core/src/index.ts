@@ -5,11 +5,18 @@
  *
  * AstraJS Core provides:
  * - `store()` — ES6 Proxy-based fine-grained reactivity (~3KB)
- * - `memo()` / `batch()` / `untrack()` — Derived values and batching
  * - `dynamic()` — Zero-VDOM reactive expression marker
  * - DOM bindings — `bindText`, `bindAttr`, `bindClass`, `bindConditional`, etc.
  * - `component()` — Declarative component wrapper (single execution)
  * - `mounted()` — DOM lifecycle hook
+ *
+ * ## Auto-Optimization (Zero-Config)
+ *
+ * AstraJS automatically optimizes your code at build time:
+ * - **Auto-Batching:** Multiple synchronous mutations are grouped via
+ *   `queueMicrotask()`. No manual `batch()` needed.
+ * - **Auto-Memoization:** Derived arrow functions (`() => expr`) that read
+ *   from stores are automatically wrapped in `memo()` by the AST compiler.
  *
  * `effect()` is an internal primitive — use `dynamic()`, `bindText()`,
  * or `bindList()` for reactivity. Never exposed to application code.
@@ -29,10 +36,14 @@ export {
   setBindingUpdate,
   setComponentCache,
   clearComponentCache,
+  /** @internal Auto-batch flush for testing */
+  flushPending,
 } from './runtime/store.js';
 
 export {
+  /** @internal Auto-injected by the AST compiler. Do not use directly. */
   memo,
+  /** @internal Framework primitive. Auto-batching handles this transparently. */
   batch,
   untrack,
 } from './runtime/effect.js';
@@ -62,8 +73,10 @@ export { mounted } from './runtime/lifecycle.js';
 export { classes } from './runtime/classes.js';
 export type { ClassValue } from './runtime/classes.js';
 
-// Effect primitive (for advanced custom reactive logic)
-export { effect } from './runtime/effect.js';
+// Effect primitive — internal, used by bindText/bindAttr/dynamic/mounted.
+// Not part of the public API. Developers use mounted() for side effects.
+export { /** @internal Framework primitive. Use `mounted()` for side effects. */
+effect } from './runtime/effect.js';
 
 // ─── Public Types ────────────────────────────────────────────────────────────
 

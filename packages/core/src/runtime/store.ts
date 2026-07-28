@@ -182,9 +182,26 @@ const proxyToRaw = new WeakMap<object, object>();
 /**
  * Whether we're currently inside a batch. When batched, notifications are
  * queued rather than executed immediately.
+ *
+ * With auto-batching (queueMicrotask), batch() is now an internal primitive
+ * for framework use. User code gets automatic batching via the microtask queue.
  */
 let batchDepth = 0;
 const pendingNotifications = new Set<() => void>();
+let microtaskScheduled = false;
+
+/**
+ * Schedules a microtask to flush pending notifications.
+ * Uses a single queued microtask for all mutations in the current synchronous block.
+ */
+function scheduleMicrotaskFlush(): void {
+  if (microtaskScheduled) return;
+  microtaskScheduled = true;
+  queueMicrotask(() => {
+    microtaskScheduled = false;
+    flushPending();
+  });
+}
 
 // ─── Tracker Context ─────────────────────────────────────────────────────────
 
@@ -230,6 +247,10 @@ export function track(raw: object, prop: string | symbol): void {
 /**
  * Notifies all subscribers that depend on `raw[prop]` that the value changed.
  * Called from the Proxy's `set` trap.
+ *
+ * With auto-batching, notifications are deferred via `queueMicrotask()`.
+ * Multiple synchronous mutations (e.g. `ui.x++; ui.y++;`) are automatically
+ * grouped into a single notification cycle — no manual `batch()` needed.
  */
 export function trigger(raw: object, prop: string | symbol): void {
   const propMap = rawDeps.get(raw);
@@ -246,29 +267,38 @@ export function trigger(raw: object, prop: string | symbol): void {
     return;
   }
 
-  if (batchDepth > 0) {
-    // Queue for batch flush
-    for (const sub of subscribers) {
-      pendingNotifications.add(sub);
-    }
-  } else {
-    // Execute immediately
-    for (const sub of subscribers) {
-      sub();
-    }
+  // Queue all subscribers for deferred execution
+  for (const sub of subscribers) {
+    pendingNotifications.add(sub);
   }
+
+  if (batchDepth > 0) {
+    // Inside explicit batch(): defer to batch flush, do NOT schedule microtask
+    return;
+  }
+
+  // Auto-batching: schedule a single microtask to flush all pending notifications.
+  // If multiple mutations happen synchronously, they all share the same microtask.
+  scheduleMicrotaskFlush();
 }
 
 // ─── Batch Processing ────────────────────────────────────────────────────────
 
 /**
  * Flushes all pending notifications collected during a batch.
+ * Also used by tests to synchronously flush auto-batched notifications.
  */
-function flushPending(): void {
-  for (const sub of pendingNotifications) {
-    sub();
+export function flushPending(): void {
+  // Take a snapshot: flushing may trigger cascading mutations
+  // that add more subscribers to pendingNotifications.
+  // We loop until the set is empty to handle cascading effects.
+  while (pendingNotifications.size > 0) {
+    const snapshot = [...pendingNotifications];
+    pendingNotifications.clear();
+    for (const sub of snapshot) {
+      sub();
+    }
   }
-  pendingNotifications.clear();
 }
 
 // ─── Proxy Factory ───────────────────────────────────────────────────────────
@@ -378,11 +408,14 @@ export function _beginBatch(): void {
 
 /**
  * Ends a batching scope. If the outermost batch ends, flushes all pending
- * notifications in a single synchronous cycle.
+ * notifications synchronously (no microtask needed — batch() provides
+ * explicit synchronous control for internal framework use).
  */
 export function _endBatch(): void {
   batchDepth--;
   if (batchDepth === 0) {
+    // Cancel any pending microtask since we're flushing synchronously
+    microtaskScheduled = false;
     flushPending();
   }
 }

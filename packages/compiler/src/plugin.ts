@@ -28,7 +28,7 @@
 
 import type { Plugin, ResolvedConfig } from 'vite';
 import type { AstraViteConfig } from './index.js';
-import { transformJSX, autoWrapDynamic } from './transformers/jsx.js';
+import { transformJSX, autoWrapDynamic, autoMemoDerivedFunctions } from './transformers/jsx.js';
 // TODO: Re-enable when CSS extraction and server$ compilation are stable
 // import { transformCSS } from './transformers/css.js';
 // import { transformServerRPC } from './transformers/server-rpc.js';
@@ -152,17 +152,29 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
       //   hasChanges = true;
       // }
 
-      // Phase 3: JSX Expression Wrapping (dynamic mode) or Vanilla DOM (vanilla mode)
+      // Phase 3: JSX transforms (dynamic mode) or Vanilla DOM (vanilla mode)
       if (/\.(tsx|jsx)$/.test(id)) {
+        // Detect reactive store variables: const st = store({...})
+        const storeRegex = /\b(const|let|var)\s+([\w$]+)\s*=\s*store\s*\(/g;
+        const reactiveVars = new Set<string>();
+        let match: RegExpExecArray | null;
+        while ((match = storeRegex.exec(transformed)) !== null) {
+          reactiveVars.add(match[2]!);
+        }
+
+        // Phase 3a: Auto-Memoization — wrap derived arrow functions with memo()
+        // Runs for BOTH dynamic and vanilla modes. Transparent to developer.
+        const memoResult = autoMemoDerivedFunctions(transformed, reactiveVars);
+        if (memoResult.needsMemo) {
+          transformed = ensureImport(memoResult.code, '@astrajs/core', ['memo']);
+          hasChanges = true;
+        } else if (memoResult.code !== transformed) {
+          transformed = memoResult.code;
+          hasChanges = true;
+        }
+
         if (config.transformMode === 'dynamic') {
           // ── Dynamic mode: auto-wrap reactive JSX expressions with dynamic() ──
-          const storeRegex = /\b(const|let|var)\s+([\w$]+)\s*=\s*store\s*\(/g;
-          const reactiveVars = new Set<string>();
-          let match: RegExpExecArray | null;
-          while ((match = storeRegex.exec(transformed)) !== null) {
-            reactiveVars.add(match[2]!);
-          }
-
           const wrapped = autoWrapDynamic(transformed, reactiveVars);
           if (wrapped.needsDynamic) {
             transformed = ensureImport(wrapped.code, '@astrajs/core', ['dynamic']);

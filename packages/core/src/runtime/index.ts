@@ -5,9 +5,9 @@
  */
 
 // Store & Reactivity
-export { store, toRaw, toProxy } from './store.js';
+export { store, toRaw, toProxy, flushPending } from './store.js';
 
-// Effects & Memo
+// Effects & Memo (memo/batch are internal — injected by compiler)
 export { effect, memo, batch, untrack } from './effect.js';
 
 // DOM Bindings
