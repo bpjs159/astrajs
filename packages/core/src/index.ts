@@ -1,3 +1,5 @@
+/// <reference path="./jsx.d.ts" />
+
 /**
  * @astrajs/core — Public API Entry Point
  *

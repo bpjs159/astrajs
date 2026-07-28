@@ -67,7 +67,7 @@ export class StringSchema implements BaseSchema<string> {
     }
     for (const check of this._checks) {
       const err = check.fn(data);
-      if (err) return { success: false, errors: { _: err } as any };
+      if (err) return { success: false, errors: { _: err } as Record<string, string> as any };
     }
     return { success: true, data: data as string };
   }
@@ -75,7 +75,7 @@ export class StringSchema implements BaseSchema<string> {
   parse(data: unknown): string {
     const result = this.validate(data);
     if (!result.success) {
-      throw new Error(result.errors?._ ?? 'Validation failed');
+      throw new Error((result.errors as Record<string, string> | undefined)?._ ?? 'Validation failed');
     }
     return result.data!;
   }

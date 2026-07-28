@@ -40,7 +40,11 @@ const activeCleanups = new Map<HTMLElement, UnmountCallback>();
 /** Single shared MutationObserver for detecting element removal. */
 let observer: MutationObserver | null = null;
 
-function getObserver(): MutationObserver {
+function getObserver(): MutationObserver | null {
+  // Guard: MutationObserver is only available in browser environments.
+  if (typeof MutationObserver === 'undefined' || typeof document === 'undefined') {
+    return null;
+  }
   if (!observer) {
     observer = new MutationObserver((mutations) => {
       for (const mutation of mutations) {
@@ -69,8 +73,10 @@ function getObserver(): MutationObserver {
   return observer;
 }
 
-// Initialize the observer eagerly so DOM removals are always detected.
-getObserver();
+// Initialize the observer lazily — only in browser environments.
+if (typeof MutationObserver !== 'undefined' && typeof document !== 'undefined') {
+  getObserver();
+}
 
 // ─── Public API ──────────────────────────────────────────────────────────────
 

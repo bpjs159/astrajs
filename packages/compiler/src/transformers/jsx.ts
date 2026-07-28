@@ -843,7 +843,6 @@ function _parseChildren(
         const childStart = pos + subResult.tagStart;
         if (subResult.selfClose) {
           const childEnd = pos + subResult.tagEnd;
-          const childSource = remaining.slice(childStart, childEnd);
           // Transform this child element
           const transformed = _transformElement(
             subResult.tag,
@@ -952,14 +951,12 @@ function _extractBracedExpr(source: string, start: number): { expr: string; endP
   };
 }
 
-/**
- * Escapes a string for use in generated code (as a string literal or text node content).
- */
-function _escapeForCode(text: string): string {
-  // If it's just text content, quote it
-  const escaped = text.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n');
-  return `'${escaped}'`;
-}
+// TODO: Use this when generating vanilla DOM code strings
+// function _escapeForCode(text: string): string {
+//   // If it's just text content, quote it
+//   const escaped = text.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n');
+//   return `'${escaped}'`;
+// }
 
 /**
  * Parses JSX attributes from a string like ' class="foo" onClick={handler} disabled'.
@@ -1043,7 +1040,9 @@ function _transformElement(
   const hasOnInput = attrs['onInput'] || attrs['oninput'] || attrs['onChange'] || attrs['onchange'];
 
   // Check for bindList pattern: .map() in expression children
-  const mapChild = children.find(c => c.kind === 'expression' && c.code.includes('.map('));
+  const mapChild: { kind: 'expression'; code: string } | undefined = children.find(
+    (c): c is { kind: 'expression'; code: string } => c.kind === 'expression' && c.code.includes('.map(')
+  );
 
   if (mapChild) {
     // Transform {items.map(i => <li>...</li>)} into bindList call

@@ -1,3 +1,5 @@
+/// <reference path="./jsx.d.ts" />
+
 /**
  * @astrajs/core — JSX Runtime (automatic mode)
  *
@@ -34,7 +36,7 @@ export {
   bindDynamicText,
 } from './runtime/dom.js';
 
-import { bindText, bindValue, bindConditional, bindDynamicList, bindDynamicText, bindAttr } from './runtime/dom.js';
+import { bindValue, bindConditional, bindDynamicList, bindDynamicText, bindAttr } from './runtime/dom.js';
 import { getLastReactiveAccess, clearLastReactiveAccess } from './runtime/store.js';
 import { untrack } from './runtime/effect.js';
 
@@ -69,12 +71,14 @@ const DYNAMIC_SYM = Symbol('astra-dynamic');
  * ```
  */
 export function dynamic<T>(fn: () => T): () => T {
-  (fn as Record<symbol, unknown>)[DYNAMIC_SYM] = true;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (fn as any)[DYNAMIC_SYM] = true;
   return fn;
 }
 
 function isDynamic(value: unknown): value is (() => unknown) {
-  return typeof value === 'function' && (value as Record<symbol, unknown>)[DYNAMIC_SYM] === true;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return typeof value === 'function' && (value as any)[DYNAMIC_SYM] === true;
 }
 
 // ─── JSX Factory ─────────────────────────────────────────────────────────────

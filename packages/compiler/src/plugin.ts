@@ -29,8 +29,9 @@
 import type { Plugin, ResolvedConfig } from 'vite';
 import type { AstraViteConfig } from './index.js';
 import { transformJSX, autoWrapDynamic } from './transformers/jsx.js';
-import { transformCSS } from './transformers/css.js';
-import { transformServerRPC } from './transformers/server-rpc.js';
+// TODO: Re-enable when CSS extraction and server$ compilation are stable
+// import { transformCSS } from './transformers/css.js';
+// import { transformServerRPC } from './transformers/server-rpc.js';
 import { ensureImport } from './utils/ast.js';
 
 // ─── Plugin State ────────────────────────────────────────────────────────────

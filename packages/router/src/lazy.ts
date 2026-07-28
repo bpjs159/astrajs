@@ -27,7 +27,7 @@ export function lazy(loader: () => Promise<ComponentModule>, exportName?: string
   // Start loading immediately
   loader()
     .then(mod => {
-      state.component = exportName ? mod[exportName] : Object.values(mod)[0];
+      state.component = (exportName ? mod[exportName] : Object.values(mod)[0]) ?? null;
     })
     .catch(err => {
       state.error = err;

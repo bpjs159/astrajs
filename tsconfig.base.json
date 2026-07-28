@@ -13,6 +13,7 @@
     /* Module Resolution */
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "customConditions": ["development"],
     "target": "ES2022",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "resolveJsonModule": true,

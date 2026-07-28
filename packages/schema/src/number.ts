@@ -38,17 +38,17 @@ export class NumberSchema implements BaseSchema<number> {
       return { success: true, data: 0 };
     }
     const num = Number(data);
-    if (isNaN(num)) return { success: false, errors: { _: 'Must be a number' } as any };
+    if (isNaN(num)) return { success: false, errors: { _: 'Must be a number' } as Record<string, string> as any };
     for (const check of this._checks) {
       const err = check.fn(num);
-      if (err) return { success: false, errors: { _: err } as any };
+      if (err) return { success: false, errors: { _: err } as Record<string, string> as any };
     }
     return { success: true, data: num };
   }
 
   parse(data: unknown): number {
     const result = this.validate(data);
-    if (!result.success) throw new Error(result.errors?._ ?? 'Validation failed');
+    if (!result.success) throw new Error((result.errors as Record<string, string> | undefined)?._ ?? 'Validation failed');
     return result.data!;
   }
 }

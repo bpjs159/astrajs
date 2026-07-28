@@ -38,7 +38,7 @@ export class ObjectSchema<T extends SchemaShape> implements BaseSchema<ShapeToTy
         hasErrors = true;
         // Grab the first error from the field schema
         const fieldErrors = fieldResult.errors ?? {};
-        errors[key] = Object.values(fieldErrors)[0] ?? 'Invalid';
+        errors[key] = (Object.values(fieldErrors)[0] as string) ?? 'Invalid';
       } else {
         parsed[key] = fieldResult.data;
       }

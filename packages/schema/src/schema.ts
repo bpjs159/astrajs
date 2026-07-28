@@ -16,7 +16,10 @@
 import { StringSchema } from './string.js';
 import { NumberSchema } from './number.js';
 import { ObjectSchema } from './object.js';
-import type { SchemaShape } from '../internal/shape.js';
+import type { BaseSchema } from './types.js';
+
+/** A schema shape is a record of field-name → schema. */
+type SchemaShape = Record<string, BaseSchema<unknown>>;
 
 export const schema = {
   /** Create a string validator. */

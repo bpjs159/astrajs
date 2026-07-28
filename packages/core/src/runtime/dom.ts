@@ -251,7 +251,7 @@ export function bindConditional(
 
     // Insert new node before the current one, then remove current
     parent.insertBefore(next, current);
-    current.remove();
+    (current as ChildNode).remove();
     current = next;
   });
 }
@@ -281,7 +281,7 @@ export function bindDynamicList(
 
     // Remove old nodes
     for (const n of currentNodes) {
-      if (n.parentNode === parent) n.remove();
+      if (n.parentNode === parent) (n as ChildNode).remove();
     }
 
     // Insert new nodes before anchor
@@ -321,7 +321,7 @@ export function bindDynamicText(
     } else {
       const tn = document.createTextNode(value);
       parent.insertBefore(tn, current);
-      current.remove();
+      (current as ChildNode).remove();
       current = tn;
     }
   });

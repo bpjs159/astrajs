@@ -201,7 +201,7 @@ export function clearSWRCache(key?: string): void {
 if (typeof window !== 'undefined') {
   // Revalidate on focus
   window.addEventListener('focus', () => {
-    for (const [key, entry] of swrCache) {
+    for (const [, entry] of swrCache) {
       if (entry.options.revalidateOnFocus !== false && !entry.isValidating) {
         const swrEntry = entry as SWRCacheEntry<unknown>;
         swrEntry.isValidating = true;
@@ -222,7 +222,7 @@ if (typeof window !== 'undefined') {
 
   // Revalidate on online (after being offline)
   window.addEventListener('online', () => {
-    for (const [key, entry] of swrCache) {
+    for (const [, entry] of swrCache) {
       if (!entry.isValidating) {
         const swrEntry = entry as SWRCacheEntry<unknown>;
         swrEntry.isValidating = true;

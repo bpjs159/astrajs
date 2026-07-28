@@ -21,8 +21,7 @@
  * DOM tree and converts each node to its HTML representation.
  */
 
-import type { SSRConfig, SSGConfig, ISRConfig } from '../index.js';
-import { serializeState, astraDataAttr } from './serialize.js';
+import type { SSRConfig, SSGConfig } from './index.js';
 
 // ─── DOM Node → HTML String Serializer ───────────────────────────────────────
 
@@ -196,8 +195,13 @@ export async function renderToString(config: SSRConfig): Promise<string> {
   // Render the root component — produces real DOM nodes
   const rootNode = root();
 
+  // Guard against null/false returns from components
+  if (!rootNode) {
+    return template('');
+  }
+
   // Serialize to HTML
-  const appHtml = nodeToHTML(rootNode, { minify });
+  const appHtml = nodeToHTML(rootNode as Node, { minify });
 
   // Wrap in template
   return template(appHtml);
@@ -246,7 +250,6 @@ export async function generateStaticSite(config: SSGConfig): Promise<void> {
     extraPaths = [],
     sitemap: generateSitemap = true,
     siteUrl,
-    minify = true,
     concurrency = 4,
   } = config;
 
@@ -271,7 +274,7 @@ export async function generateStaticSite(config: SSGConfig): Promise<void> {
   });
 
   const allPaths = [
-    ...leafRoutes.map((r) => r.path),
+    ...leafRoutes.map((r: { path: string }) => r.path),
     ...extraPaths,
   ];
 

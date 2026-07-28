@@ -48,10 +48,14 @@ export function component<P extends Record<string, unknown>>(
     setComponentCache(storeCache, () => storeCounter++);
     const prevWrapper = setCurrentWrapper(wrapper);
     const root = fn(props);
-    setCurrentWrapper(prevWrapper);
+    if (prevWrapper !== null) {
+      setCurrentWrapper(prevWrapper);
+    }
     clearComponentCache();
 
-    wrapper.appendChild(root as Node);
+    if (root) {
+      wrapper.appendChild(root as Node);
+    }
 
     // Fire mount callbacks after the wrapper enters the live DOM.
     if (hasPendingMountCallbacks(wrapper)) {

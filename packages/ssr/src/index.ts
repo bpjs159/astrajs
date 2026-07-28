@@ -19,9 +19,17 @@
  * ```
  */
 
-import type { RouteDefinition } from '@astrajs/router';
-
 // ─── Configuration Types ─────────────────────────────────────────────────────
+
+/**
+ * A route definition used by the SSG crawler.
+ * Matches the shape expected by `@astrajs/router` routes.
+ */
+export interface RouteDefinition {
+  path: string;
+  children?: RouteDefinition[];
+  redirect?: string;
+}
 
 /**
  * Configuration for the SSR renderer.
