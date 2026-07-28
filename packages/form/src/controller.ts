@@ -37,6 +37,18 @@ export interface FormController {
   reset(): void;
   /** Force re-evaluation of all inputs' validity state. */
   validateAll(): void;
+  /**
+   * Release all internal references and stop listening to DOM events.
+   * Call this when the form is unmounted (e.g., in a `mounted()` cleanup)
+   * to allow the garbage collector to reclaim the controller and form element.
+   *
+   * @example
+   * ```ts
+   * const loginForm = form();
+   * mounted(() => () => loginForm.dispose());
+   * ```
+   */
+  dispose(): void;
 }
 
 // ─── WeakMap: controller → form element ──────────────────────────────────────
@@ -103,6 +115,17 @@ export function form(): FormController {
       // Event delegation on document — survives component() re-renders
       _delegate(state as unknown as FormController);
     },
+
+    /**
+     * Release all internal references and stop listening to DOM events.
+     * After calling dispose(), the controller is inert — event listeners
+     * will skip this form (isConnected guard) and the WeakMap entry is
+     * cleared, allowing GC to reclaim both the controller and form element.
+     */
+    dispose(): void {
+      _formEls.delete(state);
+      _wired.delete(state);
+    },
   });
 
   return state as unknown as FormController;
@@ -116,7 +139,8 @@ function _delegate(controller: FormController): void {
     const input = e.target as HTMLElement | null;
     if (!input) return;
     const form = _formEls.get(controller as unknown as object);
-    if (!form || !form.contains(input)) return; // not our form
+    // Guard: skip if form was disposed or detached from DOM (routing, unmount)
+    if (!form || !form.isConnected || !form.contains(input)) return;
 
     _refresh(controller);
     let dirty = false;
@@ -133,7 +157,8 @@ function _delegate(controller: FormController): void {
     const input = target as HTMLInputElement;
     if (!input.name) return;
     const form = _formEls.get(controller as unknown as object);
-    if (!form || !form.contains(input)) return;
+    // Guard: skip if form was disposed or detached from DOM
+    if (!form || !form.isConnected || !form.contains(input)) return;
 
     const touched = { ...controller.touched, [input.name]: true };
     (controller as unknown as Record<string, unknown>).touched = touched;
@@ -146,7 +171,8 @@ function _delegate(controller: FormController): void {
     const target = e.target as HTMLElement | null;
     if (!target) return;
     const form = _formEls.get(controller as unknown as object);
-    if (!form || !form.contains(target)) return;
+    // Guard: skip if form was disposed or detached from DOM
+    if (!form || !form.isConnected || !form.contains(target)) return;
     _refresh(controller);
   }, true);
 

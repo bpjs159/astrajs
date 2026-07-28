@@ -7,11 +7,11 @@
  */
 
 import type { RouteDefinition } from '@astrajs/router';
-import { DashboardLayout } from '../layouts/dashboard.js';
-import { HomePage } from '../pages/home.js';
-import { ProductsPage } from '../pages/products.js';
-import { ProductDetailPage } from '../pages/product-detail.js';
-import { OrdersPage } from '../pages/orders.js';
+import { DashboardLayout } from './layouts/dashboard.js';
+import { HomePage } from './pages/home.js';
+import { ProductsPage } from './pages/products.js';
+import { ProductDetailPage } from './pages/product-detail.js';
+import { OrdersPage } from './pages/orders.js';
 
 /**
  * The full route tree for AstraStore.

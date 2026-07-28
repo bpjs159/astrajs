@@ -58,6 +58,9 @@ export { dynamic } from './jsx-runtime.js';
 // Lifecycle
 export { mounted } from './runtime/lifecycle.js';
 
+// Effect primitive (for advanced custom reactive logic)
+export { effect } from './runtime/effect.js';
+
 // ─── Public Types ────────────────────────────────────────────────────────────
 
 /**

@@ -12,23 +12,20 @@
  */
 
 import type { Component } from '@astrajs/core';
+import { effect } from '@astrajs/core';
 import { createRouter, Outlet } from '@astrajs/router';
-import { mounted } from '@astrajs/core';
-import { routes } from '../routes.js';
-import { productStore } from '../stores/products.js';
-import { orderStore } from '../stores/orders.js';
-import { getProducts } from '../server/products.server.js';
-import { getOrders } from '../server/orders.server.js';
+import { routes } from './routes.js';
+import { productStore } from './stores/products.js';
+import { orderStore } from './stores/orders.js';
+import { getProducts } from './server/products.server.js';
+import { getOrders } from './server/orders.server.js';
 
 /**
  * The router instance — created once, shared globally.
  * Components use `useLocation()` and `useParams()` to react
  * to route changes.
  */
-export const router = createRouter({
-  routes,
-  viewTransitions: true,
-});
+export const router = createRouter(routes);
 
 // Expose router globally for components that need programmatic navigation
 if (typeof window !== 'undefined') {

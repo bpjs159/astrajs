@@ -8,13 +8,13 @@
  */
 
 import type { Component } from '@astrajs/core';
-import { useParams } from '@astrajs/router';
+import { params } from '@astrajs/router';
 import { addToCart } from '../stores/cart.js';
 import { productStore } from '../stores/products.js';
 import { styles } from '../styles/dashboard.css.js';
 
 export const ProductDetailPage: Component = () => {
-  const { id } = useParams();
+  const id = params.id;
   const product = productStore.items.find((p) => p.id === id) ?? null;
 
   if (!product) {

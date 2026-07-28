@@ -13,7 +13,7 @@ describe('Counter', () => {
     const el = Counter({}) as HTMLElement;
     const buttons = el.querySelectorAll('button');
     expect(buttons).toHaveLength(2);
-    expect(buttons[0]?.textContent).toContain('− 1');
+    expect(buttons[0]?.textContent).toContain('- 1');
     expect(buttons[1]?.textContent).toContain('+ 1');
   });
 });
