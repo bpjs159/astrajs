@@ -19,16 +19,16 @@ export interface TimerEvents {
 }
 
 export const Timer = component((props: TimerEvents) => {
-  const st = store({ seconds: 0 });
+  const timerStore = store({ seconds: 0 });
 
   mounted(() => {
     props.onMount?.();
-    const id = setInterval(() => {
-      st.seconds++;
-      props.onTick?.(st.seconds);
+    const intervalId = setInterval(() => {
+      timerStore.seconds++;
+      props.onTick?.(timerStore.seconds);
     }, 1000);
     return () => {
-      clearInterval(id);
+      clearInterval(intervalId);
       props.onUnmount?.();
     };
   });
@@ -36,8 +36,8 @@ export const Timer = component((props: TimerEvents) => {
   return (
     <div>
       <div class="timer">
-        {String(Math.floor(st.seconds / 60)).padStart(2, '0')}:
-        {String(st.seconds % 60).padStart(2, '0')}
+        {String(Math.floor(timerStore.seconds / 60)).padStart(2, '0')}:
+        {String(timerStore.seconds % 60).padStart(2, '0')}
       </div>
       <p style="color:#64748b;font-size:.8rem;">mounted() started the interval — unmount cleans it up</p>
     </div>

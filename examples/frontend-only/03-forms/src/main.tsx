@@ -1,7 +1,7 @@
 /**
  * 03 — @astrajs/form Controller
  *
- * Data layer:  @astrajs/core store (ui.email, ui.password…)
+ * Data layer:  @astrajs/core store (formStore.email, formStore.password…)
  * Meta layer:  @astrajs/form controller (errors, touched, isDirty…)
  * Validation:  Browser Constraint Validation API + setCustomValidity()
  *
@@ -14,7 +14,7 @@ const takenUsernames = new Set(['admin', 'root', 'test']);
 
 export const Form = component(() => {
   // ── Data (pure values) ──────────────────────────────────────────
-  const ui = store({
+  const formStore = store({
     username: '',
     email: '',
     password: '',
@@ -25,22 +25,22 @@ export const Form = component(() => {
   });
 
   // ── Metadata (errors, touched, isDirty…) — READ-ONLY ─────────────
-  const formCtrl = form();
+  const formController = form();
 
   const handleSubmit = (e: SubmitEvent) => {
     e.preventDefault();
-    ui.submitCount++;
+    formStore.submitCount++;
     if (!formCtrl.isValid) {
-      formCtrl.focusFirstError();
+      formController.focusFirstError();
       return;
     }
-    ui.isSubmitting = true;
+    formStore.isSubmitting = true;
     // Simulate API call
     setTimeout(() => {
-      ui.isSubmitting = false;
-      ui.success = true;
-      formCtrl.reset();
-      setTimeout(() => { ui.success = false; }, 3000);
+      formStore.isSubmitting = false;
+      formStore.success = true;
+      formController.reset();
+      setTimeout(() => { formStore.success = false; }, 3000);
     }, 800);
   };
 
@@ -49,11 +49,11 @@ export const Form = component(() => {
       <h1>@astrajs/form</h1>
       <p class="subtitle">Data + Metadata + Native Validation</p>
 
-      <form controller={formCtrl} onSubmit={handleSubmit}>
+      <form controller={formController} onSubmit={handleSubmit}>
         {/* ── Error box — only shows touched fields ── */}
         <>{(() => {
-          const touchedErrors = Object.entries(formCtrl.errors).filter(
-            ([field]) => formCtrl.touched[field]
+          const touchedErrors = Object.entries(formController.errors).filter(
+            ([field]) => formController.touched[field]
           );
           return touchedErrors.length > 0 ? (
             <div class="error-summary">
@@ -78,7 +78,7 @@ export const Form = component(() => {
             required
             minLength={3}
             placeholder="Pick a username"
-            value={ui.username}
+            value={formStore.username}
             validate={async (val: string) => {
               await new Promise(r => setTimeout(r, 500));
               return takenUsernames.has(val.toLowerCase())
@@ -86,14 +86,14 @@ export const Form = component(() => {
                 : true;
             }}
           />
-          {formCtrl.touched.username && formCtrl.errors.username === 'required' && (
+          {formController.touched.username && formController.errors.username === 'required' && (
             <p class="error-msg">Required</p>
           )}
-          {formCtrl.touched.username && formCtrl.errors.username === 'minlength' && (
+          {formController.touched.username && formController.errors.username === 'minlength' && (
             <p class="error-msg">At least 3 characters</p>
           )}
-          {formCtrl.errors.username && formCtrl.errors.username !== 'required' && formCtrl.errors.username !== 'minlength' && (
-            <p class="error-msg">{formCtrl.errors.username}</p>
+          {formController.errors.username && formController.errors.username !== 'required' && formController.errors.username !== 'minlength' && (
+            <p class="error-msg">{formController.errors.username}</p>
           )}
         </div>
 
@@ -104,12 +104,12 @@ export const Form = component(() => {
             type="email"
             required
             placeholder="you@example.com"
-            value={ui.email}
+            value={formStore.email}
           />
-          {formCtrl.touched.email && formCtrl.errors.email === 'required' && (
+          {formController.touched.email && formController.errors.email === 'required' && (
             <p class="error-msg">Required</p>
           )}
-          {formCtrl.touched.email && formCtrl.errors.email === 'type' && (
+          {formController.touched.email && formController.errors.email === 'type' && (
             <p class="error-msg">Invalid email format</p>
           )}
         </div>
@@ -122,12 +122,12 @@ export const Form = component(() => {
             required
             minLength={6}
             placeholder="Min 6 characters"
-            value={ui.password}
+            value={formStore.password}
           />
-          {formCtrl.touched.password && formCtrl.errors.password === 'required' && (
+          {formController.touched.password && formController.errors.password === 'required' && (
             <p class="error-msg">Required</p>
           )}
-          {formCtrl.touched.password && formCtrl.errors.password === 'minlength' && (
+          {formController.touched.password && formController.errors.password === 'minlength' && (
             <p class="error-msg">At least 6 characters</p>
           )}
         </div>
@@ -142,36 +142,36 @@ export const Form = component(() => {
             type="password"
             required
             placeholder="Repeat password"
-            value={ui.confirm}
+            value={formStore.confirm}
             validate={(val: string) =>
-              val === ui.password ? true : 'Passwords do not match'
+              val === formStore.password ? true : 'Passwords do not match'
             }
           />
-          {formCtrl.touched.confirm && formCtrl.errors.confirm && (
-            <p class="error-msg">{formCtrl.errors.confirm}</p>
+          {formController.touched.confirm && formController.errors.confirm && (
+            <p class="error-msg">{formController.errors.confirm}</p>
           )}
         </div>
 
         <button
           class="btn-submit"
           type="submit"
-          disabled={!formCtrl.isDirty || ui.isSubmitting}
+          disabled={!formCtrl.isDirty || formStore.isSubmitting}
         >
-          {ui.isSubmitting ? 'Creating…' : 'Create Account'}
+          {formStore.isSubmitting ? 'Creating…' : 'Create Account'}
         </button>
 
-        <>{ui.success ? <div class="success">Account created!</div> : <></>}</>
+        <>{formStore.success ? <div class="success">Account created!</div> : <></>}</>
       </form>
 
       <div class="live-preview">
         <h3>How it works</h3>
-        <div class="preview-item"><span><code>controller={'{formCtrl}'}</code></span><span class="badge badge-auto">Auto-wired</span></div>
-        <div class="preview-item"><span><code>formCtrl.errors.email</code></span><span>Error codes (i18n-safe)</span></div>
-        <div class="preview-item"><span><code>formCtrl.touched.email</code></span><span>Show after blur</span></div>
-        <div class="preview-item"><span><code>formCtrl.isDirty</code></span><span>Button disabled</span></div>
-        <div class="preview-item"><span><code>ui.isSubmitting</code></span><span>Loading state (store)</span></div>
-        <div class="preview-item"><span><code>ui.submitCount</code></span><span>Attempts (store)</span></div>
-        <div class="preview-item"><span><code>formCtrl.focusFirstError()</code></span><span>Scroll to error</span></div>
+        <div class="preview-item"><span><code>controller={'{formController}'}</code></span><span class="badge badge-auto">Auto-wired</span></div>
+        <div class="preview-item"><span><code>formController.errors.email</code></span><span>Error codes (i18n-safe)</span></div>
+        <div class="preview-item"><span><code>formController.touched.email</code></span><span>Show after blur</span></div>
+        <div class="preview-item"><span><code>formController.isDirty</code></span><span>Button disabled</span></div>
+        <div class="preview-item"><span><code>formStore.isSubmitting</code></span><span>Loading state (store)</span></div>
+        <div class="preview-item"><span><code>formStore.submitCount</code></span><span>Attempts (store)</span></div>
+        <div class="preview-item"><span><code>formController.focusFirstError()</code></span><span>Scroll to error</span></div>
       </div>
     </div>
   );

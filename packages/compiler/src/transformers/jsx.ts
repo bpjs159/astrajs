@@ -252,16 +252,13 @@ export function autoWrapDynamic(
         return;
       }
 
-      // Skip expressions inside event handlers (onClick, etc.) or refs.
-      // The parent JsxAttribute visitor already skips these, but a nested
-      // JsxExpression visitor would otherwise re-wrap the inner expression.
+      // Skip expressions inside ALL JSX attributes — dynamic() is designed
+      // for child expressions (text, conditional, list rendering), not
+      // attribute values. Reactive attribute bindings use bindAttr().
       const parent = node.parent;
       if (parent && ts.isJsxAttribute(parent)) {
-        const attrName = parent.name.getText(sourceFile);
-        if (attrName.startsWith('on') || attrName === 'ref') {
-          ts.forEachChild(node, visit);
-          return;
-        }
+        ts.forEachChild(node, visit);
+        return;
       }
 
       // Skip static literals

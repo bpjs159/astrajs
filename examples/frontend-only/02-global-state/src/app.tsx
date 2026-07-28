@@ -1,5 +1,11 @@
 /**
- * 02 — Global State · JSX Entry
+ * 02 — Global State · Shared Store Across Components
+ *
+ * Demonstrates that a single `store()` imported by multiple components
+ * acts as shared reactive state. When any component mutates the store,
+ * all components reading from it update automatically.
+ *
+ * This file handles DOM mounting and global styles.
  */
 import { component } from '@astrajs/core';
 import { LikesDislikes } from './likes.js';

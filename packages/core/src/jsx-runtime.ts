@@ -182,7 +182,11 @@ function setProps(
     }
 
     if (key === 'class' || key === 'className') {
-      el.className = String(value ?? '');
+      if (typeof value === 'function') {
+        bindAttr(el, 'class', value as () => string | null);
+      } else {
+        el.className = String(value ?? '');
+      }
     } else if (key === 'style' && typeof value === 'object' && value !== null) {
       Object.assign(el.style, value);
     } else if (key === 'ref') {

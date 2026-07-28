@@ -1,25 +1,79 @@
-import { component, store } from '@astrajs/core';
-import { styles as s } from './styles.js';
-const themes = ['primary','success','warning','danger'];
-const labels: Record<string,string> = { primary:'Primary', success:'Success', warning:'Warning', danger:'Danger' };
-const descs: Record<string,string> = { primary:'Indigo gradient', success:'Green gradient', warning:'Amber gradient', danger:'Red gradient' };
+/**
+ * 05 — CSS Macro · Native Dark Mode with CSS Custom Properties
+ *
+ * `css\`...\`` defines CSS custom properties for light/dark themes
+ * at build time. `prefers-color-scheme` is used for the `system` mode
+ * so the OS preference is respected with zero JavaScript.
+ *
+ * Three modes:
+ * - `system` — follows OS preference via @media (prefers-color-scheme)
+ * - `light`  — forces light theme
+ * - `dark`   — forces dark theme
+ *
+ * Key concepts:
+ * - `css\`...\`` + CSS custom properties = design tokens at build time
+ * - `data-theme` attribute + `@media (prefers-color-scheme)` = native dark mode
+ * - Zero runtime CSS — the `css` import is stripped at compile time
+ */
+import { component, store, classes } from '@astrajs/core';
+import { styles } from './styles.js';
+
+type ThemeMode = 'system' | 'light' | 'dark';
+const modes: ThemeMode[] = ['system', 'light', 'dark'];
+const modeLabels: Record<ThemeMode, string> = {
+  system: 'System',
+  light: 'Light',
+  dark: 'Dark',
+};
 
 export const CSSDemo = component(() => {
-  const st = store({ theme: 'primary', clicks: 0 });
+  const cssDemoStore = store({ mode: 'system' as ThemeMode, clicks: 0 });
+
+  const cycleMode = () => {
+    const currentIndex = modes.indexOf(cssDemoStore.mode);
+    cssDemoStore.mode = modes[(currentIndex + 1) % modes.length]!;
+    cssDemoStore.clicks++;
+  };
+
   return (
     <div>
       <h1>CSS Macro</h1>
-      <p class="subtitle"><code>css\...\</code> extracts styles at build time � zero runtime cost</p>
+      <p class="subtitle"><code>css\`...\`</code> + CSS custom properties = native dark mode at build time</p>
       <div class="demo-grid">
-        <div class={s.box + ' ' + s['box-' + st.theme]} onClick={() => { const i = themes.indexOf(st.theme); st.theme = themes[(i+1)%themes.length]!; st.clicks++; }}>
-          <h3>{labels[st.theme]}</h3>
-          <p>{descs[st.theme]}</p>
-          <p style="margin-top:12px;font-size:.75rem;opacity:.7;">Click to cycle � Clicks: {st.clicks}</p>
+        <div class={classes(styles.card)} data-theme={cssDemoStore.mode} onClick={cycleMode}>
+          <span class={styles.badge}>{modeLabels[cssDemoStore.mode]}</span>
+          <h2>Click to cycle theme</h2>
+          <p>This card uses <code>--bg</code>, <code>--text</code>, <code>--accent</code> custom properties defined in <code>css\`...\`</code>.</p>
+          <p style="margin-top:16px;font-size:.75rem;opacity:.6;">Clicks: {cssDemoStore.clicks}</p>
         </div>
         <div class="code-block">
-          <pre><span class="kw">import</span> {'{'} css {'}'} <span class="kw">from</span> <span class="str">'@astrajs/compiler'</span>;{'\n\n'}<span class="kw">const</span> styles = <span class="fn">css</span><span class="str">\{'\\n'}  .card {'{'} padding: 16px; {'}'}{'\\n'}\</span>;{'\n\n'}<span class="comment">// Compiles to at build time:</span>{'\n'}<span class="kw">const</span> styles = {'{'} card: <span class="str">'card_a3f2c1'</span> {'}'};</pre>
+          <pre><span class="kw">const</span> <span class="fn">styles</span> = <span class="fn">css</span><span class="str">\`</span>
+  <span class="prop">.card</span> {'{'}
+    <span class="prop">--bg</span>: #fff;
+    <span class="prop">--text</span>: #1e293b;
+    <span class="prop">--accent</span>: #6366f1;
+    <span class="prop">background</span>: <span class="kw">var</span>(<span class="prop">--bg</span>);
+    <span class="prop">color</span>: <span class="kw">var</span>(<span class="prop">--text</span>);
+  {'}'}
+
+  <span class="comment">// Forces dark when data-theme="dark"</span>
+  <span class="prop">.card[data-theme="dark"]</span> {'{'}
+    <span class="prop">--bg</span>: #1e293b;
+    <span class="prop">--text</span>: #f1f5f9;
+    <span class="prop">--accent</span>: #818cf8;
+  {'}'}
+
+  <span class="comment">// Respects OS preference</span>
+  <span class="kw">@media</span> (<span class="prop">prefers-color-scheme</span>: dark) {'{'}
+    <span class="prop">.card[data-theme="system"]</span> {'{'}
+      <span class="prop">--bg</span>: #1e293b;
+      <span class="prop">--text</span>: #f1f5f9;
+    {'}'}
+  {'}'}
+<span class="str">\`</span>;</pre>
         </div>
       </div>
     </div>
   );
 });
+

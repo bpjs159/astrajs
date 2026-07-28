@@ -58,6 +58,10 @@ export { dynamic } from './jsx-runtime.js';
 // Lifecycle
 export { mounted } from './runtime/lifecycle.js';
 
+// CSS class name composer
+export { classes } from './runtime/classes.js';
+export type { ClassValue } from './runtime/classes.js';
+
 // Effect primitive (for advanced custom reactive logic)
 export { effect } from './runtime/effect.js';
 

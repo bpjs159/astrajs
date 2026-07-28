@@ -6,7 +6,7 @@
  * ## Zero-VDOM transparent DX
  *
  * The compiler auto-wraps reactive JSX expressions with `dynamic()`.
- * You write plain JSX — `{$.show ? <Timer /> : <p>}</p>` — and the
+ * You write plain JSX — `{lifecycleStore.show ? <Timer /> : <p>}</p>` — and the
  * compiler injects `dynamic(() => ...)` automatically. Each expression
  * gets its own micro-effect for O(1) surgical DOM updates.
  */
@@ -16,7 +16,7 @@ import { Timer } from './timer.js';
 // ── Main component ──────────────────────────────────────────────────────────
 
 export const LifecycleDemo = component(() => {
-  const $ = store((self) => ({
+  const lifecycleStore = store((self) => ({
     show: true,
     logs: [] as string[],
     addLog(msg: string) { self.logs = [...self.logs, '[' + new Date().toLocaleTimeString() + '] ' + msg]; },
@@ -28,24 +28,24 @@ export const LifecycleDemo = component(() => {
       <h1>mounted() / Unmount</h1>
       <p class="subtitle">Lifecycle tied to DOM insertion & removal</p>
 
-      {$.show ? (
+      {lifecycleStore.show ? (
         <Timer
-          onMount={() => $.addLog('[Timer] mounted — interval started')}
-          onUnmount={() => $.addLog('[Timer] unmounted — interval cleared')}
+          onMount={() => lifecycleStore.addLog('[Timer] mounted — interval started')}
+          onUnmount={() => lifecycleStore.addLog('[Timer] unmounted — interval cleared')}
         />
       ) : (
         <p style="color:#64748b;padding:20px;">Timer hidden — unmount cleanup ran</p>
       )}
 
-      <button class="btn btn-toggle" onClick={() => $.show = !$.show}>
-        {$.show ? 'Unmount' : 'Mount'} Timer
+      <button class="btn btn-toggle" onClick={() => lifecycleStore.show = !lifecycleStore.show}>
+        {lifecycleStore.show ? 'Unmount' : 'Mount'} Timer
       </button>
-      <button class="btn btn-reset" onClick={() => $.clearLogs()}>
+      <button class="btn btn-reset" onClick={() => lifecycleStore.clearLogs()}>
         Clear Log
       </button>
 
       <div class="log">
-        {$.logs.map((entry: string) => (
+        {lifecycleStore.logs.map((entry: string) => (
           <div>{entry}</div>
         ))}
       </div>
