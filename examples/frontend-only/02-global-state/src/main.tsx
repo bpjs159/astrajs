@@ -1,17 +1,15 @@
 /**
- * 02 — Global State · Likes/Dislikes
+ * 02 ï¿½ Global State ï¿½ Likes/Dislikes
  *
  * Pure declarative JSX. One shared store. No innerHTML, no manual effects.
- * component() handles reactivity — compiler optimizes in production.
+ * component() handles reactivity ï¿½ compiler optimizes in production.
  *
  * Compiler output (conceptual):
  *   {appStore.likes} ? bindText(tn, () => String(appStore.likes))
  */
-import { component, store } from '@astrajs/core';
+import { component } from '@astrajs/core';
+import { appStore, total } from './store.js';
 import { styles } from './styles.js';
-
-export const appStore = store({ likes: 0, dislikes: 0, comments: 0 });
-const total = () => appStore.likes + appStore.dislikes + appStore.comments;
 
 export const LikesDislikes = component(() => {
   return (

@@ -32,4 +32,4 @@ export function jsxs(
 /**
  * Fragment component — renders children without a wrapper element.
  */
-export function Fragment(props: { children?: JSX.Element | JSX.Element[] }): DocumentFragment;
+export function Fragment(props: { children?: JSX.Element | string | number | boolean | null | undefined | readonly (JSX.Element | string | number | boolean | null | undefined)[] }): DocumentFragment;

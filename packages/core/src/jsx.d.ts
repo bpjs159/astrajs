@@ -215,7 +215,7 @@ declare namespace JSX {
     onMouseLeave?: (event: MouseEvent) => void;
 
     // --- Children ---
-    children?: JSX.Element | string | number | boolean | null | undefined | readonly (JSX.Element | string | number)[];
+    children?: JSX.Element | string | number | boolean | null | undefined | readonly (JSX.Element | string | number | boolean | null | undefined)[];
   }
 
   interface AnchorHTMLAttributes<T> extends HTMLAttributes<T> {
