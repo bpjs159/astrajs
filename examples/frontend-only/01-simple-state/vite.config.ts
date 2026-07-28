@@ -1,7 +1,11 @@
 import { defineConfig } from 'vite';
 import path from 'path';
+import astra from '../../../packages/compiler/src/plugin.js';
 
 export default defineConfig({
+  plugins: [
+    astra({ transformMode: 'dynamic' }),
+  ],
   resolve: {
     alias: {
       '@astrajs/core': path.resolve(__dirname, '../../../packages/core/src'),

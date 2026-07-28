@@ -28,9 +28,10 @@
 
 import type { Plugin, ResolvedConfig } from 'vite';
 import type { AstraViteConfig } from './index.js';
-import { transformJSX } from './transformers/jsx.js';
+import { transformJSX, autoWrapDynamic } from './transformers/jsx.js';
 import { transformCSS } from './transformers/css.js';
 import { transformServerRPC } from './transformers/server-rpc.js';
+import { ensureImport } from './utils/ast.js';
 
 // ─── Plugin State ────────────────────────────────────────────────────────────
 
@@ -96,6 +97,7 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
     cssOutput: 'assets',
     apiPrefix: '/api/astra',
     sourceMaps: true,
+    transformMode: 'dynamic',
     ...userConfig,
   };
 
@@ -128,36 +130,53 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
       let transformed = code;
       let hasChanges = false;
 
-      // Phase 1: CSS Extraction
-      const cssResult = transformCSS(transformed, id, config);
-      if (cssResult.cssFiles.size > 0) {
-        transformed = cssResult.code;
-        // Merge CSS files into plugin state
-        for (const [filename, content] of cssResult.cssFiles) {
-          state.cssFiles.set(filename, content);
-        }
-        hasChanges = true;
-      }
+      // Phase 1: CSS Extraction (TODO: fix comment-breaking bug)
+      // const cssResult = transformCSS(transformed, id, config);
+      // if (cssResult.cssFiles.size > 0) {
+      //   transformed = cssResult.code;
+      //   for (const [filename, content] of cssResult.cssFiles) {
+      //     state.cssFiles.set(filename, content);
+      //   }
+      //   hasChanges = true;
+      // }
 
-      // Phase 2: server$ Compilation
-      const serverResult = transformServerRPC(transformed, id, config);
-      if (serverResult.serverEndpoints.size > 0 || serverResult.preBuildIds.length > 0) {
-        transformed = serverResult.clientCode;
-        // Merge endpoints
-        for (const [endpointId, handlerSource] of serverResult.serverEndpoints) {
-          state.serverEndpoints.set(endpointId, handlerSource);
-        }
-        state.preBuildIds.push(...serverResult.preBuildIds);
-        hasChanges = true;
-      }
+      // Phase 2: server$ Compilation (TODO: fix @astrajs/server resolution)
+      // const serverResult = transformServerRPC(transformed, id, config);
+      // if (serverResult.serverEndpoints.size > 0 || serverResult.preBuildIds.length > 0) {
+      //   transformed = serverResult.clientCode;
+      //   for (const [endpointId, handlerSource] of serverResult.serverEndpoints) {
+      //     state.serverEndpoints.set(endpointId, handlerSource);
+      //   }
+      //   state.preBuildIds.push(...serverResult.preBuildIds);
+      //   hasChanges = true;
+      // }
 
-      // Phase 3: JSX → Vanilla DOM
-      // Only process .tsx and .jsx files for JSX transformation
+      // Phase 3: JSX Expression Wrapping (dynamic mode) or Vanilla DOM (vanilla mode)
       if (/\.(tsx|jsx)$/.test(id)) {
-        const jsxResult = transformJSX(transformed, id, config);
-        if (jsxResult.code !== transformed) {
-          transformed = jsxResult.code;
-          hasChanges = true;
+        if (config.transformMode === 'dynamic') {
+          // ── Dynamic mode: auto-wrap reactive JSX expressions with dynamic() ──
+          const storeRegex = /\b(const|let|var)\s+([\w$]+)\s*=\s*store\s*\(/g;
+          const reactiveVars = new Set<string>();
+          let match: RegExpExecArray | null;
+          while ((match = storeRegex.exec(transformed)) !== null) {
+            reactiveVars.add(match[2]!);
+          }
+
+          const wrapped = autoWrapDynamic(transformed, reactiveVars);
+          if (wrapped.needsDynamic) {
+            transformed = ensureImport(wrapped.code, '@astrajs/core', ['dynamic']);
+            hasChanges = true;
+          } else if (wrapped.code !== transformed) {
+            transformed = wrapped.code;
+            hasChanges = true;
+          }
+        } else {
+          // ── Vanilla mode: full JSX → DOM transformation ──
+          const jsxResult = transformJSX(transformed, id, config);
+          if (jsxResult.code !== transformed) {
+            transformed = jsxResult.code;
+            hasChanges = true;
+          }
         }
       }
 
@@ -171,7 +190,7 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
 
     // ─── generateBundle ──────────────────────────────────────────────────
 
-    generateBundle(_options, bundle) {
+    generateBundle(_options, _bundle) {
       // Emit collected CSS files as assets
       for (const [filename, content] of state.cssFiles) {
         this.emitFile({

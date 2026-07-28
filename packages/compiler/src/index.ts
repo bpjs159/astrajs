@@ -82,6 +82,22 @@ export interface AstraViteConfig {
    * Custom transform plugins to apply before AstraJS processes the AST.
    */
   preTransformPlugins?: readonly unknown[];
+
+  /**
+   * JSX transform mode.
+   *
+   * - `'dynamic'` (default): Only injects `dynamic()` wrappers around
+   *   reactive JSX expressions. The standard JSX runtime handles the rest.
+   *   This gives transparent DX — you write plain JSX, the compiler
+   *   auto-wraps reactive expressions for Zero-VDOM granular updates.
+   *
+   * - `'vanilla'`: Full JSX → vanilla DOM transformation. Bypasses the
+   *   JSX runtime entirely, generating `document.createElement` +
+   *   `bindText`/`bindAttr` calls directly. Best for maximum performance.
+   *
+   * @default 'dynamic'
+   */
+  transformMode?: 'dynamic' | 'vanilla';
 }
 
 // ─── CSS Macro (Compile-Time Only) ───────────────────────────────────────────

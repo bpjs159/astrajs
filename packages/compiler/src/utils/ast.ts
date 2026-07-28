@@ -124,7 +124,7 @@ export interface ParsedTemplate {
  */
 export function parseTemplateLiteral(
   source: string,
-  tagStart: number,
+  _tagStart: number,
   tagEnd: number
 ): ParsedTemplate | null {
   // Find the backtick after the tag

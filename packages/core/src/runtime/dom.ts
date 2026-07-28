@@ -204,3 +204,125 @@ export function bindList<T>(
     el.appendChild(fragment);
   });
 }
+
+// ─── Granular Bindings for dynamic() expressions ──────────────────────────
+
+/**
+ * Converts a dynamic() getter result into a DOM Node.
+ * - Node → returned as-is
+ * - string/number → TextNode
+ * - null/undefined/false → empty Comment (placeholder)
+ */
+function toNode(value: unknown): Node {
+  if (value instanceof Node) return value;
+  if (value === null || value === undefined || value === false) return document.createComment('');
+  return document.createTextNode(String(value));
+}
+
+/**
+ * Binds a conditional DOM node to a reactive getter.
+ *
+ * When the getter returns a different node, the old one is replaced
+ * in-place (O(1) swap). Used internally by appendChildren when it
+ * encounters a `dynamic()` expression that returns a Node.
+ *
+ * @param parent  — The parent element containing the conditional.
+ * @param anchor  — Comment marker that marks the insertion point.
+ * @param getter  — A function returning the current Node (reactive).
+ */
+export function bindConditional(
+  parent: HTMLElement | DocumentFragment,
+  anchor: Comment,
+  getter: () => Node | string | number | null | undefined | false
+): void {
+  let current: Node = anchor;
+
+  effect(() => {
+    const next = toNode(getter());
+
+    // Same node instance → nothing to do
+    if (next === current) return;
+
+    // The anchor may have been removed by an external operation
+    if (!current.parentNode || current.parentNode !== parent) {
+      current = next;
+      return;
+    }
+
+    // Insert new node before the current one, then remove current
+    parent.insertBefore(next, current);
+    current.remove();
+    current = next;
+  });
+}
+
+/**
+ * Binds a dynamic list of DOM nodes to a reactive getter.
+ *
+ * Each time the getter returns a new array, the old nodes are removed
+ * and the new ones inserted before the anchor marker.
+ *
+ * @param parent  — The parent element.
+ * @param anchor  — Comment marker for insertion point.
+ * @param getter  — A function returning an array of Nodes (reactive).
+ */
+export function bindDynamicList(
+  parent: HTMLElement | DocumentFragment,
+  anchor: Comment,
+  getter: () => readonly Node[]
+): void {
+  let currentNodes: Node[] = [];
+
+  effect(() => {
+    const nextNodes = getter();
+
+    // Fast path: same reference
+    if (nextNodes === currentNodes) return;
+
+    // Remove old nodes
+    for (const n of currentNodes) {
+      if (n.parentNode === parent) n.remove();
+    }
+
+    // Insert new nodes before anchor
+    for (const n of nextNodes) {
+      if (n instanceof Node) {
+        parent.insertBefore(n, anchor);
+      }
+    }
+
+    currentNodes = [...nextNodes];
+  });
+}
+
+/**
+ * Binds a dynamic text value to a reactive getter.
+ *
+ * Replaces the anchor comment with a TextNode on first evaluation,
+ * then updates the TextNode's data on subsequent changes.
+ *
+ * @param parent  — The parent element.
+ * @param anchor  — Comment marker for insertion point.
+ * @param getter  — A function returning a string (reactive).
+ */
+export function bindDynamicText(
+  parent: HTMLElement | DocumentFragment,
+  anchor: Comment,
+  getter: () => string | number
+): void {
+  let current: Node = anchor;
+
+  effect(() => {
+    const value = String(getter());
+    if (current instanceof Text) {
+      if (current.data !== value) {
+        current.data = value;
+      }
+    } else {
+      const tn = document.createTextNode(value);
+      parent.insertBefore(tn, current);
+      current.remove();
+      current = tn;
+    }
+  });
+}

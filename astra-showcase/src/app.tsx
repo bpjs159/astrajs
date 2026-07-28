@@ -13,7 +13,7 @@
 
 import type { Component } from '@astrajs/core';
 import { createRouter, Outlet } from '@astrajs/router';
-import { effect } from '@astrajs/core';
+import { mounted } from '@astrajs/core';
 import { routes } from '../routes.js';
 import { productStore } from '../stores/products.js';
 import { orderStore } from '../stores/orders.js';

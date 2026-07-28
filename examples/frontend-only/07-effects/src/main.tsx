@@ -1,4 +1,4 @@
-import { component, store, effect, untrack } from '@astrajs/core';
+import { component, store, mounted } from '@astrajs/core';
 import { styles as s } from './styles.js';
 
 let timerHandle: ReturnType<typeof setInterval> | null = null;
@@ -6,7 +6,7 @@ let timerHandle: ReturnType<typeof setInterval> | null = null;
 export const EffectsDemo = component(() => {
   const st = store({ running: false, seconds: 0 });
 
-  effect(() => {
+  mounted(() => {
     if (st.running) {
       timerHandle = setInterval(() => { st.seconds++; }, 1000);
     }
@@ -20,7 +20,7 @@ export const EffectsDemo = component(() => {
   return (
     <div class={s.card}>
       <h1>Effects & Cleanup</h1>
-      <p class={s.subtitle}><code>effect(fn)</code> auto-tracks · cleanup runs before re-execution</p>
+      <p class={s.subtitle}><code>effect(fn)</code> auto-tracks ï¿½ cleanup runs before re-execution</p>
       <div class={s.timerDisplay}>
         <div class={s.time}>{time}</div>
         <div class={st.running ? s.statusRunning : s.statusStopped}>{st.running ? 'Running' : 'Stopped'}</div>

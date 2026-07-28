@@ -7,7 +7,7 @@
  * This demo simulates what pre-built data looks like after SSG compilation.
  */
 
-import { store, effect } from '@astrajs/core';
+import { store, mounted } from '@astrajs/core';
 
 // ─── Simulated Pre-Build Data ────────────────────────────────────────────────
 // In production, this would be:

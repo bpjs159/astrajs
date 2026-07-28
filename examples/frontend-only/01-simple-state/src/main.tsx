@@ -1,8 +1,9 @@
 /**
- * 01 — Simple State · Counter
+ * 01 â€” Simple State â€” Counter
  *
- * Pure declarative JSX. No manual DOM, no innerHTML, no getElementById.
- * component() makes {ui.value} reactive — compiler optimizes in production.
+ * Zero-VDOM: component() runs once. The compiler auto-wraps {ui.value}
+ * with dynamic() â€” you write plain JSX, the AST transform handles the rest.
+ * Each reactive expression gets its own O(1) micro-effect.
  */
 import { component, store } from '@astrajs/core';
 import { styles } from './styles.js';

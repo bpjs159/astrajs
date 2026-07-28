@@ -16,6 +16,10 @@ export {
   bindTextContent,
   bindValue,
   bindList,
+  bindConditional,
+  bindDynamicList,
+  bindDynamicText,
+  dynamic,
   Fragment,
 } from './jsx-runtime.js';
 

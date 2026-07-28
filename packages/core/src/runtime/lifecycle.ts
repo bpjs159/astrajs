@@ -1,26 +1,14 @@
 /**
  * @astrajs/core — Component Lifecycle
  *
- * `onMount(fn)` registers a callback that fires when the component's
+ * `mounted(fn)` registers a callback that fires when the component's
  * root element is inserted into the live DOM. The callback can return
  * a cleanup function that fires when the element is removed.
  *
- * ## How it works
- *
- * 1. `onMount(fn)` stores `fn` in a global pending queue.
- * 2. The `component()` wrapper, after appending to the DOM, flushes
- *    the queue and registers each callback with the root element.
- * 3. A MutationObserver on the root element detects removal and
- *    runs the cleanup function returned by `fn`.
- * 4. The Router's `<Outlet />` triggers mount/unmount when
- *    swapping route content (appendChild → mount, removeChild → unmount).
- *
- * ## Compiler integration
- *
- * The AST plugin detects `onMount()` calls and emits them as
- * lifecycle registrations bound to the component's root HTMLElement.
- * In production, the compiler inlines the mount/unmount logic directly
- * into the generated `document.createElement` code.
+ * In the Zero-VDOM architecture, store mutations during lifecycle
+ * callbacks are safe — each mutation triggers only its specific
+ * subscribed effects (O(1) surgical DOM updates), never a full
+ * component re-render.
  */
 
 // ─── Global State ────────────────────────────────────────────────────────────
@@ -72,6 +60,9 @@ function getObserver(): MutationObserver {
   return observer;
 }
 
+// Initialize the observer eagerly so DOM removals are always detected.
+getObserver();
+
 // ─── Public API ──────────────────────────────────────────────────────────────
 
 /**
@@ -90,7 +81,7 @@ function getObserver(): MutationObserver {
  * const Timer = component(() => {
  *   const st = store({ seconds: 0 });
  *
- *   onMount(() => {
+ *   mounted(() => {
  *     const id = setInterval(() => st.seconds++, 1000);
  *     return () => clearInterval(id); // cleanup on unmount
  *   });
@@ -99,7 +90,7 @@ function getObserver(): MutationObserver {
  * });
  * ```
  */
-export function onMount(fn: MountCallback): void {
+export function mounted(fn: MountCallback): void {
   pendingCallbacks.push({ callback: fn, element: null });
 }
 
@@ -109,14 +100,23 @@ export function onMount(fn: MountCallback): void {
  *
  * @param wrapper — The component's root wrapper element.
  */
+/** Track which wrappers have already fired mount callbacks. */
+const _mountedWrappers = new WeakSet<HTMLElement>();
+
 export function flushMountCallbacks(wrapper: HTMLElement): void {
-  // Start the observer if not already
-  getObserver();
+  if (_mountedWrappers.has(wrapper)) {
+    pendingCallbacks = [];
+    return;
+  }
+  _mountedWrappers.add(wrapper);
 
   const callbacks = pendingCallbacks;
   pendingCallbacks = [];
 
-  // Defer to next microtask so the element is definitely in the DOM
+  // Defer so the wrapper is in the DOM when callbacks fire.
+  // In the Zero-VDOM architecture, mount callbacks can safely modify
+  // reactive state — each mutation triggers only its specific effects
+  // (O(1) surgical DOM updates), not a full component re-render.
   queueMicrotask(() => {
     for (const entry of callbacks) {
       entry.element = wrapper;

@@ -3,24 +3,14 @@
  *
  * AstraJS Core provides:
  * - `store()` — ES6 Proxy-based fine-grained reactivity (~3KB)
- * - `effect()` / `memo()` — Auto-tracking reactive computations
- * - `batch()` / `untrack()` — Batching and escape hatches
- * - DOM bindings — `bindText`, `bindAttr`, `bindClass`, `bindValue`, `bindList`
- * - `Component<P>` — Optional type alias for component signatures
+ * - `memo()` / `batch()` / `untrack()` — Derived values and batching
+ * - `dynamic()` — Zero-VDOM reactive expression marker
+ * - DOM bindings — `bindText`, `bindAttr`, `bindClass`, `bindConditional`, etc.
+ * - `component()` — Declarative component wrapper (single execution)
+ * - `mounted()` — DOM lifecycle hook
  *
- * ## Quick Start
- *
- * ```ts
- * import { store, effect, memo, Component } from '@astrajs/core';
- *
- * const counter = store({ count: 0 });
- *
- * effect(() => {
- *   console.log(`Count: ${counter.count}`);
- * });
- *
- * counter.count++; // Only `count` subscribers are notified — O(1)
- * ```
+ * `effect()` is an internal primitive — use `dynamic()`, `bindText()`,
+ * or `bindList()` for reactivity. Never exposed to application code.
  */
 
 // ─── Re-exports from Runtime ─────────────────────────────────────────────────
@@ -40,7 +30,6 @@ export {
 } from './runtime/store.js';
 
 export {
-  effect,
   memo,
   batch,
   untrack,
@@ -53,13 +42,19 @@ export {
   bindTextContent,
   bindValue,
   bindList,
+  bindConditional,
+  bindDynamicList,
+  bindDynamicText,
 } from './runtime/dom.js';
 
 // Component wrapper
 export { component } from './runtime/component.js';
 
+// Zero-VDOM reactive expression
+export { dynamic } from './jsx-runtime.js';
+
 // Lifecycle
-export { onMount } from './runtime/lifecycle.js';
+export { mounted } from './runtime/lifecycle.js';
 
 // ─── Public Types ────────────────────────────────────────────────────────────
 

@@ -29,10 +29,53 @@ export {
   bindTextContent,
   bindValue,
   bindList,
+  bindConditional,
+  bindDynamicList,
+  bindDynamicText,
 } from './runtime/dom.js';
 
-import { bindText, bindValue } from './runtime/dom.js';
+import { bindText, bindValue, bindConditional, bindDynamicList, bindDynamicText, bindAttr } from './runtime/dom.js';
 import { getLastReactiveAccess, clearLastReactiveAccess } from './runtime/store.js';
+import { untrack } from './runtime/effect.js';
+
+// ─── dynamic() — Zero-VDOM reactive expression marker ────────────────────
+
+/**
+ * Symbol to mark expressions wrapped with `dynamic()`.
+ * Detected by `appendChildren` to create individual micro-effects
+ * instead of evaluating the expression eagerly.
+ */
+const DYNAMIC_SYM = Symbol('astra-dynamic');
+
+/**
+ * Wraps a reactive JSX expression so the runtime creates a granular
+ * DOM binding (O(1) update) instead of evaluating it inline.
+ *
+ * Without `dynamic()`, JSX expressions are evaluated once at component
+ * creation time and never update. With `dynamic()`, the runtime creates
+ * a micro-effect that updates only the specific DOM node(s) affected
+ * by the expression.
+ *
+ * @example
+ * ```tsx
+ * // Conditional rendering — bindConditional swaps the DOM node
+ * <div>{dynamic(() => show ? <Timer /> : <p>Hidden</p>)}</div>
+ *
+ * // List rendering — bindDynamicList reconciles children
+ * <div>{dynamic(() => items.map(i => <li>{i}</li>))}</div>
+ *
+ * // Scalar text — bindDynamicText updates the TextNode
+ * <span>{dynamic(() => `Count: ${count}`)}</span>
+ * ```
+ */
+export function dynamic<T>(fn: () => T): () => T {
+  (fn as Record<symbol, unknown>)[DYNAMIC_SYM] = true;
+  return fn;
+}
+
+function isDynamic(value: unknown): value is (() => unknown) {
+  return typeof value === 'function' && (value as Record<symbol, unknown>)[DYNAMIC_SYM] === true;
+}
 
 // ─── JSX Factory ─────────────────────────────────────────────────────────────
 
@@ -47,8 +90,13 @@ function flattenChildren(children: JSXChild): (Node | string | number)[] {
 
 /**
  * Appends children to a parent element.
- * Strings/numbers become TextNodes with AUTO reactive binding
- * if the value came from a store access.
+ *
+ * Zero-VDOM granular rendering:
+ * - `dynamic()` expressions → individual micro-effects (bindConditional,
+ *   bindDynamicList, bindDynamicText) targeting only that DOM node.
+ * - Static Nodes → appended once, never recreated.
+ * - Static scalars → TextNodes created once.
+ * - No full re-render, no VDOM diffing — O(1) surgical DOM updates.
  */
 function appendChildren(
   parent: HTMLElement | DocumentFragment,
@@ -56,14 +104,35 @@ function appendChildren(
 ): void {
   const flat = flattenChildren(children);
   for (const child of flat) {
-    if (child instanceof Node) {
+    // ── dynamic() expression → granular micro-effect ──
+    if (isDynamic(child)) {
+      const marker = document.createComment('~');
+      parent.appendChild(marker);
+
+      // Evaluate once to determine the binding type.
+      // CRITICAL: Use untrack() to prevent the current effect (e.g.,
+      // bindConditional) from subscribing to the inner store. Without
+      // untrack, a conditional's getter accessing a child's store would
+      // cause the conditional to re-evaluate on every child store change,
+      // destroying and recreating the child component.
+      const initial = untrack(() => child());
+      if (Array.isArray(initial)) {
+        // List: each item is already a rendered Node
+        bindDynamicList(parent, marker, child as () => readonly Node[]);
+      } else if (initial instanceof Node) {
+        // Conditional or component: the getter returns a Node
+        bindConditional(parent, marker, child as () => Node);
+      } else {
+        // Scalar: string, number, etc.
+        bindDynamicText(parent, marker, child as () => string | number);
+      }
+    }
+    // ── Static Node → append once ──
+    else if (child instanceof Node) {
       parent.appendChild(child);
-    } else if (typeof child === 'function') {
-      // Reactive getter: create TextNode + bindText
-      const tn = document.createTextNode('');
-      bindText(tn, child as () => string);
-      parent.appendChild(tn);
-    } else {
+    }
+    // ── Static scalar → TextNode once ──
+    else {
       parent.appendChild(document.createTextNode(String(child)));
     }
   }
@@ -141,6 +210,11 @@ function setProps(
     } else if (key === 'minLength' || key === 'maxLength') {
       // Map JSX camelCase to native lowercase attribute (minlength, maxlength)
       el.setAttribute(key.toLowerCase(), String(value));
+    } else if (typeof value === 'function') {
+      // ── Reactive attribute getter ──────────────────────────────────
+      // Compiler wraps reactive attrs as `attr={() => store.prop}`.
+      // bindAttr creates an effect that updates the attribute reactively.
+      bindAttr(el, key, value as () => string | null);
     } else if (value === true) {
       el.setAttribute(key, '');
     } else if (value === false || value === null) {

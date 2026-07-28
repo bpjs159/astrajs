@@ -74,6 +74,32 @@ export function setBindingUpdate(value: boolean): void {
   _isBindingUpdate = value;
 }
 
+/**
+ * When true, store mutations are BLOCKED entirely.
+ * Used during lifecycle callbacks (mount/unmount) to prevent
+ * side effects from corrupting the component's render state.
+ * Unlike setBindingUpdate (which allows mutations but suppresses
+ * effects), lifecyclePhase blocks the actual data change.
+ */
+let _lifecyclePhase = false;
+
+export function setLifecyclePhase(value: boolean): void {
+  _lifecyclePhase = value;
+}
+
+export function isLifecyclePhase(): boolean {
+  return _lifecyclePhase;
+}
+
+/** Counts store mutations suppressed during setBindingUpdate. */
+let _pendingMutations = 0;
+
+export function getAndClearPendingMutations(): number {
+  const n = _pendingMutations;
+  _pendingMutations = 0;
+  return n;
+}
+
 /** Symbol to mark store proxies — detectable by JSX runtime */
 export const STORE_SYMBOL: unique symbol = Symbol('astra-store');
 
@@ -212,6 +238,14 @@ export function trigger(raw: object, prop: string | symbol): void {
   const subscribers = propMap.get(prop);
   if (!subscribers || subscribers.size === 0) return;
 
+  // During lifecycle callbacks (setBindingUpdate), suppress effect
+  // execution but count mutations so component() can do one re-render
+  // after all callbacks complete.
+  if (_isBindingUpdate) {
+    _pendingMutations++;
+    return;
+  }
+
   if (batchDepth > 0) {
     // Queue for batch flush
     for (const sub of subscribers) {
@@ -292,6 +326,11 @@ function createReactiveProxy<T extends object>(raw: T): T {
 
       // If the value hasn't changed, skip notification
       if (oldValue === value) return true;
+
+      // During lifecycle callbacks, block store mutations entirely.
+      // Lifecycle hooks are for side effects (timers, DOM measurements),
+      // not for modifying reactive state that affects rendering.
+      if (_lifecyclePhase) return true;
 
       const result = Reflect.set(target, prop, value, receiver);
 
@@ -374,12 +413,52 @@ export function clearComponentCache(): void {
 // ─── Public API: store() ─────────────────────────────────────────────────────
 
 /**
- * Creates a reactive store from an initial state object.
+ * Creates a reactive store.
+ *
+ * Two forms:
+ * - `store({ count: 0 })` — plain initial state
+ * - `store((self) => ({ count: 0, inc() { self.count++ } }))` — factory,
+ *   receives the proxy as `self` so methods can mutate it reactively
  */
 export function store<T extends object>(
-  initialState: T,
+  initialState: T | ((self: any) => T),
   _options?: StoreOptions
 ): T {
+  // Factory form: store((self) => ({ ... }))
+  if (typeof initialState === 'function') {
+    // Reuse cached proxy inside component() to avoid creating
+    // a new reactive object on every re-render.
+    if (_componentCache && _componentKeyGen) {
+      const cacheKey = _options?.key ?? `__astra_auto_${_componentKeyGen()}`;
+      const cached = _componentCache.get(cacheKey);
+      if (cached) return cached as T;
+
+      const raw: any = {};
+      const proxy = createReactiveProxy(raw);
+      const result = (initialState as (self: any) => T)(proxy);
+      Object.assign(raw, result);
+      for (const key of Object.keys(result)) {
+        if (typeof (result as any)[key] === 'function') {
+          raw[key] = (result as any)[key];
+        }
+      }
+      _componentCache.set(cacheKey, proxy);
+      return proxy;
+    }
+
+    // No component cache: create fresh every time
+    const raw: any = {};
+    const proxy = createReactiveProxy(raw);
+    const result = (initialState as (self: any) => T)(proxy);
+    Object.assign(raw, result);
+    for (const key of Object.keys(result)) {
+      if (typeof (result as any)[key] === 'function') {
+        raw[key] = (result as any)[key];
+      }
+    }
+    return proxy;
+  }
+
   if (typeof initialState !== 'object' || initialState === null) {
     throw new TypeError(
       `[AstraJS] store() expects a plain object, received ${typeof initialState}`

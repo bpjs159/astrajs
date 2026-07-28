@@ -1,4 +1,4 @@
-import { component, store, effect } from '@astrajs/core';
+import { component, store, mounted } from '@astrajs/core';
 import { styles as s } from './styles.js';
 
 const swrState = store({ data: 'Loading...', lastFetched: 0, isStale: true, isValidating: false, autoSyncEnabled: false, logs: [] as string[] });

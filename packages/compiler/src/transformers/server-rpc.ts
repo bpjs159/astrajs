@@ -275,7 +275,7 @@ export interface ServerTransformResult {
  */
 export function transformServerRPC(
   source: string,
-  filename: string,
+  _filename: string,
   config: AstraViteConfig
 ): ServerTransformResult {
   const apiPrefix = config.apiPrefix ?? '/api/astra';

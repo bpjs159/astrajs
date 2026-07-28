@@ -2,36 +2,29 @@
  * @astrajs/core — Component Wrapper
  *
  * `component(fn)` wraps a function that uses `store()` + JSX so that
- * reactive expressions like `{ui.valor}` auto-update the DOM when the
- * store changes — without manual `effect()` calls.
+ * reactive expressions auto-update the DOM when the store changes.
  *
- * ## How It Works
+ * ## Zero-VDOM Architecture
  *
- * 1. Runs `fn(props)` once to produce the initial DOM.
- * 2. During that run, any `store()` property accessed is tracked.
- * 3. An `effect()` is created that re-runs `fn(props)` whenever any
- *    tracked store property changes.
- * 4. The old DOM is replaced with the new DOM via `replaceWith()`.
+ * 1. `fn(props)` executes **exactly once** to produce the initial DOM.
+ * 2. Reactive expressions inside JSX must use `dynamic()` to create
+ *    individual micro-effects targeting specific DOM nodes.
+ * 3. Each store property change triggers only the effects subscribed
+ *    to that property — O(1) surgical DOM updates. No full re-render,
+ *    no diffing, no component re-execution.
+ * 4. Static DOM nodes (child components, text, attributes) are never
+ *    recreated — they stay in the DOM unless explicitly removed.
  *
- * ## With the Compiler (Production)
+ * ## Lifecycle
  *
- * When the Vite compiler plugin processes the component, it transforms
- * `{ui.valor}` into `bindText(textNode, () => String(ui.valor))`.
- * In that case, `component()` is NOT needed — the bindings are direct
- * and O(1) per mutation.
- *
- * `component()` is the dev-mode convenience wrapper.
+ * `mounted()` callbacks fire when the component's wrapper enters the
+ * DOM. The MutationObserver in lifecycle.ts handles cleanup when
+ * nodes are removed.
  */
 
-import { effect } from './effect.js';
-import { setComponentCache, clearComponentCache, isBindingUpdate } from './store.js';
-import { flushMountCallbacks, triggerUnmount, hasPendingMountCallbacks } from './lifecycle.js';
+import { setComponentCache, clearComponentCache } from './store.js';
+import { flushMountCallbacks, hasPendingMountCallbacks } from './lifecycle.js';
 
-/**
- * Wraps a component function so JSX expressions referencing
- * reactive stores auto-update the DOM when the store changes.
- * Also wires up `onMount`/unmount lifecycle hooks.
- */
 export function component<P extends Record<string, unknown>>(
   fn: (props: P) => JSX.Element
 ): (props: P) => JSX.Element {
@@ -41,29 +34,23 @@ export function component<P extends Record<string, unknown>>(
     const storeCache = new Map<string, object>();
     let storeCounter = 0;
 
-    effect(() => {
-      if (isBindingUpdate()) return;
+    // ZERO-VDOM: Execute fn ONCE to build the initial DOM.
+    // store() calls are cached so the same proxy is reused if
+    // the component is re-invoked (e.g., inside a dynamic() block).
+    setComponentCache(storeCache, () => storeCounter++);
+    const root = fn(props);
+    clearComponentCache();
 
-      // Snapshot old children (before replaceChildren removes them)
-      const oldNodes = Array.from(wrapper.childNodes);
+    wrapper.appendChild(root as Node);
 
-      storeCounter = 0;
-      setComponentCache(storeCache, () => storeCounter++);
-      const newRoot = fn(props);
-      clearComponentCache();
-
-      // Atomic swap: remove old + add new in one paint
-      wrapper.replaceChildren(newRoot as Node);
-
-      for (const n of oldNodes) {
-        if (n instanceof HTMLElement) triggerUnmount(n);
-      }
-
-      // Flush any onMount callbacks collected during render
-      if (hasPendingMountCallbacks()) {
-        flushMountCallbacks(wrapper);
-      }
-    });
+    // Fire mount callbacks after the wrapper enters the live DOM.
+    if (hasPendingMountCallbacks()) {
+      queueMicrotask(() => {
+        if (wrapper.isConnected) {
+          flushMountCallbacks(wrapper);
+        }
+      });
+    }
 
     return wrapper as JSX.Element;
   };

@@ -157,7 +157,6 @@ export function extractCSS(
 ): ExtractedCSS[] {
   const results: ExtractedCSS[] = [];
   const prefix = config.cssPrefix ?? 'astra-';
-  const hashLen = config.cssHashLength ?? 6;
 
   // Pattern: const/let/var name = css`...`  OR  css`...`
   const cssTagRegex = /(?:const|let|var)\s+(\w+)\s*=\s*css\s*`([\s\S]*?)`|css\s*`([\s\S]*?)`/g;
