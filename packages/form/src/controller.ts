@@ -12,7 +12,7 @@
  * - **No manual validation loops** — we read `ValidityState` from the DOM.
  */
 
-import { store } from '@astrajs/core';
+import { store, mounted } from '@astrajs/core';
 import { getFormErrors } from './validity-map.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -38,15 +38,11 @@ export interface FormController {
   /** Force re-evaluation of all inputs' validity state. */
   validateAll(): void;
   /**
-   * Release all internal references and stop listening to DOM events.
-   * Call this when the form is unmounted (e.g., in a `mounted()` cleanup)
-   * to allow the garbage collector to reclaim the controller and form element.
+   * Release all internal references.
    *
-   * @example
-   * ```ts
-   * const loginForm = form();
-   * mounted(() => () => loginForm.dispose());
-   * ```
+   * **Normally not needed** — dispose() is called automatically when the
+   * parent component unmounts (via `mounted()` cleanup). Use this only
+   * if you need to manually detach the controller before unmount.
    */
   dispose(): void;
 }
@@ -114,6 +110,15 @@ export function form(): FormController {
 
       // Event delegation on document — survives component() re-renders
       _delegate(state as unknown as FormController);
+
+      // Auto-dispose when the parent component unmounts.
+      // _attach() runs synchronously inside the component function,
+      // so mounted() correctly registers against the current wrapper.
+      // The developer never needs to call dispose() manually.
+      mounted(() => () => {
+        _formEls.delete(state);
+        _wired.delete(state);
+      });
     },
 
     /**
