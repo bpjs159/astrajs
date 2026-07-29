@@ -18,8 +18,9 @@ declare namespace JSX {
    * This is the foundation of Zero-VDOM: components return physical DOM.
    *
    * Includes arrays for `.map()` render patterns and Fragment support.
+   * Functions (from `dynamic()`) are detected at runtime as reactive markers.
    */
-  type Element = HTMLElement | DocumentFragment | false | null | readonly Element[];
+  type Element = HTMLElement | DocumentFragment | false | null | readonly Element[] | (() => Element);
 
   /**
    * Children can be any renderable value.
