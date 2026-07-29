@@ -518,9 +518,11 @@ export function autoMemoDerivedFunctions(
 
       const arrowFn = initializer as ts.ArrowFunction;
 
-      // Only memoize expression-body arrows: () => expr
-      // Block-body arrows () => { ... } may have side effects
-      if (!ts.isConciseBody(arrowFn)) {
+      // Only memoize expression-body arrows with no parameters.
+      // Block bodies may have side effects; parameters mean it's called
+      // with arguments (e.g. event handlers), so memo is unsafe.
+      // isConciseBody is unreliable — use isBlock on the body instead.
+      if (ts.isBlock(arrowFn.body) || arrowFn.parameters.length > 0) {
         ts.forEachChild(node, visit);
         return;
       }

@@ -49,7 +49,7 @@ function getObserver(): MutationObserver | null {
     observer = new MutationObserver((mutations) => {
       for (const mutation of mutations) {
         for (const node of mutation.removedNodes) {
-          if (node instanceof HTMLElement) {
+          if (typeof HTMLElement !== 'undefined' && node instanceof HTMLElement) {
             // Run cleanup for the removed element
             const cleanup = activeCleanups.get(node);
             if (cleanup) {

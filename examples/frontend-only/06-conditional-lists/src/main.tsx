@@ -1,7 +1,9 @@
 /**
  * 06 — Conditional & List Rendering
  *
- * Plain JS expressions — no special directives needed. The compiler
+ * Arrow functions for handlers — the compiler auto-wraps reactive JSX 
+ * expressions, not handler functions. Plain JS operators — no special 
+ * directives needed. The compiler
  * auto-wraps reactive expressions with `dynamic()`, so conditionals
  * and .map() just work.
  *
@@ -14,7 +16,7 @@
  * Zero-VDOM: `dynamic()` re-evaluates the expression when tracked
  * stores change, surgically updating only the affected DOM node.
  */
-import { component, store, dynamic } from '@astrajs/core';
+import { component, store } from '@astrajs/core';
 import { styles } from './styles.js';
 
 interface Task {
@@ -51,28 +53,27 @@ export const ConditionalListsDemo = component(() => {
     nextId: 4,
   });
 
-  function filterTasks(tasks: Task[], filter: Filter): Task[] {
-    return tasks.filter((t: Task) =>
+  const filterTasks = (tasks: Task[], filter: Filter): Task[] =>
+    tasks.filter((t: Task) =>
       filter === 'all' ? true :
       filter === 'active' ? !t.done :
       t.done
     );
-  }
 
-  function addTask() {
+  const addTask = () => {
     const labels = ['Write tests', 'Review PR', 'Update docs', 'Fix bug', 'Refactor', 'Add feature'];
     const label = labels[ui.nextId % labels.length]!;
     ui.tasks = [...ui.tasks, { id: ui.nextId, text: label, done: false }];
     ui.nextId++;
-  }
+  };
 
-  function toggleTask(id: number) {
+  const toggleTask = (id: number) => {
     ui.tasks = ui.tasks.map((t: Task) => t.id === id ? { ...t, done: !t.done } : t);
-  }
+  };
 
-  function removeTask(id: number) {
+  const removeTask = (id: number) => {
     ui.tasks = ui.tasks.filter((t: Task) => t.id !== id);
-  }
+  };
 
   return (
     <div class={styles.card}>
@@ -149,51 +150,44 @@ export const ConditionalListsDemo = component(() => {
             <button class={styles.btnAdd} onClick={addTask}>+ Add task</button>
           </div>
 
-          {/* ── List & Empty State (reactive via dynamic()) ── */}
-          {dynamic(() => {
-            const filtered = filterTasks(ui.tasks, ui.filter);
-            const doneCount = ui.tasks.filter((t: Task) => t.done).length;
-            const total = ui.tasks.length;
+          {/* ── Empty State ────────────────────────── */}
+          {filterTasks(ui.tasks, ui.filter).length === 0 && (
+            <div class={styles.emptyBox}>
+              <span class={styles.emptyIcon}>📭</span>
+              <p>No {ui.filter === 'all' ? '' : ui.filter} tasks yet.</p>
+              <button class={styles.btnPrimarySm} onClick={addTask}>Create one →</button>
+            </div>
+          )}
 
-            if (filtered.length === 0) {
-              return (
-                <div class={styles.emptyBox}>
-                  <span class={styles.emptyIcon}>📭</span>
-                  <p>No {ui.filter === 'all' ? '' : ui.filter} tasks yet.</p>
-                  <button class={styles.btnPrimarySm} onClick={addTask}>Create one →</button>
-                </div>
-              );
-            }
-
-            return (
-              <div>
-                <div class={styles.taskList}>
-                  {filtered.map(task => (
-                    <div class={`${styles.taskRow} ${task.done ? styles.taskDone : ''}`}>
-                      <button
-                        class={task.done ? styles.checkboxDone : styles.checkbox}
-                        onClick={() => toggleTask(task.id)}
-                        aria-label={task.done ? 'Mark undone' : 'Mark done'}
-                      >
-                        {task.done ? '✓' : ''}
-                      </button>
-                      <span class={task.done ? styles.taskTextDone : styles.taskText}>{task.text}</span>
-                      <span class={styles.taskId}>#{task.id}</span>
-                      <button class={styles.btnDel} onClick={() => removeTask(task.id)} aria-label="Delete task">×</button>
-                    </div>
-                  ))}
-                </div>
-                <div class={styles.listFooter}>
-                  <span><strong>{doneCount}</strong> of <strong>{total}</strong> completed</span>
-                  {doneCount > 0 && (
-                    <div class={styles.progressBar}>
-                      <div class={styles.progressFill} style={`width:${Math.round((doneCount / Math.max(1, total)) * 100)}%`} />
-                    </div>
-                  )}
-                </div>
+          {/* ── Task List ──────────────────────────── */}
+          {filterTasks(ui.tasks, ui.filter).length > 0 && (
+            <div>
+              <div class={styles.taskList}>
+                {filterTasks(ui.tasks, ui.filter).map(task => (
+                  <div class={`${styles.taskRow} ${task.done ? styles.taskDone : ''}`}>
+                    <button
+                      class={task.done ? styles.checkboxDone : styles.checkbox}
+                      onClick={() => toggleTask(task.id)}
+                      aria-label={task.done ? 'Mark undone' : 'Mark done'}
+                    >
+                      {task.done ? '✓' : ''}
+                    </button>
+                    <span class={task.done ? styles.taskTextDone : styles.taskText}>{task.text}</span>
+                    <span class={styles.taskId}>#{task.id}</span>
+                    <button class={styles.btnDel} onClick={() => removeTask(task.id)} aria-label="Delete task">×</button>
+                  </div>
+                ))}
               </div>
-            );
-          })}
+              <div class={styles.listFooter}>
+                <span><strong>{ui.tasks.filter((t: Task) => t.done).length}</strong> of <strong>{ui.tasks.length}</strong> completed</span>
+                {ui.tasks.filter((t: Task) => t.done).length > 0 && (
+                  <div class={styles.progressBar}>
+                    <div class={styles.progressFill} style={`width:${Math.round((ui.tasks.filter((t: Task) => t.done).length / Math.max(1, ui.tasks.length)) * 100)}%`} />
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
