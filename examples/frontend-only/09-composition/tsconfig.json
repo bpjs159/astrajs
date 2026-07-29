@@ -1,0 +1,16 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "@astrajs/core",
+    "rootDir": "../../..",
+    "noEmit": true,
+    "paths": {
+      "@astrajs/core": ["../../../packages/core/src"],
+      "@astrajs/core/jsx-runtime": ["../../../packages/core/src/jsx-runtime"],
+      "@astrajs/compiler/css": ["../../../packages/compiler/src/css"],
+      "@astrajs/compiler": ["../../../packages/compiler/src"]
+    }
+  },
+  "include": ["src", "../../../packages/core/src/jsx.d.ts"]
+}

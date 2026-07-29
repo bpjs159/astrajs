@@ -720,7 +720,7 @@ export function transformJSX(
   };
 
   // Detect reactive store variables: const st = store({...})
-  const storeRegex = /\b(const|let|var)\s+([\w$]+)\s*=\s*store\s*\(/g;
+  const storeRegex = /\b(const|let|var)\s+([\w$]+)(?:\s*:\s*[^=]+)?\s*=\s*(?:store|swr)\s*\(/g;
   let match: RegExpExecArray | null;
   while ((match = storeRegex.exec(source)) !== null) {
     config.reactiveVars.add(match[2]!);

@@ -16,8 +16,10 @@ declare namespace JSX {
   /**
    * AstraJS JSX elements are real, live DOM nodes — not virtual representations.
    * This is the foundation of Zero-VDOM: components return physical DOM.
+   *
+   * Includes arrays for `.map()` render patterns and Fragment support.
    */
-  type Element = HTMLElement | DocumentFragment | false | null;
+  type Element = HTMLElement | DocumentFragment | false | null | readonly Element[];
 
   /**
    * Children can be any renderable value.

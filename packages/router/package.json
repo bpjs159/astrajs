@@ -21,7 +21,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@astrajs/core": "workspace:*"
+    "@astrajs/core": "0.1.0"
   },
   "devDependencies": {
     "typescript": "^5.5.0",

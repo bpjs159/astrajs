@@ -123,8 +123,10 @@ function appendChildren(
       if (Array.isArray(initial)) {
         // List: each item is already a rendered Node
         bindDynamicList(parent, marker, child as () => readonly Node[]);
-      } else if (initial instanceof Node) {
-        // Conditional or component: the getter returns a Node
+      } else if (initial instanceof Node || initial === false || initial === null || initial === undefined || initial === true) {
+        // Conditional or component: the getter returns a Node, or a
+        // falsy/boolean value that will transition to a Node later.
+        // bindConditional handles falsy → Node transitions correctly.
         bindConditional(parent, marker, child as () => Node);
       } else {
         // Scalar: string, number, etc.

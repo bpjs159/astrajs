@@ -28,4 +28,4 @@ style.textContent = `
 document.head.appendChild(style);
 
 // Mount
-document.getElementById('app')!.appendChild(Counter({}));
+document.getElementById('app')!.appendChild(Counter({}) as Node);

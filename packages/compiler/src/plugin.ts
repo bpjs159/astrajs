@@ -155,7 +155,7 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
       // Phase 3: JSX transforms (dynamic mode) or Vanilla DOM (vanilla mode)
       if (/\.(tsx|jsx)$/.test(id)) {
         // Detect reactive store variables: const st = store({...})
-        const storeRegex = /\b(const|let|var)\s+([\w$]+)\s*=\s*store\s*\(/g;
+        const storeRegex = /\b(const|let|var)\s+([\w$]+)(?:\s*:\s*[^=]+)?\s*=\s*(?:store|swr)\s*\(/g;
         const reactiveVars = new Set<string>();
         let match: RegExpExecArray | null;
         while ((match = storeRegex.exec(transformed)) !== null) {

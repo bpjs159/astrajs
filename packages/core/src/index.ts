@@ -78,6 +78,11 @@ export type { ClassValue } from './runtime/classes.js';
 export { /** @internal Framework primitive. Use `mounted()` for side effects. */
 effect } from './runtime/effect.js';
 
+// SWR — Stale-While-Revalidate caching
+// One import, zero boilerplate: swr(() => fetch('/api/data').then(r => r.json()))
+export { swr } from './runtime/swr.js';
+export type { SWRState, SWROptions } from './runtime/swr.js';
+
 // ─── Public Types ────────────────────────────────────────────────────────────
 
 /**

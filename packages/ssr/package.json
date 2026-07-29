@@ -21,9 +21,9 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@astrajs/core": "workspace:*",
-    "@astrajs/router": "workspace:*",
-    "@astrajs/server": "workspace:*"
+    "@astrajs/core": "0.1.0",
+    "@astrajs/router": "0.1.0",
+    "@astrajs/server": "0.1.0"
   },
   "devDependencies": {
     "typescript": "^5.5.0",

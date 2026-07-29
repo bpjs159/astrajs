@@ -34,8 +34,8 @@
     }
   },
   "typesVersions": {
-    "*": {
-      "*": ["./dist/index.d.ts"],
+    "0.1.0": {
+      "0.1.0": ["./dist/index.d.ts"],
       "validation": ["./dist/validation.d.ts"],
       "vite": ["./dist/compiler/index.d.ts"]
     }
@@ -54,7 +54,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@astrajs/validation": "workspace:*"
+    "@astrajs/validation": "0.1.0"
   },
   "devDependencies": {
     "typescript": "^5.5.0",

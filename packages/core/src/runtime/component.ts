@@ -29,7 +29,7 @@ import {
   setCurrentWrapper,
 } from './lifecycle.js';
 
-export function component<P extends Record<string, unknown>>(
+export function component<P>(
   fn: (props: P) => JSX.Element
 ): (props: P) => JSX.Element {
   return (props: P): JSX.Element => {
