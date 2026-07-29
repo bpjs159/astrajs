@@ -50,14 +50,14 @@ export function bindText(node: Text, getter: () => string): void {
 export function bindAttr(
   el: HTMLElement,
   attr: string,
-  getter: () => string | null
+  getter: () => string | null | boolean
 ): void {
   effect(() => {
     const value = getter();
-    if (value === null || value === undefined || value === '') {
+    if (value === null || value === undefined || value === false || value === '') {
       el.removeAttribute(attr);
-    } else if (el.getAttribute(attr) !== value) {
-      el.setAttribute(attr, value);
+    } else if (el.getAttribute(attr) !== String(value)) {
+      el.setAttribute(attr, String(value));
     }
   });
 }
