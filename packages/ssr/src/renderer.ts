@@ -237,7 +237,7 @@ export async function renderRoute(
  * The SSG crawler:
  * 1. Collects all leaf routes from the route definitions.
  * 2. Renders each route to a static HTML file.
- * 3. Resolves `server$({ type: 'pre-build' })` calls at build time.
+ * 3. Resolves `server({ type: 'pre-build' })` calls at build time.
  * 4. Generates a sitemap.xml if configured.
  *
  * @param config — SSG configuration.

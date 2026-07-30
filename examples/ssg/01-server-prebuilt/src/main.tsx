@@ -1,7 +1,7 @@
 /**
- * 06 — Pre-Build server$
+ * 06 — Pre-Build server
  *
- * `server$({ type: 'pre-build' })` executes the function at BUILD TIME.
+ * `server({ type: 'pre-build' })` executes the function at BUILD TIME.
  * The result is INLINED into the HTML — 0 KB of JS shipped for that query.
  *
  * This demo simulates what pre-built data looks like after SSG compilation.
@@ -11,7 +11,7 @@ import { store, mounted } from '@astrajs/core';
 
 // ─── Simulated Pre-Build Data ────────────────────────────────────────────────
 // In production, this would be:
-//   const getProducts = server$({ type:'pre-build', tags:['products'] },
+//   const getProducts = server({ type:'pre-build', tags:['products'] },
 //     async () => db.products.findMany()
 //   );
 // At build time, the function is EXECUTED and the result is INLINED.
@@ -42,9 +42,9 @@ const app = document.getElementById('app')!;
 function render(): void {
   app.innerHTML = `
     <div class="card">
-      <h1>⚡ Pre-Build server$</h1>
+      <h1>⚡ Pre-Build server</h1>
       <p class="subtitle">
-        <code style="background:#334155;padding:2px 6px;border-radius:4px;">server$({ type: 'pre-build' })</code>
+        <code style="background:#334155;padding:2px 6px;border-radius:4px;">server({ type: 'pre-build' })</code>
         — executed at build time, result inlined in HTML
       </p>
 

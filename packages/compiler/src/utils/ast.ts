@@ -2,7 +2,7 @@
  * @astrajs/compiler — AST Utility Helpers
  *
  * Low-level utilities for walking and manipulating AST nodes during
- * the JSX → DOM, CSS extraction, and server$ compilation passes.
+ * the JSX → DOM, CSS extraction, and server compilation passes.
  *
  * Since AstraJS is a build-time compiler, these utilities operate on
  * source code as strings using pattern matching and structured transforms.

@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { RPCDemo } from '../main.js';
+import { ServerDemo } from '../main.js';
 
-describe('RPC Demo', () => {
+describe('Server Demo', () => {
   it('renders without crashing', () => {
-    const el = RPCDemo({}) as HTMLElement;
+    const el = ServerDemo({}) as HTMLElement;
     expect(el).toBeInstanceOf(HTMLElement);
     expect(el.querySelector('button')).toBeTruthy();
   });

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { registerRPCHandler, getRPCHandler, revalidate, onCacheInvalidate } from '../rpc.js';
+import { rpcHandler, getRPCHandler, revalidate, onCacheInvalidate } from '../rpc.js';
 
 describe('registerRPCHandler()', () => {
   it('registers and retrieves a handler', () => {

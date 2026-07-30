@@ -1,13 +1,13 @@
 /**
  * @astrajs/ssr — Constant Folding (Pre-Build Execution)
  *
- * When `server$()` is called with `{ type: 'pre-build' }`, the function
+ * When `server()` is called with `{ type: 'pre-build' }`, the function
  * is executed at build time (during SSG) and its result is inlined into
  * the HTML. This means **0 KB of JavaScript** is shipped for that query.
  *
  * ## How It Works
  *
- * 1. The Vite plugin identifies `server$({ type: 'pre-build' }, fn)` calls.
+ * 1. The Vite plugin identifies `server({ type: 'pre-build' }, fn)` calls.
  * 2. It emits a manifest entry (`astra-prebuild-manifest.json`).
  * 3. During SSG, the pre-build executor runs each function:
  *    - In a sandboxed VM context (for safety).
@@ -51,7 +51,7 @@ const preBuildCache = new Map<string, PreBuildEntry>();
 // ─── Pre-Build Executor ──────────────────────────────────────────────────────
 
 /**
- * Executes a `server$({ type: 'pre-build' })` function at build time
+ * Executes a `server({ type: 'pre-build' })` function at build time
  * and returns the serialized result.
  *
  * The function is executed in the current Node.js process (with access

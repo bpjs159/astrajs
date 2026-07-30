@@ -6,7 +6,7 @@
  *    `document.createElement` + reactive binding calls.
  * 2. **CSS Extraction** — Hoists `css` tagged template literals into
  *    static `.css` files with content-hash class names.
- * 3. **server$ Compilation** — Creates API endpoints and replaces
+ * 3. **server Compilation** — Creates API endpoints and replaces
  *    client calls with type-safe fetch wrappers.
  *
  * @example
@@ -67,7 +67,7 @@ export interface AstraViteConfig {
   cssPrefix?: string;
 
   /**
-   * API route prefix for server$ endpoints.
+   * API route prefix for server endpoints.
    * @default '/api/astra'
    */
   apiPrefix?: string;

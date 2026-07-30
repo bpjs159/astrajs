@@ -2,24 +2,24 @@
  * @astrajs/server — RPC Runtime
  *
  * Client-side fetch wrapper and server-side handler registry for
- * the `server$()` macro. The compiler transforms `server$()` calls
- * into calls to `createRPCClient()`, which returns a type-safe
+ * the `server()` macro. The compiler transforms `server()` calls
+ * into calls to `rpcClient()`, which returns a type-safe
  * fetch-based function.
  *
  * ## How It Works
  *
  * ### Client Side
  * ```ts
- * // Transformed from: const getData = server$(async (id: string) => db.find(id));
- * import { createRPCClient } from '@astrajs/server';
- * const getData = createRPCClient('/api/astra/getData');
+ * // Transformed from: const getData = server(async (id: string) => db.find(id));
+ * import { rpcClient } from '@astrajs/server';
+ * const getData = rpcClient('/api/astra/getData');
  * // → getData('42') → fetch('/api/astra/getData', { method:'POST', body:'["42"]' })
  * ```
  *
  * ### Server Side
  * ```ts
- * import { registerRPCHandler } from '@astrajs/server';
- * registerRPCHandler('getData', async (args) => {
+ * import { rpcHandler } from '@astrajs/server';
+ * rpcHandler('getData', async (args) => {
  *   const [id] = args;
  *   return db.find(id);
  * });
@@ -35,7 +35,7 @@
 /**
  * Creates a client-side RPC function that calls a server endpoint via fetch.
  *
- * The compiler replaces `server$(fn)` with a call to this function,
+ * The compiler replaces `server(fn)` with a call to this function,
  * passing the generated endpoint path.
  *
  * @typeParam Args — Tuple of argument types.
@@ -46,13 +46,13 @@
  *
  * @example
  * ```ts
- * const getProducts = createRPCClient<string[], Product[]>(
+ * const getProducts = rpcClient<string[], Product[]>(
  *   '/api/astra/getProducts'
  * );
  * const hats = await getProducts(['hats']);
  * ```
  */
-export function createRPCClient<Args extends unknown[], Return>(
+export function rpcClient<Args extends unknown[], Return>(
   endpoint: string,
   options?: {
     /** HTTP method (default: POST). */
@@ -126,7 +126,7 @@ interface RegisteredHandler {
 const handlerRegistry = new Map<string, RegisteredHandler>();
 
 /**
- * Registers a server-side handler for a `server$()` function.
+ * Registers a server-side handler for a `server()` function.
  *
  * Called by the generated server endpoint code. The handler function
  * receives the deserialized arguments array and returns the result.
@@ -137,13 +137,13 @@ const handlerRegistry = new Map<string, RegisteredHandler>();
  *
  * @example
  * ```ts
- * registerRPCHandler('getProducts', async (args: [string]) => {
+ * rpcHandler('getProducts', async (args: [string]) => {
  *   const [category] = args;
  *   return db.products.findMany({ where: { category } });
  * }, { tags: ['products'], maxAge: 3600 });
  * ```
  */
-export function registerRPCHandler(
+export function rpcHandler(
   id: string,
   fn: (...args: unknown[]) => Promise<unknown>,
   options: {
@@ -303,11 +303,11 @@ export function onCacheInvalidate(callback: (tag: string) => void): () => void {
  * Invalidates the static cache for a given tag and notifies all
  * connected autoSync clients to re-fetch affected data.
  *
- * @param tag — The cache tag to invalidate (must match tags used in `server$`).
+ * @param tag — The cache tag to invalidate (must match tags used in `server`).
  *
  * @example
  * ```ts
- * const updateProduct = server$(async (id: string, data: ProductData) => {
+ * const updateProduct = server(async (id: string, data: ProductData) => {
  *   await db.products.update({ where: { id }, data });
  *   revalidate('products');
  *   return { success: true };

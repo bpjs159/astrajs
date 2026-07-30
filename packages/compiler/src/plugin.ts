@@ -13,8 +13,8 @@
  *   ├── Phase 1: CSS Extraction
  *   │   css`...` → static .css files + class-name map replacement
  *   │
- *   ├── Phase 2: server$ Compilation
- *   │   server$() → client fetch wrapper (+ server endpoint)
+ *   ├── Phase 2: server Compilation
+ *   │   server() → client fetch wrapper (+ server endpoint)
  *   │   type: 'pre-build' → constant folding placeholder
  *   │
  *   └── Phase 3: JSX → Vanilla DOM
@@ -29,9 +29,8 @@
 import type { Plugin, ResolvedConfig } from 'vite';
 import type { AstraViteConfig } from './index.js';
 import { transformJSX, autoWrapDynamic, autoMemoDerivedFunctions } from './transformers/jsx.js';
-// TODO: Re-enable when CSS extraction and server$ compilation are stable
-// import { transformCSS } from './transformers/css.js';
-// import { transformServerRPC } from './transformers/server-rpc.js';
+import { transformServerRPC } from './transformers/server-rpc.js';
+import type { ServerCallInfo } from './transformers/server-rpc.js';
 import { ensureImport } from './utils/ast.js';
 
 // ─── Plugin State ────────────────────────────────────────────────────────────
@@ -42,8 +41,8 @@ import { ensureImport } from './utils/ast.js';
 interface PluginState {
   /** Collected CSS files to emit (filename → content). */
   cssFiles: Map<string, string>;
-  /** Collected server endpoints (endpoint ID → handler source). */
-  serverEndpoints: Map<string, string>;
+  /** Collected server call metadata (for dev server handler registration). */
+  serverCalls: ServerCallInfo[];
   /** Pre-build call IDs for the SSG phase. */
   preBuildIds: string[];
   /** Resolved Vite config (available after configResolved). */
@@ -74,7 +73,7 @@ function shouldTransform(id: string): boolean {
  *
  * This plugin transforms source files in three phases:
  * 1. **CSS Extraction** — `css` tagged templates → static CSS files
- * 2. **server$ Compilation** — Server RPC → fetch wrappers + endpoints
+ * 2. **server Compilation** — Server RPC → fetch wrappers + endpoints
  * 3. **JSX Transpilation** — JSX → vanilla DOM construction code
  *
  * @param userConfig — Optional configuration overrides.
@@ -104,7 +103,7 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
 
   const state: PluginState = {
     cssFiles: new Map(),
-    serverEndpoints: new Map(),
+    serverCalls: [],
     preBuildIds: [],
     resolvedConfig: null,
   };
@@ -121,6 +120,73 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
       if (resolvedConfig.command === 'serve') {
         config.sourceMaps = true;
       }
+    },
+
+    // ─── configureServer ─────────────────────────────────────────────────
+
+    async configureServer(server) {
+      if (state.serverCalls.length === 0) return;
+
+      // Dynamically import server-side primitives
+      const serverMod = await server.ssrLoadModule('@astrajs/server');
+      const { rpcHandler: registerHandler, handleRPCRequest } = serverMod as {
+        rpcHandler: (id: string, fn: (...args: unknown[]) => Promise<unknown>, opts?: { tags?: string[] }) => void;
+        handleRPCRequest: (req: Request, id: string) => Promise<Response>;
+      };
+
+      // Register each server call as a live handler
+      for (const call of state.serverCalls) {
+        if (call.isPreBuild) continue; // pre-build calls don't need runtime handlers
+
+        // Dynamically create the handler function from extracted metadata.
+        // new Function() creates a function with access to globals (crypto, etc.)
+        // but no closure over the original module scope — so server bodies
+        // must be self-contained (no references to module-level variables).
+        const fnBody = call.functionBody;
+        const fnParams = call.paramNames;
+        const handlerFn = new Function(
+          `return (async (${fnParams.join(', ')}) => { ${fnBody} });`
+        )() as (...args: unknown[]) => Promise<unknown>;
+
+        registerHandler(call.id, handlerFn, { tags: call.config.tags });
+      }
+
+      // Intercept RPC requests and dispatch to registered handlers
+      server.middlewares.use(async (req, res, next) => {
+        const apiPrefix = config.apiPrefix ?? '/api/astra';
+        if (!req.url?.startsWith(apiPrefix)) return next();
+
+        const url = new URL(req.url, `http://${req.headers.host ?? 'localhost'}`);
+
+        // Collect request body
+        const chunks: Buffer[] = [];
+        for await (const chunk of req) {
+          chunks.push(chunk);
+        }
+        const body = Buffer.concat(chunks).toString();
+
+        // Build Web API Request
+        const webRequest = new Request(url.toString(), {
+          method: req.method,
+          headers: Object.entries(req.headers).reduce(
+            (acc, [k, v]) => ({ ...acc, [k]: v?.toString() ?? '' }),
+            {} as Record<string, string>
+          ),
+          body: body || undefined,
+        });
+
+        // Extract handler ID from path: /api/astra/createUser → createUser
+        const handlerId = url.pathname.replace(`${apiPrefix}/`, '');
+
+        const response = await handleRPCRequest(webRequest, handlerId);
+
+        // Write Web Response back to Node response
+        res.statusCode = response.status;
+        response.headers.forEach((value, key) => {
+          res.setHeader(key, value);
+        });
+        res.end(await response.text());
+      });
     },
 
     // ─── transform ───────────────────────────────────────────────────────
@@ -141,16 +207,14 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
       //   hasChanges = true;
       // }
 
-      // Phase 2: server$ Compilation (TODO: fix @astrajs/server resolution)
-      // const serverResult = transformServerRPC(transformed, id, config);
-      // if (serverResult.serverEndpoints.size > 0 || serverResult.preBuildIds.length > 0) {
-      //   transformed = serverResult.clientCode;
-      //   for (const [endpointId, handlerSource] of serverResult.serverEndpoints) {
-      //     state.serverEndpoints.set(endpointId, handlerSource);
-      //   }
-      //   state.preBuildIds.push(...serverResult.preBuildIds);
-      //   hasChanges = true;
-      // }
+      // Phase 2: server Compilation
+      const serverResult = transformServerRPC(transformed, id, config);
+      if (serverResult.calls.length > 0) {
+        transformed = serverResult.clientCode;
+        state.serverCalls.push(...serverResult.calls);
+        state.preBuildIds.push(...serverResult.preBuildIds);
+        hasChanges = true;
+      }
 
       // Phase 3: JSX transforms (dynamic mode) or Vanilla DOM (vanilla mode)
       if (/\.(tsx|jsx)$/.test(id)) {
@@ -213,17 +277,16 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
         });
       }
 
-      // Write server endpoint manifest
-      if (state.serverEndpoints.size > 0) {
-        const manifest = JSON.stringify(
-          Object.fromEntries(state.serverEndpoints),
-          null,
-          2
-        );
+      // Write server endpoint manifest (for production builds)
+      if (state.serverCalls.length > 0) {
+        const manifest: Record<string, { paramNames: string[]; functionBody: string }> = {};
+        for (const call of state.serverCalls) {
+          manifest[call.id] = { paramNames: call.paramNames, functionBody: call.functionBody };
+        }
         this.emitFile({
           type: 'asset',
           fileName: 'astra-server-manifest.json',
-          source: manifest,
+          source: JSON.stringify(manifest, null, 2),
         });
       }
 

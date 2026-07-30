@@ -9,7 +9,7 @@
 - **ISR** — Incremental Static Regeneration with cache tags and `maxAge`
 - **`renderToString`** — Render any component tree to HTML on the server
 - **State Serialization** — `serializeState` / `deserializeState` for `astra-data`
-- **Constant Folding** — Pre-build `server$` calls are executed at SSG time
+- **Constant Folding** — Pre-build `server` calls are executed at SSG time
 
 ## Usage
 

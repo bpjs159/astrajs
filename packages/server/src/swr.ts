@@ -2,7 +2,7 @@
  * @astrajs/server — Stale-While-Revalidate (SWR)
  *
  * Enhances reactive stores with SWR semantics. When a store is
- * initialized with a Promise (e.g., from a `server$()` call), SWR:
+ * initialized with a Promise (e.g., from a `server()` call), SWR:
  *
  * 1. Returns stale (cached) data immediately if available.
  * 2. Revalidates in the background.

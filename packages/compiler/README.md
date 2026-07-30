@@ -1,14 +1,14 @@
 # @astrajs/compiler
 
-> **AST-based Vite plugin: JSX → Vanilla DOM, CSS extraction, server$ compilation.**
+> **AST-based Vite plugin: JSX → Vanilla DOM, CSS extraction, server compilation.**
 
 ## Features
 
 - **JSX → DOM** — Transforms JSX into `document.createElement` + reactive bindings
 - **CSS Extraction** — `css` tagged templates → static `.css` files with hashed class names
-- **server$ Compilation** — Creates API endpoints, replaces client calls with typed fetch
+- **server Compilation** — Creates API endpoints, replaces client calls with typed fetch
 - **Constant Folding** — `type: 'pre-build'` functions execute at build time, result inlined
-- **Zero Runtime** — All macros (`css`, `server$`) are compile-time only
+- **Zero Runtime** — All macros (`css`, `server`) are compile-time only
 
 ## Usage
 
@@ -57,11 +57,11 @@ const styles = css`.card { color: red; }`
 // styles = { card: 'card_a1b2c3' }
 ```
 
-### Phase 3: server$ Compilation
+### Phase 3: server Compilation
 
 ```ts
 // Input
-const getData = server$(async (id: string) => db.find(id));
+const getData = server(async (id: string) => db.find(id));
 
 // Output (client)
 const getData = async (id) => fetch('/api/astra/getData', {

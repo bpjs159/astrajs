@@ -4,7 +4,7 @@
 
 ## Features
 
-- **`server$()`** — Type-safe server RPC with function overloading
+- **`server()`** — Type-safe server RPC with function overloading
 - **SWR** — Stale-While-Revalidate for async store initialization
 - **Cache Tags** — Surgical cache invalidation with `revalidate()`
 - **ISR** — Incremental Static Regeneration via `maxAge`
@@ -13,10 +13,10 @@
 ## Usage
 
 ```ts
-import { server$, revalidate, ServerConfig } from '@astrajs/server';
+import { server, revalidate, ServerConfig } from '@astrajs/server';
 
 // Pre-built query (SSG — 0 KB JS on client)
-const getProducts = server$(
+const getProducts = server(
   { type: 'pre-build', tags: ['products'], maxAge: 3600 },
   async (category: string) => {
     const products = await db.products.findMany({ where: { category } });
@@ -25,7 +25,7 @@ const getProducts = server$(
 );
 
 // Dynamic mutation (CSR/SSR)
-const addToCart = server$(async (productId: string, qty: number) => {
+const addToCart = server(async (productId: string, qty: number) => {
   await db.cart.create({ data: { productId, qty } });
   revalidate('cart'); // Invalidate cache, notify clients
   return { success: true };
@@ -38,7 +38,7 @@ const products = store(getProducts('hats'), { swr: true });
 
 ## How it works
 
-The Vite AST compiler transforms `server$()` calls:
+The Vite AST compiler transforms `server()` calls:
 
 1. **Build time:** Creates a server endpoint at `/api/astra/...`
 2. **Client:** Replaces the call with a type-safe `fetch()` wrapper

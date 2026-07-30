@@ -1,13 +1,13 @@
 /**
- * @astrajs/compiler — server$ RPC Transformer
+ * @astrajs/compiler — server RPC Transformer
  *
- * Transforms `server$()` calls into:
+ * Transforms `server()` calls into:
  * 1. **Server side**: An API endpoint handler.
  * 2. **Client side**: A type-safe `fetch()` wrapper.
  *
  * ## Constant Folding (`type: 'pre-build'`)
  *
- * When `server$()` is called with `{ type: 'pre-build' }`, the function
+ * When `server()` is called with `{ type: 'pre-build' }`, the function
  * is EXECUTED at build time and its result is INLINED into the AST.
  * This means 0 KB of JS is shipped for that query — it's pure static data.
  *
@@ -15,7 +15,7 @@
  *
  * **Input:**
  * ```ts
- * const getProducts = server$(
+ * const getProducts = server(
  *   { type: 'dynamic', tags: ['products'], maxAge: 3600 },
  *   async (category: string) => {
  *     return await db.query('SELECT * FROM products WHERE category = ?', [category]);
@@ -50,10 +50,10 @@ import type { AstraViteConfig } from '../index.js';
 import type { ServerConfig } from '@astrajs/server';
 import { hashContent } from '../utils/ast.js';
 
-// ─── server$ Call Parser ─────────────────────────────────────────────────────
+// ─── server Call Parser ─────────────────────────────────────────────────────
 
 /**
- * Represents a parsed `server$()` call found in source code.
+ * Represents a parsed `server()` call found in source code.
  */
 export interface ServerCallInfo {
   /** A unique identifier for this server function (hash-based). */
@@ -64,9 +64,9 @@ export interface ServerCallInfo {
   functionBody: string;
   /** The function parameter names. */
   paramNames: string[];
-  /** The assigned variable name (if `const foo = server$(...)`). */
+  /** The assigned variable name (if `const foo = server(...)`). */
   varName: string | null;
-  /** Start offset of the entire `server$(...)` expression in source. */
+  /** Start offset of the entire `server(...)` expression in source. */
   start: number;
   /** End offset of the entire expression. */
   end: number;
@@ -75,7 +75,7 @@ export interface ServerCallInfo {
 }
 
 /**
- * Parses server$ configuration from the first argument if it's an object literal.
+ * Parses server configuration from the first argument if it's an object literal.
  */
 function parseServerConfig(configSource: string): ServerConfig {
   const config: ServerConfig = {};
@@ -110,17 +110,17 @@ function parseServerConfig(configSource: string): ServerConfig {
 }
 
 /**
- * Finds all `server$()` calls in source code and extracts their metadata.
+ * Finds all `server()` calls in source code and extracts their metadata.
  *
  * @param source — The source code to scan.
- * @returns Array of parsed server$ call info.
+ * @returns Array of parsed server call info.
  */
 export function findServerCalls(source: string): ServerCallInfo[] {
   const results: ServerCallInfo[] = [];
 
-  // Pattern: const/let/var name = server$(...)   OR   server$(...)
-  // This regex captures the full server$() call.
-  const serverRegex = /(?:const|let|var)\s+(\w+)\s*=\s*server\$(\s*\([\s\S]*?\)\s*\))\s*;|server\$(\s*\([\s\S]*?\)\s*\))/g;
+  // Pattern: const/let/var name = server(...)   OR   server(...)
+  // This regex captures the full server() call.
+  const serverRegex = /(?:const|let|var)\s+(\w+)\s*=\s*server(\s*\([\s\S]*?\)\s*\))\s*;|server(\s*\([\s\S]*?\)\s*\))/g;
   let match: RegExpExecArray | null;
 
   while ((match = serverRegex.exec(source)) !== null) {
@@ -131,8 +131,8 @@ export function findServerCalls(source: string): ServerCallInfo[] {
     const end = start + fullMatch!.length;
 
     // Determine if this has a config object as first argument
-    // Pattern: server$({ ... }, async (...) => { ... })
-    //        OR server$(async (...) => { ... })
+    // Pattern: server({ ... }, async (...) => { ... })
+    //        OR server(async (...) => { ... })
     const withConfigMatch = callSource.match(
       /\(\s*\{([^}]*(?:\{[^}]*\}[^}]*)*)\}\s*,\s*(async\s*)?\(([^)]*)\)\s*=>\s*\{([\s\S]*)\}\s*\)/
     );
@@ -180,9 +180,9 @@ export function findServerCalls(source: string): ServerCallInfo[] {
 // ─── Code Generators ─────────────────────────────────────────────────────────
 
 /**
- * Generates the client-side fetch wrapper for a server$ function.
+ * Generates the client-side fetch wrapper for a server function.
  *
- * @param call — The parsed server$ call info.
+ * @param call — The parsed server call info.
  * @param apiPrefix — The API route prefix (e.g., '/api/astra').
  * @returns The generated client-side source code.
  */
@@ -215,9 +215,9 @@ export function generateClientWrapper(
 }
 
 /**
- * Generates the server-side API route handler for a server$ function.
+ * Generates the server-side API route handler for a server function.
  *
- * @param call — The parsed server$ call info.
+ * @param call — The parsed server call info.
  * @returns Server-side handler source code.
  */
 export function generateServerHandler(call: ServerCallInfo): string {
@@ -236,12 +236,12 @@ export async function handler(args: unknown[]) {
 }
 
 /**
- * Generates the inlined result for a pre-build server$ call.
+ * Generates the inlined result for a pre-build server call.
  *
  * In a real implementation, this would execute the function at build time
  * in a sandboxed Node.js environment. Here we generate the structure.
  *
- * @param call — The parsed pre-build server$ call info.
+ * @param call — The parsed pre-build server call info.
  * @returns The inlined constant source code.
  */
 export function generatePreBuildInline(call: ServerCallInfo): string {
@@ -259,6 +259,8 @@ export function generatePreBuildInline(call: ServerCallInfo): string {
 export interface ServerTransformResult {
   /** The transformed client-side source. */
   clientCode: string;
+  /** The parsed server call metadata (for dev server handler registration). */
+  calls: ServerCallInfo[];
   /** Map of endpoint ID → server handler source code. */
   serverEndpoints: Map<string, string>;
   /** IDs of pre-build calls for the SSG phase. */
@@ -266,7 +268,7 @@ export interface ServerTransformResult {
 }
 
 /**
- * Transforms all server$() calls in a source file.
+ * Transforms all server() calls in a source file.
  *
  * @param source — Original source code.
  * @param filename — The file being processed.
@@ -311,5 +313,5 @@ export function transformServerRPC(
     }
   }
 
-  return { clientCode, serverEndpoints, preBuildIds };
+  return { clientCode, calls, serverEndpoints, preBuildIds };
 }
