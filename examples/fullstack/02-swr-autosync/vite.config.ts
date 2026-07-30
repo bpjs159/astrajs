@@ -1,7 +1,13 @@
 import { defineConfig } from 'vite';
+import astra from '@astrajs/compiler';
 import path from 'path';
 
 export default defineConfig({
+  plugins: [
+    astra({
+      apiPrefix: '/api/astra',
+    }),
+  ],
   resolve: {
     alias: {
       '@astrajs/core': path.resolve(__dirname, '../../../packages/core/src'),

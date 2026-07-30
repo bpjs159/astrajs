@@ -1,58 +1,94 @@
-import { component, store, mounted } from '@astrajs/core';
-import { styles as s } from './styles.js';
+// 02 — SWR + Server · Stale-While-Revalidate with server functions
+import { component, swr } from '@astrajs/core';
+import type { SWRState } from '@astrajs/core';
+import { server } from '@astrajs/server';
 
-const swrState = store({ data: 'Loading...', lastFetched: 0, isStale: true, isValidating: false, autoSyncEnabled: false, logs: [] as string[] });
-let syncInterval: ReturnType<typeof setInterval> | null = null;
-
-async function fetchWithSWR(): Promise<void> {
-  if (swrState.isValidating) return;
-  swrState.isValidating = true;
-  swrState.logs = [...swrState.logs.slice(-20), '[' + new Date().toLocaleTimeString() + '] Revalidating...'];
-  await new Promise(r => setTimeout(r, 1500));
-  swrState.data = 'Data v' + Math.floor(Math.random() * 100) + ' (at ' + new Date().toLocaleTimeString() + ')';
-  swrState.lastFetched = Date.now();
-  swrState.isStale = false;
-  swrState.isValidating = false;
-  swrState.logs = [...swrState.logs.slice(-20), '[' + new Date().toLocaleTimeString() + '] Fresh data arrived!'];
-  setTimeout(() => { swrState.isStale = true; }, 10000);
+interface DashboardStats {
+  totalUsers: number;
+  totalOrders: number;
+  revenue: number;
+  serverTimestamp: string;
+  serverId: string;
 }
 
-function toggleAutoSync(): void {
-  swrState.autoSyncEnabled = !swrState.autoSyncEnabled;
-  if (swrState.autoSyncEnabled) {
-    swrState.logs = [...swrState.logs, 'AutoSync enabled (polling every 5s)'];
-    syncInterval = setInterval(() => { swrState.isStale = true; fetchWithSWR(); }, 5000);
-  } else {
-    swrState.logs = [...swrState.logs, 'AutoSync disabled'];
-    if (syncInterval) clearInterval(syncInterval);
-  }
-}
+const getDashboardStats = server(async () => {
+  return {
+    totalUsers: 12400 + Math.floor(Math.random() * 200),
+    totalOrders: 3800 + Math.floor(Math.random() * 300),
+    revenue: 95600 + Math.floor(Math.random() * 5000),
+    serverTimestamp: new Date().toISOString(),
+    serverId: crypto.randomUUID().slice(0, 8),
+  };
+});
 
 export const SWRDemo = component(() => {
-  const age = swrState.lastFetched ? Math.round((Date.now() - swrState.lastFetched) / 1000) : 0;
-  const dotClass = swrState.isValidating ? s.dotSyncing : swrState.isStale ? s.dotStale : s.dotFresh;
-  const statusText = swrState.isValidating ? 'Syncing...' : swrState.isStale ? 'Stale' : 'Fresh';
-
-  effect(() => { if (swrState.data === 'Loading...') fetchWithSWR(); });
+  // Wrap server call with simulated network delay so SWR behavior is visible
+  const stats: SWRState<DashboardStats> = swr(async () => {
+    await new Promise(r => setTimeout(r, 1500));
+    return getDashboardStats();
+  });
 
   return (
-    <div class={s.card}>
-      <h1>SWR & AutoSync</h1>
-      <p class={s.subtitle}>Stale-While-Revalidate + ETag polling</p>
-      <div class={s.metric}>
-        <div>
-          <div class={s.label}>Cached Data</div>
-          <div class={s.value} style="font-size:.95rem;">{swrState.data}</div>
-          <div class={s.age}>Age: {age}s ago</div>
-          <div class={s.status}><span class={dotClass}></span><span style="font-size:.75rem;">{statusText}</span></div>
+    <div class="card">
+      <div class="header">
+        <h1>SWR + Server</h1>
+        <p>
+          <code>swr</code> + <code>server</code> — auto cache, localStorage, stale-while-revalidate
+        </p>
+      </div>
+      <div class="body">
+        {stats.loading && !stats.stale && (
+          <div class="loadingBox">
+            <div class="spinner" />
+            <p>Fetching dashboard stats from server...</p>
+          </div>
+        )}
+        {stats.stale && !stats.loading && (
+          <div class="staleBar">
+            Showing cached data — revalidating in background...
+            <div class="spinnerSm" />
+          </div>
+        )}
+        {stats.error && (
+          <div class="errorBox">
+            <p>Error: {stats.error}</p>
+            <button class="btnRetry" onClick={() => stats.refetch()}>Retry</button>
+          </div>
+        )}
+        {stats.data && !stats.loading && !stats.error && (
+          <div>
+            <div class="statsGrid">
+              <div class="statCard">
+                <div class="statIcon">Users</div>
+                <div class="statValue">{stats.data.totalUsers.toLocaleString()}</div>
+                <div class="statLabel">Total Users</div>
+              </div>
+              <div class="statCard">
+                <div class="statIcon">Orders</div>
+                <div class="statValue">{stats.data.totalOrders.toLocaleString()}</div>
+                <div class="statLabel">Total Orders</div>
+              </div>
+              <div class="statCard">
+                <div class="statIcon">Revenue</div>
+                <div class="statValue">${stats.data.revenue.toLocaleString()}</div>
+                <div class="statLabel">Revenue</div>
+              </div>
+            </div>
+            <div class="serverInfo">
+              <span>Server ID: <strong>{stats.data.serverId}</strong></span>
+              <span>{new Date(stats.data.serverTimestamp).toLocaleTimeString()}</span>
+            </div>
+          </div>
+        )}
+        <div class="controls">
+          <button class="btnRefresh" onClick={() => stats.refetch()} disabled={stats.loading}>
+            {stats.loading ? 'Fetching...' : 'Refresh'}
+          </button>
+          <button class="btnClear" onClick={() => { localStorage.clear(); stats.refetch(); }}>
+            Clear cache
+          </button>
         </div>
       </div>
-      <div style="display:flex;gap:8px;">
-        <button class={s.btnRefresh} onClick={() => { swrState.isStale = true; fetchWithSWR(); }} disabled={swrState.isValidating}>Force Refresh</button>
-        <button class={s.btnAuto} onClick={toggleAutoSync}>{swrState.autoSyncEnabled ? 'Stop' : 'Start'} AutoSync</button>
-        <button class={s.btnInvalidate} onClick={() => { swrState.isStale = true; swrState.logs = [...swrState.logs, 'Cache invalidated']; }}>Invalidate Cache</button>
-      </div>
-      <div class={s.log}>{swrState.logs.slice(-8).map(l => <div class={l.includes('Revalidating') ? s.stale : s.fresh}>{l}</div>)}</div>
     </div>
   );
 });
