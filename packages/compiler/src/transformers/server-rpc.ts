@@ -110,6 +110,29 @@ function parseServerConfig(configSource: string): ServerConfig {
 }
 
 /**
+ * Strips TypeScript type annotations from a function parameter.
+ *
+ * Finds the top-level colon (not inside nested {}, [], or <>).
+ *
+ * @example
+ * stripTypeAnnotation('name: string')               // → 'name'
+ * stripTypeAnnotation('updates: { price: number }')  // → 'updates'
+ * stripTypeAnnotation('{ price }: { price: number }') // → '{ price }'
+ */
+function stripTypeAnnotation(param: string): string {
+  let depth = 0;
+  for (let i = 0; i < param.length; i++) {
+    const ch = param[i];
+    if (ch === '{' || ch === '[' || ch === '<') depth++;
+    else if (ch === '}' || ch === ']' || ch === '>') depth--;
+    else if (ch === ':' && depth === 0) {
+      return param.slice(0, i);
+    }
+  }
+  return param;
+}
+
+/**
  * Finds all `server()` calls in source code and extracts their metadata.
  *
  * @param source — The source code to scan.
@@ -120,7 +143,7 @@ export function findServerCalls(source: string): ServerCallInfo[] {
 
   // Pattern: const/let/var name = server(...)   OR   server(...)
   // This regex captures the full server() call.
-  const serverRegex = /(?:const|let|var)\s+(\w+)\s*=\s*server(\s*\([\s\S]*?\)\s*\))\s*;|server(\s*\([\s\S]*?\)\s*\))/g;
+  const serverRegex = /(?:const|let|var)\s+(\w+)\s*=\s*\bserver(\s*\([\s\S]*?[\)\}]\))\s*;|\bserver(\s*\([\s\S]*?[\)\}]\))/g;
   let match: RegExpExecArray | null;
 
   while ((match = serverRegex.exec(source)) !== null) {
@@ -149,13 +172,13 @@ export function findServerCalls(source: string): ServerCallInfo[] {
       config = parseServerConfig(configSource);
       paramNames = withConfigMatch[3]!
         .split(',')
-        .map((p) => p.trim())
+        .map((p) => stripTypeAnnotation(p.trim()))
         .filter(Boolean);
       functionBody = withConfigMatch[4]!;
     } else if (withoutConfigMatch) {
       paramNames = withoutConfigMatch[2]!
         .split(',')
-        .map((p) => p.trim())
+        .map((p) => stripTypeAnnotation(p.trim()))
         .filter(Boolean);
       functionBody = withoutConfigMatch[3]!;
     }

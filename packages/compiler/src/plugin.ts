@@ -27,6 +27,7 @@
  */
 
 import type { Plugin, ResolvedConfig } from 'vite';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { AstraViteConfig } from './index.js';
 import { transformJSX, autoWrapDynamic, autoMemoDerivedFunctions } from './transformers/jsx.js';
 import { transformServerRPC } from './transformers/server-rpc.js';
@@ -47,6 +48,8 @@ interface PluginState {
   preBuildIds: string[];
   /** Resolved Vite config (available after configResolved). */
   resolvedConfig: ResolvedConfig | null;
+  /** Dynamically-loaded handler registration function (populated in configureServer). */
+  registerHandler: ((id: string, fn: (...args: unknown[]) => Promise<unknown>, opts?: { tags?: string[] }) => void) | null;
 }
 
 // ─── File Filter ─────────────────────────────────────────────────────────────
@@ -106,6 +109,7 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
     serverCalls: [],
     preBuildIds: [],
     resolvedConfig: null,
+    registerHandler: null,
   };
 
   return {
@@ -125,47 +129,35 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
     // ─── configureServer ─────────────────────────────────────────────────
 
     async configureServer(server) {
-      if (state.serverCalls.length === 0) return;
-
       // Dynamically import server-side primitives
-      const serverMod = await server.ssrLoadModule('@astrajs/server');
-      const { rpcHandler: registerHandler, handleRPCRequest } = serverMod as {
-        rpcHandler: (id: string, fn: (...args: unknown[]) => Promise<unknown>, opts?: { tags?: string[] }) => void;
-        handleRPCRequest: (req: Request, id: string) => Promise<Response>;
-      };
+      const serverMod = await import('@astrajs/server');
+      const { rpcHandler: registerHandler, handleRPCRequest } = serverMod as any;
 
-      // Register each server call as a live handler
+      // Store for later use in transform hook (handlers registered as files are processed)
+      state.registerHandler = registerHandler;
+
+      // Register any handlers already collected (from initial build scan)
       for (const call of state.serverCalls) {
-        if (call.isPreBuild) continue; // pre-build calls don't need runtime handlers
-
-        // Dynamically create the handler function from extracted metadata.
-        // new Function() creates a function with access to globals (crypto, etc.)
-        // but no closure over the original module scope — so server bodies
-        // must be self-contained (no references to module-level variables).
-        const fnBody = call.functionBody;
-        const fnParams = call.paramNames;
+        if (call.isPreBuild) continue;
         const handlerFn = new Function(
-          `return (async (${fnParams.join(', ')}) => { ${fnBody} });`
+          `return (async (${call.paramNames.join(', ')}) => { ${call.functionBody} });`
         )() as (...args: unknown[]) => Promise<unknown>;
-
         registerHandler(call.id, handlerFn, { tags: call.config.tags });
       }
 
-      // Intercept RPC requests and dispatch to registered handlers
-      server.middlewares.use(async (req, res, next) => {
+      // Always set up RPC middleware — handlers may be registered later via transform
+      server.middlewares.use(async (req: IncomingMessage, res: ServerResponse, next) => {
         const apiPrefix = config.apiPrefix ?? '/api/astra';
         if (!req.url?.startsWith(apiPrefix)) return next();
 
         const url = new URL(req.url, `http://${req.headers.host ?? 'localhost'}`);
 
-        // Collect request body
         const chunks: Buffer[] = [];
         for await (const chunk of req) {
           chunks.push(chunk);
         }
         const body = Buffer.concat(chunks).toString();
 
-        // Build Web API Request
         const webRequest = new Request(url.toString(), {
           method: req.method,
           headers: Object.entries(req.headers).reduce(
@@ -175,14 +167,11 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
           body: body || undefined,
         });
 
-        // Extract handler ID from path: /api/astra/createUser → createUser
         const handlerId = url.pathname.replace(`${apiPrefix}/`, '');
-
         const response = await handleRPCRequest(webRequest, handlerId);
 
-        // Write Web Response back to Node response
         res.statusCode = response.status;
-        response.headers.forEach((value, key) => {
+        response.headers.forEach((value: string, key: string) => {
           res.setHeader(key, value);
         });
         res.end(await response.text());
@@ -214,6 +203,17 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
         state.serverCalls.push(...serverResult.calls);
         state.preBuildIds.push(...serverResult.preBuildIds);
         hasChanges = true;
+
+        // Register handlers dynamically (may run after configureServer)
+        if (state.registerHandler) {
+          for (const call of serverResult.calls) {
+            if (call.isPreBuild) continue;
+            const handlerFn = new Function(
+              `return (async (${call.paramNames.join(', ')}) => { ${call.functionBody} });`
+            )() as (...args: unknown[]) => Promise<unknown>;
+            state.registerHandler(call.id, handlerFn, { tags: call.config.tags });
+          }
+        }
       }
 
       // Phase 3: JSX transforms (dynamic mode) or Vanilla DOM (vanilla mode)

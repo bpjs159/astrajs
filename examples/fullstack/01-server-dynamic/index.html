@@ -3,30 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>07 — Dynamic Server$ · AstraJS</title>
+  <title>01 — Dynamic Server · AstraJS</title>
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family: system-ui, sans-serif; background: #0f172a; color: #e2e8f0;
-           display:flex; align-items:center; justify-content:center; min-height:100vh; }
-    .card { background:#1e293b; border:1px solid #334155; border-radius:16px; padding:36px;
-            max-width:520px; width:100%; }
-    h1 { font-size:1.6rem; margin-bottom:4px; }
-    .subtitle { color:#64748b; font-size:.85rem; margin-bottom:24px; }
-    .result-box { background:#0f172a; border-radius:10px; padding:16px; min-height:80px;
-                  margin:16px 0; font-family: monospace; font-size:.85rem; white-space:pre-wrap; }
-    .result-box.loading { color:#fbbf24; }
-    .result-box.success { color:#34d399; }
-    .result-box.error { color:#f87171; }
-    .btn { padding:10px 20px; border:none; border-radius:8px; font-weight:600; cursor:pointer;
-           margin:4px; transition:all .15s; }
-    .btn-fetch { background:#6366f1; color:#fff; }
-    .btn-fetch:hover { background:#4f46e5; }
-    .btn-fetch:disabled { opacity:.4; cursor:not-allowed; }
-    .btn-clear { background:#334155; color:#cbd5e1; }
-    .btn-clear:hover { background:#475569; }
-    .flow { display:flex; gap:12px; margin:20px 0; align-items:center; font-size:.8rem; color:#64748b; }
-    .flow-step { background:#1e293b; border:1px solid #334155; border-radius:8px; padding:8px 14px; text-align:center; }
-    .flow-step strong { color:#818cf8; display:block; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
   </style>
 </head>
 <body>

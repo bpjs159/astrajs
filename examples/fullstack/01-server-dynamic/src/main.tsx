@@ -11,8 +11,8 @@ interface LogEntry { id: number; endpoint: string; status: string; result: strin
 const logEntryStore = store({ logs: [] as LogEntry[], counter: 0 });
 
 // ─── server functions ───────────────────────────────────────────────────────
-// Each server() call is a single function. The AstraJS compiler splits it into:
-//   Client → typed fetch() wrapper
+// Each server function is a single function. The AstraJS compiler splits it into:
+//   Client → typed fetch wrapper
 //   Server → endpoint handler
 // You write ONE function. The compiler does the rest.
 
@@ -25,93 +25,152 @@ const updateProduct = server(async (productId: string, updates: { price: number 
 });
 
 const deleteOrder = server(async (orderId: string) => {
-  // Simulated: 70% chance the order exists
   const existed = Math.random() > 0.3;
   return { ok: true, data: { id: orderId, deleted: existed } };
 });
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function tagClass(status: string): string {
+  return status === 'success' ? (s.logTagOk ?? '') : status === 'error' ? (s.logTagErr ?? '') : (s.logTagPending ?? '');
+}
+function tagLabel(status: string): string {
+  return status === 'success' ? 'OK' : status === 'error' ? 'ERR' : 'PENDING';
+}
+function statusClass(status: string): string {
+  return status === 'success' ? (s.logSuccess ?? '') : status === 'error' ? (s.logError ?? '') : (s.logLoading ?? '');
+}
+function resultClass(status: string): string {
+  return status === 'success' ? (s.logResultSuccess ?? '') : status === 'error' ? (s.logResultError ?? '') : (s.logResultLoading ?? '');
+}
+
+function addLog(endpoint: string, args: unknown[]): number {
+  const id = ++logEntryStore.counter;
+  logEntryStore.logs = [...logEntryStore.logs, {
+    id, endpoint, status: 'loading', result: 'Sending request...',
+    time: new Date().toLocaleTimeString(), args: [...args],
+  }];
+  return id;
+}
+
+function updateLog(id: number, status: string, result: string): void {
+  logEntryStore.logs = logEntryStore.logs.map(l =>
+    l.id === id ? { ...l, status, result } : l
+  );
+}
+
+// ─── Component ───────────────────────────────────────────────────────────────
+
 export const ServerDemo = component(() => {
   async function handleCreateUser() {
-    const args = ['Alice', 'alice@example.com'] as const;
-    const id = ++logEntryStore.counter;
-    logEntryStore.logs = [...logEntryStore.logs, {
-      id, endpoint: '/api/astra/createUser', status: 'loading', result: 'Pending...',
-      time: new Date().toLocaleTimeString(), args: [...args],
-    }];
+    const id = addLog('/api/astra/createUser', ['Alice', 'alice@example.com']);
     try {
-      const result = await createUser(...args);
-      logEntryStore.logs = logEntryStore.logs.map(l =>
-        l.id === id ? { ...l, status: 'success', result: JSON.stringify(result) } : l
-      );
+      const result = await createUser('Alice', 'alice@example.com');
+      updateLog(id, 'success', JSON.stringify(result, null, 2));
     } catch (err) {
-      logEntryStore.logs = logEntryStore.logs.map(l =>
-        l.id === id ? { ...l, status: 'error', result: err instanceof Error ? err.message : 'Unknown error' } : l
-      );
+      updateLog(id, 'error', err instanceof Error ? err.message : 'Unknown error');
     }
   }
 
   async function handleUpdateProduct() {
-    const args = ['prod_42', { price: 199 }] as const;
-    const id = ++logEntryStore.counter;
-    logEntryStore.logs = [...logEntryStore.logs, {
-      id, endpoint: '/api/astra/updateProduct', status: 'loading', result: 'Pending...',
-      time: new Date().toLocaleTimeString(), args: [...args],
-    }];
+    const id = addLog('/api/astra/updateProduct', ['prod_42', { price: 199 }]);
     try {
-      const result = await updateProduct(...args);
-      logEntryStore.logs = logEntryStore.logs.map(l =>
-        l.id === id ? { ...l, status: 'success', result: JSON.stringify(result) } : l
-      );
+      const result = await updateProduct('prod_42', { price: 199 });
+      updateLog(id, 'success', JSON.stringify(result, null, 2));
     } catch (err) {
-      logEntryStore.logs = logEntryStore.logs.map(l =>
-        l.id === id ? { ...l, status: 'error', result: err instanceof Error ? err.message : 'Unknown error' } : l
-      );
+      updateLog(id, 'error', err instanceof Error ? err.message : 'Unknown error');
     }
   }
 
   async function handleDeleteOrder() {
-    const args = ['ord_007'] as const;
-    const id = ++logEntryStore.counter;
-    logEntryStore.logs = [...logEntryStore.logs, {
-      id, endpoint: '/api/astra/deleteOrder', status: 'loading', result: 'Pending...',
-      time: new Date().toLocaleTimeString(), args: [...args],
-    }];
+    const id = addLog('/api/astra/deleteOrder', ['ord_007']);
     try {
-      const result = await deleteOrder(...args);
-      logEntryStore.logs = logEntryStore.logs.map(l =>
-        l.id === id ? { ...l, status: 'success', result: JSON.stringify(result) } : l
-      );
+      const result = await deleteOrder('ord_007');
+      updateLog(id, 'success', JSON.stringify(result, null, 2));
     } catch (err) {
-      logEntryStore.logs = logEntryStore.logs.map(l =>
-        l.id === id ? { ...l, status: 'error', result: err instanceof Error ? err.message : 'Unknown error' } : l
-      );
+      updateLog(id, 'error', err instanceof Error ? err.message : 'Unknown error');
     }
   }
 
   return (
     <div class={s.card}>
-      <h1>Dynamic server</h1>
-      <p class={s.subtitle}>Server functions via typed <code>fetch()</code> wrappers</p>
-      <div class={s.flow}>
-        <span class={s.flowStep}><strong>Client</strong>server</span>
-        <span>?</span>
-        <span class={s.flowStep}><strong>fetch()</strong>/api/astra/endpoint</span>
-        <span>?</span>
-        <span class={s.flowStep}><strong>Server</strong>handler</span>
-        <span>?</span>
-        <span class={s.flowStep}><strong>JSON</strong>Response</span>
+      {/* ── Header ─────────────────────────────────── */}
+      <div class={s.header}>
+        <h1>Dynamic Server</h1>
+        <p>
+          Server functions via typed <code>fetch()</code> wrappers.
+          Write one function — runs on the server, called from the client.
+        </p>
       </div>
-      <div style="display:flex;gap:8px;margin:16px 0;">
-        <button class={s.btnFetch} onClick={handleCreateUser}>Create User</button>
-        <button class={s.btnFetch} onClick={handleUpdateProduct}>Update Product</button>
-        <button class={s.btnFetch} onClick={handleDeleteOrder}>Delete Order</button>
-        <button class={s.btnClear} onClick={() => logEntryStore.logs = []}>Clear</button>
-      </div>
-      <div class={s.resultBox}>
-        {logEntryStore.logs.length === 0 ? <span style="color:#64748b;">Click a button to call a server function...</span> : null}
-        {logEntryStore.logs.slice(-8).map(l => (
-          <div style={l.status === 'success' ? 'color:#34d399' : l.status === 'error' ? 'color:#f87171' : 'color:#fbbf24'}>[{l.time}] <strong>{l.endpoint}</strong>({JSON.stringify(l.args)}) ? {l.result}</div>
-        ))}
+
+      {/* ── Body ───────────────────────────────────── */}
+      <div class={s.body}>
+        {/* Flow diagram */}
+        <div class={s.flow}>
+          <div class={s.flowStep}>
+            <strong>Client</strong>
+            <span>your fn</span>
+          </div>
+          <span class={s.flowArrow}>→</span>
+          <div class={s.flowStep}>
+            <strong>fetch</strong>
+            <span>/api/astra</span>
+          </div>
+          <span class={s.flowArrow}>→</span>
+          <div class={s.flowStep}>
+            <strong>Server</strong>
+            <span>handler</span>
+          </div>
+          <span class={s.flowArrow}>→</span>
+          <div class={s.flowStep}>
+            <strong>JSON</strong>
+            <span>response</span>
+          </div>
+        </div>
+
+        {/* Action buttons */}
+        <div class={s.actions}>
+          <button class={s.btnFetch} onClick={handleCreateUser}>
+            👤 Create User
+          </button>
+          <button class={s.btnFetch} onClick={handleUpdateProduct}>
+            📦 Update Product
+          </button>
+          <button class={s.btnFetch} onClick={handleDeleteOrder}>
+            🗑 Delete Order
+          </button>
+          <button class={s.btnClear} onClick={() => logEntryStore.logs = []}>
+            ✕ Clear
+          </button>
+        </div>
+
+        {/* Log output */}
+        <div class={s.resultBox}>
+          {logEntryStore.logs.length === 0 ? (
+            <div class={s.emptyState}>
+              <div class={s.emptyIcon}>📡</div>
+              Click a button to call a server function
+            </div>
+          ) : null}
+          {logEntryStore.logs.slice(-8).reverse().map(l => (
+            <div class={s.logEntry}>
+              <div class={`${s.logStatus} ${statusClass(l.status)}`}></div>
+              <div class={s.logBody}>
+                <div class={s.logMeta}>
+                  <span class={s.logTime}>{l.time}</span>
+                  <span class={s.logEndpoint}>{l.endpoint}</span>
+                  <span class={`${s.logTag} ${tagClass(l.status)}`}>
+                    {tagLabel(l.status)}
+                  </span>
+                </div>
+                <div class={s.logArgs}>args: {JSON.stringify(l.args)}</div>
+                <div class={`${s.logResult} ${resultClass(l.status)}`}>
+                  {l.result}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
