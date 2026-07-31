@@ -26,6 +26,20 @@
 import { store, toRaw } from '@astrajs/core';
 import type { StoreOptions } from '@astrajs/core';
 
+// ─── Forward declarations for form resumability ──────────────────────────────
+// These are lazily imported to avoid circular dependencies.
+let _formResume: ((root: ParentNode) => void) | null = null;
+
+/**
+ * Registers a form resume handler. Called by @astrajs/form to enable
+ * SSR-resumable forms without creating a circular dependency.
+ *
+ * @internal
+ */
+export function registerFormResumeHandler(fn: (root: ParentNode) => void): void {
+  _formResume = fn;
+}
+
 // ─── Serialization ───────────────────────────────────────────────────────────
 
 /**
@@ -174,6 +188,11 @@ export function resume(root: ParentNode = document): Map<Element, object> {
 
   // Register delegated event handlers for astra-on:*
   registerDelegatedEvents(root);
+
+  // Resume form controllers — restores validation state from SSR
+  if (_formResume) {
+    _formResume(root);
+  }
 
   return stores;
 }

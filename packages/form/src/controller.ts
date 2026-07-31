@@ -18,8 +18,10 @@ import { getFormErrors } from './validity-map.js';
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export interface FormController {
-  /** Error codes keyed by input `name`. Populated from ValidityState. Read-only. */
+  /** Client-side error codes keyed by input `name`. Populated from ValidityState. Read-only. */
   readonly errors: Record<string, string>;
+  /** Server-side error messages keyed by input `name`. Set via `setServerErrors()`. Read-only. */
+  readonly serverErrors: Record<string, string>;
   /** Whether each field has been blurred. Read-only. */
   readonly touched: Record<string, boolean>;
   /** True if any field has been modified. Read-only. */
@@ -29,7 +31,7 @@ export interface FormController {
   /** True while async validators are running. Read-only. */
   readonly isValidating: boolean;
 
-  /** Get the current error code for a specific field. */
+  /** Get the current error code for a specific field (merges client + server errors). */
   getError(name: string): string | undefined;
   /** Focus the first invalid field with smooth scroll. */
   focusFirstError(): void;
@@ -37,6 +39,13 @@ export interface FormController {
   reset(): void;
   /** Force re-evaluation of all inputs' validity state. */
   validateAll(): void;
+  /**
+   * Set server-side validation errors.
+   * Merged with client errors so `formCtrl.errors` reflects all errors.
+   */
+  setServerErrors(errors: Record<string, string>): void;
+  /** Clear server-side errors (e.g., when user starts editing again). */
+  clearServerErrors(): void;
   /**
    * Release all internal references.
    *
@@ -57,13 +66,23 @@ const _wired = new WeakSet<object>();
 export function form(): FormController {
   const state = store({
     errors: {} as Record<string, string>,
+    _serverErrors: {} as Record<string, string>,
     touched: {} as Record<string, boolean>,
     isDirty: false,
     isValid: true,
     isValidating: false,
 
+    // Computed: merges client + server errors (server wins for same field).
+    get serverErrors(): Record<string, string> {
+      return (this as unknown as Record<string, unknown>)._serverErrors as Record<string, string>;
+    },
+
     getError(name: string): string | undefined {
-      return (this as unknown as FormController).errors[name];
+      const self = this as unknown as Record<string, unknown>;
+      const serverErrs = self._serverErrors as Record<string, string>;
+      const clientErrs = self.errors as Record<string, string>;
+      // Server errors take priority over client errors
+      return serverErrs[name] ?? clientErrs[name];
     },
 
     focusFirstError(): void {
@@ -83,6 +102,7 @@ export function form(): FormController {
       // Directly assign to trigger reactive updates
       const s = state as unknown as Record<string, unknown>;
       s.errors = {};
+      s._serverErrors = {};
       s.touched = {};
       s.isDirty = false;
       s.isValid = true;
@@ -101,6 +121,53 @@ export function form(): FormController {
       if (form) _refresh(state);
     },
 
+    /**
+     * Set server-side validation errors. These are merged with client errors.
+     * When the user starts editing a field that had a server error,
+     * the server error for that field is automatically cleared.
+     */
+    setServerErrors(errors: Record<string, string>): void {
+      const s = state as unknown as Record<string, unknown>;
+      s._serverErrors = { ...errors };
+
+      // Mark inputs with server errors using setCustomValidity
+      // so the native Constraint Validation API reflects them
+      const form = _formEls.get(state);
+      if (form) {
+        for (const [name, message] of Object.entries(errors)) {
+          const input = form.querySelector(`[name="${CSS.escape(name)}"]`) as
+            | HTMLInputElement
+            | HTMLTextAreaElement
+            | HTMLSelectElement
+            | null;
+          if (input) {
+            input.setCustomValidity(message);
+            input.setAttribute('data-astra-server-error', '');
+          }
+        }
+        // Refresh to update errors map
+        _refresh(state);
+      }
+    },
+
+    clearServerErrors(): void {
+      const s = state as unknown as Record<string, unknown>;
+      s._serverErrors = {};
+
+      // Clear custom validity from inputs that had server errors
+      const form = _formEls.get(state);
+      if (form) {
+        for (const el of form.querySelectorAll('[data-astra-server-error]')) {
+          const input = el as HTMLInputElement;
+          input.setCustomValidity('');
+          input.removeAttribute('data-astra-server-error');
+          // Re-run the input validator to restore client-only state
+          input.dispatchEvent(new Event('input'));
+        }
+        _refresh(state);
+      }
+    },
+
     // Called by JSX runtime via <form controller={...}> directive.
     _attach(formEl: HTMLFormElement): void {
       _formEls.set(state, formEl);
@@ -110,6 +177,9 @@ export function form(): FormController {
 
       // Event delegation on document — survives component() re-renders
       _delegate(state as unknown as FormController);
+
+      // Wire up server-error auto-clear on input
+      _wireServerErrorAutoClear(formEl, state as unknown as Record<string, unknown>);
 
       // Auto-dispose when the parent component unmounts.
       // _attach() runs synchronously inside the component function,
@@ -134,6 +204,45 @@ export function form(): FormController {
   });
 
   return state as unknown as FormController;
+}
+
+// ─── Server error auto-clear on user input ───────────────────────────────────
+
+/**
+ * When the user starts editing a field that had a server error,
+ * clear the server error for that field so the user sees fresh
+ * client-side validation.
+ */
+function _wireServerErrorAutoClear(
+  formEl: HTMLFormElement,
+  internalState: Record<string, unknown>
+): void {
+  formEl.addEventListener(
+    'input',
+    (e: Event) => {
+      const input = e.target as HTMLElement | null;
+      if (!input) return;
+      const name =
+        (input as HTMLInputElement).name ??
+        input.getAttribute('name');
+      if (!name) return;
+
+      const serverErrs = internalState._serverErrors as Record<string, string>;
+      if (serverErrs[name]) {
+        // Clear server error for this field
+        const newServerErrs = { ...serverErrs };
+        delete newServerErrs[name];
+        internalState._serverErrors = newServerErrs;
+
+        // Clear custom validity marker
+        (input as HTMLInputElement).setCustomValidity('');
+        input.removeAttribute('data-astra-server-error');
+        // Trigger re-validation to show client-side errors
+        (input as HTMLInputElement).dispatchEvent(new Event('input'));
+      }
+    },
+    true // capture phase — fires before the form controller's input handler
+  );
 }
 
 // ─── Internal: document-level event delegation ──────────────────────────────

@@ -217,6 +217,15 @@ function setProps(
     } else if (key === 'validate' && typeof value === 'function') {
       // Deferred: installed after children are appended (see jsx())
       (el as any).__astraValidate = value;
+      // Register validator metadata for SSR extraction
+      // Use dynamic import to avoid circular dependency with @astrajs/form
+      const inputName = (props as Record<string, unknown>)?.name as string | undefined;
+      if (inputName) {
+        try {
+          // Store enough info for the validator-extractor to resolve
+          (el as any).__astraValidateName = (value as Function).name || 'custom';
+        } catch { /* ignore */ }
+      }
     } else if (key === 'minLength' || key === 'maxLength') {
       // Map JSX camelCase to native lowercase attribute (minlength, maxlength)
       el.setAttribute(key.toLowerCase(), String(value));

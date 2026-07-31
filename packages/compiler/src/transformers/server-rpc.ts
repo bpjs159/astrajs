@@ -133,7 +133,89 @@ function stripTypeAnnotation(param: string): string {
 }
 
 /**
- * Finds all `server()` calls in source code and extracts their metadata.
+ * Strips JavaScript/TypeScript comments and string literals from source,
+ * replacing them with spaces of the same length. This preserves character
+ * offsets so that regex match positions remain valid in the original source.
+ *
+ * Handles:
+ * - Single-line comments: `// ...`
+ * - Multi-line comments: `/* ... *\/`
+ * - String literals: `'...'`, `"..."`, `` `...` ``
+ *
+ * @param source — The original source code.
+ * @returns The source with comments and strings blanked out (preserving length).
+ */
+function stripCommentsAndStrings(source: string): string {
+  const len = source.length;
+  const output: string[] = new Array(len);
+  let i = 0;
+
+  while (i < len) {
+    const ch = source[i]!;
+
+    // Single-line comment: //
+    if (ch === '/' && source[i + 1] === '/') {
+      while (i < len && source[i] !== '\n') {
+        output[i] = ' ';
+        i++;
+      }
+      continue;
+    }
+
+    // Multi-line comment: /* ... */
+    if (ch === '/' && source[i + 1] === '*') {
+      output[i] = ' ';
+      output[i + 1] = ' ';
+      i += 2;
+      while (i < len - 1 && !(source[i] === '*' && source[i + 1] === '/')) {
+        output[i] = source[i] === '\n' ? '\n' : ' ';
+        i++;
+      }
+      if (i < len - 1) {
+        output[i] = ' ';
+        output[i + 1] = ' ';
+        i += 2;
+      }
+      continue;
+    }
+
+    // String literals: '...', "...", `...`
+    if (ch === "'" || ch === '"' || ch === '`') {
+      const quote = ch;
+      output[i] = ' ';
+      i++;
+      while (i < len) {
+        if (source[i] === '\\' && i + 1 < len) {
+          // Escape sequence — skip next char too
+          output[i] = ' ';
+          output[i + 1] = ' ';
+          i += 2;
+          continue;
+        }
+        if (source[i] === quote) {
+          output[i] = ' ';
+          i++;
+          break;
+        }
+        output[i] = source[i] === '\n' ? '\n' : ' ';
+        i++;
+      }
+      continue;
+    }
+
+    output[i] = ch;
+    i++;
+  }
+
+  return output.join('');
+}
+
+/**
+ * Finds all `server()` calls in source code using bracket counting
+ * (instead of regex) to correctly handle nested parentheses and braces.
+ *
+ * Comments and string literals are stripped before scanning to prevent
+ * false positives from JSDoc or documentation strings containing "server(".
  *
  * @param source — The source code to scan.
  * @returns Array of parsed server call info.
@@ -141,47 +223,74 @@ function stripTypeAnnotation(param: string): string {
 export function findServerCalls(source: string): ServerCallInfo[] {
   const results: ServerCallInfo[] = [];
 
-  // Pattern: const/let/var name = server(...)   OR   server(...)
-  // This regex captures the full server() call.
-  const serverRegex = /(?:const|let|var)\s+(\w+)\s*=\s*\bserver(\s*\([\s\S]*?[\)\}]\))\s*;|\bserver(\s*\([\s\S]*?[\)\}]\))/g;
-  let match: RegExpExecArray | null;
+  // Strip comments and strings to avoid false matches in JSDoc/docstrings
+  const cleanSource = stripCommentsAndStrings(source);
 
-  while ((match = serverRegex.exec(source)) !== null) {
-    const varName = match[1] ?? null;
-    const callSource = match[2] ?? match[3]!;
-    const fullMatch = match[0];
-    const start = match.index;
-    const end = start + fullMatch!.length;
+  // Find all occurrences of "server(" in the clean source
+  let searchPos = 0;
+  while (searchPos < cleanSource.length) {
+    const serverIdx = cleanSource.indexOf('server(', searchPos);
+    if (serverIdx === -1) break;
 
-    // Determine if this has a config object as first argument
-    // Pattern: server({ ... }, async (...) => { ... })
-    //        OR server(async (...) => { ... })
-    const withConfigMatch = callSource.match(
-      /\(\s*\{([^}]*(?:\{[^}]*\}[^}]*)*)\}\s*,\s*(async\s*)?\(([^)]*)\)\s*=>\s*\{([\s\S]*)\}\s*\)/
-    );
-    const withoutConfigMatch = callSource.match(
-      /\(\s*(async\s*)?\(([^)]*)\)\s*=>\s*\{([\s\S]*)\}\s*\)/
-    );
-
-    let config: ServerConfig = {};
-    let paramNames: string[] = [];
-    let functionBody = '';
-
-    if (withConfigMatch) {
-      const configSource = `{${withConfigMatch[1]}}`;
-      config = parseServerConfig(configSource);
-      paramNames = withConfigMatch[3]!
-        .split(',')
-        .map((p) => stripTypeAnnotation(p.trim()))
-        .filter(Boolean);
-      functionBody = withConfigMatch[4]!;
-    } else if (withoutConfigMatch) {
-      paramNames = withoutConfigMatch[2]!
-        .split(',')
-        .map((p) => stripTypeAnnotation(p.trim()))
-        .filter(Boolean);
-      functionBody = withoutConfigMatch[3]!;
+    // Check if this is preceded by word boundary (not part of another identifier)
+    if (serverIdx > 0 && /\w/.test(cleanSource[serverIdx - 1]!)) {
+      searchPos = serverIdx + 7;
+      continue;
     }
+
+    // Find the opening paren position
+    const openParenIdx = serverIdx + 6; // position of '(' in 'server('
+    if (openParenIdx >= cleanSource.length) break;
+
+    // Use bracket counting to find the matching closing ')'
+    const closeParenIdx = findMatchingParen(cleanSource, openParenIdx);
+    if (closeParenIdx === -1) {
+      searchPos = serverIdx + 7;
+      continue;
+    }
+
+    // Check for trailing semicolon after the closing paren
+    let endIdx = closeParenIdx + 1;
+    // Skip whitespace
+    while (endIdx < cleanSource.length && /\s/.test(cleanSource[endIdx]!)) {
+      endIdx++;
+    }
+    // Include trailing semicolon if present
+    if (endIdx < cleanSource.length && cleanSource[endIdx] === ';') {
+      endIdx++;
+    }
+
+    // Now check if this is an assignment: const/let/var name = server(...)
+    let varName: string | null = null;
+    let startIdx = serverIdx;
+
+    // Look backwards from serverIdx for "const/let/var name ="
+    const beforeServer = cleanSource.slice(Math.max(0, serverIdx - 50), serverIdx);
+    const assignMatch = beforeServer.match(/(?:const|let|var)\s+(\w+)\s*=\s*$/);
+    if (assignMatch) {
+      varName = assignMatch[1]!;
+      // Adjust start to include the full assignment
+      const assignStart = serverIdx - assignMatch[0].length;
+      startIdx = assignStart;
+    }
+
+    // Extract the call source from the ORIGINAL source (positions are preserved)
+    const originalCallText = source.slice(openParenIdx, closeParenIdx + 1);
+
+    // Parse the inner structure: server(config?, async (params) => { body })
+    // First, check if there's a config object before the arrow function
+    const parseResult = parseServerCallArgs(originalCallText);
+
+    if (!parseResult) {
+      searchPos = endIdx;
+      continue;
+    }
+
+    const {
+      config,
+      paramNames,
+      functionBody,
+    } = parseResult;
 
     const id = varName ?? hashContent(functionBody.slice(0, 100), 8);
 
@@ -191,13 +300,87 @@ export function findServerCalls(source: string): ServerCallInfo[] {
       functionBody: functionBody.trim(),
       paramNames,
       varName,
-      start,
-      end,
+      start: startIdx,
+      end: endIdx,
       isPreBuild: config.type === 'pre-build',
     });
+
+    searchPos = endIdx;
   }
 
   return results;
+}
+
+/**
+ * Finds the matching closing parenthesis using bracket counting.
+ * Handles nested (), {}, and [].
+ *
+ * @param source — The source to scan.
+ * @param openIdx — The index of the opening '('.
+ * @returns The index of the matching ')', or -1 if not found.
+ */
+function findMatchingParen(source: string, openIdx: number): number {
+  let depth = 0;
+  for (let i = openIdx; i < source.length; i++) {
+    const ch = source[i];
+    if (ch === '(' || ch === '{' || ch === '[') {
+      depth++;
+    } else if (ch === ')' || ch === '}' || ch === ']') {
+      depth--;
+      if (depth === 0) {
+        return i;
+      }
+    }
+  }
+  return -1;
+}
+
+/**
+ * Parses the argument list of a server() call.
+ *
+ * Two forms are supported:
+ * 1. `server(async (params) => { body })`
+ * 2. `server({ config }, async (params) => { body })`
+ *
+ * @param callText — The text between the outer parentheses of server(...).
+ * @returns Parsed config, params, and body, or null if parsing fails.
+ */
+function parseServerCallArgs(
+  callText: string
+): {
+  config: ServerConfig;
+  paramNames: string[];
+  functionBody: string;
+} | null {
+  // Try with-config form first: { config }, async (params) => { body }
+  const withConfigMatch = callText.match(
+    /^\s*\{([^}]*(?:\{[^}]*\}[^}]*)*)\}\s*,\s*(async\s+)?\(([^)]*)\)\s*=>\s*\{([\s\S]*)\}\s*$/
+  );
+  if (withConfigMatch) {
+    const configSource = `{${withConfigMatch[1]}}`;
+    const config = parseServerConfig(configSource);
+    const paramNames = withConfigMatch[3]!
+      .split(',')
+      .map((p) => stripTypeAnnotation(p.trim()))
+      .filter(Boolean);
+    const functionBody = withConfigMatch[4]!;
+    return { config, paramNames, functionBody };
+  }
+
+  // Try without-config form: async (params) => { body }
+  const withoutConfigMatch = callText.match(
+    /^\s*(async\s+)?\(([^)]*)\)\s*=>\s*\{([\s\S]*)\}\s*$/
+  );
+  if (withoutConfigMatch) {
+    const paramNames = withoutConfigMatch[2]!
+      .split(',')
+      .map((p) => stripTypeAnnotation(p.trim()))
+      .filter(Boolean);
+    const functionBody = withoutConfigMatch[3]!;
+    return { config: {}, paramNames, functionBody };
+  }
+
+  return null;
 }
 
 // ─── Code Generators ─────────────────────────────────────────────────────────

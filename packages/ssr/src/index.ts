@@ -88,6 +88,7 @@ export {
   deserializeState,
   astraDataAttr,
   resume,
+  registerFormResumeHandler,
 } from './serialize.js';
 
 // Constant Folding (Pre-Build)

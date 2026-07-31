@@ -15,3 +15,32 @@ export { form } from './controller.js';
 export type { FormController } from './controller.js';
 export { getFormErrors, getErrorCode } from './validity-map.js';
 export type { ErrorCode } from './validity-map.js';
+
+// Server form integration — E2E validation bridge
+export {
+  serverForm,
+  createValidatorMap,
+} from './server-form.js';
+export type {
+  ServerFormConfig,
+  ServerFormResult,
+  ServerFormHandle,
+  ServerValidator,
+} from './server-form.js';
+
+// Validator extraction — for SSR and server-side re-execution
+export {
+  extractValidators,
+  serializeValidators,
+  deserializeValidators,
+  runValidators,
+  registerValidator,
+} from './validator-extractor.js';
+export type { ValidatorMeta } from './validator-extractor.js';
+
+// SSR Resumability — form state survives SSR → client transition
+export {
+  resumeFormControllers,
+  serializeFormState,
+  ensureFormResumeRegistered,
+} from './ssr-bridge.js';
