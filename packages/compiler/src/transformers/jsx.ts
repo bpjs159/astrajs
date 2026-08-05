@@ -350,6 +350,18 @@ export function autoWrapDynamic(
         return;
       }
 
+      // Skip framework directives / special attributes. These receive the raw
+      // value (object or function), NOT a reactive getter:
+      //   - `controller={formCtrl}`       → form controller directive (_attach)
+      //   - `validate={validation.fn}`    → validator function (setCustomValidity)
+      //   - `astra-schema`, `astra-data`, `astra-on:*` → SSR / schema directives
+      // Wrapping them as `() => value` would break how the JSX runtime reads
+      // them in setProps().
+      if (attrName === 'controller' || attrName === 'validate' || attrName.startsWith('astra-')) {
+        ts.forEachChild(node, visit);
+        return;
+      }
+
       // Skip `value` on form controls (input/textarea/select). The JSX
       // runtime auto-detects two-way binding for `value={store.prop}` by
       // reading the store property EAGERLY (via `getLastReactiveAccess()`)

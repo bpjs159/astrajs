@@ -184,4 +184,59 @@ describe('autoWrapDynamic', () => {
     // itself gets wrapped.
     expect(result.code).toContain('value={formData.name}');
   });
+
+  it('wraps form controller expressions in dynamic() without manual dyn()', () => {
+    // Regression for the 03-form-server DX: the developer must NOT write
+    // `dyn(() => formCtrl.getError(...))` by hand. Once `formCtrl` is
+    // recognised as reactive (via form()), the compiler auto-wraps the
+    // child expression.
+    const source = `
+      const formCtrl = form();
+      const el = <p>{formCtrl.getError('name')}</p>;
+    `;
+    const result = autoWrapDynamic(source, new Set(['formCtrl']));
+    expect(result.needsDynamic).toBe(true);
+    expect(result.code).toContain('dynamic(() => (formCtrl.getError(\'name\')))');
+  });
+
+  it('wraps serverForm handle expressions without manual dyn()', () => {
+    const source = `
+      const formHandle = serverForm({});
+      const el = <button disabled={formHandle.isSubmitting}>{formHandle.isSubmitting ? 'S' : 'R'}</button>;
+    `;
+    const result = autoWrapDynamic(source, new Set(['formHandle']));
+    expect(result.needsDynamic).toBe(true);
+    expect(result.code).toContain('disabled={() => (formHandle.isSubmitting)}');
+    expect(result.code).toContain('dynamic(() => (formHandle.isSubmitting ? \'S\' : \'R\'))');
+  });
+
+  it('does NOT wrap controller/validate directives as getters', () => {
+    // The <form controller={formCtrl}> directive and validate={fn} must
+    // receive their raw value — wrapping them as `() => formCtrl` would
+    // break the form controller wiring in setProps().
+    const source = `
+      const formCtrl = form();
+      const el = (
+        <form controller={formCtrl}>
+          <input name="email" validate={validation.isEmail} />
+        </form>
+      );
+    `;
+    const result = autoWrapDynamic(source, new Set(['formCtrl']));
+    expect(result.code).toContain('controller={formCtrl}');
+    expect(result.code).not.toContain('controller={() =>');
+    expect(result.code).toContain('validate={validation.isEmail}');
+    expect(result.code).not.toContain('validate={() =>');
+  });
+
+  it('wraps reactive attrs on form controls (disabled) but keeps value eager', () => {
+    const source = `
+      const formCtrl = form();
+      const formData = store({ name: '' });
+      const el = <input value={formData.name} disabled={!formCtrl.isValid} />;
+    `;
+    const result = autoWrapDynamic(source, new Set(['formCtrl', 'formData']));
+    expect(result.code).toContain('value={formData.name}');
+    expect(result.code).toContain('disabled={() => (!formCtrl.isValid)}');
+  });
 });

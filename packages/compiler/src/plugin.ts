@@ -234,8 +234,18 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
 
       // Phase 3: JSX transforms (dynamic mode) or Vanilla DOM (vanilla mode)
       if (/\.(tsx|jsx)$/.test(id)) {
-        // Detect reactive store variables: const st = store({...})
-        const storeRegex = /\b(const|let|var)\s+([\w$]+)(?:\s*:\s*[^=]+)?\s*=\s*(?:store|swr)\s*\(/g;
+        // Detect reactive variables: any var assigned from a reactive source.
+        // This covers the core `store()`/`swr()` plus the framework's other
+        // reactive factories — `form()` (form controller), `serverForm()`
+        // (server-form bridge), etc. — so the compiler can auto-wrap JSX
+        // expressions referencing them with `dynamic()` without the developer
+        // writing `dynamic()`/`dyn()` by hand.
+        //
+        //   const ui = store({...})            → reactive
+        //   const formCtrl = form()            → reactive
+        //   const formHandle = serverForm({})  → reactive
+        const storeRegex =
+          /\b(const|let|var)\s+([\w$]+)(?:\s*:\s*[^=]+)?\s*=\s*(?:store|swr|form|serverForm)\s*\(/g;
         const reactiveVars = new Set<string>();
         let match: RegExpExecArray | null;
         while ((match = storeRegex.exec(transformed)) !== null) {

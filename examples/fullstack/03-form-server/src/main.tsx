@@ -7,7 +7,7 @@
 // - Server: Same validators re-executed against submitted data
 // - SSR Resumable: Form state survives server → client transition
 //
-import { component, store, dynamic } from '@astrajs/core';
+import { component, store } from '@astrajs/core';
 import { form, serverForm } from '@astrajs/form';
 import * as validation from '@astrajs/validation';
 import { server } from '@astrajs/server';
@@ -83,13 +83,6 @@ export const FormServerDemo = component(() => {
   });
   const { submit } = formHandle;
 
-  // `dynamic()` is normally injected invisibly by the compiler for plain
-  // expressions, and its .d.ts typing only models that auto-injected shape
-  // (a getter returning `Element`). These calls are intentionally explicit
-  // (see note below), so this thin wrapper accepts the scalar/boolean
-  // returns the runtime already supports (bindDynamicText/bindAttr).
-  const dyn = <T,>(fn: () => T): any => dynamic(fn);
-
   return (
     <div class="card">
       <div class="header">
@@ -136,9 +129,9 @@ export const FormServerDemo = component(() => {
               value={formData.name}
               validate={validation.minLength(3)}
             />
-            {dyn(() => formCtrl.getError('name') && (
+            {formCtrl.getError('name') && (
               <p class="error">{formCtrl.getError('name')}</p>
-            ))}
+            )}
           </div>
 
           {/* Email */}
@@ -152,9 +145,9 @@ export const FormServerDemo = component(() => {
               value={formData.email}
               validate={validation.all([validation.isRequired, validation.isEmail])}
             />
-            {dyn(() => formCtrl.getError('email') && (
+            {formCtrl.getError('email') && (
               <p class="error">{formCtrl.getError('email')}</p>
-            ))}
+            )}
           </div>
 
           {/* Password */}
@@ -169,18 +162,18 @@ export const FormServerDemo = component(() => {
               value={formData.password}
               validate={validation.minLength(8)}
             />
-            {dyn(() => formCtrl.getError('password') && (
+            {formCtrl.getError('password') && (
               <p class="error">{formCtrl.getError('password')}</p>
-            ))}
+            )}
           </div>
 
           {/* Submit */}
           <button
             class="btnSubmit"
             type="submit"
-            disabled={dyn(() => formHandle.isSubmitting || !formCtrl.isValid)}
+            disabled={formHandle.isSubmitting || !formCtrl.isValid}
           >
-            {dyn(() => (formHandle.isSubmitting ? 'Submitting...' : 'Register'))}
+            {formHandle.isSubmitting ? 'Submitting...' : 'Register'}
           </button>
 
           <p class="hint">
