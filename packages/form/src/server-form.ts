@@ -46,7 +46,10 @@
  *   const formCtrl = form();
  *
  *   // Validators auto-resolved — no createValidatorMap() needed!
- *   const { submit, isSubmitting } = serverForm({
+ *   // Keep the whole handle (don't destructure `isSubmitting`): it's a
+ *   // reactive getter, so it must be read inside dynamic()/bindings to
+ *   // update the DOM when submission starts/ends.
+ *   const handle = serverForm({
  *     controller: formCtrl,
  *     data: formData,
  *     serverAction: server(async (data) => {
@@ -58,16 +61,17 @@
  *   });
  *
  *   return (
- *     <form controller={formCtrl} onSubmit={submit}>
+ *     <form controller={formCtrl} onSubmit={handle.submit}>
  *       <input name="email" validate={all([isRequired, isEmail])} />
  *       {formCtrl.getError('email') && <p>{formCtrl.getError('email')}</p>}
- *       <button disabled={isSubmitting}>Register</button>
+ *       <button disabled={handle.isSubmitting}>Register</button>
  *     </form>
  *   );
  * });
  * ```
  */
 
+import { store } from '@astrajs/core';
 import type { FormController } from './controller.js';
 import { extractValidators, runValidators } from './validator-extractor.js';
 import type { ServerValidator } from './builtin-validators.js';
@@ -191,7 +195,10 @@ export function serverForm<T extends Record<string, unknown>>(
     onError,
   } = config;
 
-  let isSubmitting = false;
+  // Backed by a reactive store so `formHandle.isSubmitting` can be read
+  // inside `dynamic()` / effects and update the DOM reactively. A plain
+  // closure variable would never notify subscribers on change.
+  const submitState = store({ isSubmitting: false });
 
   const submit = async (e: Event): Promise<void> => {
     e.preventDefault();
@@ -219,7 +226,7 @@ export function serverForm<T extends Record<string, unknown>>(
     }
 
     // ── Step 5: Submit to server ──────────────────────────────────
-    isSubmitting = true;
+    submitState.isSubmitting = true;
     try {
       const result = await serverAction(data as T);
 
@@ -245,7 +252,7 @@ export function serverForm<T extends Record<string, unknown>>(
         _form: 'Failed to submit. Please check your connection and try again.',
       });
     } finally {
-      isSubmitting = false;
+      submitState.isSubmitting = false;
     }
   };
 
@@ -277,7 +284,7 @@ export function serverForm<T extends Record<string, unknown>>(
   return {
     submit,
     get isSubmitting() {
-      return isSubmitting;
+      return submitState.isSubmitting;
     },
     validateOnServer,
   };

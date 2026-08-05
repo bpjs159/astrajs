@@ -63,7 +63,7 @@ function updateLog(id: number, status: string, result: string): void {
 
 export const ServerDemo = component(() => {
   async function handleCreateUser() {
-    const id = addLog('/api/astra/createUser', ['Alice', 'alice@example.com']);
+    const id = addLog('createUser', ['Alice', 'alice@example.com']);
     try {
       const result = await createUser('Alice', 'alice@example.com');
       updateLog(id, 'success', JSON.stringify(result, null, 2));
@@ -73,7 +73,7 @@ export const ServerDemo = component(() => {
   }
 
   async function handleUpdateProduct() {
-    const id = addLog('/api/astra/updateProduct', ['prod_42', { price: 199 }]);
+    const id = addLog('updateProduct', ['prod_42', { price: 199 }]);
     try {
       const result = await updateProduct('prod_42', { price: 199 });
       updateLog(id, 'success', JSON.stringify(result, null, 2));
@@ -83,7 +83,7 @@ export const ServerDemo = component(() => {
   }
 
   async function handleDeleteOrder() {
-    const id = addLog('/api/astra/deleteOrder', ['ord_007']);
+    const id = addLog('deleteOrder', ['ord_007']);
     try {
       const result = await deleteOrder('ord_007');
       updateLog(id, 'success', JSON.stringify(result, null, 2));
@@ -114,7 +114,7 @@ export const ServerDemo = component(() => {
           <span class={s.flowArrow}>→</span>
           <div class={s.flowStep}>
             <strong>fetch</strong>
-            <span>/api/astra</span>
+            <span>astra server</span>
           </div>
           <span class={s.flowArrow}>→</span>
           <div class={s.flowStep}>

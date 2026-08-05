@@ -4,7 +4,7 @@
  * Tests that the AST compiler transforms JSX into correct DOM code.
  */
 import { describe, it, expect } from 'vitest';
-import { transformJSX } from '../transformers/jsx.js';
+import { transformJSX, autoWrapDynamic } from '../transformers/jsx.js';
 
 describe('JSX → DOM Transform', () => {
   it('transforms a simple div to document.createElement', () => {
@@ -118,5 +118,70 @@ describe('JSX → DOM Transform', () => {
     const result = transformJSX(source, 'test.tsx');
     // Should NOT add bindValue since onInput is explicit
     expect(result.code).not.toContain('bindValue');
+  });
+});
+
+describe('autoWrapDynamic', () => {
+  it('wraps reactive child expressions in dynamic()', () => {
+    const source = `
+      const ui = store({ show: true, count: 0 });
+      const el = <p>{ui.count}</p>;
+    `;
+    const result = autoWrapDynamic(source, new Set(['ui']));
+    expect(result.needsDynamic).toBe(true);
+    expect(result.code).toContain('dynamic(() => (ui.count))');
+  });
+
+  it('does NOT wrap value on form controls (preserves two-way binding)', () => {
+    const source = `
+      const formData = store({ name: '' });
+      const el = <input value={formData.name} />;
+    `;
+    const result = autoWrapDynamic(source, new Set(['formData']));
+    // The eager `value={formData.name}` read must survive untouched so the
+    // JSX runtime can auto-detect the two-way binding via getLastReactiveAccess.
+    expect(result.code).toContain('value={formData.name}');
+    expect(result.code).not.toContain('value={() =>');
+  });
+
+  it('still wraps other reactive attributes as lazy getters', () => {
+    const source = `
+      const ui = store({ ok: false });
+      const el = <input disabled={ui.ok} />;
+    `;
+    const result = autoWrapDynamic(source, new Set(['ui']));
+    expect(result.code).toContain('disabled={() => (ui.ok)}');
+  });
+
+  it('does not wrap value on non-form-control elements', () => {
+    const source = `
+      const ui = store({ name: '' });
+      const el = <div value={ui.name}></div>;
+    `;
+    const result = autoWrapDynamic(source, new Set(['ui']));
+    expect(result.code).toContain('value={() => (ui.name)}');
+  });
+
+  it('does not wrap a whole form subtree that contains value bindings', () => {
+    // Regression for the 03-form-server blank page: wrapping the <form>
+    // in dynamic() would rebuild (destroy + recreate) every input on each
+    // reactive tick because the getter reads the form's own stores.
+    const source = `
+      const formData = store({ name: '' });
+      const result = formData.result;
+      const el = (
+        <div>
+          {!result && (
+            <form>
+              <input value={formData.name} />
+            </form>
+          )}
+        </div>
+      );
+    `;
+    const result = autoWrapDynamic(source, new Set(['formData']));
+    // The form's value bindings must stay eager even though the conditional
+    // itself gets wrapped.
+    expect(result.code).toContain('value={formData.name}');
   });
 });

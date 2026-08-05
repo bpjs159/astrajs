@@ -199,6 +199,26 @@ export function autoWrapDynamic(
   }
 
   /**
+   * Returns the lowercase intrinsic tag name of the JSX element that owns
+   * `attr` (e.g., `'input'`), or `null` if it can't be determined
+   * (fragments, component elements, etc.).
+   */
+  function getEnclosingTagName(attr: ts.JsxAttribute): string | null {
+    const attributes = attr.parent;
+    const opening = attributes?.parent;
+    if (!opening || !(ts.isJsxOpeningElement(opening) || ts.isJsxSelfClosingElement(opening))) {
+      return null;
+    }
+    const tagName = opening.tagName;
+    return ts.isIdentifier(tagName) ? tagName.text.toLowerCase() : null;
+  }
+
+  /** Whether `tagName` is a form control that supports two-way `value` binding. */
+  function isFormControlTag(tagName: string | null): boolean {
+    return tagName === 'input' || tagName === 'textarea' || tagName === 'select';
+  }
+
+  /**
    * Checks whether a node is already wrapped in a `dynamic(...)` call.
    */
   function isAlreadyDynamic(node: ts.Node): boolean {
@@ -326,6 +346,17 @@ export function autoWrapDynamic(
       // Skip event handlers (onClick, etc.) and refs
       const attrName = attr.name.getText(sourceFile);
       if (attrName.startsWith('on') || attrName === 'ref') {
+        ts.forEachChild(node, visit);
+        return;
+      }
+
+      // Skip `value` on form controls (input/textarea/select). The JSX
+      // runtime auto-detects two-way binding for `value={store.prop}` by
+      // reading the store property EAGERLY (via `getLastReactiveAccess()`)
+      // right before the element is created. Wrapping it in a lazy getter
+      // here would defer that read, silently breaking the auto-binding
+      // (the input would stop syncing back into the store on user input).
+      if (attrName === 'value' && isFormControlTag(getEnclosingTagName(attr))) {
         ts.forEachChild(node, visit);
         return;
       }

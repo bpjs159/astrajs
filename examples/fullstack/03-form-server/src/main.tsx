@@ -7,7 +7,7 @@
 // - Server: Same validators re-executed against submitted data
 // - SSR Resumable: Form state survives server → client transition
 //
-import { component, store } from '@astrajs/core';
+import { component, store, dynamic } from '@astrajs/core';
 import { form, serverForm } from '@astrajs/form';
 import * as validation from '@astrajs/validation';
 import { server } from '@astrajs/server';
@@ -58,6 +58,7 @@ export const FormServerDemo = component(() => {
     name: '',
     email: '',
     password: '',
+    result: null as RegistrationResult | null,
   });
 
   // Form controller — tracks errors, touched, validity
@@ -65,23 +66,29 @@ export const FormServerDemo = component(() => {
 
   // Server form bridge — E2E validation orchestration
   // Validators are auto-resolved from the built-in registry — zero boilerplate.
-  const { submit, isSubmitting } = serverForm({
+  // NOTE: keep the whole handle around (don't destructure `isSubmitting`) so
+  // it can be read reactively from inside `dynamic()` below — destructuring
+  // a getter copies its value once and would never update.
+  const formHandle = serverForm({
     controller: formCtrl,
     data: formData,
     serverAction: submitRegistration,
     onSuccess: (_data: RegistrationData, result: RegistrationResult) => {
       // Show success message — store the result for rendering
-      const fd = formData as unknown as Record<string, unknown>;
-      fd.result = result;
-      fd.name = '';
-      fd.email = '';
-      fd.password = '';
+      formData.result = result;
+      formData.name = '';
+      formData.email = '';
+      formData.password = '';
     },
   });
+  const { submit } = formHandle;
 
-  const result = (formData as unknown as Record<string, unknown>).result as
-    | { ok: boolean; message: string }
-    | undefined;
+  // `dynamic()` is normally injected invisibly by the compiler for plain
+  // expressions, and its .d.ts typing only models that auto-injected shape
+  // (a getter returning `Element`). These calls are intentionally explicit
+  // (see note below), so this thin wrapper accepts the scalar/boolean
+  // returns the runtime already supports (bindDynamicText/bindAttr).
+  const dyn = <T,>(fn: () => T): any => dynamic(fn);
 
   return (
     <div class="card">
@@ -93,90 +100,94 @@ export const FormServerDemo = component(() => {
         </p>
       </div>
       <div class="body">
-        {/* ── Success State ─────────────────────────────────────── */}
-        {result && result.ok && (
-          <div class="successBox">
-            <div class="successIcon">✅</div>
-            <p>{result.message}</p>
-            <button
-              class="btnSecondary"
-              onClick={() => {
-                (formData as unknown as Record<string, unknown>).result = null;
-              }}
-            >
-              Register another
-            </button>
+        {/*
+          Both views stay permanently mounted; only visibility toggles via
+          the `hidden` attribute (a single, targeted reactive binding).
+          IMPORTANT: don't wrap the <form> itself in a `{cond && <form>}`
+          child expression — the compiler's dynamic() auto-wrap walks the
+          ENTIRE expression subtree for reactive store references, so it
+          would catch the `value={formData.x}` bindings on every input
+          inside and rebuild (destroy + recreate) the whole form on every
+          keystroke, which is what made this demo appear frozen/blank.
+        */}
+        <div class="successBox" hidden={!formData.result || !formData.result.ok}>
+          <div class="successIcon">✅</div>
+          <p>{formData.result?.message ?? ''}</p>
+          <button
+            class="btnSecondary"
+            onClick={() => {
+              formData.result = null;
+            }}
+          >
+            Register another
+          </button>
+        </div>
+
+        <form controller={formCtrl} onSubmit={submit} hidden={!!formData.result}>
+          {/* Full Name */}
+          <div class="field">
+            <label>Full Name</label>
+            <input
+              name="name"
+              type="text"
+              placeholder="John Doe"
+              required
+              minLength={3}
+              value={formData.name}
+              validate={validation.minLength(3)}
+            />
+            {dyn(() => formCtrl.getError('name') && (
+              <p class="error">{formCtrl.getError('name')}</p>
+            ))}
           </div>
-        )}
 
-        {/* ── Form ──────────────────────────────────────────────── */}
-        {!result && (
-          <form controller={formCtrl} onSubmit={submit}>
-            {/* Full Name */}
-            <div class="field">
-              <label>Full Name</label>
-              <input
-                name="name"
-                type="text"
-                placeholder="John Doe"
-                required
-                minLength={3}
-                value={formData.name}
-                validate={validation.minLength(3)}
-              />
-              {formCtrl.getError('name') && (
-                <p class="error">{formCtrl.getError('name')}</p>
-              )}
-            </div>
+          {/* Email */}
+          <div class="field">
+            <label>Email</label>
+            <input
+              name="email"
+              type="email"
+              placeholder="john@example.com"
+              required
+              value={formData.email}
+              validate={validation.all([validation.isRequired, validation.isEmail])}
+            />
+            {dyn(() => formCtrl.getError('email') && (
+              <p class="error">{formCtrl.getError('email')}</p>
+            ))}
+          </div>
 
-            {/* Email */}
-            <div class="field">
-              <label>Email</label>
-              <input
-                name="email"
-                type="email"
-                placeholder="john@example.com"
-                required
-                value={formData.email}
-                validate={validation.all([validation.isRequired, validation.isEmail])}
-              />
-              {formCtrl.getError('email') && (
-                <p class="error">{formCtrl.getError('email')}</p>
-              )}
-            </div>
+          {/* Password */}
+          <div class="field">
+            <label>Password</label>
+            <input
+              name="password"
+              type="password"
+              placeholder="Min 8 characters"
+              required
+              minLength={8}
+              value={formData.password}
+              validate={validation.minLength(8)}
+            />
+            {dyn(() => formCtrl.getError('password') && (
+              <p class="error">{formCtrl.getError('password')}</p>
+            ))}
+          </div>
 
-            {/* Password */}
-            <div class="field">
-              <label>Password</label>
-              <input
-                name="password"
-                type="password"
-                placeholder="Min 8 characters"
-                required
-                minLength={8}
-                value={formData.password}
-                validate={validation.minLength(8)}
-              />
-              {formCtrl.getError('password') && (
-                <p class="error">{formCtrl.getError('password')}</p>
-              )}
-            </div>
+          {/* Submit */}
+          <button
+            class="btnSubmit"
+            type="submit"
+            disabled={dyn(() => formHandle.isSubmitting || !formCtrl.isValid)}
+          >
+            {dyn(() => (formHandle.isSubmitting ? 'Submitting...' : 'Register'))}
+          </button>
 
-            {/* Submit */}
-            <button
-              class="btnSubmit"
-              type="submit"
-              disabled={isSubmitting || !formCtrl.isValid}
-            >
-              {isSubmitting ? 'Submitting...' : 'Register'}
-            </button>
-
-            <p class="hint">
-              💡 Try submitting with empty fields, invalid email, or use{' '}
-              <code>taken@example.com</code> to see server-side validation.
-            </p>
-          </form>
-        )}
+          <p class="hint">
+            💡 Try submitting with empty fields, invalid email, or use{' '}
+            <code>taken@example.com</code> to see server-side validation.
+          </p>
+        </form>
       </div>
     </div>
   );

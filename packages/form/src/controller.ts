@@ -294,20 +294,44 @@ function _delegate(controller: FormController): void {
   queueMicrotask(() => _refresh(controller));
 }
 
+// ─── Reentrancy guard ────────────────────────────────────────────────────────
+//
+// `_refresh()` calls `form.checkValidity()`, and per the HTML spec
+// `checkValidity()` **fires an `invalid` event** on every control that
+// fails constraint validation. Our document-level `invalid` listener
+// (capture phase) calls `_refresh()` again, which calls `checkValidity()`
+// again → infinite synchronous recursion → RangeError / browser OOM.
+//
+// The guard below breaks that loop: while a refresh is in flight, re-entrant
+// calls (triggered by the `invalid` events that checkValidity() itself
+// dispatched) are ignored. The very first `_refresh()` still runs to
+// completion and writes the real errors/validity state.
+let _refreshing = false;
+
 function _refresh(controller: FormController): void {
+  // Re-entrancy guard: `form.checkValidity()` fires `invalid` events, which
+  // the document listener forwards back into `_refresh()`. Swallow those
+  // re-entrant calls instead of recursing forever.
+  if (_refreshing) return;
+
   const form = _formEls.get(controller as unknown as object);
   if (!form) return;
 
-  const newErrors = getFormErrors(form);
-  const newValid = form.checkValidity();
+  _refreshing = true;
+  try {
+    const newErrors = getFormErrors(form);
+    const newValid = form.checkValidity();
 
-  // Only update if values actually changed (avoids infinite re-render)
-  const ctrl = controller as unknown as Record<string, unknown>;
-  const oldErrors = ctrl.errors as Record<string, string>;
-  if (_shallowEqual(oldErrors, newErrors) && ctrl.isValid === newValid) return;
+    // Only update if values actually changed (avoids infinite re-render)
+    const ctrl = controller as unknown as Record<string, unknown>;
+    const oldErrors = ctrl.errors as Record<string, string>;
+    if (_shallowEqual(oldErrors, newErrors) && ctrl.isValid === newValid) return;
 
-  ctrl.errors = newErrors;
-  ctrl.isValid = newValid;
+    ctrl.errors = newErrors;
+    ctrl.isValid = newValid;
+  } finally {
+    _refreshing = false;
+  }
 }
 
 function _shallowEqual(a: Record<string, string>, b: Record<string, string>): boolean {
