@@ -63,8 +63,11 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#0f172a;color:#e2
 .field input{width:100%;padding:10px 14px;border:1px solid #334155;border-radius:10px;background:#0f172a;color:#f1f5f9;font-size:.88rem;font-family:inherit;transition:border-color .2s,box-shadow .2s;outline:none}
 .field input:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.15)}
 .field input::placeholder{color:#475569}
-.field input:invalid{border-color:#f87171}
-.field input:invalid:focus{box-shadow:0 0 0 3px rgba(248,113,113,.15)}
+/* Red outline only after the field has been touched (blur). The controller
+   sets data-astra-touched on blur, so an untouched invalid field (e.g.
+   required + empty) keeps the neutral border until the user interacts. */
+.field input[data-astra-touched]:invalid{border-color:#f87171}
+.field input[data-astra-touched]:invalid:focus{box-shadow:0 0 0 3px rgba(248,113,113,.15)}
 .field input[data-astra-server-error]{border-color:#f59e0b}
 .field input[data-astra-server-error]:focus{box-shadow:0 0 0 3px rgba(245,158,11,.15)}
 

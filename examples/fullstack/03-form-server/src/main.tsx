@@ -129,7 +129,7 @@ export const FormServerDemo = component(() => {
               value={formData.name}
               validate={validation.minLength(3)}
             />
-            {formCtrl.getError('name') && (
+            {formCtrl.touched.name && formCtrl.getError('name') && (
               <p class="error">{formCtrl.getError('name')}</p>
             )}
           </div>
@@ -145,7 +145,7 @@ export const FormServerDemo = component(() => {
               value={formData.email}
               validate={validation.all([validation.isRequired, validation.isEmail])}
             />
-            {formCtrl.getError('email') && (
+            {formCtrl.touched.email && formCtrl.getError('email') && (
               <p class="error">{formCtrl.getError('email')}</p>
             )}
           </div>
@@ -162,7 +162,7 @@ export const FormServerDemo = component(() => {
               value={formData.password}
               validate={validation.minLength(8)}
             />
-            {formCtrl.getError('password') && (
+            {formCtrl.touched.password && formCtrl.getError('password') && (
               <p class="error">{formCtrl.getError('password')}</p>
             )}
           </div>

@@ -41,4 +41,26 @@ describe('03-form-server render', () => {
     expect(document.body.querySelectorAll('input').length).toBe(3);
     expect(document.body.querySelector('.successBox')).toBeTruthy();
   });
+
+  it('gates errors behind touched: no error before blur, touched set after blur', async () => {
+    const el = FormServerDemo({}) as HTMLElement;
+    document.body.appendChild(el);
+    await drainQueue();
+
+    const nameInput = document.body.querySelector<HTMLInputElement>('input[name="name"]')!;
+    expect(nameInput).toBeTruthy();
+
+    // The field is invalid (required, empty) but errors are gated behind
+    // `touched` — so NO error <p> is rendered yet.
+    expect(document.body.querySelector('.field .error')).toBeNull();
+
+    // Blur marks the field as touched. The controller stores `touched.name`
+    // and flags the DOM element with data-astra-touched (CSS target for
+    // touched:invalid). The reactive error <p> then renders in the browser
+    // because the Vite compiler wraps the JSX in dynamic().
+    nameInput.dispatchEvent(new FocusEvent('blur', { bubbles: true, composed: true }));
+    await drainQueue();
+
+    expect(nameInput.hasAttribute('data-astra-touched')).toBe(true);
+  });
 });
