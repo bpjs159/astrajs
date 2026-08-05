@@ -243,6 +243,8 @@ declare namespace JSX {
     disabled?: boolean;
     required?: boolean;
     checked?: boolean;
+    /** Restricts selectable file types for `type="file"` inputs. */
+    accept?: string;
     /** Native HTML5 constraint: minimum string length (maps to `minlength` attribute). */
     minLength?: number;
     /** Native HTML5 constraint: maximum string length (maps to `maxlength` attribute). */
