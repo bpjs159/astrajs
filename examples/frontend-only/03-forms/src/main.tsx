@@ -1,14 +1,19 @@
 /**
- * 03 — @astrajs/form Controller
+ * 03 — @astrajs/form Controller + @astrajs/validation
  *
  * Data layer:  @astrajs/core store (formStore.email, formStore.password…)
  * Meta layer:  @astrajs/form controller (errors, touched, isDirty…)
- * Validation:  Browser Constraint Validation API + setCustomValidity()
+ * Validation:  @astrajs/validation — same validators used client & server
+ *
+ * Standard validators (isEmail, minLength, isRequired) come from
+ * @astrajs/validation. Custom async/cross-field validators are
+ * inline — the form controller handles both transparently.
  *
  * Cero efectos. Cero reimplementación de validación.
  */
 import { component, store } from '@astrajs/core';
 import { form } from '@astrajs/form';
+import * as validation from '@astrajs/validation';
 
 const takenUsernames = new Set(['admin', 'root', 'test']);
 
@@ -30,7 +35,7 @@ export const Form = component(() => {
   const handleSubmit = (e: SubmitEvent) => {
     e.preventDefault();
     formStore.submitCount++;
-    if (!formCtrl.isValid) {
+    if (!formController.isValid) {
       formController.focusFirstError();
       return;
     }
@@ -47,7 +52,7 @@ export const Form = component(() => {
   return (
     <div class="form-card">
       <h1>@astrajs/form</h1>
-      <p class="subtitle">Data + Metadata + Native Validation</p>
+      <p class="subtitle">Data + Metadata + <code>@astrajs/validation</code></p>
 
       <form controller={formController} onSubmit={handleSubmit}>
         {/* ── Error box — only shows touched fields ── */}
@@ -67,10 +72,12 @@ export const Form = component(() => {
           ) : null;
         })()}</>
 
+        {/* ── Username — async validator (custom) + built-in ──────── */}
         <div class="field">
           <label>
             Username
             <span class="badge badge-async">async</span>
+            <span class="badge badge-builtin">built-in</span>
           </label>
           <input
             name="username"
@@ -79,43 +86,47 @@ export const Form = component(() => {
             minLength={3}
             placeholder="Pick a username"
             value={formStore.username}
-            validate={async (val: string) => {
-              await new Promise(r => setTimeout(r, 500));
-              return takenUsernames.has(val.toLowerCase())
-                ? 'Username already taken'
-                : true;
-            }}
+            validate={validation.all([
+              validation.isRequired,
+              validation.minLength(3),
+              async (val: string) => {
+                await new Promise(r => setTimeout(r, 500));
+                return takenUsernames.has(val.toLowerCase())
+                  ? 'Username already taken'
+                  : true;
+              },
+            ])}
           />
-          {formController.touched.username && formController.errors.username === 'required' && (
-            <p class="error-msg">Required</p>
-          )}
-          {formController.touched.username && formController.errors.username === 'minlength' && (
-            <p class="error-msg">At least 3 characters</p>
-          )}
-          {formController.errors.username && formController.errors.username !== 'required' && formController.errors.username !== 'minlength' && (
+          {formController.touched.username && formController.errors.username && (
             <p class="error-msg">{formController.errors.username}</p>
           )}
         </div>
 
+        {/* ── Email — standard validators ─────────────────────────── */}
         <div class="field">
-          <label>Email</label>
+          <label>
+            Email
+            <span class="badge badge-builtin">built-in</span>
+          </label>
           <input
             name="email"
             type="email"
             required
             placeholder="you@example.com"
             value={formStore.email}
+            validate={validation.all([validation.isRequired, validation.isEmail])}
           />
-          {formController.touched.email && formController.errors.email === 'required' && (
-            <p class="error-msg">Required</p>
-          )}
-          {formController.touched.email && formController.errors.email === 'type' && (
-            <p class="error-msg">Invalid email format</p>
+          {formController.touched.email && formController.errors.email && (
+            <p class="error-msg">{formController.errors.email}</p>
           )}
         </div>
 
+        {/* ── Password — standard validator ────────────────────────── */}
         <div class="field">
-          <label>Password</label>
+          <label>
+            Password
+            <span class="badge badge-builtin">built-in</span>
+          </label>
           <input
             name="password"
             type="password"
@@ -123,15 +134,14 @@ export const Form = component(() => {
             minLength={6}
             placeholder="Min 6 characters"
             value={formStore.password}
+            validate={validation.all([validation.isRequired, validation.minLength(6)])}
           />
-          {formController.touched.password && formController.errors.password === 'required' && (
-            <p class="error-msg">Required</p>
-          )}
-          {formController.touched.password && formController.errors.password === 'minlength' && (
-            <p class="error-msg">At least 6 characters</p>
+          {formController.touched.password && formController.errors.password && (
+            <p class="error-msg">{formController.errors.password}</p>
           )}
         </div>
 
+        {/* ── Confirm Password — custom cross-field validator ──────── */}
         <div class="field">
           <label>
             Confirm Password
@@ -143,9 +153,11 @@ export const Form = component(() => {
             required
             placeholder="Repeat password"
             value={formStore.confirm}
-            validate={(val: string) =>
-              val === formStore.password ? true : 'Passwords do not match'
-            }
+            validate={validation.all([
+              validation.isRequired,
+              (val: string) =>
+                val === formStore.password ? true : 'Passwords do not match',
+            ])}
           />
           {formController.touched.confirm && formController.errors.confirm && (
             <p class="error-msg">{formController.errors.confirm}</p>
@@ -155,7 +167,7 @@ export const Form = component(() => {
         <button
           class="btn-submit"
           type="submit"
-          disabled={!formCtrl.isDirty || formStore.isSubmitting}
+          disabled={!formController.isDirty || formStore.isSubmitting}
         >
           {formStore.isSubmitting ? 'Creating…' : 'Create Account'}
         </button>
@@ -165,13 +177,13 @@ export const Form = component(() => {
 
       <div class="live-preview">
         <h3>How it works</h3>
+        <div class="preview-item"><span><code>validate={'{validation.isEmail}'}</code></span><span class="badge badge-builtin">@astrajs/validation</span></div>
+        <div class="preview-item"><span><code>validate={'{validation.all([...])}'}</code></span><span>Compose validators</span></div>
+        <div class="preview-item"><span><code>validate={'{async (val) => ...}'}</code></span><span class="badge badge-async">Custom async</span></div>
         <div class="preview-item"><span><code>controller={'{formController}'}</code></span><span class="badge badge-auto">Auto-wired</span></div>
-        <div class="preview-item"><span><code>formController.errors.email</code></span><span>Error codes (i18n-safe)</span></div>
-        <div class="preview-item"><span><code>formController.touched.email</code></span><span>Show after blur</span></div>
+        <div class="preview-item"><span><code>formController.errors.*</code></span><span>Error codes (i18n-safe)</span></div>
+        <div class="preview-item"><span><code>formController.touched.*</code></span><span>Show after blur</span></div>
         <div class="preview-item"><span><code>formController.isDirty</code></span><span>Button disabled</span></div>
-        <div class="preview-item"><span><code>formStore.isSubmitting</code></span><span>Loading state (store)</span></div>
-        <div class="preview-item"><span><code>formStore.submitCount</code></span><span>Attempts (store)</span></div>
-        <div class="preview-item"><span><code>formController.focusFirstError()</code></span><span>Scroll to error</span></div>
       </div>
     </div>
   );

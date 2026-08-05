@@ -16,10 +16,9 @@ export type { FormController } from './controller.js';
 export { getFormErrors, getErrorCode } from './validity-map.js';
 export type { ErrorCode } from './validity-map.js';
 
-// Server form integration — E2E validation bridge
+// Server form integration — E2E validation bridge (auto-resolving validators)
 export {
   serverForm,
-  createValidatorMap,
 } from './server-form.js';
 export type {
   ServerFormConfig,
@@ -27,6 +26,12 @@ export type {
   ServerFormHandle,
   ServerValidator,
 } from './server-form.js';
+
+// Built-in validator registry — standard validators auto-resolved, no boilerplate
+export {
+  BUILTIN_VALIDATORS,
+  resolveBuiltinValidator,
+} from './builtin-validators.js';
 
 // Validator extraction — for SSR and server-side re-execution
 export {

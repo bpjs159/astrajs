@@ -5,6 +5,16 @@
  * The developer writes validation rules ONCE on the inputs, and AstraJS
  * automatically re-runs them on the server when the form is submitted.
  *
+ * ## Zero-Config Auto-Resolution
+ *
+ * Standard `@astrajs/validation` validators (`isEmail`, `isRequired`,
+ * `minLength`, etc.) are resolved automatically from the built-in registry.
+ * **No manual `createValidatorMap()` needed.** Just write `validate={fn}`
+ * on your inputs and AstraJS handles the rest.
+ *
+ * Custom validators can still be provided via `serverValidators` for
+ * non-standard validation logic.
+ *
  * ## How It Works
  *
  * 1. **Client side**: The form controller tracks input validity via the
@@ -35,16 +45,15 @@
  *   const formData = store({ name: '', email: '', password: '' });
  *   const formCtrl = form();
  *
+ *   // Validators auto-resolved — no createValidatorMap() needed!
  *   const { submit, isSubmitting } = serverForm({
  *     controller: formCtrl,
  *     data: formData,
  *     serverAction: server(async (data) => {
- *       // Server-side validation
  *       if (data.email === 'taken@example.com') {
  *         return { ok: false, serverErrors: { email: 'Email already taken' } };
  *       }
- *       // Save to database...
- *       return { ok: true }; // → formCtrl.reset() is called automatically
+ *       return { ok: true };
  *     }),
  *   });
  *
@@ -61,22 +70,10 @@
 
 import type { FormController } from './controller.js';
 import { extractValidators, runValidators } from './validator-extractor.js';
-import type { Validator, AsyncValidator } from '@astrajs/validation';
+import type { ServerValidator } from './builtin-validators.js';
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-/**
- * A validator function or a factory that produces one.
- *
- * Factory validators (like `minLength`) are called with their stored
- * parameters to produce a concrete validator at execution time.
- *
- * Accepts both:
- * - Standalone validators: `(value: string) => string | true`
- * - Factory validators: `(n: number) => (value: string) => string | true`
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type ServerValidator = ((...args: any[]) => any) | Validator | AsyncValidator;
+// Re-export for convenience
+export type { ServerValidator } from './builtin-validators.js';
 
 /**
  * Configuration for `serverForm()`.
@@ -306,31 +303,4 @@ function getFormElement(_controller: FormController): HTMLFormElement | null {
     }
   }
   return null;
-}
-
-/**
- * Creates a server-compatible validator map from @astrajs/validation imports.
- *
- * Convenience function — pass the result to `serverForm()`'s
- * `serverValidators` option.
- *
- * @example
- * ```ts
- * import * as v from '@astrajs/validation';
- * const { submit } = serverForm({
- *   controller: formCtrl,
- *   data: formData,
- *   serverAction: myServerAction,
- *   serverValidators: createValidatorMap({
- *     isRequired: v.isRequired,
- *     isEmail: v.isEmail,
- *     minLength: v.minLength,
- *   }),
- * });
- * ```
- */
-export function createValidatorMap(
-  custom: Record<string, ServerValidator>
-): Record<string, ServerValidator> {
-  return { ...custom };
 }

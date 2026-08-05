@@ -8,8 +8,8 @@
 // - SSR Resumable: Form state survives server → client transition
 //
 import { component, store } from '@astrajs/core';
-import { form, serverForm, createValidatorMap } from '@astrajs/form';
-import * as v from '@astrajs/validation';
+import { form, serverForm } from '@astrajs/form';
+import * as validation from '@astrajs/validation';
 import { server } from '@astrajs/server';
 
 // ─── Shared Types ────────────────────────────────────────────────────────────
@@ -50,19 +50,6 @@ const submitRegistration = server(async (data: RegistrationData): Promise<Regist
   };
 });
 
-// ─── Validator Map for Server-Side Re-Execution ──────────────────────────────
-//
-// This maps validator function names to their implementations so
-// AstraJS can re-run the same validators on the server.
-// The compiler auto-generates this map at build time when the
-// `validate={fn}` prop is detected on inputs.
-//
-const serverValidators = createValidatorMap({
-  isRequired: v.isRequired,
-  isEmail: v.isEmail,
-  minLength: v.minLength,
-});
-
 // ─── Component ───────────────────────────────────────────────────────────────
 
 export const FormServerDemo = component(() => {
@@ -77,11 +64,11 @@ export const FormServerDemo = component(() => {
   const formCtrl = form();
 
   // Server form bridge — E2E validation orchestration
+  // Validators are auto-resolved from the built-in registry — zero boilerplate.
   const { submit, isSubmitting } = serverForm({
     controller: formCtrl,
     data: formData,
     serverAction: submitRegistration,
-    serverValidators,
     onSuccess: (_data: RegistrationData, result: RegistrationResult) => {
       // Show success message — store the result for rendering
       const fd = formData as unknown as Record<string, unknown>;
@@ -135,7 +122,7 @@ export const FormServerDemo = component(() => {
                 required
                 minLength={3}
                 value={formData.name}
-                validate={v.minLength(3)}
+                validate={validation.minLength(3)}
               />
               {formCtrl.getError('name') && (
                 <p class="error">{formCtrl.getError('name')}</p>
@@ -151,7 +138,7 @@ export const FormServerDemo = component(() => {
                 placeholder="john@example.com"
                 required
                 value={formData.email}
-                validate={v.all([v.isRequired, v.isEmail])}
+                validate={validation.all([validation.isRequired, validation.isEmail])}
               />
               {formCtrl.getError('email') && (
                 <p class="error">{formCtrl.getError('email')}</p>
@@ -168,7 +155,7 @@ export const FormServerDemo = component(() => {
                 required
                 minLength={8}
                 value={formData.password}
-                validate={v.minLength(8)}
+                validate={validation.minLength(8)}
               />
               {formCtrl.getError('password') && (
                 <p class="error">{formCtrl.getError('password')}</p>

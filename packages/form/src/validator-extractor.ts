@@ -23,16 +23,11 @@
  */
 
 import type { Validator, AsyncValidator } from '@astrajs/validation';
+import { resolveBuiltinValidator } from './builtin-validators.js';
+import type { ServerValidator } from './builtin-validators.js';
 
-// ─── Validator Types ─────────────────────────────────────────────────────────
-
-/**
- * A validator function or a factory that produces one.
- * Factory validators (like `minLength`) are called with stored params
- * at runtime to produce a concrete validator.
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type ServerValidator = ((...args: any[]) => any) | Validator | AsyncValidator;
+// Re-export for convenience
+export type { ServerValidator } from './builtin-validators.js';
 
 // ─── Validator Metadata ──────────────────────────────────────────────────────
 
@@ -49,6 +44,12 @@ export interface ValidatorMeta {
   params?: unknown[];
   /** The original error message template. */
   message?: string;
+  /**
+   * Direct reference to the validator function (client-side only).
+   * When available, this takes priority over name-based lookup,
+   * enabling zero-config server-side re-execution for standard validators.
+   */
+  fn?: Validator | AsyncValidator;
 }
 
 /**
@@ -139,14 +140,22 @@ export function extractValidators(formEl: HTMLFormElement): ValidatorMeta[] {
       | AsyncValidator
       | undefined;
     if (customValidate) {
+      // Try to resolve the function name (for serialization / SSR)
+      const fnName =
+        (input as unknown as Record<string, unknown>).__astraValidateName as string | undefined
+        ?? customValidate.name
+        ?? 'custom';
+
       // Check the registry first
       const registered = _validatorRegistry.get(customValidate);
       if (registered) {
-        result.push(registered);
+        result.push({ ...registered, fn: customValidate });
       } else {
-        // Fallback: try to detect the function name
-        const name = customValidate.name || 'custom';
-        result.push({ field, validatorName: name });
+        result.push({
+          field,
+          validatorName: fnName,
+          fn: customValidate, // direct reference for client-side auto-resolution
+        });
       }
     }
   }
@@ -206,44 +215,63 @@ export function deserializeValidators(encoded: string): ValidatorMeta[] {
  * form data, re-runs every validation rule and returns a map of
  * `{ fieldName: errorMessage }` for any failing fields.
  *
+ * **Auto-resolution**: Standard @astrajs/validation validators are resolved
+ * automatically from the built-in registry. No manual `createValidatorMap()`
+ * needed. Custom validators can be provided via `customValidators`.
+ *
  * This function is designed to work on BOTH client and server.
  *
  * @param validators — The validator metadata (extracted from the form).
  * @param formData — The submitted form data as a plain object.
- * @param validatorMap — A map of validator name → implementation function.
+ * @param customValidators — Optional map for non-standard/custom validators.
  * @returns A record of `{ fieldName: errorMessage }` for failing fields.
  *
  * @example
  * ```ts
- * import { isEmail, isRequired, minLength } from '@astrajs/validation';
- *
- * const errors = runValidators(
- *   [
- *     { field: 'email', validatorName: 'isRequired' },
- *     { field: 'email', validatorName: 'isEmail' },
- *     { field: 'password', validatorName: 'minLength', params: [8] },
- *   ],
- *   { email: '', password: '123' },
- *   { isRequired, isEmail, minLength }
+ * // Standard validators — auto-resolved, no map needed:
+ * const errors = await runValidators(
+ *   [{ field: 'email', validatorName: 'isEmail' }],
+ *   { email: 'bad' }
  * );
- * // → { email: 'This field is required', password: 'At least 8 characters required' }
+ * // → { email: 'Invalid email format' }
+ *
+ * // With custom validators:
+ * const errors = await runValidators(
+ *   [{ field: 'username', validatorName: 'isUnique' }],
+ *   { username: 'taken' },
+ *   { isUnique: async (v) => v === 'taken' ? 'Taken' : true }
+ * );
  * ```
  */
 export async function runValidators(
   validators: ValidatorMeta[],
   formData: Record<string, string>,
-  validatorMap: Record<string, ServerValidator>
+  customValidators?: Record<string, ServerValidator>
 ): Promise<Record<string, string>> {
   const errors: Record<string, string> = {};
 
   for (const meta of validators) {
-    const { field, validatorName, params = [] } = meta;
+    const { field, validatorName, params = [], fn: directFn } = meta;
     const value = formData[field] ?? '';
 
-    // Resolve the validator function
-    const validatorFn = validatorMap[validatorName];
+    // ── Resolution order ──────────────────────────────────────────
+    // 1. Direct function reference (captured from DOM on client)
+    // 2. Custom validators map (provided by developer for non-standard)
+    // 3. Built-in registry (@astrajs/validation standard validators)
+    let validatorFn: ServerValidator | undefined;
+
+    if (directFn) {
+      // Direct reference — use immediately (client-side path)
+      validatorFn = directFn;
+    } else if (customValidators && customValidators[validatorName]) {
+      validatorFn = customValidators[validatorName];
+    } else {
+      // Auto-resolve from built-in registry
+      validatorFn = resolveBuiltinValidator(validatorName);
+    }
+
     if (!validatorFn) {
-      // Skip unknown validators (they may be client-only custom functions)
+      // Unknown validator — skip (may be client-only custom inline function)
       continue;
     }
 

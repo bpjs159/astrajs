@@ -272,8 +272,9 @@ function handleDelegatedEvent(
     const modulePath = handlerRef.slice(0, hashIdx);
     const exportName = handlerRef.slice(hashIdx + 1);
 
-    // Dynamic import for lazy loading
-    import(modulePath)
+    // Dynamic import for lazy loading (JIT — path comes from SSR HTML attribute).
+    // Vite cannot analyze this at build time because modulePath is a runtime variable.
+    import(/* @vite-ignore */ modulePath)
       .then((mod: Record<string, unknown>) => {
         const importedFn = mod[exportName];
         if (typeof importedFn === 'function') {
