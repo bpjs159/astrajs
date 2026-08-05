@@ -106,6 +106,12 @@ function parseServerConfig(configSource: string): ServerConfig {
     config.autoSync = autoSyncMatch[1] === 'true';
   }
 
+  // Extract autoSyncInterval
+  const autoSyncIntervalMatch = configSource.match(/autoSyncInterval\s*:\s*(\d+)/);
+  if (autoSyncIntervalMatch) {
+    config.autoSyncInterval = parseInt(autoSyncIntervalMatch[1]!, 10);
+  }
+
   return config;
 }
 
@@ -274,8 +280,10 @@ export function findServerCalls(source: string): ServerCallInfo[] {
       startIdx = assignStart;
     }
 
-    // Extract the call source from the ORIGINAL source (positions are preserved)
-    const originalCallText = source.slice(openParenIdx, closeParenIdx + 1);
+    // Extract the call source from the ORIGINAL source (positions are preserved).
+    // Slice strictly BETWEEN the outer parens (parseServerCallArgs expects the
+    // inner argument-list text, not the parens themselves).
+    const originalCallText = source.slice(openParenIdx + 1, closeParenIdx);
 
     // Parse the inner structure: server(config?, async (params) => { body })
     // First, check if there's a config object before the arrow function
@@ -352,36 +360,67 @@ function parseServerCallArgs(
   paramNames: string[];
   functionBody: string;
 } | null {
-  // Try with-config form first: { config }, async (params) => { body }
-  const withConfigMatch = callText.match(
-    /^\s*\{([^}]*(?:\{[^}]*\}[^}]*)*)\}\s*,\s*(async\s+)?\(([^)]*)\)\s*=>\s*\{([\s\S]*)\}\s*$/
+  // Try with-config form first: { config }, async (params) => <body>
+  const withConfigPrefix = callText.match(
+    /^\s*\{([^}]*(?:\{[^}]*\}[^}]*)*)\}\s*,\s*(async\s+)?\(([^)]*)\)\s*=>\s*/
   );
-  if (withConfigMatch) {
-    const configSource = `{${withConfigMatch[1]}}`;
+  if (withConfigPrefix) {
+    const configSource = `{${withConfigPrefix[1]}}`;
     const config = parseServerConfig(configSource);
-    const paramNames = withConfigMatch[3]!
+    const paramNames = withConfigPrefix[3]!
       .split(',')
       .map((p) => stripTypeAnnotation(p.trim()))
       .filter(Boolean);
-    const functionBody = withConfigMatch[4]!;
+    const functionBody = extractArrowFunctionBody(callText.slice(withConfigPrefix[0].length));
+    if (functionBody === null) return null;
     return { config, paramNames, functionBody };
   }
 
-  // Try without-config form: async (params) => { body }
-  const withoutConfigMatch = callText.match(
-    /^\s*(async\s+)?\(([^)]*)\)\s*=>\s*\{([\s\S]*)\}\s*$/
-  );
-  if (withoutConfigMatch) {
-    const paramNames = withoutConfigMatch[2]!
+  // Try without-config form: async (params) => <body>
+  const withoutConfigPrefix = callText.match(/^\s*(async\s+)?\(([^)]*)\)\s*=>\s*/);
+  if (withoutConfigPrefix) {
+    const paramNames = withoutConfigPrefix[2]!
       .split(',')
       .map((p) => stripTypeAnnotation(p.trim()))
       .filter(Boolean);
-    const functionBody = withoutConfigMatch[3]!;
+    const functionBody = extractArrowFunctionBody(callText.slice(withoutConfigPrefix[0].length));
+    if (functionBody === null) return null;
     return { config: {}, paramNames, functionBody };
   }
 
   return null;
 }
+
+/**
+ * Extracts the executable statements of an arrow function's body given the
+ * text immediately following its `=>`. Supports both forms:
+ * - Block body: `{ statements }` — returned as-is (statements are used as-is
+ *   when generating the server handler).
+ * - Concise body: `expr` or `(expr)` — synthesized into `return (expr);` so
+ *   it can be interpolated as statements the same way a block body is.
+ */
+function extractArrowFunctionBody(rest: string): string | null {
+  const trimmed = rest.trim();
+  if (trimmed.length === 0) return null;
+
+  if (trimmed.startsWith('{')) {
+    // Block body — the rest of callText must be exactly the closing brace
+    // (trailing whitespace/semicolon already stripped by the caller's regex
+    // via the full-string anchor, so just strip the outer braces here).
+    if (!trimmed.endsWith('}')) return null;
+    return trimmed.slice(1, -1);
+  }
+
+  // Concise body — strip a trailing semicolon, then one layer of wrapping
+  // parens if present (required by JS syntax for concise object literals).
+  let expr = trimmed.replace(/;\s*$/, '').trim();
+  if (expr.startsWith('(') && expr.endsWith(')')) {
+    expr = expr.slice(1, -1);
+  }
+  if (expr.length === 0) return null;
+  return `return (${expr});`;
+}
+
 
 // ─── Code Generators ─────────────────────────────────────────────────────────
 

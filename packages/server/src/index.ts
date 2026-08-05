@@ -33,6 +33,12 @@ export interface ServerConfig {
   maxAge?: number;
   /** ETag-based automatic DOM mutation when server data changes. */
   autoSync?: boolean;
+  /**
+   * Polling interval in ms for `autoSync`, applied automatically by the
+   * compiler when this function is called inside `mounted()`. Ignored
+   * unless `autoSync: true`. @default 3000
+   */
+  autoSyncInterval?: number;
 }
 
 // ─── Runtime Implementations ─────────────────────────────────────────────────

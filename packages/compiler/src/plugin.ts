@@ -32,6 +32,9 @@ import type { AstraViteConfig } from './index.js';
 import { transformJSX, autoWrapDynamic, autoMemoDerivedFunctions } from './transformers/jsx.js';
 import { transformServerRPC } from './transformers/server-rpc.js';
 import type { ServerCallInfo } from './transformers/server-rpc.js';
+import { autoWrapMountedCleanup } from './transformers/mounted-cleanup.js';
+import { autoWireAutoSyncCalls } from './transformers/autosync-wire.js';
+import type { AutoSyncCallInfo } from './transformers/autosync-wire.js';
 import { ensureImport } from './utils/ast.js';
 
 // ─── Plugin State ────────────────────────────────────────────────────────────
@@ -198,6 +201,7 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
 
       // Phase 2: server Compilation
       const serverResult = transformServerRPC(transformed, id, config);
+      const autoSyncCalls = new Map<string, AutoSyncCallInfo>();
       if (serverResult.calls.length > 0) {
         transformed = serverResult.clientCode;
         state.serverCalls.push(...serverResult.calls);
@@ -214,6 +218,18 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
             state.registerHandler(call.id, handlerFn, { tags: call.config.tags });
           }
         }
+
+        // Track autoSync-enabled calls so Phase 3 can auto-wire polling
+        // into mounted() for whichever variable name they were assigned to.
+        const apiPrefix = config.apiPrefix ?? '/api/astra';
+        for (const call of serverResult.calls) {
+          if (call.config.autoSync && call.varName) {
+            autoSyncCalls.set(call.varName, {
+              endpoint: `${apiPrefix}/${call.id}`,
+              interval: call.config.autoSyncInterval ?? 3000,
+            });
+          }
+        }
       }
 
       // Phase 3: JSX transforms (dynamic mode) or Vanilla DOM (vanilla mode)
@@ -226,7 +242,25 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
           reactiveVars.add(match[2]!);
         }
 
-        // Phase 3a: Auto-Memoization — wrap derived arrow functions with memo()
+        // Phase 3a: auto-wire real autoSync() polling into mounted() when a
+        // tracked `server({ autoSync: true, autoSyncInterval })` function is
+        // called there — no manual autoSync() call needed from the developer.
+        const wiredResult = autoWireAutoSyncCalls(transformed, autoSyncCalls);
+        if (wiredResult.changed) {
+          transformed = ensureImport(wiredResult.code, '@astrajs/server', ['autoSync']);
+          hasChanges = true;
+        }
+
+        // Phase 3b: mounted() cleanup auto-wiring — auto-return autoSync()/
+        // watchTags() disposers so mounted()'s existing unmount cleanup picks
+        // them up without the developer writing `return unsubscribe`.
+        const mountedResult = autoWrapMountedCleanup(transformed);
+        if (mountedResult.changed) {
+          transformed = mountedResult.code;
+          hasChanges = true;
+        }
+
+        // Phase 3b: Auto-Memoization — wrap derived arrow functions with memo()
         // Runs for BOTH dynamic and vanilla modes. Transparent to developer.
         const memoResult = autoMemoDerivedFunctions(transformed, reactiveVars);
         if (memoResult.needsMemo) {
