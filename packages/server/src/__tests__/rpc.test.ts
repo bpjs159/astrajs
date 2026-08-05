@@ -1,10 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import { rpcHandler, getRPCHandler, revalidate, onCacheInvalidate } from '../rpc.js';
 
-describe('registerRPCHandler()', () => {
+describe('rpcHandler()', () => {
   it('registers and retrieves a handler', () => {
     const fn = vi.fn().mockResolvedValue({ ok: true });
-    registerRPCHandler('testHandler', fn, { tags: ['test'] });
+    rpcHandler('testHandler', fn, { tags: ['test'] });
     const handler = getRPCHandler('testHandler');
     expect(handler).toBeDefined();
     expect(handler!.tags).toContain('test');

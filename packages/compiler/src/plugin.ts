@@ -30,7 +30,7 @@ import type { Plugin, ResolvedConfig } from 'vite';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { AstraViteConfig } from './index.js';
 import { transformJSX, autoWrapDynamic, autoMemoDerivedFunctions } from './transformers/jsx.js';
-import { transformServerRPC } from './transformers/server-rpc.js';
+import { transformServerRPC, findServerCalls } from './transformers/server-rpc.js';
 import type { ServerCallInfo } from './transformers/server-rpc.js';
 import { autoWrapMountedCleanup } from './transformers/mounted-cleanup.js';
 import { autoWireAutoSyncCalls } from './transformers/autosync-wire.js';
@@ -45,14 +45,24 @@ import { ensureImport } from './utils/ast.js';
 interface PluginState {
   /** Collected CSS files to emit (filename → content). */
   cssFiles: Map<string, string>;
-  /** Collected server call metadata (for dev server handler registration). */
+  /** Collected server call metadata (for manifest generation). */
   serverCalls: ServerCallInfo[];
   /** Pre-build call IDs for the SSG phase. */
   preBuildIds: string[];
   /** Resolved Vite config (available after configResolved). */
   resolvedConfig: ResolvedConfig | null;
-  /** Dynamically-loaded handler registration function (populated in configureServer). */
-  registerHandler: ((id: string, fn: (...args: unknown[]) => Promise<unknown>, opts?: { tags?: string[] }) => void) | null;
+  /**
+   * RPC handler id → module id (absolute path) that defines it.
+   * Used by the dev middleware to SSR-load the module on demand so the
+   * real `server()` closure (with module-scope state) is registered.
+   */
+  handlerModules: Map<string, string>;
+  /**
+   * RPC handler ids whose defining module changed on disk since the last
+   * registration. The dev middleware re-SSR-loads them so edits to
+   * `server()` functions take effect without a dev-server restart.
+   */
+  handlerDirty: Set<string>;
 }
 
 // ─── File Filter ─────────────────────────────────────────────────────────────
@@ -112,7 +122,8 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
     serverCalls: [],
     preBuildIds: [],
     resolvedConfig: null,
-    registerHandler: null,
+    handlerModules: new Map(),
+    handlerDirty: new Set(),
   };
 
   return {
@@ -132,59 +143,143 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
     // ─── configureServer ─────────────────────────────────────────────────
 
     async configureServer(server) {
-      // Dynamically import server-side primitives
-      const serverMod = await import('@astrajs/server');
-      const { rpcHandler: registerHandler, handleRPCRequest } = serverMod as any;
+      // Server-side handler state must live in the SAME module instance as the
+      // SSR-loaded app modules that register handlers. Resolving @astrajs/server
+      // through Vite's SSR graph (not a plain `import()`) guarantees the RPC
+      // middleware and the app modules share one handler registry.
+      let rpcSsrPromise: Promise<any> | null = null;
+      const getRpcSsr = (): Promise<any> => {
+        if (!rpcSsrPromise) {
+          rpcSsrPromise = server.ssrLoadModule('@astrajs/server');
+        }
+        return rpcSsrPromise;
+      };
 
-      // Store for later use in transform hook (handlers registered as files are processed)
-      state.registerHandler = registerHandler;
+      // When a module that defines `server()` handlers changes on disk, Vite's
+      // HMR reloads the BROWSER module but the SSR graph (which holds the real
+      // handler closures) stays cached — so edits to server functions would
+      // silently keep running the old code until a restart. Invalidate the SSR
+      // module and mark the handlers dirty so the next RPC re-registers them.
+      server.watcher.on('change', (file: string) => {
+        const changedPath = String(file).replace(/\\/g, '/');
+        for (const [handlerId, moduleId] of state.handlerModules) {
+          if (moduleId.replace(/\\/g, '/') === changedPath) {
+            state.handlerDirty.add(handlerId);
+            const mod = server.moduleGraph.getModuleById(moduleId);
+            if (mod) server.moduleGraph.invalidateModule(mod);
+          }
+        }
+      });
 
-      // Register any handlers already collected (from initial build scan)
-      for (const call of state.serverCalls) {
-        if (call.isPreBuild) continue;
-        const handlerFn = new Function(
-          `return (async (${call.paramNames.join(', ')}) => { ${call.functionBody} });`
-        )() as (...args: unknown[]) => Promise<unknown>;
-        registerHandler(call.id, handlerFn, { tags: call.config.tags });
-      }
-
-      // Always set up RPC middleware — handlers may be registered later via transform
+      // RPC middleware. Handlers are registered lazily: when an RPC request
+      // arrives, we SSR-load the module that defines it, which evaluates the
+      // real `server()` functions and registers their closures — so module-scope
+      // state (e.g. an in-memory `CATALOG`) is preserved instead of being lost to
+      // a rebuilt `new Function`.
       server.middlewares.use(async (req: IncomingMessage, res: ServerResponse, next) => {
         const apiPrefix = config.apiPrefix ?? '/api/astra';
         if (!req.url?.startsWith(apiPrefix)) return next();
 
-        const url = new URL(req.url, `http://${req.headers.host ?? 'localhost'}`);
+        try {
+          const rpc = await getRpcSsr();
+          const url = new URL(req.url, `http://${req.headers.host ?? 'localhost'}`);
+          const handlerId = url.pathname.replace(`${apiPrefix}/`, '');
 
-        const chunks: Buffer[] = [];
-        for await (const chunk of req) {
-          chunks.push(chunk);
+          // Ensure the defining module is evaluated in the SSR graph so its real
+          // handler is registered before dispatch. Re-load when the module is
+          // dirty (changed on disk) so edited server() functions take effect.
+          const moduleId = state.handlerModules.get(handlerId);
+          if (moduleId && (!rpc.getRPCHandler(handlerId) || state.handlerDirty.has(handlerId))) {
+            state.handlerDirty.delete(handlerId);
+            await server.ssrLoadModule(moduleId);
+          }
+
+          const chunks: Buffer[] = [];
+          for await (const chunk of req) {
+            chunks.push(chunk);
+          }
+          const body = Buffer.concat(chunks).toString();
+
+          const webRequest = new Request(url.toString(), {
+            method: req.method,
+            headers: Object.entries(req.headers).reduce(
+              (acc, [k, v]) => ({ ...acc, [k]: v?.toString() ?? '' }),
+              {} as Record<string, string>
+            ),
+            body: body || undefined,
+          });
+
+          const response = await rpc.handleRPCRequest(webRequest, handlerId);
+
+          res.statusCode = response.status;
+          response.headers.forEach((value: string, key: string) => {
+            res.setHeader(key, value);
+          });
+          res.end(await response.text());
+        } catch (err) {
+          const message = err instanceof Error ? err.message : 'Internal AstraJS RPC error';
+          if (!res.headersSent) {
+            res.statusCode = 500;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ error: message }));
+          } else {
+            next(err as Error);
+          }
         }
-        const body = Buffer.concat(chunks).toString();
-
-        const webRequest = new Request(url.toString(), {
-          method: req.method,
-          headers: Object.entries(req.headers).reduce(
-            (acc, [k, v]) => ({ ...acc, [k]: v?.toString() ?? '' }),
-            {} as Record<string, string>
-          ),
-          body: body || undefined,
-        });
-
-        const handlerId = url.pathname.replace(`${apiPrefix}/`, '');
-        const response = await handleRPCRequest(webRequest, handlerId);
-
-        res.statusCode = response.status;
-        response.headers.forEach((value: string, key: string) => {
-          res.setHeader(key, value);
-        });
-        res.end(await response.text());
       });
     },
 
     // ─── transform ───────────────────────────────────────────────────────
 
-    async transform(code: string, id: string) {
+    async transform(code: string, id: string, options?: { ssr?: boolean }) {
       if (!shouldTransform(id)) return null;
+
+      const isSSR = !!(options && options.ssr);
+
+      // ── SSR pass (dev-server RPC registration) ─────────────────────────
+      // In the SSR graph the `server()` macro stays intact, so the runtime
+      // fallback returns the real function — with its module-scope closure.
+      // We then register that function as the RPC handler. This is what makes
+      // module-scope state like `const CATALOG = [...]` work: the handler runs
+      // inside the module's own scope instead of a rebuilt `new Function`.
+      if (isSSR) {
+        const calls = findServerCalls(code);
+        let transformed = code;
+        let hasChanges = false;
+
+        for (const call of calls) {
+          if (call.isPreBuild) continue;
+          state.handlerModules.set(call.id, id);
+        }
+
+        const regs = calls
+          .filter((c) => !c.isPreBuild && c.varName)
+          .map((c) => `rpcHandler(${JSON.stringify(c.id)}, ${c.varName});`);
+
+        if (regs.length > 0) {
+          transformed = ensureImport(transformed, '@astrajs/server', ['rpcHandler']);
+          transformed +=
+            '\n\n// @astrajs dev: register server() handlers (SSR graph)\n' +
+            regs.join('\n') +
+            '\n';
+          hasChanges = true;
+        }
+
+        // Strip JSX so the module is valid, executable JS in the SSR graph.
+        if (/\.(tsx|jsx)$/.test(id)) {
+          const jsxResult = transformJSX(transformed, id, config);
+          if (jsxResult.code !== transformed) {
+            transformed = jsxResult.code;
+            hasChanges = true;
+          }
+        }
+
+        if (!hasChanges) return null;
+        return {
+          code: transformed,
+          map: config.sourceMaps ? { mappings: '' } : undefined,
+        };
+      }
 
       let transformed = code;
       let hasChanges = false;
@@ -208,15 +303,11 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
         state.preBuildIds.push(...serverResult.preBuildIds);
         hasChanges = true;
 
-        // Register handlers dynamically (may run after configureServer)
-        if (state.registerHandler) {
-          for (const call of serverResult.calls) {
-            if (call.isPreBuild) continue;
-            const handlerFn = new Function(
-              `return (async (${call.paramNames.join(', ')}) => { ${call.functionBody} });`
-            )() as (...args: unknown[]) => Promise<unknown>;
-            state.registerHandler(call.id, handlerFn, { tags: call.config.tags });
-          }
+        // Remember which module defines each handler so the dev RPC middleware
+        // can SSR-load it on demand and register the real closure.
+        for (const call of serverResult.calls) {
+          if (call.isPreBuild) continue;
+          state.handlerModules.set(call.id, id);
         }
 
         // Track autoSync-enabled calls so Phase 3 can auto-wire polling

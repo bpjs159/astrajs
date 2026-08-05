@@ -239,4 +239,30 @@ describe('autoWrapDynamic', () => {
     expect(result.code).toContain('value={formData.name}');
     expect(result.code).toContain('disabled={() => (!formCtrl.isValid)}');
   });
+
+  it('wraps route()/fallbackRoute() child expressions so views update on navigation', () => {
+    const source = `
+      const el = (
+        <div>
+          {route('/products', { exact: true }) && <ProductList />}
+          {route('/products/:id') && <ProductDetail />}
+          {fallbackRoute() && <NotFound />}
+        </div>
+      );
+    `;
+    const result = autoWrapDynamic(source, new Set([]));
+    expect(result.needsDynamic).toBe(true);
+    expect(result.code).toContain("dynamic(() => (route('/products', { exact: true }) &&");
+    expect(result.code).toContain("dynamic(() => (route('/products/:id') &&");
+    expect(result.code).toContain('dynamic(() => (fallbackRoute() &&');
+  });
+
+  it('wraps params reads in child expressions', () => {
+    const source = `
+      const el = <p>Fetching product {params.id} from server...</p>;
+    `;
+    const result = autoWrapDynamic(source, new Set([]));
+    expect(result.needsDynamic).toBe(true);
+    expect(result.code).toContain('dynamic(() => (params.id))');
+  });
 });

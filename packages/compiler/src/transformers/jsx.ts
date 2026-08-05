@@ -136,6 +136,14 @@ function escapeRegex(s: string): string {
 // ─── AST-Based Dynamic Expression Wrapping ────────────────────────────────
 
 /**
+ * Router primitives that read the reactive `_pathState` store internally.
+ * Expressions calling them (e.g. `{route('/x') && <View />}`) must be wrapped
+ * in `dynamic()` so they re-evaluate when the URL changes — otherwise routed
+ * views are evaluated once and never update on client-side navigation.
+ */
+const ROUTER_REACTIVE_IDS = new Set(['route', 'fallbackRoute', 'params']);
+
+/**
  * Uses the TypeScript compiler API to traverse the AST and auto-wrap
  * reactive JSX expressions with `dynamic()` for transparent DX.
  *
@@ -239,16 +247,17 @@ export function autoWrapDynamic(
   }
 
   /**
-   * Checks if the expression references any reactive store variable.
+   * Checks if the expression references any reactive store variable or a
+   * router primitive that reads the reactive path store (`route()`,
+   * `fallbackRoute()`, `params`).
    */
   function referencesReactiveVar(node: ts.Node): boolean {
     // Walk the subtree looking for identifiers that match reactive vars
     let found = false;
     function check(n: ts.Node): void {
       if (found) return;
-      if (ts.isIdentifier(n) && reactiveVars.has(n.text)) {
-        // Make sure it's a property access (e.g. $.show) not just the var itself
-        // Actually, any reference is enough — the heuristic is broad on purpose
+      if (ts.isIdentifier(n) && (reactiveVars.has(n.text) || ROUTER_REACTIVE_IDS.has(n.text))) {
+        // Any reference is enough — the heuristic is broad on purpose
         found = true;
         return;
       }
