@@ -15,7 +15,10 @@ const posts = store({
 const ui = store({ pending: new Set<string>(), lastError: undefined as string | undefined });
 
 // Simulates a flaky backend — roughly 30% of likes are rejected server-side.
+// The latency makes the optimistic increment visible in the UI before the
+// server confirms (keeps the like) or rejects (rolls it back).
 const likePost = server(async (id: string) => {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   if (Math.random() < 0.3) throw new Error(`Server rejected the like for "${id}"`);
   return { id };
 });
@@ -50,7 +53,9 @@ export const OptimisticDemo = component(() => (
       <p>Update the store immediately, roll back if <code>server()</code> throws</p>
     </div>
     <div class="body">
-      {ui.lastError && <p class="error">{ui.lastError} — rolled back.</p>}
+      <div class="errorSlot">
+        {ui.lastError && <p class="error">{ui.lastError} — rolled back.</p>}
+      </div>
       <div class="list">
         {posts.items.map(p => (
           <div class="row">

@@ -53,4 +53,14 @@ describe('findServerCalls', () => {
     expect(result.clientCode).not.toContain('server({');
     expect(result.clientCode).toContain('/api/astra/getProducts');
   });
+
+  it('generated client wrapper parses the { error } JSON body for a clean message', () => {
+    const src = `const likePost = server(async (id) => { if (Math.random() < 0.3) throw new Error('rejected'); return { id }; });`;
+    const result = transformServerRPC(src, 'test.tsx', { apiPrefix: '/api/astra' });
+    expect(result.clientCode).toContain('JSON.parse(_err)');
+    expect(result.clientCode).toContain('_body?.error');
+    expect(result.clientCode).toContain('_error.status = _res.status');
+    // The old raw-HTTP message is now only a fallback, not the default.
+    expect(result.clientCode).toContain('[AstraJS RPC]');
+  });
 });

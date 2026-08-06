@@ -304,6 +304,20 @@ export function flushPending(): void {
 // ─── Proxy Factory ───────────────────────────────────────────────────────────
 
 /**
+ * Whether a nested value should be wrapped in a reactive Proxy.
+ *
+ * Only plain objects and arrays are proxied. Built-in collection and
+ * class instances (Set, Map, WeakSet, WeakMap, Date, RegExp, Promise,
+ * DOM nodes, …) are returned raw because their methods depend on
+ * internal slots that a Proxy cannot forward via get/set traps.
+ */
+function isProxyable(value: object): boolean {
+  if (Array.isArray(value)) return true;
+  const proto = Object.getPrototypeOf(value);
+  return proto === Object.prototype || proto === null;
+}
+
+/**
  * Wraps a plain object in a reactive Proxy.
  *
  * - `get` trap: records dependency if inside a tracker, and recursively
@@ -338,8 +352,21 @@ function createReactiveProxy<T extends object>(raw: T): T {
 
       const value = Reflect.get(target, prop, receiver);
 
-      // Lazy deep proxy: wrap nested objects/arrays on access
-      if (value !== null && typeof value === 'object' && !ArrayBuffer.isView(value)) {
+      // Lazy deep proxy: wrap nested plain objects/arrays on access.
+      // Built-in collections (Set/Map/WeakSet/WeakMap), Date, RegExp,
+      // Promise, DOM nodes, and other class instances are returned RAW:
+      // their methods rely on internal slots (e.g. [[SetData]]) that a
+      // Proxy cannot intercept, so calling e.g. set.has() on a wrapped
+      // value throws "Method Set.prototype.has called on incompatible
+      // receiver". Reactivity for those values comes from reassigning the
+      // whole property (e.g. `ui.pending = new Set(...)`), which the `set`
+      // trap still tracks.
+      if (
+        value !== null &&
+        typeof value === 'object' &&
+        !ArrayBuffer.isView(value) &&
+        isProxyable(value)
+      ) {
         // Check if already proxied
         const existingProxy = rawToProxy.get(value);
         if (existingProxy) return existingProxy;

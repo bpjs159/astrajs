@@ -15,7 +15,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#0f172a;color:#e2
 .header code{background:rgba(99,102,241,.15);color:#818cf8;padding:1px 7px;border-radius:4px;font-size:.78rem;font-weight:500}
 .body{padding:24px 32px 28px}
 
-.error{color:#f87171;font-size:.8rem;font-weight:500;margin-bottom:14px;padding:10px 14px;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.22);border-radius:10px}
+.errorSlot{min-height:51px}.error{color:#f87171;font-size:.8rem;font-weight:500;margin-bottom:14px;padding:10px 14px;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.22);border-radius:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 .list{display:flex;flex-direction:column;gap:8px}
 .row{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:#0f172a;border:1px solid #334155;border-radius:10px}

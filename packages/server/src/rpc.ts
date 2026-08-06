@@ -95,13 +95,47 @@ export function rpcClient<Args extends unknown[], Return>(
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => 'Unknown error');
-      throw new Error(
-        `[AstraJS RPC] ${endpoint} returned ${response.status}: ${errorText}`
-      );
+
+      // Surface the server's real error message when it responds with the
+      // standard `{ error }` JSON contract — instead of leaking the raw
+      // HTTP wrapper (e.g. "[AstraJS RPC] ... 500: {"error":...}") into
+      // `error.message`, which is what most apps display to the user.
+      let serverMessage: string | null = null;
+      try {
+        const parsed = JSON.parse(errorText) as { error?: unknown };
+        if (typeof parsed?.error === 'string') serverMessage = parsed.error;
+      } catch {
+        // Response body is not JSON — fall back to the descriptive message.
+      }
+
+      const err: RPCError = new Error(
+        serverMessage ??
+          `[AstraJS RPC] ${endpoint} returned ${response.status}: ${errorText}`
+      ) as RPCError;
+      err.status = response.status;
+      err.endpoint = endpoint;
+      err.body = errorText;
+      throw err;
     }
 
     return response.json() as Promise<Return>;
   };
+}
+
+/**
+ * Error thrown by `rpcClient()` when the server responds with a non-2xx.
+ *
+ * `message` carries the server's own error message (from the `{ error }`
+ * JSON contract) when available; `status`, `endpoint` and `body` keep the
+ * raw HTTP context for debugging.
+ */
+export interface RPCError extends Error {
+  /** The HTTP status code returned by the server. */
+  status?: number;
+  /** The RPC endpoint that was called. */
+  endpoint?: string;
+  /** The raw response body (useful when the body wasn't a JSON error). */
+  body?: string;
 }
 
 // ─── Server-Side Handler Registry ────────────────────────────────────────────

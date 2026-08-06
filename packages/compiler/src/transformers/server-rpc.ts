@@ -453,7 +453,19 @@ export function generateClientWrapper(
   });
   if (!_res.ok) {
     const _err = await _res.text();
-    throw new Error(\`[AstraJS RPC] \${_res.status}: \${_err}\`);
+    // Surface the server's real message from the standard { error } JSON
+    // contract instead of leaking the raw HTTP wrapper (e.g.
+    // "[AstraJS RPC] 500: {"error":...}") into error.message, which is what
+    // most apps display to the user.
+    let _msg = null;
+    try {
+      const _body = JSON.parse(_err);
+      if (typeof _body?.error === 'string') _msg = _body.error;
+    } catch {}
+    const _error = new Error(_msg ?? \`[AstraJS RPC] \${_res.status}: \${_err}\`);
+    _error.status = _res.status;
+    _error.body = _err;
+    throw _error;
   }
   return _res.json();
 };`;
