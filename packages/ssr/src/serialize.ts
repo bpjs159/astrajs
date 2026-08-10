@@ -24,6 +24,7 @@
  */
 
 import { store, toRaw } from '@astrajs/core';
+import { getHandlerRegistry } from '@astrajs/core';
 import type { StoreOptions } from '@astrajs/core';
 
 // ─── Forward declarations for form resumability ──────────────────────────────
@@ -197,6 +198,75 @@ export function resume(root: ParentNode = document): Map<Element, object> {
   return stores;
 }
 
+// ─── Bootstrap (Auto-Resume) ─────────────────────────────────────────────────
+
+/**
+ * Bootstraps an AstraJS application — automatically detects whether the
+ * page was server-rendered (SSR with `[astra-data]` markers) or needs a
+ * fresh client-side mount (CSR), and handles the correct path.
+ *
+ * ## SSR mode (resumability)
+ *
+ * When `[astra-data]` elements are present in the DOM:
+ * 1. Calls `resume()` — deserializes state from `astra-data` attributes
+ * 2. Installs registered handlers onto `window` so the delegated
+ *    `astra-on:*` event system can find them
+ * 3. The component is NEVER executed — zero hydration
+ *
+ * ## CSR mode (fresh mount)
+ *
+ * When no `[astra-data]` markers are found:
+ * 1. Calls `componentFn()` to render the component fresh
+ * 2. Appends the result to the root element
+ *
+ * @param componentFn — The root component to mount in CSR mode.
+ * @param rootSelector — The DOM selector for the mount point (default `#app`).
+ *
+ * @example
+ * ```ts
+ * import { bootstrap } from '@astrajs/ssr';
+ * import { App } from './app';
+ *
+ * // Single call — handles both SSR resume and CSR mount transparently
+ * bootstrap(App);
+ * ```
+ */
+export function bootstrap(
+  componentFn: () => JSX.Element,
+  rootSelector = '#app'
+): void {
+  const root = document.querySelector(rootSelector);
+  if (!root) {
+    console.error(`[AstraJS] Root element "${rootSelector}" not found`);
+    return;
+  }
+
+  const hasSSRData = root.querySelector('[astra-data]') !== null;
+
+  if (hasSSRData) {
+    // ── SSR: resume from server-rendered HTML ─────────────────────────
+    resume(root);
+
+    // Install registered handlers on window so the delegated event
+    // system (registered by resume()) can find them via astra-on:click
+    // attributes.
+    const registry = getHandlerRegistry();
+    for (const [name, fn] of registry) {
+      (window as unknown as Record<string, unknown>)[name] = fn;
+    }
+
+    console.log('[AstraJS] ⚡ Resumed from SSR — no hydration needed');
+  } else {
+    // ── CSR: fresh client-side mount ─────────────────────────────────
+    const node = componentFn();
+    // Guard against null/false returns (components may render nothing)
+    if (node) {
+      root.appendChild(node as Node);
+    }
+    console.log('[AstraJS] ⚡ Mounted fresh (CSR mode)');
+  }
+}
+
 // ─── Delegated Event System ──────────────────────────────────────────────────
 
 /**
@@ -231,8 +301,14 @@ function registerDelegatedEvents(root: ParentNode): void {
       if (!target) return;
 
       // Walk up the DOM tree looking for astra-on:<event>
+      // Skip non-Element nodes (document, text nodes, etc.) that may
+      // appear as event targets (e.g. mouseenter on the document root).
       let el: HTMLElement | null = target;
       while (el) {
+        if (typeof el.getAttribute !== 'function') {
+          el = el.parentElement;
+          continue;
+        }
         const handlerRef = el.getAttribute(`astra-on:${eventName}`);
         if (handlerRef) {
           handleDelegatedEvent(event, handlerRef, el);

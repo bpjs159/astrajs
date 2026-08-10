@@ -88,6 +88,7 @@ export {
   deserializeState,
   astraDataAttr,
   resume,
+  bootstrap,
   registerFormResumeHandler,
 } from './serialize.js';
 

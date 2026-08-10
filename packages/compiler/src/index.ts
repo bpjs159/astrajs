@@ -98,6 +98,25 @@ export interface AstraViteConfig {
    * @default 'dynamic'
    */
   transformMode?: 'dynamic' | 'vanilla';
+
+  /**
+   * Enable transparent resumability.
+   *
+   * When `true`, the compiler automatically:
+   * - Converts `onClick={fn}` to `astra-on:click` during SSR
+   * - Injects `registerHandler(fn)` calls at module level
+   * - The `bootstrap()` client entry auto-detects SSR vs CSR
+   *
+   * The developer writes normal JSX — the framework handles the rest.
+   *
+   * Can also be set via `astra.config.json`:
+   * ```json
+   * { "resumability": true }
+   * ```
+   *
+   * @default false
+   */
+  resumability?: boolean;
 }
 
 // ─── CSS Macro (Compile-Time Only) ───────────────────────────────────────────

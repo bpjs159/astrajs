@@ -40,6 +40,58 @@ import { bindValue, bindConditional, bindDynamicList, bindDynamicText, bindAttr 
 import { getLastReactiveAccess, clearLastReactiveAccess } from './runtime/store.js';
 import { untrack } from './runtime/effect.js';
 
+// ─── SSR Resumability ────────────────────────────────────────────────────────
+
+/**
+ * Set to `true` by the SSR renderer before executing components.
+ * When active, the JSX runtime converts `onClick={fn}` into
+ * `astra-on:click="fnName"` attributes instead of addEventListener(),
+ * so the HTML can be "resumed" on the client without re-executing
+ * any component.
+ */
+let _ssrResumable = false;
+
+/** Enables SSR-resumable mode (called by @astrajs/ssr before rendering). */
+export function setSSRResumable(mode: boolean): void {
+  _ssrResumable = mode;
+}
+
+/** Returns whether the JSX runtime is in SSR-resumable mode. */
+export function isSSRResumable(): boolean {
+  return _ssrResumable;
+}
+
+/**
+ * Global registry of handler functions keyed by name.
+ *
+ * Populated at module level by `registerHandler()` calls. During SSR
+ * the JSX runtime also auto-registers handlers encountered in
+ * `onClick={fn}` props. On the client, `bootstrap()` from @astrajs/ssr
+ * installs these handlers on `window` so the delegated `astra-on:*`
+ * event system can find them.
+ */
+const _handlerRegistry = new Map<string, Function>();
+
+/**
+ * Registers a named handler function for SSR resumability.
+ *
+ * Call this at module level for every handler referenced in JSX
+ * `onClick={fn}` / `onInput={fn}` etc. The function name is used as
+ * the `astra-on:click` attribute value in the server-rendered HTML.
+ *
+ * Anonymous functions receive an auto-generated name (`__h_0`, …).
+ */
+export function registerHandler(fn: Function): string {
+  const name = fn.name || `__h_${_handlerRegistry.size}`;
+  _handlerRegistry.set(name, fn);
+  return name;
+}
+
+/** Returns the full handler registry (for @astrajs/ssr bootstrap). */
+export function getHandlerRegistry(): ReadonlyMap<string, Function> {
+  return _handlerRegistry;
+}
+
 // ─── dynamic() — Zero-VDOM reactive expression marker ────────────────────
 
 /**
@@ -207,7 +259,17 @@ function setProps(
       if (event !== event.toLowerCase()) {
         event = event.replace(/[A-Z]/g, (c) => c.toLowerCase());
       }
-      el.addEventListener(event, value as EventListener);
+
+      // SSR resumability: instead of addEventListener (which is lost
+      // when serializing to HTML), emit astra-on:click="handlerName"
+      // attributes. The client resumes them via delegated events.
+      if (_ssrResumable) {
+        const fn = value as Function;
+        const handlerName = registerHandler(fn);
+        el.setAttribute(`astra-on:${event}`, handlerName);
+      } else {
+        el.addEventListener(event, value as EventListener);
+      }
     } else if (key === 'astra-data') {
       el.setAttribute('astra-data', typeof value === 'string' ? value : JSON.stringify(value));
     } else if (key.startsWith('astra-on:')) {

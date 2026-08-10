@@ -29,12 +29,15 @@
 import type { Plugin, ResolvedConfig } from 'vite';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { AstraViteConfig } from './index.js';
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { transformJSX, autoWrapDynamic, autoMemoDerivedFunctions } from './transformers/jsx.js';
 import { transformServerRPC, findServerCalls } from './transformers/server-rpc.js';
 import type { ServerCallInfo } from './transformers/server-rpc.js';
 import { autoWrapMountedCleanup } from './transformers/mounted-cleanup.js';
 import { autoWireAutoSyncCalls } from './transformers/autosync-wire.js';
 import type { AutoSyncCallInfo } from './transformers/autosync-wire.js';
+import { injectRegisterHandlers } from './transformers/resumability.js';
 import { ensureImport } from './utils/ast.js';
 
 // ─── Plugin State ────────────────────────────────────────────────────────────
@@ -79,10 +82,39 @@ function shouldTransform(id: string): boolean {
   // Only process source files, not node_modules
   if (id.includes('node_modules')) return false;
   if (id.includes('/dist/')) return false;
+  // Don't transform the framework's own packages (core, ssr, compiler, etc.)
+  // — resumability transforms are for application code only.
+  if (id.includes('/packages/')) return false;
   return TRANSFORM_EXTENSIONS.test(id);
 }
 
 // ─── Plugin Factory ──────────────────────────────────────────────────────────
+
+/**
+ * Reads `astra.config.json` from the project root (if it exists) and
+ * returns its contents merged with the inline config. Inline options
+ * always take precedence over file-based config.
+ */
+function readConfigFile(root: string): Partial<AstraViteConfig> {
+  const configPath = resolve(root, 'astra.config.json');
+  if (!existsSync(configPath)) return {};
+
+  try {
+    const raw = readFileSync(configPath, 'utf-8');
+    const parsed = JSON.parse(raw);
+    if (typeof parsed !== 'object' || parsed === null) return {};
+    // Only pick known keys
+    const out: Partial<AstraViteConfig> = {};
+    if (typeof parsed.resumability === 'boolean') out.resumability = parsed.resumability;
+    if (typeof parsed.apiPrefix === 'string') out.apiPrefix = parsed.apiPrefix;
+    if (typeof parsed.cssPrefix === 'string') out.cssPrefix = parsed.cssPrefix;
+    if (typeof parsed.transformMode === 'string') out.transformMode = parsed.transformMode as AstraViteConfig['transformMode'];
+    return out;
+  } catch {
+    console.warn('[AstraJS] Failed to parse astra.config.json — ignoring file config');
+    return {};
+  }
+}
 
 /**
  * Creates the AstraJS Vite plugin.
@@ -107,13 +139,16 @@ function shouldTransform(id: string): boolean {
  * ```
  */
 export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
-  const config: AstraViteConfig = {
+  // Start with defaults + inline config. File-based config (astra.config.json)
+  // is merged in configResolved — inline options always take precedence.
+  let config: AstraViteConfig = {
     cssPrefix: 'astra-',
     cssHashLength: 6,
     cssOutput: 'assets',
     apiPrefix: '/api/astra',
     sourceMaps: true,
     transformMode: 'dynamic',
+    resumability: false,
     ...userConfig,
   };
 
@@ -134,6 +169,22 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
 
     configResolved(resolvedConfig: ResolvedConfig) {
       state.resolvedConfig = resolvedConfig;
+
+      // Merge astra.config.json from the project root.
+      // Priority: inline config > file config > defaults
+      const fileConfig = readConfigFile(resolvedConfig.root);
+      config = {
+        cssPrefix: 'astra-',
+        cssHashLength: 6,
+        cssOutput: 'assets',
+        apiPrefix: '/api/astra',
+        sourceMaps: true,
+        transformMode: 'dynamic',
+        resumability: false,
+        ...fileConfig,     // astra.config.json
+        ...userConfig,     // inline in vite.config.ts (highest priority)
+      } as AstraViteConfig;
+
       // In dev mode, source maps are more useful
       if (resolvedConfig.command === 'serve') {
         config.sourceMaps = true;
@@ -320,6 +371,17 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
               interval: call.config.autoSyncInterval ?? 3000,
             });
           }
+        }
+      }
+
+      // Phase 2.5: Resumability — auto-inject registerHandler() calls
+      // for JSX event handler props (onClick={fn}, onInput={fn}, etc.)
+      // so the SSR path emits astra-on:click attributes automatically.
+      if (config.resumability) {
+        const rr = injectRegisterHandlers(transformed);
+        if (rr.changed) {
+          transformed = rr.code;
+          hasChanges = true;
         }
       }
 

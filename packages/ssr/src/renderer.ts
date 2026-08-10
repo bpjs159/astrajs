@@ -22,6 +22,7 @@
  */
 
 import type { SSRConfig, SSGConfig } from './index.js';
+import { setSSRResumable } from '@astrajs/core';
 
 // ─── DOM Node → HTML String Serializer ───────────────────────────────────────
 
@@ -192,8 +193,12 @@ function defaultTemplate(appHtml: string): string {
 export async function renderToString(config: SSRConfig): Promise<string> {
   const { root, template = defaultTemplate, minify = false } = config;
 
-  // Render the root component — produces real DOM nodes
+  // Render the root component — produces real DOM nodes.
+  // Enable SSR-resumable mode so onClick={fn} becomes astra-on:click
+  // attributes instead of addEventListener() (which is lost in HTML).
+  setSSRResumable(true);
   const rootNode = root();
+  setSSRResumable(false);
 
   // Guard against null/false returns from components
   if (!rootNode) {

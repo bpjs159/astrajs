@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>09 — Resumability · AstraJS</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:system-ui,-apple-system,sans-serif;background:#0f172a;color:#e2e8f0;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:40px 20px}
+
+    .card{background:#1e293b;border:1px solid #334155;border-radius:20px;max-width:440px;width:100%;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.3),0 8px 32px rgba(0,0,0,.15)}
+    .header{padding:28px 32px 20px;border-bottom:1px solid #334155;background:linear-gradient(135deg,rgba(99,102,241,.06) 0%,transparent 60%)}
+    .header h1{font-size:1.3rem;font-weight:700;color:#f1f5f9;margin-bottom:5px;letter-spacing:-.01em}
+    .header p{font-size:.8rem;color:#64748b;line-height:1.5}
+    .header code{background:rgba(99,102,241,.15);color:#818cf8;padding:1px 7px;border-radius:4px;font-size:.78rem;font-weight:500}
+    .body{padding:28px 32px 32px}
+
+    .counter{display:flex;align-items:center;justify-content:center;gap:20px}
+    .count{font-size:3rem;font-weight:800;color:#f1f5f9;min-width:80px;text-align:center;font-variant-numeric:tabular-nums}
+    .btn{width:52px;height:52px;border:1px solid #334155;border-radius:12px;background:#0f172a;color:#818cf8;font-size:1.4rem;font-weight:700;cursor:pointer;transition:border-color .15s,background .15s,transform .1s;display:flex;align-items:center;justify-content:center}
+    .btn:hover{border-color:#6366f1;background:rgba(99,102,241,.1)}
+    .btn:active{transform:scale(.93)}
+
+    .info{margin-top:28px;padding:16px 20px;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.15);border-radius:12px}
+    .info p{font-size:.78rem;color:#94a3b8;line-height:1.6}
+    .info strong{color:#c4b5fd}
+    .info .highlight{color:#6ee7b7;font-weight:600}
+
+    .status{margin-top:16px;padding:10px 20px;background:rgba(110,231,183,.08);border:1px solid rgba(110,231,183,.2);border-radius:10px;font-size:.78rem;color:#6ee7b7;font-weight:600;text-align:center}
+  </style>
+</head>
+<body>
+  <!--
+    ═══════════════════════════════════════════════════════════════════
+    This HTML is the SSR OUTPUT — what the server sends to the browser.
+
+    The developer wrote normal JSX with onClick={handler} in app.tsx.
+    During SSR, the framework AUTO-CONVERTED:
+      onClick={handleIncrement}  →  astra-on:click="handleIncrement"
+      counter state              →  astra-data='{"count":0}'
+
+    On the client, a single bootstrap(App) call in main.ts handles:
+      1. Auto-detect SSR markers ([astra-data])
+      2. Deserialize state → reactive Proxy
+      3. Register delegated events for astra-on:*
+      4. Install handlers on window (from registerHandler() calls)
+
+    The developer never writes astra-on:click or astra-data manually.
+    ═══════════════════════════════════════════════════════════════════
+  -->
+  <div id="app">
+    <div class="card" astra-data='{"count":0}'>
+      <div class="header">
+        <h1>⚡ Resumability</h1>
+        <p>Write <code>onClick</code> in JSX — the framework auto-converts to <code>astra-on:click</code> during SSR</p>
+      </div>
+      <div class="body">
+        <div class="counter">
+          <button class="btn" astra-on:click="handleDecrement">−</button>
+          <span class="count">0</span>
+          <button class="btn" astra-on:click="handleIncrement">+</button>
+        </div>
+
+        <div class="info">
+          <p>
+            <strong>app.tsx</strong> uses normal <code>onClick={'{'}handleIncrement{'}'}</code> JSX.<br>
+            <strong>registerHandler()</strong> registers the function for SSR.<br>
+            <strong>bootstrap(App)</strong> in main.ts handles everything.<br>
+            <strong>View page source</strong> — the framework auto-generated
+            <code>astra-on:click</code> attributes during SSR.
+          </p>
+        </div>
+
+        <div class="status" id="status">
+          ⚡ Resumed from SSR — no hydration needed
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

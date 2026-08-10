@@ -66,6 +66,14 @@ export { component } from './runtime/component.js';
 // Zero-VDOM reactive expression
 export { dynamic } from './jsx-runtime.js';
 
+// SSR Resumability — transparent handler registration & SSR-mode control
+export {
+  setSSRResumable,
+  isSSRResumable,
+  registerHandler,
+  getHandlerRegistry,
+} from './jsx-runtime.js';
+
 // Lifecycle
 export { mounted } from './runtime/lifecycle.js';
 
