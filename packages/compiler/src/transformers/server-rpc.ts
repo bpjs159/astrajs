@@ -502,13 +502,24 @@ export async function handler(args: unknown[]) {
  * @returns The inlined constant source code.
  */
 export function generatePreBuildInline(call: ServerCallInfo): string {
-  const { varName } = call;
+  const { varName, functionBody } = call;
   const stub = varName ? `const ${varName} = ` : '';
 
-  // In production, the function would be executed here and its result
-  // serialized. For now, we emit a placeholder that the SSG crawler
-  // will resolve at generation time.
-  return `${stub}/* @astrajs pre-build — resolved at SSG time */ undefined;`;
+  try {
+    // Execute the function body at build time.
+    // The body is wrapped as a synchronous IIFE. For async functions
+    // the SSG executor (prebuild.ts) handles them via executePreBuild().
+    const fn = new Function(`return (function() { ${functionBody} })();`);
+    const result = fn();
+    return `${stub}${JSON.stringify(result)};`;
+  } catch (e) {
+    console.warn(
+      `[AstraJS] Pre-build execution failed for "${call.id}" ` +
+      `(function may depend on module-scope variables):`,
+      e instanceof Error ? e.message : e
+    );
+    return `${stub}/* @astrajs pre-build — execution failed */ undefined;`;
+  }
 }
 
 // ─── Source-Level Transformer ────────────────────────────────────────────────
