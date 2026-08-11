@@ -291,7 +291,7 @@ export const routes = {
           <p class="hero-tagline">The Full-Stack Framework<br/>that Ships Zero <span style="background:linear-gradient(135deg,#8d4dff,#4d7cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">JavaScript</span>.</p>
           <p class="hero-sub">AstraJS elimina el Virtual DOM y compila tu código TypeScript a mutaciones directas del DOM. Más rápido, más ligero, más simple.</p>
           <div class="hero-buttons">
-            <button class="btn-primary" onclick={() => navigate('/docs')}>
+            <button class="btn-primary" onclick={() => navigate('/docs/introduction')}>
               Comenzar ahora <span>→</span>
             </button>
             <a class="btn-secondary" href="https://github.com" target="_blank" rel="noopener">
@@ -335,7 +335,7 @@ export const routes = {
               <div class="section-label">Sin Virtual DOM</div>
               <h3>Sin Virtual DOM.<br/>Actualizaciones quirúrgicas.</h3>
               <p>AstraJS convierte tu JSX en DOM nativo en tiempo de compilación y suscribe únicamente los nodos que cambian. <strong>O(1)</strong> actualizaciones. Máxima velocidad.</p>
-              <Link href="/docs" class="feature-link">Saber más sobre la reactividad</Link>
+              <Link href="/docs/fundamentals" class="feature-link">Saber más sobre la reactividad</Link>
             </div>
             <div class="code-compare">
               <div class="code-box">
@@ -578,7 +578,7 @@ export const routes = {
             <span>pnpm create astra@latest</span>
           </div>
           <br/>
-          <button class="btn-primary" onclick={() => navigate('/docs')} style="font-size:.92rem;padding:14px 36px">
+          <button class="btn-primary" onclick={() => navigate('/docs/introduction')} style="font-size:.92rem;padding:14px 36px">
             Instalar AstraJS <span>→</span>
           </button>
         </div>

@@ -6,7 +6,13 @@ import { component } from '@astrajs/core';
 import { Header } from './components/header.js';
 import { Footer } from './components/footer.js';
 import { HomePage } from './pages/home.js';
-import { DocsPage } from './pages/docs.js';
+import { DocsIntroduction } from './pages/docs/introduction.js';
+import { DocsFundamentals } from './pages/docs/fundamentals.js';
+import { DocsServerData } from './pages/docs/server-data.js';
+import { DocsRouter } from './pages/docs/router.js';
+import { DocsRendering } from './pages/docs/rendering.js';
+import { DocsComparison } from './pages/docs/comparison.js';
+import { DocsAdvanced } from './pages/docs/advanced.js';
 import { routes } from './routes.js';
 
 /* ── Global Styles ── */
@@ -78,7 +84,14 @@ export const App = component(() => (
     <main>
       {(() => {
         if (routes.home) return <HomePage />;
-        if (routes.docs) return <DocsPage />;
+        if (routes.docsIntroduction) return <DocsIntroduction />;
+        if (routes.docsFundamentals) return <DocsFundamentals />;
+        if (routes.docsServerData) return <DocsServerData />;
+        if (routes.docsRouter) return <DocsRouter />;
+        if (routes.docsRendering) return <DocsRendering />;
+        if (routes.docsComparison) return <DocsComparison />;
+        if (routes.docsAdvanced) return <DocsAdvanced />;
+        if (routes.docs) return <DocsIntroduction />;
         return <HomePage />;
       })()}
     </main>

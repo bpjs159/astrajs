@@ -41,19 +41,19 @@ export const Header = component(() => {
           ☰
         </button>
         <nav class="header-nav">
-          <Link href="/docs">Docs</Link>
-          <Link href="/docs">Guide</Link>
-          <Link href="/docs">API</Link>
+          <Link href="/docs/introduction">Docs</Link>
+          <Link href="/docs/introduction">Guide</Link>
+          <Link href="/docs/server-data">API</Link>
           <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
-          <Link href="/docs" class="header-cta">Get Started</Link>
+          <Link href="/docs/introduction" class="header-cta">Get Started</Link>
         </nav>
       </div>
       <div class={`header-mobile-menu${state.mobileOpen ? ' open' : ''}`}>
-        <Link href="/docs" onclick={closeMenu}>Docs</Link>
-        <Link href="/docs" onclick={closeMenu}>Guide</Link>
-        <Link href="/docs" onclick={closeMenu}>API</Link>
+        <Link href="/docs/introduction" onclick={closeMenu}>Docs</Link>
+        <Link href="/docs/introduction" onclick={closeMenu}>Guide</Link>
+        <Link href="/docs/server-data" onclick={closeMenu}>API</Link>
         <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
-        <Link href="/docs" class="header-cta" onclick={closeMenu}>Get Started</Link>
+        <Link href="/docs/introduction" class="header-cta" onclick={closeMenu}>Get Started</Link>
       </div>
     </header>
   );

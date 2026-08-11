@@ -26,8 +26,8 @@ export function Footer(): JSX.Element {
           <span>ASTRAJS</span>
         </div>
         <div class="footer-links">
-          <Link href="/docs">Docs</Link>
-          <Link href="/docs">API</Link>
+          <Link href="/docs/introduction">Docs</Link>
+          <Link href="/docs/server-data">API</Link>
           <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
           <a href="https://discord.com" target="_blank" rel="noopener">Discord</a>
           <a href="https://x.com" target="_blank" rel="noopener">X (Twitter)</a>
