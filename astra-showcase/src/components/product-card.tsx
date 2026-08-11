@@ -1,55 +1,34 @@
-/**
- * AstraStore — Product Card Component
- *
- * Displays a product in a card format with image, name, price, and rating.
- * Clicking navigates to the product detail page.
- *
- * Type: Component<ProductCardProps>
- */
-
-import type { Component } from '@astrajs/core';
-import type { Product } from '../stores/products.js';
-import { styles } from '../styles/dashboard.css.js';
-
 export interface ProductCardProps {
-  product: Product;
+  id: string;
+  name: string;
+  price: number;
+  stock: number;
+  category: string;
+  onAdd?: (id: string) => void;
 }
 
-/**
- * Product card with gradient image placeholder, name, category,
- * price, and star rating.
- *
- * The `onclick` handler navigates to the product detail using
- * `router.navigate()` — intercepted by the router as SPA navigation,
- * not a full page reload.
- */
-export const ProductCard: Component<ProductCardProps> = ({ product }) => {
+export function ProductCard({ id, name, price, stock, category, onAdd }: ProductCardProps): JSX.Element {
+  const badgeColor = stock > 50 ? '#34d399' : stock > 10 ? '#f59e0b' : '#f87171';
+
   return (
-    <div
-      class={styles['product-card']}
-      onclick={() => {
-        // Use the global router reference
-        const win = window as Record<string, unknown>;
-        const router = win.__astra_router as
-          | { navigate: (to: string) => void }
-          | undefined;
-        router?.navigate(`/products/${product.id}`);
-      }}
-    >
-      <div class={styles['product-image']}>{product.image}</div>
-      <div class={styles['product-info']}>
-        <div class={styles['product-name']}>{product.name}</div>
-        <div class={styles['product-category']}>{product.category}</div>
-        <div class={styles['product-footer']}>
-          <span class={styles['product-price']}>
-            ${product.price.toFixed(2)}
-          </span>
-          <span class={styles['product-rating']}>
-            {'★'.repeat(Math.round(product.rating))}{' '}
-            {product.rating}
+    <div class="product-card">
+      <div class="product-info">
+        <div class="product-name">{name}</div>
+        <div class="product-meta">
+          <span class="product-category">{category}</span>
+          <span class="product-stock" style={`color:${badgeColor}`}>
+            {stock} in stock
           </span>
         </div>
       </div>
+      <div class="product-actions">
+        <span class="product-price">${price}</span>
+        {onAdd && (
+          <button class="btn-add" onClick={() => onAdd(id)} disabled={stock === 0}>
+            + Cart
+          </button>
+        )}
+      </div>
     </div>
   );
-};
+}

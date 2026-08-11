@@ -12,6 +12,7 @@
  */
 
 import { navigate } from './navigate.js';
+import { bindAttr } from '@astrajs/core';
 
 export interface LinkProps {
   href: string;
@@ -26,8 +27,19 @@ export function Link(props: LinkProps): HTMLElement {
 
   const a = document.createElement('a');
   a.href = href;
-  if (cls) a.className = cls;
-  if (className) a.className = className;
+  // Reactive class binding: when `class` is a getter function
+  // (e.g. from dynamic()), use bindAttr for granular updates instead
+  // of setting className once.
+  if (typeof cls === 'function') {
+    bindAttr(a, 'class', cls as () => string | null);
+  } else if (cls) {
+    a.className = cls;
+  }
+  if (typeof className === 'function') {
+    bindAttr(a, 'class', className as () => string | null);
+  } else if (className) {
+    a.className = className;
+  }
 
   // Set remaining attributes
   for (const [key, value] of Object.entries(rest)) {
@@ -36,12 +48,13 @@ export function Link(props: LinkProps): HTMLElement {
     }
   }
 
-  // Append children
-  if (children !== undefined && children !== null) {
+  // Append children — skip falsy values (false, null, undefined, true)
+  // that are common in JSX expressions like {cond && <span/>}.
+  if (children || children === 0 || children === '') {
     if (Array.isArray(children)) {
       for (const child of children) {
         if (child instanceof Node) a.appendChild(child);
-        else a.appendChild(document.createTextNode(String(child)));
+        else if (child || child === 0 || child === '') a.appendChild(document.createTextNode(String(child)));
       }
     } else if (children instanceof Node) {
       a.appendChild(children);

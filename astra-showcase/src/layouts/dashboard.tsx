@@ -1,35 +1,26 @@
-/**
- * AstraStore — Dashboard Layout
- *
- * Persistent layout with sidebar + main content area.
- * The `<Outlet />` renders child route content inside `<main>`.
- *
- * When navigating between pages, the Sidebar stays intact (no re-render),
- * and only the content inside `<Outlet />` is swapped.
- *
- * This is the magic of layout preservation in AstraJS.
- *
- * Type: Component
- */
-
-import type { Component } from '@astrajs/core';
-import { Outlet } from '@astrajs/router';
+import { component } from '@astrajs/core';
 import { Sidebar } from '../components/sidebar.js';
-import { styles } from '../styles/dashboard.css.js';
+import { DashboardPage } from '../pages/dashboard.js';
+import { ProductsPage } from '../pages/products.js';
+import { OrdersPage } from '../pages/orders.js';
+import { CartPage } from '../pages/cart.js';
+import { FormDemoPage } from '../pages/form-demo.js';
+import { UploadPage } from '../pages/upload-demo.js';
+import { routes } from '../routes.js';
 
-export const DashboardLayout: Component = () => {
-  return (
-    <div class={styles['app-shell']}>
-      {/* Sidebar — rendered once, never re-renders on navigation */}
-      <Sidebar />
-
-      {/* Main content — <Outlet /> swaps on route change */}
-      <main
-        class={styles['main-content']}
-        style={{ 'view-transition-name': 'main-content' }}
-      >
-        <Outlet />
-      </main>
-    </div>
-  );
-};
+export const DashboardLayout = component(() => (
+  <div class="layout">
+    <Sidebar />
+    <main class="main-content">
+      {(() => {
+        if (routes.dashboard) return <DashboardPage />;
+        if (routes.products) return <ProductsPage />;
+        if (routes.orders) return <OrdersPage />;
+        if (routes.cart) return <CartPage />;
+        if (routes.formDemo) return <FormDemoPage />;
+        if (routes.upload) return <UploadPage />;
+        return <div class="page"><h1>404</h1></div>;
+      })()}
+    </main>
+  </div>
+));

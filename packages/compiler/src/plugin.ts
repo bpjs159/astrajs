@@ -435,7 +435,7 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
         }
 
         if (config.transformMode === 'dynamic') {
-          // ── Dynamic mode: auto-wrap reactive JSX expressions with dynamic() ──
+          // ── Dynamic mode: auto-wrap ALL JSX child expressions with dynamic() ──
           const wrapped = autoWrapDynamic(transformed, reactiveVars);
           if (wrapped.needsDynamic) {
             transformed = ensureImport(wrapped.code, '@astrajs/core', ['dynamic']);

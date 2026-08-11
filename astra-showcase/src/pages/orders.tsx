@@ -1,107 +1,92 @@
-/**
- * AstraStore — Orders Page
- *
- * Displays order history with status badges and totals.
- * Data flows from the orderStore — reactive, zero re-renders.
- *
- * Type: Component
- */
+import { component, mounted } from '@astrajs/core';
+import { orderStore } from '../stores/orders.js';
+import { getOrders, likeOrder } from '../server/orders.server.js';
+import type { Order } from '../stores/orders.js';
 
-import type { Component } from '@astrajs/core';
-import { orderStore, getOrderStats } from '../stores/orders.js';
-import { styles } from '../styles/dashboard.css.js';
-import { StatCard } from '../components/stat-card.js';
+async function toggleLike(order: Order): Promise<void> {
+  if (orderStore.pending.has(order.id)) return;
+  orderStore.lastError = undefined;
 
-export const OrdersPage: Component = () => {
-  const stats = getOrderStats();
-  const orders = orderStore.orders;
+  order.likes++;
+  orderStore.pending = new Set(orderStore.pending).add(order.id);
+
+  try {
+    await likeOrder(order.id);
+  } catch (e) {
+    order.likes--;
+    orderStore.lastError = e instanceof Error ? e.message : 'Unknown error';
+  } finally {
+    const next = new Set(orderStore.pending);
+    next.delete(order.id);
+    orderStore.pending = next;
+  }
+}
+
+const statusColor: Record<string, string> = {
+  pending: '#f59e0b',
+  confirmed: '#38bdf8',
+  shipped: '#34d399',
+};
+
+export const OrdersPage = component(() => {
+  mounted(() => {
+    if (orderStore.items.length === 0) {
+      getOrders().then((orders) => {
+        orderStore.items = orders;
+      });
+    }
+  });
+
+  const totalRevenue = orderStore.items.reduce((s: number, o: { total: number }) => s + o.total, 0);
 
   return (
-    <div>
-      {/* Header */}
-      <div class={styles['page-header']}>
-        <div>
-          <h1 class={styles['page-title']}>Orders</h1>
-          <p class={styles['page-subtitle']}>
-            {orders.length} total order{orders.length !== 1 ? 's' : ''}
-          </p>
-        </div>
+    <div class="page">
+      <div class="page-header">
+        <h1>Orders</h1>
+        <p>Optimistic mutations (<code>06</code>) + AutoSync polling (<code>08</code>)</p>
       </div>
 
-      {/* Stats */}
-      <div class={styles['stats-grid']}>
-        <StatCard
-          icon="📦"
-          value={stats.totalOrders}
-          label="Total Orders"
-          accent="#6366f1"
-        />
-        <StatCard
-          icon="💰"
-          value={stats.totalRevenue}
-          label="Total Revenue"
-          accent="#10b981"
-        />
-        <StatCard
-          icon="⏳"
-          value={stats.pendingOrders}
-          label="Pending"
-          accent="#f59e0b"
-        />
-        <StatCard
-          icon="📊"
-          value={stats.averageOrderValue}
-          label="Avg. Order Value"
-          accent="#8b5cf6"
-        />
-      </div>
-
-      {/* Orders Table */}
-      {orders.length === 0 ? (
-        <div style="text-align:center;padding:48px;color:#64748b;">
-          <div style="font-size:3rem;margin-bottom:16px;">📭</div>
-          <p style="font-weight:500;">No orders yet</p>
-          <p>Orders will appear here once customers start purchasing.</p>
-        </div>
-      ) : (
-        <div class={styles['table']}>
-          <div class={styles['table-header']}>
-            <span>Order ID</span>
-            <span>Items</span>
-            <span>Total</span>
-            <span>Status</span>
-            <span>Date</span>
-          </div>
-          {orders
-            .slice()
-            .sort((a, b) => b.date.localeCompare(a.date))
-            .map((order) => (
-              <div class={styles['table-row']}>
-                <span style="font-family:monospace;font-size:0.8rem;font-weight:600;">
-                  {order.id}
-                </span>
-                <span>
-                  {order.items.map((i) => (
-                    <span style="display:block;font-size:0.85rem;">
-                      {i.name} × {i.quantity}
-                    </span>
-                  ))}
-                </span>
-                <span style="font-weight:600;">
-                  ${order.total.toFixed(2)}
-                </span>
-                <span>
-                  <span class={`${styles['status-badge']} ${styles[`status-${order.status}`]}`}>
-                    {order.status}
-                  </span>
-                </span>
-                <span style="color:#64748b;font-size:0.85rem;">
-                  {new Date(order.date).toLocaleDateString()}
-                </span>
-              </div>
-            ))}
+      {orderStore.lastError && (
+        <div class="errorSlot">
+          <div class="error-banner">{orderStore.lastError} — rolled back.</div>
         </div>
       )}
+
+      <div class="stats-row">
+        <div class="stat-mini">
+          <span class="stat-mini-num">{orderStore.items.length}</span>
+          <span class="stat-mini-lbl">Total Orders</span>
+        </div>
+        <div class="stat-mini">
+          <span class="stat-mini-num">${totalRevenue.toLocaleString()}</span>
+          <span class="stat-mini-lbl">Revenue</span>
+        </div>
+      </div>
+
+      <div class="order-list">
+        {orderStore.items.map((o) => (
+          <div class="order-row">
+            <div class="order-info">
+              <div class="order-product">{o.product}</div>
+              <div class="order-meta">
+                <span class="order-status" style={`color:${statusColor[o.status] || '#64748b'}`}>
+                  ● {o.status}
+                </span>
+                <span class="order-date">{o.date}</span>
+                <span class="order-qty">×{o.quantity}</span>
+                <span class="order-total">${o.total}</span>
+              </div>
+            </div>
+            <button
+              class={`like-btn ${orderStore.pending.has(o.id) ? 'pending' : ''}`}
+              disabled={orderStore.pending.has(o.id)}
+              onClick={() => toggleLike(o)}
+            >
+              ▲ {o.likes}
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
-};
+});

@@ -63,8 +63,9 @@ export {
 // Component wrapper
 export { component } from './runtime/component.js';
 
-// Zero-VDOM reactive expression
-export { dynamic } from './jsx-runtime.js';
+// Zero-VDOM reactive expression marker (internal — injected by compiler)
+export { /** @internal Auto-injected by the AST compiler. Do not use directly. */
+dynamic } from './jsx-runtime.js';
 
 // SSR Resumability — transparent handler registration & SSR-mode control
 export {

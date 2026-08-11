@@ -54,8 +54,8 @@
  * - Input values → `bindValue(el, () => expr, (v) => { expr = v })`
  *
  * The detection uses simple heuristics:
- * 1. If the expression references a variable initialized with `store()`, it's reactive.
- * 2. If the ancestor scope already has reactive bindings, all expressions are candidates.
+ * 1. All non-literal JSX child expressions are wrapped in `dynamic()`.
+ * 2. All non-event JSX attribute expressions are wrapped as lazy getters.
  */
 
 import type { AstraViteConfig } from '../index.js';
@@ -137,9 +137,6 @@ function escapeRegex(s: string): string {
 
 /**
  * Router primitives that read the reactive `_pathState` store internally.
- * Expressions calling them (e.g. `{route('/x') && <View />}`) must be wrapped
- * in `dynamic()` so they re-evaluate when the URL changes — otherwise routed
- * views are evaluated once and never update on client-side navigation.
  */
 const ROUTER_REACTIVE_IDS = new Set(['route', 'fallbackRoute', 'params']);
 
@@ -246,18 +243,11 @@ export function autoWrapDynamic(
     return node.getText(sourceFile);
   }
 
-  /**
-   * Checks if the expression references any reactive store variable or a
-   * router primitive that reads the reactive path store (`route()`,
-   * `fallbackRoute()`, `params`).
-   */
   function referencesReactiveVar(node: ts.Node): boolean {
-    // Walk the subtree looking for identifiers that match reactive vars
     let found = false;
     function check(n: ts.Node): void {
       if (found) return;
       if (ts.isIdentifier(n) && (reactiveVars.has(n.text) || ROUTER_REACTIVE_IDS.has(n.text))) {
-        // Any reference is enough — the heuristic is broad on purpose
         found = true;
         return;
       }
@@ -302,26 +292,29 @@ export function autoWrapDynamic(
         return;
       }
 
-      // Check if reactive
-      if (referencesReactiveVar(expr)) {
-        const exprText = getText(expr);
-        const start = expr.getStart(sourceFile);
-        const end = expr.getEnd();
+      // Wrap ALL non-literal, non-attribute JSX child expressions in
+      // dynamic(). The runtime detects store access at evaluation time
+      // and creates reactive bindings automatically. Expressions that
+      // don't touch reactive stores still work correctly — dynamic()
+      // sets up a binding that simply never fires (no deps).
+      //
+      // This makes reactivity fully transparent: developers never write
+      // dynamic() manually, and imported stores work out of the box.
+      const exprText = getText(expr);
+      const start = expr.getStart(sourceFile);
+      const end = expr.getEnd();
 
-        // Skip if this expression is nested inside a larger expression
-        // that will already be wrapped (prevents overlapping replacements).
-        if (isInsideExisting(start, end)) {
-          ts.forEachChild(node, visit);
-          return;
-        }
-
-        replacements.push({
-          start,
-          end,
-          text: `dynamic(() => (${exprText}))`,
-        });
-        needsDynamic = true;
+      if (isInsideExisting(start, end)) {
+        ts.forEachChild(node, visit);
+        return;
       }
+
+      replacements.push({
+        start,
+        end,
+        text: `dynamic(() => (${exprText}))`,
+      });
+      needsDynamic = true;
 
       ts.forEachChild(node, visit);
       return;
@@ -382,31 +375,37 @@ export function autoWrapDynamic(
         return;
       }
 
+      // Skip event handlers — the JSX runtime handles addEventListener
+      // directly. Wrapping them as lazy getters would break event binding.
+      if (attrName.startsWith('on')) {
+        ts.forEachChild(node, visit);
+        return;
+      }
+
       // Skip already wrapped
       if (isAlreadyDynamic(expr)) {
         ts.forEachChild(node, visit);
         return;
       }
 
-      // Check if reactive
+      // Check if reactive — only wrap attributes that reference known
+      // reactive store variables. Universal wrapping breaks function
+      // component props (StatCard value={getter} renders as string).
       if (referencesReactiveVar(expr)) {
         const exprText = getText(expr);
         const start = expr.getStart(sourceFile);
         const end = expr.getEnd();
 
-        // Skip if nested inside an already-planned replacement
         if (isInsideExisting(start, end)) {
           ts.forEachChild(node, visit);
           return;
         }
 
-        // Wrap as lazy getter for bindAttr
         replacements.push({
           start,
           end,
           text: `() => (${exprText})`,
         });
-        // Note: no `dynamic` import needed for attribute getters
       }
 
       ts.forEachChild(node, visit);

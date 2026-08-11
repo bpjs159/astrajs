@@ -1,11 +1,30 @@
 {
-  "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "..",
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "jsx": "react-jsx",
     "jsxImportSource": "@astrajs/core",
-    "types": []
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "paths": {
+      "@astrajs/core": ["../packages/core/src"],
+      "@astrajs/core/jsx-runtime": ["../packages/core/src/jsx-runtime"],
+      "@astrajs/core/jsx-dev-runtime": ["../packages/core/src/jsx-dev-runtime"],
+      "@astrajs/server": ["../packages/server/src"],
+      "@astrajs/router": ["../packages/router/src"],
+      "@astrajs/form": ["../packages/form/src"],
+      "@astrajs/schema": ["../packages/schema/src"],
+      "@astrajs/validation": ["../packages/validation/src"],
+      "@astrajs/ssr": ["../packages/ssr/src"],
+      "@astrajs/compiler": ["../packages/compiler/src"],
+      "@astrajs/compiler/css": ["../packages/compiler/src/css"]
+    }
   },
   "include": ["src"]
 }
