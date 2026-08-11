@@ -17,6 +17,7 @@
   "workspaces": [
     "packages/*",
     "astra-showcase",
+    "astra-site",
     "examples/*/*"
   ],
   "devDependencies": {

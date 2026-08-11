@@ -13,12 +13,32 @@ export function navigate(to: string): void {
   if (typeof window === 'undefined') return;
 
   const resolved = _resolvePath(to);
-  if (resolved === _pathState.path) return;
+
+  // Separate path from hash fragment — route matching operates on the
+  // path only, while the full URL (with hash) is pushed to history so
+  // that in-page anchor navigation (e.g. /docs#instalacion) works.
+  const hashIndex = resolved.indexOf('#');
+  const pathOnly = hashIndex >= 0 ? resolved.slice(0, hashIndex) : resolved;
+  const hash = hashIndex >= 0 ? resolved.slice(hashIndex) : '';
+
+  if (pathOnly === _pathState.path && !hash) return;
 
   _nextRenderCycle();
-  _pathState.path = resolved;
-  window.history.pushState(null, '', resolved);
-  _onNavigation(resolved);
+  _pathState.path = pathOnly;
+  window.history.pushState(null, '', pathOnly + hash);
+  _onNavigation(pathOnly);
+
+  // Scroll to hash anchor after navigation
+  if (hash) {
+    const id = hash.slice(1);
+    if (id) {
+      // Defer scrolling until after the DOM has updated from the route change
+      queueMicrotask(() => {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  }
 }
 
 function _resolvePath(to: string): string {

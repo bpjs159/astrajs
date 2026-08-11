@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "jsxImportSource": "@astrajs/core",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "paths": {
+      "@astrajs/core": ["../packages/core/src"],
+      "@astrajs/core/jsx-runtime": ["../packages/core/src/jsx-runtime"],
+      "@astrajs/core/jsx-dev-runtime": ["../packages/core/src/jsx-dev-runtime"],
+      "@astrajs/router": ["../packages/router/src"],
+      "@astrajs/compiler": ["../packages/compiler/src"],
+      "@astrajs/compiler/css": ["../packages/compiler/src/css"]
+    }
+  },
+  "include": ["src"]
+}

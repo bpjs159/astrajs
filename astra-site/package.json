@@ -1,0 +1,18 @@
+{
+  "name": "astra-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@astrajs/core": "0.1.0",
+    "@astrajs/router": "0.1.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0",
+    "typescript": "^5.5.0"
+  }
+}
