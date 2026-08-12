@@ -32,11 +32,11 @@ export const DocsCli = component(() => (
         <h1>CLI</h1>
         <p><code>create-astra</code> is the official command-line tool for scaffolding AstraJS projects. Zero dependencies, zero configuration, and zero JavaScript shipped to the browser — the CLI follows the same philosophy as the framework.</p>
 
-        <h2>What is the CLI?</h2>
+        <h2 id="que-es">What is the CLI?</h2>
         <p>The CLI generates a complete, working AstraJS project in seconds: Vite configuration, TypeScript configuration, package manifest, and example source files with reactive stores, routing, and typed RPC. You pick a template, it does the rest.</p>
         <p>It is a pure Node.js program (≥20) with <strong>no runtime dependencies</strong> — interactive prompts are built on <code>readline</code>, colors are ANSI codes.</p>
 
-        <h2>Creating a project</h2>
+        <h2 id="crear-proyecto">Creating a project</h2>
         <p>Three equivalent ways to run it:</p>
         <pre><code>{`pnpm create astra@latest my-app
 npm create astra@latest my-app
@@ -61,7 +61,7 @@ npx create-astra@latest my-app`}</code></pre>
 
 Happy building! 🚀`}</code></pre>
 
-        <h2>Templates</h2>
+        <h2 id="plantillas">Templates</h2>
         <table>
           <tr><th>Template</th><th>Packages</th><th>Ideal for</th></tr>
           <tr>
@@ -85,7 +85,7 @@ Happy building! 🚀`}</code></pre>
         <pre><code>{`pnpm create astra@latest my-app --template fullstack
 pnpm create astra@latest my-app -t minimal`}</code></pre>
 
-        <h2>Options</h2>
+        <h2 id="opciones">Options</h2>
         <table>
           <tr><th>Option</th><th>Description</th></tr>
           <tr><td><code>-t, --template &lt;name&gt;</code></td><td>Template: <code>minimal</code> | <code>frontend</code> | <code>fullstack</code></td></tr>

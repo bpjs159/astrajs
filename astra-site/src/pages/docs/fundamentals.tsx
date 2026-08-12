@@ -29,7 +29,7 @@ export const DocsFundamentals = component(() => (
         <h1>Fundamentos</h1>
         <p>Los bloques esenciales para construir aplicaciones con AstraJS. Cada concepto esta disenado para ser minimalista, predecible y de maximo rendimiento.</p>
 
-        <h2>Componentes</h2>
+        <h2 id="componentes">Componentes</h2>
         <p>En AstraJS, un componente es una funcion que retorna elementos del <strong>DOM real</strong>. No hay Virtual DOM: lo que retornas se inserta directamente en el documento. Esto significa que puedes usar <code>document.querySelector</code>, <code>addEventListener</code> nativo, y cualquier API del DOM directamente.</p>
 
         <h3>Componentes sin estado (funcion pura)</h3>
@@ -67,7 +67,7 @@ export const Counter = component(() => {
           <strong>Importante:</strong> <code>component()</code> envuelve tu funcion en un <code>&lt;span style="display:contents"&gt;</code> invisible. Esto permite que el compilador detecte cuando el componente entra al DOM y dispare los callbacks de <code>mounted()</code>.
         </div>
 
-        <h2>Reactividad con store</h2>
+        <h2 id="reactividad">Reactividad con store</h2>
         <p><code>store()</code> es el corazon de la reactividad en AstraJS. Crea un <strong>Proxy de ES6</strong> que intercepta cada lectura y escritura de propiedades. No hay scheduler, no hay cola de updates, no hay batching manual — todo es automatico y transparente.</p>
 
         <h3>Como funciona el Proxy</h3>
@@ -120,7 +120,7 @@ user.profile.bio = 'Senior';
 // Los efectos se ejecutan una vez, no tres.
 // Los nodos del DOM se actualizan en un solo microtask.`}</code></pre>
 
-        <h2>JSX sin VDOM</h2>
+        <h2 id="jsx-sin-vdom">JSX sin VDOM</h2>
         <p>El compilador de AstraJS transforma JSX en operaciones directas de creacion de DOM. No hay <code>createElement</code> virtual, no hay fiber, no hay reconciliation.</p>
 
         <h3>La transformacion</h3>
@@ -182,7 +182,7 @@ bindConditional(marker, () => show,
 // - Items reordenados → se mueven (sin re-crear)
 // - Items con misma key → se preservan`}</code></pre>
 
-        <h2>Estilos con css</h2>
+        <h2 id="estilos">Estilos con css</h2>
         <p>El macro <code>css</code> permite definir estilos con ambito de componente. El compilador los extrae, les genera nombres unicos, y los inyecta en el documento. Soporta anidacion al estilo CSS-in-JS:</p>
         <pre><code>{`import { css } from '@astrajs/core';
 
@@ -224,7 +224,7 @@ function Card({ title, featured }: { title: string; featured?: boolean }) {
   ...
 </div>`}</code></pre>
 
-        <h2>Eventos resumibles</h2>
+        <h2 id="eventos">Eventos resumibles</h2>
         <p>AstraJS introduce el concepto de <strong>eventos resumibles</strong>: los handlers de eventos se serializan en el HTML como referencias, y el codigo JavaScript correspondiente solo se descarga y ejecuta cuando el usuario interactua con el elemento. Esto permite paginas con 0 KB de JS hasta que el usuario hace clic.</p>
         <pre><code>{`// Eventos nativos — se ejecutan inmediatamente
 <button onclick={() => state.count++}>

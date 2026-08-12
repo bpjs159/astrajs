@@ -29,7 +29,7 @@ export const DocsRouter = component(() => (
         <h1>Router</h1>
         <p>Navegacion isomorfica con guards booleanos reactivos. Sin wrappers, sin HOCs, sin createBrowserRouter — solo funciones que retornan <code>true</code> o <code>false</code>.</p>
 
-        <h2>Rutas con route()</h2>
+        <h2 id="rutas">Rutas con route()</h2>
         <p><code>route()</code> es un guard booleano reactivo. Lee la URL actual del navegador (via <code>window.location</code>) y retorna <code>true</code> si coincide con el patron. Como internamente usa un <code>store()</code>, cualquier cambio de URL dispara una re-evaluacion:</p>
         <pre><code>{`import { route, fallbackRoute } from '@astrajs/router';
 
@@ -88,7 +88,7 @@ function ProductPage() {
   return <h1>Producto: {product.name}</h1>;
 }`}</code></pre>
 
-        <h2>Navegacion</h2>
+        <h2 id="navegacion">Navegacion</h2>
         <p>Tienes dos formas de navegar: declarativa con <code>&lt;Link&gt;</code> e imperativa con <code>navigate()</code>.</p>
 
         <h3>Link (declarativo)</h3>
@@ -125,7 +125,7 @@ async function handleCreate() {
   Ver instalacion
 </button>`}</code></pre>
 
-        <h2>Layouts con Outlet</h2>
+        <h2 id="layouts">Layouts con Outlet</h2>
         <p><code>&lt;Outlet /&gt;</code> es el punto de insercion para rutas hijas. Te permite crear layouts persistentes que no se re-renderizan al navegar:</p>
         <pre><code>{`import { Outlet } from '@astrajs/router';
 
@@ -147,7 +147,7 @@ function DashboardLayout() {
 // /dashboard/analytics → AnalyticsPage en <Outlet />
 // /dashboard/settings  → SettingsPage en <Outlet />`}</code></pre>
 
-        <h2>View Transitions API</h2>
+        <h2 id="view-transitions">View Transitions API</h2>
         <p>AstraJS integra nativamente la View Transitions API del navegador. Cuando navegas entre rutas, el navegador captura el estado visual anterior y anima la transicion — sin librerias de animacion, sin configuracion:</p>
         <pre><code>{`// Se activa automaticamente con navigate() y <Link>
 // El navegador hace:

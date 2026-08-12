@@ -29,7 +29,7 @@ export const DocsServerData = component(() => (
         <h1>Server & Data</h1>
         <p>Comunicacion tipada entre cliente y servidor sin friccion. Una funcion, dos contextos: el compilador se encarga de todo.</p>
 
-        <h2>server</h2>
+        <h2 id="server">server</h2>
         <p>El corazon del data fetching en AstraJS. Escribe <strong>una funcion</strong> — el compilador la divide automaticamente en un stub para el cliente (RPC via <code>fetch</code>) y un handler para el servidor. Los tipos de TypeScript se comparten extremo a extremo sin codegen.</p>
 
         <h3>Funcionamiento basico</h3>
@@ -75,7 +75,7 @@ const admins = await getUsers('admin');
   transform?: (data: T) => U;   // Transforma datos antes de enviar al cliente
 }`}</code></pre>
 
-        <h2>Tipos pre-build vs dynamic</h2>
+        <h2 id="tipos-server">Tipos pre-build vs dynamic</h2>
         <p>Controla <strong>cuando</strong> se ejecuta tu funcion server:</p>
 
         <h3>pre-build</h3>
@@ -104,7 +104,7 @@ const userDashboard = server(
   }
 );`}</code></pre>
 
-        <h2>Revalidate & Caching</h2>
+        <h2 id="caching">Revalidate & Caching</h2>
         <p>AstraJS ofrece un sistema de cache con <strong>invalidacion quirurgica por etiquetas</strong>. Cuando mutas datos, solo las queries con las etiquetas afectadas se revalidan — nada de "invalidar todo".</p>
 
         <h3>Cache con tags</h3>
@@ -145,7 +145,7 @@ await revalidate(['categories']);
           <strong>Mejor practica:</strong> Usa tags semanticos y granulares. Agrupa por entidad (<code>'products'</code>, <code>'users'</code>) y por contexto (<code>'product-detail'</code>, <code>'user-profile'</code>). Esto maximiza el cache hit rate y minimiza las revalidaciones innecesarias.
         </div>
 
-        <h2>autoSync y ETAGS</h2>
+        <h2 id="autosync">autoSync y ETAGS</h2>
         <p>Para datos que necesitan estar actualizados en tiempo real, <code>autoSync</code> mantiene el cliente sincronizado con el servidor mediante <strong>ETags</strong>. No es WebSocket, no es Server-Sent Events — es HTTP puro con polling inteligente.</p>
 
         <h3>Como funciona</h3>

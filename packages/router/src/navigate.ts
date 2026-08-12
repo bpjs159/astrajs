@@ -60,5 +60,32 @@ if (typeof window !== 'undefined') {
     _nextRenderCycle();
     _pathState.path = path;
     _onNavigation(path);
+
+    // Restore hash scroll on back/forward (e.g. /docs#instalacion)
+    const id = window.location.hash?.slice(1);
+    if (id) {
+      queueMicrotask(() => {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
   });
+
+  // ─── Deep-link support: initial load with a #hash ────────────────
+  // e.g. opening astrajs.dev/docs/introduction#instalacion directly.
+  const initialHash = window.location.hash?.slice(1);
+  if (initialHash) {
+    let attempts = 0;
+    const scrollToInitialHash = () => {
+      const el = document.getElementById(initialHash);
+      if (el) {
+        el.scrollIntoView({ behavior: 'auto', block: 'start' });
+      } else if (attempts++ < 120) {
+        // The app may still be mounting — retry for up to ~2s.
+        requestAnimationFrame(scrollToInitialHash);
+      }
+    };
+    // Give the router/app time to render the right page first.
+    queueMicrotask(() => requestAnimationFrame(scrollToInitialHash));
+  }
 }

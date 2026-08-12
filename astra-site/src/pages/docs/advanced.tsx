@@ -29,7 +29,7 @@ export const DocsAdvanced = component(() => (
         <h1>Avanzado</h1>
         <p>Conceptos avanzados para entender a fondo como funciona AstraJS internamente y como aprovechar al maximo sus capacidades.</p>
 
-        <h2>Compilador AST</h2>
+        <h2 id="compilador">Compilador AST</h2>
         <p>El compilador de AstraJS es un plugin de Vite que analiza tu codigo TypeScript usando el AST parser nativo de TypeScript. Opera en <strong>tres fases</strong> durante el build:</p>
 
         <h3>Fase 1: JSX → DOM nativo</h3>
@@ -96,7 +96,7 @@ export default defineConfig({
   ],
 });`}</code></pre>
 
-        <h2>Inferencia de tipos</h2>
+        <h2 id="inferencia">Inferencia de tipos</h2>
         <p>AstraJS logra <strong>100% de inferencia de tipos de extremo a extremo</strong> sin codegen, sin duplicacion de tipos, y sin anotaciones redundantes. Esto es posible gracias a tres mecanismos:</p>
 
         <h3>1. Tipos inferidos de store()</h3>
@@ -149,7 +149,7 @@ const products = await listProducts();
 // ↑ products es Product[] — el tipo viaja del servidor al cliente
 // automaticamente, sin codegen, sin duplicar definiciones`}</code></pre>
 
-        <h2>Integracion con Vite</h2>
+        <h2 id="vite">Integracion con Vite</h2>
         <p>AstraJS funciona como un plugin de Vite, lo que significa que hereda todas las capacidades del ecosistema Vite: HMR instantaneo, code splitting automatico, optimizacion de dependencias con esbuild, y compatibilidad con plugins de la comunidad.</p>
 
         <h3>Configuracion minima</h3>
@@ -180,7 +180,7 @@ export default defineConfig({
           <strong>Tip:</strong> Si editas el codigo fuente del compilador (<code>packages/compiler/src/</code>), necesitas ejecutar <code>npm run build</code> en ese paquete. El plugin de Vite siempre carga desde <code>dist/</code>, no desde <code>src/</code>.
         </div>
 
-        <h2>Despliegue</h2>
+        <h2 id="despliegue">Despliegue</h2>
         <p>AstraJS genera una carpeta <code>dist/</code> lista para produccion que contiene:</p>
         <ul>
           <li><strong>HTML estatico</strong> — Paginas SSG/ISR pre-renderizadas.</li>

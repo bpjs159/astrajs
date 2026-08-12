@@ -31,7 +31,7 @@ export const DocsRendering = component(() => (
         <h1>Renderizado</h1>
         <p>AstraJS soporta cuatro estrategias de renderizado que puedes combinar en una misma aplicacion, pagina por pagina. Sin configuracion adicional, sin plugins extra.</p>
 
-        <h2>SSR (Server-Side Rendering)</h2>
+        <h2 id="ssr">SSR (Server-Side Rendering)</h2>
         <p>El servidor renderiza el HTML en cada request. El cliente recibe la pagina completamente formada — SEO-friendly, fast First Contentful Paint, excelente para contenido dinamico.</p>
 
         <h3>Como funciona</h3>
@@ -57,7 +57,7 @@ export default function ProductPage() {
   );
 }`}</code></pre>
 
-        <h2>SSG (Static Site Generation)</h2>
+        <h2 id="ssg">SSG (Static Site Generation)</h2>
         <p>Las paginas se generan como HTML estatico <strong>en tiempo de build</strong>. Ideales para blogs, documentacion, landing pages — contenido que no cambia entre deploys. El resultado es HTML puro con <strong>0 KB de JavaScript</strong>.</p>
 
         <pre><code>{`// Las paginas SSG usan server({ type: 'pre-build' })
@@ -72,7 +72,7 @@ const posts = server(
 // El HTML generado incluye los posts serializados
 // En produccion: se sirve HTML estatico, sin consultas a BD`}</code></pre>
 
-        <h2>ISR (Incremental Static Regeneration)</h2>
+        <h2 id="isr">ISR (Incremental Static Regeneration)</h2>
         <p>Combina la velocidad del SSG con la frescura del SSR. Las paginas se generan estaticamente, pero se <strong>re-generan en el servidor</strong> cuando expira el TTL o cuando se invalidan sus tags. La primera persona que visita tras la expiracion recibe la pagina stale (rapida), y dispara una re-generacion en background. El siguiente visitante ya recibe la pagina actualizada.</p>
 
         <pre><code>{`// ISR: maxAge controla cada cuanto se re-genera
@@ -100,7 +100,7 @@ const featuredProducts = server(
           <tr><td><strong>SPA</strong></td><td>Cliente</td><td>Mayor</td><td>Apps interactivas</td><td>Por request</td></tr>
         </table>
 
-        <h2>Resumibilidad</h2>
+        <h2 id="resumibilidad">Resumibilidad</h2>
         <p>La resumibilidad es la alternativa de AstraJS a la hidratacion tradicional. En lugar de re-ejecutar todos los componentes en el cliente para "hidratar" el HTML del servidor, AstraJS serializa el estado minimo necesario en el HTML y <strong>reanuda</strong> la aplicacion exactamente donde el servidor la dejo.</p>
 
         <h3>Hidratacion tradicional vs Resumibilidad</h3>

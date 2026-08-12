@@ -132,7 +132,7 @@ export const DocsComparison = component(() => (
           </tr>
         </table>
 
-        <h2>React vs AstraJS</h2>
+        <h2 id="react-vs">React vs AstraJS</h2>
         <p>React es el framework mas popular del ecosistema. Su modelo basado en Virtual DOM y hooks revoluciono el desarrollo frontend. Sin embargo, tiene limitaciones arquitectonicas que AstraJS resuelve desde el diseno.</p>
 
         <h3>Virtual DOM vs DOM nativo</h3>
@@ -196,7 +196,7 @@ function SearchResults({ query }: { query: string }) {
         <h3>Next.js vs AstraJS full-stack</h3>
         <p>React necesita Next.js para SSR, SSG, ISR, y data fetching. Next.js agrega ~80 KB adicionales y su propia complejidad (App Router vs Pages Router, Server Components, 'use client', etc.). AstraJS ofrece todo esto integrado en ~3 KB de core — sin framework externo, sin decision fatigue.</p>
 
-        <h2>Vue.js vs AstraJS</h2>
+        <h2 id="vue-vs">Vue.js vs AstraJS</h2>
         <p>Vue comparte algunas ideas con AstraJS — reactividad basada en Proxy, SFCs, y un compilador que optimiza templates. Pero Vue sigue usando Virtual DOM para el diffing, lo que introduce overhead de runtime que AstraJS elimina completamente.</p>
 
         <h3>SFC vs funciones puras</h3>
@@ -239,7 +239,7 @@ export const Counter = component(() => {
         <h3>reactivity transform vs store()</h3>
         <p>Vue requiere <code>.value</code> para acceder a refs en JavaScript (aunque en templates se auto-desenvuelve). Esto crea una discrepancia entre template y logica. AstraJS usa Proxies sin <code>.value</code> — la propiedad se accede igual en JSX y en JavaScript.</p>
 
-        <h2>Angular vs AstraJS</h2>
+        <h2 id="angular-vs">Angular vs AstraJS</h2>
         <p>Angular es un framework enterprise con baterias incluidas: dependency injection, RxJS, decorators, modulos, y un CLI completo. Su arquitectura es potente pero viene con una curva de aprendizaje pronunciada y un bundle base considerable.</p>
 
         <h3>Change Detection vs Granular Reactivity</h3>

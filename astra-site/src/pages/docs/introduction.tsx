@@ -118,7 +118,7 @@ export const DocsIntroduction = component(() => (
           <li><strong>@astrajs/ssr</strong> — Renderizado en servidor, SSG, ISR, resumibilidad.</li>
           <li><strong>@astrajs/form</strong> — Manejo reactivo de formularios con validacion nativa.</li>
         </ul>
-        <h2>Instalacion</h2>
+        <h2 id="instalacion">Instalacion</h2>
         <p>La forma mas rapida de empezar es con el CLI:</p>
         <pre><code>pnpm create astra@latest</code></pre>
         <p>Esto crea un proyecto con Vite, TypeScript, y todos los paquetes de AstraJS configurados. Alternativamente, puedes anadir AstraJS a un proyecto Vite existente:</p>
@@ -138,7 +138,7 @@ export default defineConfig({
     "jsxImportSource": "@astrajs/core"
   }
 }`}</code></pre>
-        <h2>Primeros pasos</h2>
+        <h2 id="primeros-pasos">Primeros pasos</h2>
         <p>Crea tu primer componente reactivo. Observa como <code>store()</code> y <code>component()</code> trabajan juntos:</p>
         <pre><code>{`import { component, store } from '@astrajs/core';
 
@@ -162,7 +162,7 @@ export const Hello = component(() => {
           <li>El input mantiene su valor y el foco — <strong>no se re-crea</strong>.</li>
           <li>El componente <strong>no se re-ejecuta</strong>. La funcion <code>Hello</code> corrio una sola vez.</li>
         </ul>
-        <h2>Conceptos clave</h2>
+        <h2 id="conceptos-clave">Conceptos clave</h2>
         <ul>
           <li><strong>store()</strong> — Crea un proxy reactivo de ES6. Cada acceso a una propiedad se registra como dependencia. Cada escritura notifica solo a los suscriptores exactos de esa propiedad. O(1) updates.</li>
           <li><strong>component()</strong> — Envuelve una funcion que retorna JSX. La funcion se ejecuta <strong>una sola vez</strong>. El DOM resultante es real, no virtual. La reactividad viene de los bindings individuales que el compilador inyecta.</li>
