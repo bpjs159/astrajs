@@ -1,0 +1,29 @@
+{
+  "name": "@astrajs/cli",
+  "version": "0.1.0",
+  "description": "The AstraJS CLI — scaffold new projects and run them (astra dev|build|preview|test). Zero dependencies.",
+  "type": "module",
+  "bin": {
+    "astra": "./bin/astra.js",
+    "create-astrajs": "./bin/astra.js"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "templates"
+  ],
+  "scripts": {
+    "test": "node bin/astra.js --help"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [
+    "astrajs",
+    "scaffold",
+    "cli",
+    "typescript",
+    "vite"
+  ],
+  "license": "MIT"
+}

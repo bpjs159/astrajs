@@ -2,14 +2,29 @@ import { component, store, dynamic } from '@astrajs/core';
 import { Link, navigate } from '@astrajs/router';
 
 export const Header = component(() => {
-  const state = store({ mobileOpen: false });
+  const state = store({ mobileOpen: false, scrolled: false });
+
+  // Isotype swap on scroll: at the top we show the ASTRAJS wordmark;
+  // once the user scrolls, the isotype (logo image) fades in and the
+  // wordmark fades out.
+  state.scrolled = typeof window !== 'undefined' && window.scrollY > 24;
+  if (typeof window !== 'undefined') {
+    window.addEventListener('scroll', () => {
+      const scrolled = window.scrollY > 24;
+      if (scrolled !== state.scrolled) state.scrolled = scrolled;
+    }, { passive: true });
+  }
 
   const navStyle = `
     .site-header{position:sticky;top:0;z-index:1000;background:rgba(4,6,13,.55);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid rgba(255,255,255,.04)}
-    .header-inner{display:flex;align-items:center;justify-content:space-between;height:64px;max-width:1400px;margin:0 auto;padding:0 32px}
-    .header-logo{display:flex;align-items:center;gap:12px;cursor:pointer}
-    .header-logo img{height:36px;width:auto;object-fit:contain}
-    .header-logo span{font-family:'Fauna Pro',serif;font-size:1.25rem;font-weight:700;color:#f7f7ff;letter-spacing:-.02em}
+    .header-inner{display:flex;align-items:center;justify-content:space-between;height:64px;max-width:100%;margin:0 auto;padding:0 24px}
+    .header-logo{display:flex;align-items:center;cursor:pointer;position:relative}
+    .header-logo img{position:absolute;left:0;top:50%;height:36px;width:auto;object-fit:contain;opacity:0;transform:translateY(-50%) scale(.8);transition:opacity .3s ease,transform .3s ease;filter:drop-shadow(0 0 20px rgba(184,76,255,.5)) drop-shadow(0 0 50px rgba(77,124,255,.3)) drop-shadow(0 0 90px rgba(0,223,255,.15))}
+    .header-logo.scrolled img{opacity:1;transform:translateY(-50%) scale(1)}
+    .header-logo::after{content:'';position:absolute;left:-12px;top:50%;transform:translateY(-50%);width:60px;height:60px;background:radial-gradient(circle,rgba(139,77,255,.15) 0%,transparent 70%);border-radius:50%;pointer-events:none;z-index:-1;opacity:0;transition:opacity .3s ease}
+    .header-logo.scrolled::after{opacity:1}
+    .header-logo span{font-family:'Fauna Pro',serif;font-size:1.25rem;font-weight:500;color:#ffffff;letter-spacing:.06em;text-shadow:0 0 80px rgba(255,255,255,.15),0 0 160px rgba(255,255,255,.05);transition:opacity .3s ease,transform .3s ease}
+    .header-logo.scrolled span{opacity:0;transform:translateX(-12px)}
     .header-nav{display:flex;align-items:center;gap:4px}
     .header-nav a{font-size:.82rem;font-weight:500;color:#94a3b8;padding:6px 14px;border-radius:8px;transition:color .15s,background .15s;letter-spacing:.01em}
     .header-nav a:hover{color:#e2e8f0;background:rgba(255,255,255,.04)}
@@ -33,9 +48,9 @@ export const Header = component(() => {
     <header class="site-header">
       <style>{navStyle}</style>
       <div class="header-inner">
-        <a class="header-logo" onclick={() => { navigate('/'); closeMenu(); }}>
+        <a class={`header-logo${state.scrolled ? ' scrolled' : ''}`} onclick={() => { navigate('/'); closeMenu(); }}>
           <img src="/images/logo.png" alt="AstraJS" />
-          <span>ASTRAJS</span>
+          <span>ASTRA<span style="background:linear-gradient(135deg,#8d4dff,#4d7cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">JS</span></span>
         </a>
         <button class="header-mobile-btn" onclick={toggleMenu} aria-label="Menu">
           ☰
@@ -44,6 +59,7 @@ export const Header = component(() => {
           <Link href="/docs/introduction">Docs</Link>
           <Link href="/docs/introduction">Guide</Link>
           <Link href="/docs/server-data">API</Link>
+          <Link href="/docs/examples">Examples</Link>
           <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
           <Link href="/docs/introduction" class="header-cta">Get Started</Link>
         </nav>

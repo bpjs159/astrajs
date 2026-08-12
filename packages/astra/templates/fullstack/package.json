@@ -1,0 +1,25 @@
+{
+  "name": "{{PROJECT_NAME}}",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astra dev",
+    "build": "astra build",
+    "preview": "astra preview"
+  },
+  "dependencies": {
+    "@astrajs/core": "0.1.0",
+    "@astrajs/compiler": "0.1.0",
+    "@astrajs/router": "0.1.0",
+    "@astrajs/form": "0.1.0",
+    "@astrajs/schema": "0.1.0",
+    "@astrajs/validation": "0.1.0",
+    "@astrajs/server": "0.1.0",
+    "@astrajs/ssr": "0.1.0"
+  },
+  "devDependencies": {
+    "@astrajs/cli": "0.1.0",
+    "vite": "^5.4.0",
+    "typescript": "^5.5.0"
+  }
+}

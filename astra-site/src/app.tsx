@@ -12,7 +12,9 @@ import { DocsServerData } from './pages/docs/server-data.js';
 import { DocsRouter } from './pages/docs/router.js';
 import { DocsRendering } from './pages/docs/rendering.js';
 import { DocsComparison } from './pages/docs/comparison.js';
+import { DocsExamples } from './pages/docs/examples.js';
 import { DocsCli } from './pages/docs/cli.js';
+import { DocsTesting } from './pages/docs/testing.js';
 import { DocsAdvanced } from './pages/docs/advanced.js';
 import { routes } from './routes.js';
 
@@ -91,7 +93,9 @@ export const App = component(() => (
         if (routes.docsRouter) return <DocsRouter />;
         if (routes.docsRendering) return <DocsRendering />;
         if (routes.docsComparison) return <DocsComparison />;
+        if (routes.docsExamples) return <DocsExamples />;
         if (routes.docsCli) return <DocsCli />;
+        if (routes.docsTesting) return <DocsTesting />;
         if (routes.docsAdvanced) return <DocsAdvanced />;
         if (routes.docs) return <DocsIntroduction />;
         return <HomePage />;

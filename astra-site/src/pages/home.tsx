@@ -338,8 +338,8 @@ export const routes = {
               <Link href="/docs/fundamentals" class="feature-link">Saber más sobre la reactividad</Link>
             </div>
             <div class="code-compare">
-              <div class="code-box">
-                <div class="code-box-header">Tú escribes <span style="color:#b84cff">TypeScript • JSX</span></div>
+              <div class="code-box" style="grid-column:1/-1">
+                <div class="code-box-header"><span style="color:#b84cff">TypeScript • JSX</span></div>
                 <div class="code-box-body">
                   <pre><span class="code-keyword">function</span> <span class="code-highlight">Counter</span>() {'{'}</pre>
                   <pre>    <span class="code-keyword">const</span> state = <span class="code-highlight">store</span>({'{'} count: 0 {'}'});</pre>
@@ -349,20 +349,6 @@ export const routes = {
                   <pre>        {'</button>'}</pre>
                   <pre>    );</pre>
                   <pre>{'}'}</pre>
-                </div>
-              </div>
-              <div class="code-box">
-                <div class="code-box-header">AstraJS <span style="color:#00dfff">DOM nativo • suscripciones</span></div>
-                <div class="code-box-body">
-                  <pre><span class="code-keyword">const</span> btn = <span class="code-highlight">document.createElement</span>(<span class="code-string">'button'</span>);</pre>
-                  <pre><span class="code-keyword">const</span> text = <span class="code-highlight">document.createTextNode</span>(<span class="code-string">''</span>);</pre>
-                  <pre>btn.append(<span class="code-string">' '</span>, text);</pre>
-                  <pre> </pre>
-                  <pre><span class="code-highlight">effect</span>(() ={'>'} {'{'}</pre>
-                  <pre>    nodeValue = <span class="code-string">\`Count: {'${state.count}'}\`</span>;</pre>
-                  <pre>{'}'});</pre>
-                  <pre> </pre>
-                  <pre>btn.addEventListener(<span class="code-string">'click'</span>, () ={'>'} state.count++);</pre>
                 </div>
               </div>
             </div>
@@ -575,7 +561,7 @@ export const routes = {
           <h2>Listo para construir el futuro de la web.</h2>
           <p>Rendimiento máximo. DX moderno. Zero compromisos.</p>
           <div class="cta-code">
-            <span>pnpm create astra@latest</span>
+            <span>npx @astrajs/cli@latest</span>
           </div>
           <br/>
           <button class="btn-primary" onclick={() => navigate('/docs/introduction')} style="font-size:.92rem;padding:14px 36px">

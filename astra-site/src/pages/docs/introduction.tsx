@@ -120,7 +120,7 @@ export const DocsIntroduction = component(() => (
         </ul>
         <h2 id="instalacion">Instalacion</h2>
         <p>La forma mas rapida de empezar es con el CLI:</p>
-        <pre><code>pnpm create astra@latest</code></pre>
+        <pre><code>npx @astrajs/cli@latest</code></pre>
         <p>Esto crea un proyecto con Vite, TypeScript, y todos los paquetes de AstraJS configurados. Alternativamente, puedes anadir AstraJS a un proyecto Vite existente:</p>
         <pre><code>pnpm add @astrajs/core @astrajs/compiler
 

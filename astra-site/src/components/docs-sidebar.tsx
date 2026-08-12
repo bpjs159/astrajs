@@ -54,6 +54,13 @@ const docSections: DocSection[] = [
     ],
   },
   {
+    title: 'Ejemplos',
+    items: [
+      { label: 'Frontend-only (10)', href: '/docs/examples#frontend' },
+      { label: 'Fullstack (10)', href: '/docs/examples#fullstack' },
+    ],
+  },
+  {
     title: 'Comparativa',
     items: [
       { label: 'React vs AstraJS', href: '/docs/comparison#react-vs' },
@@ -68,6 +75,17 @@ const docSections: DocSection[] = [
       { label: 'Creating a project', href: '/docs/cli#crear-proyecto' },
       { label: 'Templates', href: '/docs/cli#plantillas' },
       { label: 'Options', href: '/docs/cli#opciones' },
+    ],
+  },
+  {
+    title: 'Pruebas',
+    items: [
+      { label: 'Unitarias con Vitest', href: '/docs/testing#unitarias' },
+      { label: 'Con Jest', href: '/docs/testing#jest' },
+      { label: 'E2E con Playwright', href: '/docs/testing#e2e-playwright' },
+      { label: 'E2E con Cypress', href: '/docs/testing#e2e-cypress' },
+      { label: 'server() RPC', href: '/docs/testing#server' },
+      { label: 'Comparativa', href: '/docs/testing#comparativa' },
     ],
   },
   {

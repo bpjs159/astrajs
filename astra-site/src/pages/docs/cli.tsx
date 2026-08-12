@@ -30,21 +30,28 @@ export const DocsCli = component(() => (
     <main class="docs-main">
       <div class="docs-content">
         <h1>CLI</h1>
-        <p><code>create-astra</code> is the official command-line tool for scaffolding AstraJS projects. Zero dependencies, zero configuration, and zero JavaScript shipped to the browser — the CLI follows the same philosophy as the framework.</p>
+        <p><code>astra</code> is the official command-line tool for AstraJS. It scaffolds new projects AND runs them — <code>astra dev</code>, <code>astra build</code>, <code>astra test</code>. Zero dependencies, zero configuration, and zero JavaScript shipped to the browser — the CLI follows the same philosophy as the framework.</p>
 
         <h2 id="que-es">What is the CLI?</h2>
         <p>The CLI generates a complete, working AstraJS project in seconds: Vite configuration, TypeScript configuration, package manifest, and example source files with reactive stores, routing, and typed RPC. You pick a template, it does the rest.</p>
         <p>It is a pure Node.js program (≥20) with <strong>no runtime dependencies</strong> — interactive prompts are built on <code>readline</code>, colors are ANSI codes.</p>
 
         <h2 id="crear-proyecto">Creating a project</h2>
-        <p>Three equivalent ways to run it:</p>
-        <pre><code>{`pnpm create astra@latest my-app
-npm create astra@latest my-app
-npx create-astra@latest my-app`}</code></pre>
+        <p>Run the CLI with a project name to scaffold:</p>
+        <pre><code>{`astra my-app
+npx @astrajs/cli@latest my-app
+pnpm create astrajs my-app`}</code></pre>
+
+        <h3>Running an existing project</h3>
+        <p>Inside an AstraJS project, the same binary drives your toolchain:</p>
+        <pre><code>{`astra dev        # vite dev server with HMR
+astra build      # production build (pre-built requests run here)
+astra preview    # preview the production build
+astra test       # vitest run`}</code></pre>
 
         <h3>The interactive wizard</h3>
         <p>Run it without arguments and the CLI asks you a few questions:</p>
-        <pre><code>{`$ pnpm create astra@latest
+        <pre><code>{`$ astra
 
 ◇ Project name: my-app
 ◇ Select a template:
@@ -57,7 +64,7 @@ npx create-astra@latest my-app`}</code></pre>
 ✔ Generated 11 files in ./my-app
 ◇ Next steps:
   cd my-app
-  pnpm dev
+  astra dev
 
 Happy building! 🚀`}</code></pre>
 
@@ -82,8 +89,8 @@ Happy building! 🚀`}</code></pre>
         </table>
 
         <h3>Select a template directly</h3>
-        <pre><code>{`pnpm create astra@latest my-app --template fullstack
-pnpm create astra@latest my-app -t minimal`}</code></pre>
+        <pre><code>{`astra my-app --template fullstack
+astra my-app -t minimal`}</code></pre>
 
         <h2 id="opciones">Options</h2>
         <table>
@@ -97,13 +104,13 @@ pnpm create astra@latest my-app -t minimal`}</code></pre>
         </table>
 
         <pre><code>{`# Skip prompts entirely
-pnpm create astra@latest my-app --yes
+astra my-app --yes
 
 # Scaffold without installing
-pnpm create astra@latest my-app --template frontend --no-install
+astra my-app --template frontend --no-install
 
 # Preview the file tree first
-pnpm create astra@latest my-app --dry-run`}</code></pre>
+astra my-app --dry-run`}</code></pre>
 
         <h2>Project structure</h2>
         <p>This is what <code>--template fullstack</code> generates:</p>
@@ -147,7 +154,7 @@ mounted(() => {
 });`}</code></pre>
 
         <h2>Package manager detection</h2>
-        <p>The CLI reads <code>npm_config_user_agent</code> to detect how it was invoked, so <code>pnpm create astra</code> installs with pnpm, <code>npm create astra</code> with npm, and so on. You never need to configure it.</p>
+        <p>The CLI reads <code>npm_config_user_agent</code> to detect how it was invoked, so <code>pnpm dlx astra</code> installs with pnpm, <code>npx astra</code> with npm, and so on. You never need to configure it.</p>
 
         <div class="note">
           <strong>Legacy note:</strong> the first CLI release named the SPA template <code>basic</code>. The alias is still accepted — <code>--template basic</code> resolves to <code>frontend</code>.

@@ -1,0 +1,803 @@
+/**
+ * Live example components — each example renders as a real, working
+ * AstraJS component inside the docs preview pane. Fullstack examples
+ * simulate server behavior client-side (mock latency, ETags, etc.)
+ * since the docs site is purely static.
+ */
+import { component, store, mounted } from '@astrajs/core';
+import { css } from '@astrajs/compiler/css';
+
+export interface LiveExample {
+  num: string;
+  title: string;
+  description: string;
+  concepts: string[];
+  code: string;
+  docsHref: string;
+  render: () => JSX.Element;
+}
+
+/* ── Shared preview styles ─────────────────────────────────────────── */
+
+const previewStyle = document.createElement('style');
+previewStyle.textContent = `
+  .lv{font-family:'Inter',sans-serif;color:#e2e8f0;display:flex;flex-direction:column;gap:12px}
+  .lv h4{font-size:.95rem;font-weight:700;color:#f7f7ff}
+  .lv p{font-size:.78rem;color:#94a3b8;line-height:1.6}
+  .lv-btn{font-size:.76rem;font-weight:600;color:#fff;background:linear-gradient(135deg,#8d4dff,#4d7cff);border:none;border-radius:8px;padding:8px 18px;cursor:pointer;transition:transform .12s}
+  .lv-btn:hover{transform:translateY(-1px)}
+  .lv-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+  .lv-btn.ghost{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:#e2e8f0}
+  .lv-input{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:8px 12px;font-size:.78rem;color:#f7f7ff;outline:none;width:100%}
+  .lv-input:focus{border-color:rgba(139,77,255,.5)}
+  .lv-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px}
+  .lv-list{display:flex;flex-direction:column;gap:6px}
+  .lv-item{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:8px 12px;font-size:.76rem}
+  .lv-tag{display:inline-flex;font-size:.62rem;font-weight:600;color:#b84cff;background:rgba(139,77,255,.1);border:1px solid rgba(139,77,255,.2);padding:2px 8px;border-radius:10px}
+  .lv-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .lv-err{color:#f87171;font-size:.72rem}
+  .lv-ok{color:#34d399;font-size:.72rem}
+  .lv-spin{display:inline-block;width:12px;height:12px;border:2px solid rgba(139,77,255,.2);border-top-color:#b84cff;border-radius:50%;animation:lvspin .8s linear infinite}
+  @keyframes lvspin{to{transform:rotate(360deg)}}
+  .lv-bar{height:6px;border-radius:3px;background:rgba(255,255,255,.06);overflow:hidden}
+  .lv-bar-fill{height:100%;background:linear-gradient(90deg,#b84cff,#4d7cff);border-radius:3px;transition:width .2s}
+`;
+if (typeof document !== 'undefined') {
+  document.head.appendChild(previewStyle);
+}
+
+/* ── Frontend examples ─────────────────────────────────────────────── */
+
+const ex01 = component(() => {
+  const counter = store({ value: 0 });
+  return (
+    <div class="lv">
+      <h4>Contador reactivo</h4>
+      <div class="lv-card" style="text-align:center">
+        <div style="font-size:2.2rem;font-weight:800;color:#fff;margin:8px 0">{counter.value}</div>
+        <div class="lv-row" style="justify-content:center">
+          <button class="lv-btn" onclick={() => counter.value--}>− 1</button>
+          <button class="lv-btn" onclick={() => counter.value++}>+ 1</button>
+        </div>
+      </div>
+      <p>⏱ Solo el número se actualiza. El componente no se re-ejecuta.</p>
+    </div>
+  );
+});
+
+const cartStore = store({ items: 0 });
+const ex02 = component(() => (
+  <div class="lv">
+    <h4>Store compartido entre componentes</h4>
+    <div class="lv-card">
+      <div class="lv-row" style="justify-content:space-between">
+        <span class="lv-tag">Componente A (Header)</span>
+        <button class="lv-btn" onclick={() => cartStore.items++}>Agregar item</button>
+      </div>
+    </div>
+    <div class="lv-card">
+      <div class="lv-row" style="justify-content:space-between">
+        <span class="lv-tag">Componente B (Badge)</span>
+        <strong style="color:#fff">🛒 {cartStore.items} items</strong>
+      </div>
+    </div>
+    <p>Sin context, sin props drilling — el store es el canal único.</p>
+  </div>
+));
+
+const ex03 = component(() => {
+  const form = store({ name: '', email: '' });
+  return (
+    <div class="lv">
+      <h4>Formulario con two-way binding</h4>
+      <input class="lv-input" placeholder="Tu nombre"
+        value={form.name}
+        onInput={(e: Event) => { form.name = (e.target as HTMLInputElement).value; }} />
+      <input class="lv-input" placeholder="Tu email"
+        value={form.email}
+        onInput={(e: Event) => { form.email = (e.target as HTMLInputElement).value; }} />
+      <div class="lv-card">
+        <p>Hola, <strong style="color:#fff">{form.name || 'anónimo'}</strong>!</p>
+        {form.email && <p class="lv-ok">Email: {form.email}</p>}
+      </div>
+    </div>
+  );
+});
+
+const ex04 = component(() => {
+  const nav = store({ page: 'home' as string });
+  return (
+    <div class="lv">
+      <h4>Router con guards booleanos</h4>
+      <div class="lv-row">
+        <button class={`lv-btn ${nav.page === 'home' ? '' : 'ghost'}`} onclick={() => { nav.page = 'home'; }}>Home</button>
+        <button class={`lv-btn ${nav.page === 'about' ? '' : 'ghost'}`} onclick={() => { nav.page = 'about'; }}>About</button>
+        <button class={`lv-btn ${nav.page === '404' ? '' : 'ghost'}`} onclick={() => { nav.page = '404'; }}>Ruta inválida</button>
+      </div>
+      <div class="lv-card">
+        {nav.page === 'home' && <p>🏠 Home — route('/', {'{ exact: true }'})</p>}
+        {nav.page === 'about' && <p>ℹ️ About — route('/about')</p>}
+        {nav.page === '404' && <p class="lv-err">404 — fallbackRoute()</p>}
+      </div>
+    </div>
+  );
+});
+
+const cardStyle = css`
+  .demo-card {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color .2s, transform .2s;
+    cursor: pointer;
+  }
+  .demo-card:hover {
+    border-color: #818cf8;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(139, 77, 255, .15);
+  }
+`;
+const ex05 = component(() => (
+  <div class="lv">
+    <h4>CSS con ámbito (hover sobre la tarjeta)</h4>
+    <div class="demo-card">
+      <p><strong style="color:#fff">Tarjeta con css`` macro</strong></p>
+      <p>El estilo está extraído en build time y el hover solo afecta a este componente.</p>
+    </div>
+    <style>{cardStyle}</style>
+  </div>
+));
+
+const ex06 = component(() => {
+  const app = store({
+    show: true,
+    items: [{ id: 1, name: 'Alpha' }, { id: 2, name: 'Beta' }] as { id: number; name: string }[],
+    nextId: 3,
+  });
+  return (
+    <div class="lv">
+      <h4>Condicionales y listas</h4>
+      <div class="lv-row">
+        <button class={`lv-btn ${app.show ? '' : 'ghost'}`} onclick={() => { app.show = !app.show; }}>
+          {app.show ? 'Ocultar lista' : 'Mostrar lista'}
+        </button>
+        <button class="lv-btn" onclick={() => { app.items.push({ id: app.nextId, name: `Item ${app.nextId}` }); app.nextId++; }}>
+          + Agregar
+        </button>
+        <button class="lv-btn ghost" onclick={() => { app.items.pop(); }}>
+          − Quitar
+        </button>
+      </div>
+      {app.show && (
+        <div class="lv-list">
+          {app.items.map((item) => (
+            <div class="lv-item">
+              <span>{item.name}</span>
+              <span class="lv-tag">id: {item.id}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+});
+
+const ex07 = component(() => {
+  const state = store({
+    data: [] as string[],
+    loading: false,
+  });
+  const load = () => {
+    state.loading = true;
+    state.data = [];
+    setTimeout(() => {
+      state.data = ['Dato A', 'Dato B', 'Dato C'];
+      state.loading = false;
+    }, 900);
+  };
+  return (
+    <div class="lv">
+      <h4>Carga asíncrona (mounted + fetch simulado)</h4>
+      <button class="lv-btn" onclick={load} disabled={state.loading}>
+        {state.loading ? 'Cargando...' : 'Cargar datos'}
+      </button>
+      <div class="lv-card">
+        {state.loading ? (
+          <div class="lv-row"><span class="lv-spin"></span><p>Cargando datos del servidor...</p></div>
+        ) : state.data.length === 0 ? (
+          <p>Sin datos. Pulsa "Cargar datos".</p>
+        ) : (
+          <div class="lv-list">
+            {state.data.map((d) => <div class="lv-item"><span>{d}</span><span class="lv-ok">✓</span></div>)}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+});
+
+const ex08 = component(() => {
+  const state = store({ time: '' });
+  mounted(() => {
+    const tick = () => { state.time = new Date().toLocaleTimeString(); };
+    tick();
+    const timer = setInterval(tick, 1000);
+    return () => clearInterval(timer);
+  });
+  return (
+    <div class="lv">
+      <h4>Lifecycle: mounted() + cleanup</h4>
+      <div class="lv-card" style="text-align:center">
+        <div style="font-size:1.6rem;font-weight:800;color:#fff">{state.time}</div>
+        <p>setInterval creado en mounted(), limpio automáticamente al desmontar.</p>
+      </div>
+    </div>
+  );
+});
+
+const ex09 = component(() => (
+  <div class="lv">
+    <h4>Composición: props + children</h4>
+    <div class="lv-card" style="border:1px dashed rgba(139,77,255,.3)">
+      <p><strong style="color:#fff">Layout {'{title}'}</strong></p>
+      <div class="lv-card" style="margin-top:8px">
+        <p>children renderizados dentro del layout</p>
+      </div>
+    </div>
+    <p>Componentes puros = funciones que retornan DOM real.</p>
+  </div>
+));
+
+const ex10 = component(() => {
+  const ui = store({ active: false });
+  return (
+    <div class="lv">
+      <h4>Atributos dinámicos (bindAttr)</h4>
+      <div class="lv-row">
+        <button class={`lv-btn ${ui.active ? '' : 'ghost'}`} onclick={() => { ui.active = !ui.active; }}>
+          Toggle active
+        </button>
+      </div>
+      <div class="lv-card" style={ui.active ? 'border-color:#b84cff;box-shadow:0 0 16px rgba(184,76,255,.25)' : ''}>
+        <p class={ui.active ? 'lv-ok' : ''}>{ui.active ? '● Activo' : '○ Inactivo'}</p>
+      </div>
+      <button class="lv-btn" disabled={!ui.active}>
+        {ui.active ? 'Botón habilitado' : 'Botón deshabilitado (disabled={!active})'}
+      </button>
+    </div>
+  );
+});
+
+/* ── Fullstack examples (server behavior simulated) ────────────────── */
+
+const ex11 = component(() => {
+  const state = store({ users: [] as string[], loading: false });
+  const load = () => {
+    state.loading = true;
+    state.users = [];
+    setTimeout(() => {
+      state.users = ['Ada', 'Grace', 'Linus'];
+      state.loading = false;
+    }, 700);
+  };
+  return (
+    <div class="lv">
+      <h4>server({'{ type: "dynamic" }'}) — RPC simulado</h4>
+      <button class="lv-btn" onclick={load} disabled={state.loading}>
+        {state.loading ? 'Ejecutando en servidor...' : 'getUsers()'}
+      </button>
+      <div class="lv-card">
+        {state.users.length > 0 ? (
+          <div class="lv-list">
+            {state.users.map((u) => <div class="lv-item"><span>{u}</span><span class="lv-tag">User</span></div>)}
+          </div>
+        ) : (
+          <p>{state.loading ? '⏳ RPC en vuelo...' : 'Llama a getUsers() — el compilador generó el stub fetch + handler.'}</p>
+        )}
+      </div>
+    </div>
+  );
+});
+
+const ex12 = component(() => {
+  const state = store({ status: 'idle' as string, version: 0 });
+  const load = () => {
+    if (state.status === 'loading') return;
+    state.status = 'cached';
+    setTimeout(() => {
+      state.status = 'revalidated';
+      state.version++;
+      setTimeout(() => { state.status = 'idle'; }, 1500);
+    }, 500);
+  };
+  return (
+    <div class="lv">
+      <h4>SWR: stale-while-revalidate</h4>
+      <button class="lv-btn" onclick={load}>getProducts()</button>
+      <div class="lv-card">
+        {state.status === 'idle' && <p>Haz clic para consumir la API.</p>}
+        {state.status === 'cached' && <p class="lv-ok">⚡ Respuesta instantánea desde caché (SWR)...</p>}
+        {state.status === 'revalidated' && <p class="lv-ok">🔄 Revalidado en background — v{state.version}</p>}
+      </div>
+      <p>Primera llamada: red. Luego: caché + revalidación silenciosa.</p>
+    </div>
+  );
+});
+
+const ex13 = component(() => {
+  const form = store({ title: '', body: '', sent: false });
+  return (
+    <div class="lv">
+      <h4>Mutación tipada al servidor</h4>
+      <input class="lv-input" placeholder="Título" value={form.title}
+        onInput={(e: Event) => { form.title = (e.target as HTMLInputElement).value; }} />
+      <input class="lv-input" placeholder="Contenido" value={form.body}
+        onInput={(e: Event) => { form.body = (e.target as HTMLInputElement).value; }} />
+      <button class="lv-btn" disabled={!form.title || !form.body}
+        onclick={() => { form.sent = true; }}>
+        createPost()
+      </button>
+      {form.sent && (
+        <div class="lv-card">
+          <p class="lv-ok">✓ Post creado en el servidor</p>
+          <p><strong style="color:#fff">{form.title}</strong> — {form.body}</p>
+          <p>Tags ['posts'] revalidados automáticamente.</p>
+        </div>
+      )}
+    </div>
+  );
+});
+
+const ex14 = component(() => {
+  const state = store({ selected: null as number | null });
+  const products = [
+    { id: 1, name: 'Auriculares', price: 49 },
+    { id: 2, name: 'Teclado', price: 129 },
+    { id: 3, name: 'Monitor', price: 349 },
+  ];
+  return (
+    <div class="lv">
+      <h4>params.id → server({'{ id }'})</h4>
+      <div class="lv-row">
+        {products.map((p) => (
+          <button class={`lv-btn ${state.selected === p.id ? '' : 'ghost'}`}
+            onclick={() => { state.selected = p.id; }}>
+            #{p.id}
+          </button>
+        ))}
+      </div>
+      <div class="lv-card">
+        {state.selected === null ? (
+          <p>Selecciona un id — la ruta sería /products/:id</p>
+        ) : (
+          (() => {
+            const p = products.find((x) => x.id === state.selected)!;
+            return (
+              <div>
+                <p><strong style="color:#fff">{p.name}</strong></p>
+                <p>Precio: ${p.price} — cargado con getProduct(params.id)</p>
+              </div>
+            );
+          })()
+        )}
+      </div>
+    </div>
+  );
+});
+
+const ex15 = component(() => {
+  const form = store({ name: '', email: '', age: '' });
+  const errors = () => {
+    const e: string[] = [];
+    if (form.name.length > 0 && form.name.length < 2) e.push('Nombre: mínimo 2 caracteres');
+    if (form.email && !/^[^@]+@[^@]+$/.test(form.email)) e.push('Email inválido');
+    if (form.age && Number(form.age) < 18) e.push('Edad: mínimo 18');
+    return e;
+  };
+  const errs = errors();
+  return (
+    <div class="lv">
+      <h4>Schema validation en vivo</h4>
+      <input class="lv-input" placeholder="Nombre (min 2)" value={form.name}
+        onInput={(e: Event) => { form.name = (e.target as HTMLInputElement).value; }} />
+      <input class="lv-input" placeholder="Email" value={form.email}
+        onInput={(e: Event) => { form.email = (e.target as HTMLInputElement).value; }} />
+      <input class="lv-input" placeholder="Edad (min 18)" value={form.age}
+        onInput={(e: Event) => { form.age = (e.target as HTMLInputElement).value; }} />
+      {errs.length === 0 ? (
+        <p class="lv-ok">✓ Sin errores — schema validado</p>
+      ) : (
+        errs.map((e) => <p class="lv-err">✖ {e}</p>)
+      )}
+    </div>
+  );
+});
+
+const ex16 = component(() => {
+  const todos = store({
+    items: [
+      { id: 1, text: 'Aprender AstraJS', done: true },
+      { id: 2, text: 'Construir mi app', done: false },
+    ] as { id: number; text: string; done: boolean }[],
+  });
+  const toggle = (id: number) => {
+    const item = todos.items.find((t) => t.id === id)!;
+    const prev = item.done;
+    item.done = !prev; // optimista
+    setTimeout(() => {
+      // servidor responde ok — sin cambios
+      if (Math.random() < 0.2) {
+        item.done = prev; // rollback simulado
+      }
+    }, 500);
+  };
+  return (
+    <div class="lv">
+      <h4>Mutaciones optimistas + rollback</h4>
+      <div class="lv-list">
+        {todos.items.map((t) => (
+          <div class="lv-item" style="cursor:pointer" onclick={() => toggle(t.id)}>
+            <span style={t.done ? 'text-decoration:line-through;color:#64748b' : ''}>{t.text}</span>
+            <span>{t.done ? '✅' : '⬜'}</span>
+          </div>
+        ))}
+      </div>
+      <p>Click en un todo: la UI cambia al instante; el servidor confirma en background. ~20% de fallos → rollback automático.</p>
+    </div>
+  );
+});
+
+const ex17 = component(() => {
+  const state = store({ file: null as { name: string; size: number } | null, progress: 0, done: false });
+  return (
+    <div class="lv">
+      <h4>Subida de archivos (multipart)</h4>
+      <input
+        class="lv-input"
+        type="file"
+        onChange={(e: Event) => {
+          const f = (e.target as HTMLInputElement).files?.[0];
+          if (!f) return;
+          state.file = { name: f.name, size: f.size };
+          state.progress = 0;
+          state.done = false;
+          const timer = setInterval(() => {
+            state.progress += 20;
+            if (state.progress >= 100) {
+              clearInterval(timer);
+              state.done = true;
+            }
+          }, 200);
+        }}
+      />
+      {state.file && (
+        <div class="lv-card">
+          <p><strong style="color:#fff">{state.file.name}</strong> — {(state.file.size / 1024).toFixed(1)} KB</p>
+          <div class="lv-bar" style="margin-top:8px">
+            <div class="lv-bar-fill" style={`width:${state.progress}%`}></div>
+          </div>
+          {state.done && <p class="lv-ok">✓ Subido al servidor</p>}
+        </div>
+      )}
+    </div>
+  );
+});
+
+const ex18 = component(() => {
+  const state = store({ sales: 1240, syncs: 0, syncing: false });
+  mounted(() => {
+    const timer = setInterval(() => {
+      state.syncing = true;
+      setTimeout(() => {
+        state.sales += Math.floor(Math.random() * 50);
+        state.syncs++;
+        state.syncing = false;
+      }, 400);
+    }, 2500);
+    return () => clearInterval(timer);
+  });
+  return (
+    <div class="lv">
+      <h4>autoSync con ETags</h4>
+      <div class="lv-card">
+        <div style="font-size:1.4rem;font-weight:800;color:#fff">${state.sales}</div>
+        <p>Ventas en tiempo real</p>
+      </div>
+      <div class="lv-row">
+        <span class="lv-tag">{state.syncing ? '⏳ Sincronizando...' : '● Sincronizado'}</span>
+        <span class="lv-tag">syncs: {state.syncs}</span>
+      </div>
+      <p>Polling con If-None-Match — el servidor responde 304 si no hay cambios.</p>
+    </div>
+  );
+});
+
+const ex19 = component(() => {
+  const state = store({ resumed: false });
+  const serialized = JSON.stringify({ items: 3, total: 42, user: 'Ada' }, null, 2);
+  return (
+    <div class="lv">
+      <h4>Resumibilidad: el estado vive en el HTML</h4>
+      <div class="lv-card">
+        <p>HTML enviado por el servidor:</p>
+        <pre style="font-size:.66rem;color:#00dfff;background:#04060d;padding:10px;border-radius:6px;margin:8px 0">{"<div data-astra-store=\"cart\"\n     data-astra-value='"}<br/>{serialized.replace(/\n/g, ' · ')}</pre>
+      </div>
+      <button class="lv-btn" onclick={() => { state.resumed = true; }}>
+        resume()
+      </button>
+      {state.resumed && (
+        <div class="lv-card">
+          <p class="lv-ok">✓ App reanudada — sin re-ejecutar componentes, sin hidratación.</p>
+          <div class="lv-list">
+            <div class="lv-item"><span>items</span><span>3</span></div>
+            <div class="lv-item"><span>total</span><span>$42</span></div>
+            <div class="lv-item"><span>user</span><span>Ada</span></div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+});
+
+const ex20 = component(() => {
+  const builtAt = '2026-08-12T09:00:00Z';
+  const posts = [
+    { title: 'Zero Virtual DOM', views: 1240 },
+    { title: 'Typed RPC', views: 890 },
+    { title: 'Resumability', views: 632 },
+  ];
+  return (
+    <div class="lv">
+      <h4>SSG: pre-build — 0 KB de JS</h4>
+      <div class="lv-card">
+        <p>Datos incrustados en el HTML durante el build:</p>
+        <div class="lv-list" style="margin-top:8px">
+          {posts.map((p) => (
+            <div class="lv-item">
+              <span>{p.title}</span>
+              <span class="lv-tag">{p.views} vistas</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <p>⏱ Build time: {builtAt} — esta página no hizo ningún fetch: los datos ya estaban en el HTML.</p>
+    </div>
+  );
+});
+
+/* ── Registro de ejemplos ──────────────────────────────────────────── */
+
+export const frontendExamples: LiveExample[] = [
+  { num: '01', title: 'Simple State', description: 'El ejemplo más básico: un store() con contador. Cada clic actualiza solo el TextNode del valor.', concepts: ['store()', 'component()'], docsHref: '/docs/fundamentals#reactividad', render: ex01,
+    code: `const counter = store({ value: 0 });
+
+export const Counter = component(() => (
+  <div>
+    <h2>Counter: {counter.value}</h2>
+    <button onClick={() => counter.value--}>-1</button>
+    <button onClick={() => counter.value++}>+1</button>
+  </div>
+));` },
+  { num: '02', title: 'Global State', description: 'Store compartido entre componentes. Reactividad cross-component sin context ni state management externo.', concepts: ['store compartido'], docsHref: '/docs/fundamentals#reactividad', render: ex02,
+    code: `// store.ts — módulo compartido
+export const cart = store({ items: 0 });
+
+// Componente A
+<button onclick={() => cart.items++}>
+  Agregar ({cart.items})
+</button>
+
+// Componente B — se actualiza solo
+<p>🛒 {cart.items} items</p>` },
+  { num: '03', title: 'Forms', description: 'Two-way binding entre inputs y store: sin re-render, sin perder el foco al escribir.', concepts: ['bindValue', 'onInput'], docsHref: '/docs/fundamentals#eventos', render: ex03,
+    code: `const form = store({ name: '', email: '' });
+
+<input
+  value={form.name}
+  onInput={(e) => { form.name = e.target.value; }}
+/>
+
+<p>Hola, {form.name}!</p>` },
+  { num: '04', title: 'Routing', description: 'Navegación con route() y fallbackRoute(). Guards booleanos reactivos — sin wrappers, sin HOCs.', concepts: ['route()', 'fallbackRoute()'], docsHref: '/docs/router#rutas', render: ex04,
+    code: `export const routes = {
+  get home()     { return route('/', { exact: true }); },
+  get about()    { return route('/about'); },
+  get fallback() { return fallbackRoute(); },
+};
+
+{routes.home     && <HomePage />}
+{routes.about    && <AboutPage />}
+{routes.fallback && <NotFound />}` },
+  { num: '05', title: 'CSS Macro', description: 'Estilos con ámbito via css``. Extraídos en build time con identificadores únicos.', concepts: ['css``', 'scope'], docsHref: '/docs/fundamentals#estilos', render: ex05,
+    code: `const cardStyle = css\`
+  .demo-card {
+    background: #0f172a;
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .demo-card:hover {
+    border-color: #818cf8;
+    transform: translateY(-3px);
+  }
+\`;
+
+<div class="demo-card">...</div>` },
+  { num: '06', title: 'Conditional Lists', description: 'Condicionales → bindConditional. map() → bindList con diffing por keys.', concepts: ['bindConditional', 'bindList'], docsHref: '/docs/fundamentals#jsx-sin-vdom', render: ex06,
+    code: `const app = store({ show: true, items: [...] });
+
+{app.show && <span>Visible!</span>}
+
+<ul>
+  {app.items.map(item => (
+    <li key={item.id}>{item.name}</li>
+  ))}
+</ul>` },
+  { num: '07', title: 'Async Data', description: 'Carga asíncrona con mounted() y estados loading/éxito gestionados con un store.', concepts: ['mounted()', 'async'], docsHref: '/docs/fundamentals#componentes', render: ex07,
+    code: `const state = store({ data: [], loading: true });
+
+mounted(() => {
+  fetch('/api/data')
+    .then(r => r.json())
+    .then(data => {
+      state.data = data;
+      state.loading = false;
+    });
+});
+
+{state.loading
+  ? <p>Loading...</p>
+  : <List data={state.data} />}` },
+  { num: '08', title: 'Lifecycle', description: 'mounted() + cleanup automático al desmontar. Sin useEffect, sin return manual.', concepts: ['mounted()', 'cleanup'], docsHref: '/docs/fundamentals#componentes', render: ex08,
+    code: `export const Clock = component(() => {
+  const state = store({ time: '' });
+
+  mounted(() => {
+    const timer = setInterval(() => {
+      state.time = new Date().toLocaleTimeString();
+    }, 1000);
+    return () => clearInterval(timer); // auto-cleanup
+  });
+
+  return <p>{state.time}</p>;
+});` },
+  { num: '09', title: 'Composition', description: 'Props, children y composición de componentes puros que retornan DOM real.', concepts: ['props', 'children'], docsHref: '/docs/fundamentals#componentes', render: ex09,
+    code: `function Layout({ title, children }: {
+  title: string;
+  children: JSX.Element;
+}) {
+  return (
+    <div>
+      <header>{title}</header>
+      <main>{children}</main>
+    </div>
+  );
+}
+
+<Layout title="Mi App">
+  <p>Contenido</p>
+</Layout>` },
+  { num: '10', title: 'Dynamic Attributes', description: 'class, style y disabled reactivos con bindAttr. Actualizaciones quirúrgicas por atributo.', concepts: ['bindAttr', 'bindClass'], docsHref: '/docs/fundamentals#jsx-sin-vdom', render: ex10,
+    code: `const ui = store({ active: false });
+
+<div class={ui.active ? 'card active' : 'card'}>
+  <button disabled={!ui.active}>Enviar</button>
+</div>
+
+// Solo cambia el class/disabled
+// del nodo afectado. Nada más.` },
+];
+
+export const fullstackExamples: LiveExample[] = [
+  { num: '01', title: 'Server Dynamic', description: 'server() type: dynamic — se ejecuta en cada request. Stub fetch en cliente, handler en servidor.', concepts: ['server()', 'RPC'], docsHref: '/docs/server-data#tipos-server', render: ex11,
+    code: `export const getUsers = server(
+  { type: 'dynamic', tags: ['users'] },
+  async () => {
+    return db.user.findMany();
+  }
+);
+
+// Cliente — RPC tipado:
+const users = await getUsers();
+// users: User[] — tipos e2e automáticos` },
+  { num: '02', title: 'SWR Server', description: 'Stale-while-revalidate: respuesta instantánea desde caché + revalidación en background con maxAge.', concepts: ['swr', 'maxAge'], docsHref: '/docs/server-data#caching', render: ex12,
+    code: `export const getProducts = server(
+  { tags: ['products'], maxAge: 300 },
+  async () => db.product.findMany()
+);
+
+// 1er fetch → red + caché
+// Siguientes → caché instantáneo (SWR)
+// Expira → stale + revalidación bg` },
+  { num: '03', title: 'Form Server', description: 'Mutación tipada al servidor. Tags revalidados automáticamente tras crear.', concepts: ['server()', 'mutations'], docsHref: '/docs/server-data#server', render: ex13,
+    code: `const createPost = server(
+  { tags: ['posts'] },
+  async (data: { title: string; body: string }) => {
+    return db.post.create({ data });
+  }
+);
+
+await createPost({ title, body });
+// Tags ['posts'] revalidados automáticamente` },
+  { num: '04', title: 'Router Server Params', description: '/products/:id → params.id → server(). Tipos compartidos entre ruta y RPC.', concepts: ['params', 'server()'], docsHref: '/docs/router#rutas', render: ex14,
+    code: `export const routes = {
+  get product() { return route('/products/:id'); },
+};
+
+export const getProduct = server(
+  { tags: ['products'] },
+  async (id: string) => {
+    return db.product.findUnique({ where: { id } });
+  }
+);
+
+const p = await getProduct(params.id);` },
+  { num: '05', title: 'Schema Validation', description: 'Un schema, dos contextos: validación en cliente y servidor con el mismo código.', concepts: ['schema', 'validation'], docsHref: '/docs/server-data#server', render: ex15,
+    code: `const UserSchema = schema({
+  name: { type: 'string', min: 2, required: true },
+  email: { type: 'email', required: true },
+  age: { type: 'number', min: 18 },
+});
+
+// Cliente:
+const result = UserSchema.validate(formData);
+
+// Servidor:
+const valid = UserSchema.validate(data);
+if (!valid.ok) return { errors: valid.errors };` },
+  { num: '06', title: 'Optimistic Mutations', description: 'UI actualizada al instante, servidor en background, rollback quirúrgico si falla.', concepts: ['optimistic', 'rollback'], docsHref: '/docs/server-data#caching', render: ex16,
+    code: `async function handleToggle(id: string) {
+  const item = todos.find(t => t.id === id)!;
+  const prev = item.done;
+  item.done = !prev; // optimista
+
+  try {
+    await toggleTodo(id); // servidor
+  } catch {
+    item.done = prev; // rollback
+  }
+}` },
+  { num: '07', title: 'File Upload', description: 'Subida multipart con server(), progreso reactivo y manejo de errores tipado.', concepts: ['upload', 'FormData'], docsHref: '/docs/server-data#server', render: ex17,
+    code: `const uploadFile = server(
+  { tags: ['files'] },
+  async (file: File) => {
+    const buffer = await file.arrayBuffer();
+    return storage.put(buffer, file.name);
+  }
+);
+
+<input type="file"
+  onChange={async (e) => {
+    const f = e.target.files?.[0];
+    if (f) await uploadFile(f);
+  }} />` },
+  { num: '08', title: 'AutoSync', description: 'Polling con ETags: If-None-Match + 304 Not Modified. Cero transferencia si no hay cambios.', concepts: ['autoSync', 'ETags'], docsHref: '/docs/server-data#autosync', render: ex18,
+    code: `export const liveStats = server(
+  { autoSync: true, autoSyncInterval: 2500 },
+  async () => db.stats.latest()
+);
+
+// El DOM se actualiza solo cuando el
+// servidor devuelve datos nuevos.
+// Sin WebSockets, sin suscripciones.` },
+  { num: '09', title: 'Resumability', description: 'El HTML incluye el estado serializado. El cliente reanuda sin re-renderizar ni hidratar.', concepts: ['resume()', 'SSR'], docsHref: '/docs/rendering#resumibilidad', render: ex19,
+    code: `// HTML del servidor:
+<div data-astra-store="cart"
+     data-astra-value='{"items":3,"total":42}'>
+  3 items · $42
+</div>
+
+// Cliente: resume()
+// 1. Lee el estado del HTML
+// 2. Store inicializado sin re-ejecutar
+// 3. Handlers se cargan on-demand` },
+  { num: '10', title: 'SSG Pre-Built', description: 'pre-build: la función corre en build time y el resultado se incrusta en el HTML. 0 KB de JS.', concepts: ['SSG', 'pre-build'], docsHref: '/docs/rendering#ssg', render: ex20,
+    code: `export const getPosts = server(
+  { type: 'pre-build', tags: ['posts'] },
+  async () => db.post.findMany()
+);
+
+// Build time: consulta ejecutada
+// HTML: datos incrustados (astra-data)
+// Cliente: 0 fetch, 0 KB de JS` },
+];

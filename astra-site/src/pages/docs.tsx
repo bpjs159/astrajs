@@ -242,7 +242,7 @@ export default function Counter() {
           {/* Placeholder sections for sidebar nav */}
           <h2 id="instalacion">Instalación</h2>
           <p>Para crear un nuevo proyecto AstraJS, ejecuta:</p>
-          <pre><code>pnpm create astra@latest</code></pre>
+          <pre><code>npx @astrajs/cli@latest</code></pre>
           <p>O añade AstraJS a un proyecto Vite existente:</p>
           <pre><code>pnpm add @astrajs/core @astrajs/compiler
 {`// vite.config.ts
