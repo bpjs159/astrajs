@@ -1,0 +1,42 @@
+{
+  "name": "@astrajs/i18n",
+  "version": "0.1.0",
+  "description": "AstraJS i18n — Built-in internationalization with fine-grained reactive translations, pluralization and Intl-based formatting. Zero dependencies.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "development": "./src/index.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@astrajs/core": "0.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  },
+  "keywords": [
+    "astrajs",
+    "i18n",
+    "translation",
+    "localization",
+    "typescript",
+    "reactive"
+  ],
+  "license": "MIT"
+}

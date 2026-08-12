@@ -569,7 +569,7 @@ const ex20 = component(() => {
 /* ── Registro de ejemplos ──────────────────────────────────────────── */
 
 export const frontendExamples: LiveExample[] = [
-  { num: '01', title: 'Simple State', description: 'El ejemplo más básico: un store() con contador. Cada clic actualiza solo el TextNode del valor.', concepts: ['store()', 'component()'], docsHref: '/docs/fundamentals#reactividad', render: ex01,
+  { num: '01', title: 'ex1.title', description: 'ex1.desc', concepts: ['store()', 'component()'], docsHref: '/docs/fundamentals#reactividad', render: ex01,
     code: `const counter = store({ value: 0 });
 
 export const Counter = component(() => (
@@ -579,7 +579,7 @@ export const Counter = component(() => (
     <button onClick={() => counter.value++}>+1</button>
   </div>
 ));` },
-  { num: '02', title: 'Global State', description: 'Store compartido entre componentes. Reactividad cross-component sin context ni state management externo.', concepts: ['store compartido'], docsHref: '/docs/fundamentals#reactividad', render: ex02,
+  { num: '02', title: 'ex2.title', description: 'ex2.desc', concepts: ['store compartido'], docsHref: '/docs/fundamentals#reactividad', render: ex02,
     code: `// store.ts — módulo compartido
 export const cart = store({ items: 0 });
 
@@ -590,7 +590,7 @@ export const cart = store({ items: 0 });
 
 // Componente B — se actualiza solo
 <p>🛒 {cart.items} items</p>` },
-  { num: '03', title: 'Forms', description: 'Two-way binding entre inputs y store: sin re-render, sin perder el foco al escribir.', concepts: ['bindValue', 'onInput'], docsHref: '/docs/fundamentals#eventos', render: ex03,
+  { num: '03', title: 'ex3.title', description: 'ex3.desc', concepts: ['bindValue', 'onInput'], docsHref: '/docs/fundamentals#eventos', render: ex03,
     code: `const form = store({ name: '', email: '' });
 
 <input
@@ -599,7 +599,7 @@ export const cart = store({ items: 0 });
 />
 
 <p>Hola, {form.name}!</p>` },
-  { num: '04', title: 'Routing', description: 'Navegación con route() y fallbackRoute(). Guards booleanos reactivos — sin wrappers, sin HOCs.', concepts: ['route()', 'fallbackRoute()'], docsHref: '/docs/router#rutas', render: ex04,
+  { num: '04', title: 'ex4.title', description: 'ex4.desc', concepts: ['route()', 'fallbackRoute()'], docsHref: '/docs/router#rutas', render: ex04,
     code: `export const routes = {
   get home()     { return route('/', { exact: true }); },
   get about()    { return route('/about'); },
@@ -609,7 +609,7 @@ export const cart = store({ items: 0 });
 {routes.home     && <HomePage />}
 {routes.about    && <AboutPage />}
 {routes.fallback && <NotFound />}` },
-  { num: '05', title: 'CSS Macro', description: 'Estilos con ámbito via css``. Extraídos en build time con identificadores únicos.', concepts: ['css``', 'scope'], docsHref: '/docs/fundamentals#estilos', render: ex05,
+  { num: '05', title: 'ex5.title', description: 'ex5.desc', concepts: ['css``', 'scope'], docsHref: '/docs/fundamentals#estilos', render: ex05,
     code: `const cardStyle = css\`
   .demo-card {
     background: #0f172a;
@@ -623,7 +623,7 @@ export const cart = store({ items: 0 });
 \`;
 
 <div class="demo-card">...</div>` },
-  { num: '06', title: 'Conditional Lists', description: 'Condicionales → bindConditional. map() → bindList con diffing por keys.', concepts: ['bindConditional', 'bindList'], docsHref: '/docs/fundamentals#jsx-sin-vdom', render: ex06,
+  { num: '06', title: 'ex6.title', description: 'ex6.desc', concepts: ['bindConditional', 'bindList'], docsHref: '/docs/fundamentals#jsx-sin-vdom', render: ex06,
     code: `const app = store({ show: true, items: [...] });
 
 {app.show && <span>Visible!</span>}
@@ -633,7 +633,7 @@ export const cart = store({ items: 0 });
     <li key={item.id}>{item.name}</li>
   ))}
 </ul>` },
-  { num: '07', title: 'Async Data', description: 'Carga asíncrona con mounted() y estados loading/éxito gestionados con un store.', concepts: ['mounted()', 'async'], docsHref: '/docs/fundamentals#componentes', render: ex07,
+  { num: '07', title: 'ex7.title', description: 'ex7.desc', concepts: ['mounted()', 'async'], docsHref: '/docs/fundamentals#componentes', render: ex07,
     code: `const state = store({ data: [], loading: true });
 
 mounted(() => {
@@ -648,7 +648,7 @@ mounted(() => {
 {state.loading
   ? <p>Loading...</p>
   : <List data={state.data} />}` },
-  { num: '08', title: 'Lifecycle', description: 'mounted() + cleanup automático al desmontar. Sin useEffect, sin return manual.', concepts: ['mounted()', 'cleanup'], docsHref: '/docs/fundamentals#componentes', render: ex08,
+  { num: '08', title: 'ex8.title', description: 'ex8.desc', concepts: ['mounted()', 'cleanup'], docsHref: '/docs/fundamentals#componentes', render: ex08,
     code: `export const Clock = component(() => {
   const state = store({ time: '' });
 
@@ -661,7 +661,7 @@ mounted(() => {
 
   return <p>{state.time}</p>;
 });` },
-  { num: '09', title: 'Composition', description: 'Props, children y composición de componentes puros que retornan DOM real.', concepts: ['props', 'children'], docsHref: '/docs/fundamentals#componentes', render: ex09,
+  { num: '09', title: 'ex9.title', description: 'ex9.desc', concepts: ['props', 'children'], docsHref: '/docs/fundamentals#componentes', render: ex09,
     code: `function Layout({ title, children }: {
   title: string;
   children: JSX.Element;
@@ -677,7 +677,7 @@ mounted(() => {
 <Layout title="Mi App">
   <p>Contenido</p>
 </Layout>` },
-  { num: '10', title: 'Dynamic Attributes', description: 'class, style y disabled reactivos con bindAttr. Actualizaciones quirúrgicas por atributo.', concepts: ['bindAttr', 'bindClass'], docsHref: '/docs/fundamentals#jsx-sin-vdom', render: ex10,
+  { num: '10', title: 'ex10.title', description: 'ex10.desc', concepts: ['bindAttr', 'bindClass'], docsHref: '/docs/fundamentals#jsx-sin-vdom', render: ex10,
     code: `const ui = store({ active: false });
 
 <div class={ui.active ? 'card active' : 'card'}>
@@ -689,7 +689,7 @@ mounted(() => {
 ];
 
 export const fullstackExamples: LiveExample[] = [
-  { num: '01', title: 'Server Dynamic', description: 'server() type: dynamic — se ejecuta en cada request. Stub fetch en cliente, handler en servidor.', concepts: ['server()', 'RPC'], docsHref: '/docs/server-data#tipos-server', render: ex11,
+  { num: '01', title: 'ex11.title', description: 'ex11.desc', concepts: ['server()', 'RPC'], docsHref: '/docs/server-data#tipos-server', render: ex11,
     code: `export const getUsers = server(
   { type: 'dynamic', tags: ['users'] },
   async () => {
@@ -700,7 +700,7 @@ export const fullstackExamples: LiveExample[] = [
 // Cliente — RPC tipado:
 const users = await getUsers();
 // users: User[] — tipos e2e automáticos` },
-  { num: '02', title: 'SWR Server', description: 'Stale-while-revalidate: respuesta instantánea desde caché + revalidación en background con maxAge.', concepts: ['swr', 'maxAge'], docsHref: '/docs/server-data#caching', render: ex12,
+  { num: '02', title: 'ex12.title', description: 'ex12.desc', concepts: ['swr', 'maxAge'], docsHref: '/docs/server-data#caching', render: ex12,
     code: `export const getProducts = server(
   { tags: ['products'], maxAge: 300 },
   async () => db.product.findMany()
@@ -709,7 +709,7 @@ const users = await getUsers();
 // 1er fetch → red + caché
 // Siguientes → caché instantáneo (SWR)
 // Expira → stale + revalidación bg` },
-  { num: '03', title: 'Form Server', description: 'Mutación tipada al servidor. Tags revalidados automáticamente tras crear.', concepts: ['server()', 'mutations'], docsHref: '/docs/server-data#server', render: ex13,
+  { num: '03', title: 'ex13.title', description: 'ex13.desc', concepts: ['server()', 'mutations'], docsHref: '/docs/server-data#server', render: ex13,
     code: `const createPost = server(
   { tags: ['posts'] },
   async (data: { title: string; body: string }) => {
@@ -719,7 +719,7 @@ const users = await getUsers();
 
 await createPost({ title, body });
 // Tags ['posts'] revalidados automáticamente` },
-  { num: '04', title: 'Router Server Params', description: '/products/:id → params.id → server(). Tipos compartidos entre ruta y RPC.', concepts: ['params', 'server()'], docsHref: '/docs/router#rutas', render: ex14,
+  { num: '04', title: 'ex14.title', description: 'ex14.desc', concepts: ['params', 'server()'], docsHref: '/docs/router#rutas', render: ex14,
     code: `export const routes = {
   get product() { return route('/products/:id'); },
 };
@@ -732,7 +732,7 @@ export const getProduct = server(
 );
 
 const p = await getProduct(params.id);` },
-  { num: '05', title: 'Schema Validation', description: 'Un schema, dos contextos: validación en cliente y servidor con el mismo código.', concepts: ['schema', 'validation'], docsHref: '/docs/server-data#server', render: ex15,
+  { num: '05', title: 'ex15.title', description: 'ex15.desc', concepts: ['schema', 'validation'], docsHref: '/docs/server-data#server', render: ex15,
     code: `const UserSchema = schema({
   name: { type: 'string', min: 2, required: true },
   email: { type: 'email', required: true },
@@ -745,7 +745,7 @@ const result = UserSchema.validate(formData);
 // Servidor:
 const valid = UserSchema.validate(data);
 if (!valid.ok) return { errors: valid.errors };` },
-  { num: '06', title: 'Optimistic Mutations', description: 'UI actualizada al instante, servidor en background, rollback quirúrgico si falla.', concepts: ['optimistic', 'rollback'], docsHref: '/docs/server-data#caching', render: ex16,
+  { num: '06', title: 'ex16.title', description: 'ex16.desc', concepts: ['optimistic', 'rollback'], docsHref: '/docs/server-data#caching', render: ex16,
     code: `async function handleToggle(id: string) {
   const item = todos.find(t => t.id === id)!;
   const prev = item.done;
@@ -757,7 +757,7 @@ if (!valid.ok) return { errors: valid.errors };` },
     item.done = prev; // rollback
   }
 }` },
-  { num: '07', title: 'File Upload', description: 'Subida multipart con server(), progreso reactivo y manejo de errores tipado.', concepts: ['upload', 'FormData'], docsHref: '/docs/server-data#server', render: ex17,
+  { num: '07', title: 'ex17.title', description: 'ex17.desc', concepts: ['upload', 'FormData'], docsHref: '/docs/server-data#server', render: ex17,
     code: `const uploadFile = server(
   { tags: ['files'] },
   async (file: File) => {
@@ -771,7 +771,7 @@ if (!valid.ok) return { errors: valid.errors };` },
     const f = e.target.files?.[0];
     if (f) await uploadFile(f);
   }} />` },
-  { num: '08', title: 'AutoSync', description: 'Polling con ETags: If-None-Match + 304 Not Modified. Cero transferencia si no hay cambios.', concepts: ['autoSync', 'ETags'], docsHref: '/docs/server-data#autosync', render: ex18,
+  { num: '08', title: 'ex18.title', description: 'ex18.desc', concepts: ['autoSync', 'ETags'], docsHref: '/docs/server-data#autosync', render: ex18,
     code: `export const liveStats = server(
   { autoSync: true, autoSyncInterval: 2500 },
   async () => db.stats.latest()
@@ -780,7 +780,7 @@ if (!valid.ok) return { errors: valid.errors };` },
 // El DOM se actualiza solo cuando el
 // servidor devuelve datos nuevos.
 // Sin WebSockets, sin suscripciones.` },
-  { num: '09', title: 'Resumability', description: 'El HTML incluye el estado serializado. El cliente reanuda sin re-renderizar ni hidratar.', concepts: ['resume()', 'SSR'], docsHref: '/docs/rendering#resumibilidad', render: ex19,
+  { num: '09', title: 'ex19.title', description: 'ex19.desc', concepts: ['resume()', 'SSR'], docsHref: '/docs/rendering#resumibilidad', render: ex19,
     code: `// HTML del servidor:
 <div data-astra-store="cart"
      data-astra-value='{"items":3,"total":42}'>
@@ -791,7 +791,7 @@ if (!valid.ok) return { errors: valid.errors };` },
 // 1. Lee el estado del HTML
 // 2. Store inicializado sin re-ejecutar
 // 3. Handlers se cargan on-demand` },
-  { num: '10', title: 'SSG Pre-Built', description: 'pre-build: la función corre en build time y el resultado se incrusta en el HTML. 0 KB de JS.', concepts: ['SSG', 'pre-build'], docsHref: '/docs/rendering#ssg', render: ex20,
+  { num: '10', title: 'ex20.title', description: 'ex20.desc', concepts: ['SSG', 'pre-build'], docsHref: '/docs/rendering#ssg', render: ex20,
     code: `export const getPosts = server(
   { type: 'pre-build', tags: ['posts'] },
   async () => db.post.findMany()

@@ -5,8 +5,47 @@
  * (No son component(): se invocan dentro de expresiones reactivas de
  * las páginas, que ya re-evalúan cuando cambia la ruta.)
  */
-import { Link } from '@astrajs/router';
+import { Link, navigate } from '@astrajs/router';
+import { WORLD_LOCALES } from '@astrajs/i18n';
 import { db } from '../db.js';
+import { i18n, navKey } from '../i18n.js';
+
+/** Título de columna del footer (config pre-built) → clave i18n. */
+const FOOTER_COLUMN_KEYS: Record<string, string> = {
+  'Categorías': 'footer.categories',
+  'Autores': 'footer.authors',
+  'Sitio': 'footer.site',
+};
+
+/** Etiquetas del nav principal (usa claves propias, no las de los links del footer). */
+const NAV_KEYS: Record<string, string> = {
+  '/': 'nav.home',
+  '/blog': 'nav.blog',
+  '/categories/asia': 'nav.regions',
+  '/authors/luna-vega': 'nav.authors',
+  '/about': 'nav.about',
+  '/contact': 'nav.contact',
+};
+
+function LangSelectMarkup(extraStyle = ''): JSX.Element {
+  return (
+    <select
+      class="lang-select"
+      style={extraStyle}
+      aria-label="Language"
+      value={i18n.locale}
+      onchange={(e: Event) => {
+        i18n.setLocale((e.target as HTMLSelectElement).value);
+      }}
+    >
+      {WORLD_LOCALES.map((loc) => (
+        <option value={loc.code} selected={i18n.locale === loc.code}>
+          {loc.label}
+        </option>
+      ))}
+    </select>
+  );
+}
 
 export function BrandMarkup(): JSX.Element {
   return (
@@ -24,10 +63,18 @@ export function SiteHeaderMarkup(): JSX.Element {
         {BrandMarkup()}
         <nav class="site-nav">
           {db.site().nav.map((item) => (
-            <Link href={item.href} class="nav-link">
-              {item.label}
-            </Link>
+            <a
+              href={item.href}
+              class="nav-link"
+              onclick={(e: Event) => {
+                e.preventDefault();
+                navigate(item.href);
+              }}
+            >
+              {i18n.t(NAV_KEYS[item.href] ?? navKey(item.href))}
+            </a>
           ))}
+          {LangSelectMarkup()}
         </nav>
       </div>
     </header>
@@ -43,7 +90,7 @@ export function SiteFooterMarkup(): JSX.Element {
           <div class="footer-brand">
             <span class="brand-mark">◈</span> {db.site().name}
           </div>
-          <p>{footer.about}</p>
+          <p>{i18n.t('footer.about')}</p>
           <div class="footer-socials">
             {db.site().socials.map((s) => (
               <a href={s.href} target="_blank" rel="noopener">
@@ -54,18 +101,23 @@ export function SiteFooterMarkup(): JSX.Element {
         </div>
         {footer.columns.map((col) => (
           <div class="footer-col">
-            <div class="footer-col-title">{col.title}</div>
+            <div class="footer-col-title">{i18n.t(FOOTER_COLUMN_KEYS[col.title] ?? col.title)}</div>
             {col.links.map((link) => (
-              <Link href={link.href} class="footer-link">
-                {link.label}
-              </Link>
+              <a
+                href={link.href}
+                class="footer-link"
+                onclick={(e: Event) => {
+                  e.preventDefault();
+                  navigate(link.href);
+                }}
+              >
+                {i18n.t(navKey(link.href))}
+              </a>
             ))}
           </div>
         ))}
       </div>
-      <div class="footer-bottom">
-        © 2026 {db.site().name} · Construido con AstraJS · Todos los datos pre-construidos en build time
-      </div>
+      <div class="footer-bottom">© 2026 {db.site().name} · {i18n.t('footer.bottom')}</div>
     </footer>
   );
 }

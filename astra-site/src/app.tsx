@@ -15,6 +15,8 @@ import { DocsComparison } from './pages/docs/comparison.js';
 import { DocsExamples } from './pages/docs/examples.js';
 import { DocsCli } from './pages/docs/cli.js';
 import { DocsTesting } from './pages/docs/testing.js';
+import { DocsI18n } from './pages/docs/i18n.js';
+import { DocsIntegrations } from './pages/docs/integrations.js';
 import { DocsAdvanced } from './pages/docs/advanced.js';
 import { routes } from './routes.js';
 
@@ -96,6 +98,8 @@ export const App = component(() => (
         if (routes.docsExamples) return <DocsExamples />;
         if (routes.docsCli) return <DocsCli />;
         if (routes.docsTesting) return <DocsTesting />;
+        if (routes.docsI18n) return <DocsI18n />;
+        if (routes.docsIntegrations) return <DocsIntegrations />;
         if (routes.docsAdvanced) return <DocsAdvanced />;
         if (routes.docs) return <DocsIntroduction />;
         return <HomePage />;

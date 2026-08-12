@@ -99,7 +99,7 @@ export const PostPage = component(() => (
 
             <blockquote class="prose-quote">“{body.quote}”</blockquote>
 
-            <h2>Código de ejemplo</h2>
+            <h2>Ficha técnica</h2>
             <div class="code-block">
               <div class="code-block-title">{body.codeTitle}</div>
               <pre>

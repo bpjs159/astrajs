@@ -1,5 +1,6 @@
 import { component, dynamic } from '@astrajs/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
+import { i18n } from '../../i18n.js';
 
 const s = `
   .docs-layout{display:flex;min-height:100vh}
@@ -33,110 +34,42 @@ export const DocsComparison = component(() => (
     <DocSidebar />
     <main class="docs-main">
       <div class="docs-content">
-        <h1>Comparativa</h1>
-        <p>Como se compara AstraJS con los frameworks mas populares del ecosistema JavaScript. Una comparacion objetiva basada en arquitectura, rendimiento, tamano de bundle, curva de aprendizaje, y experiencia de desarrollo.</p>
+        <h1>{i18n.t('sb.compare')}</h1>
+        <p>{i18n.t('cp.hero')}</p>
 
-        <h2>Tabla comparativa</h2>
+        <h2>{i18n.t('cp.table.title')}</h2>
         <table>
           <tr><th></th><th><strong>AstraJS</strong></th><th>React</th><th>Vue.js</th><th>Angular</th></tr>
-          <tr>
-            <td><strong>Paradigma</strong></td>
-            <td><span class="win">Zero-VDOM · DOM nativo</span></td>
-            <td>Virtual DOM · Runtime</td>
-            <td>Virtual DOM · Runtime</td>
-            <td>Zone.js · Change Detection</td>
-          </tr>
-          <tr>
-            <td><strong>Bundle inicial</strong></td>
-            <td><span class="win">~3 KB (core)</span></td>
-            <td>~42 KB (react + react-dom)</td>
-            <td>~34 KB (vue runtime)</td>
-            <td>~65 KB (core + common)</td>
-          </tr>
-          <tr>
-            <td><strong>Actualizaciones</strong></td>
-            <td><span class="win">O(1) quirurgicas</span></td>
-            <td>O(n) diffing + reconciliacion</td>
-            <td>O(n) diffing + reconciliacion</td>
-            <td>O(n) change detection</td>
-          </tr>
-          <tr>
-            <td><strong>Re-ejecucion</strong></td>
-            <td><span class="win">Nunca — el componente corre 1 vez</span></td>
-            <td>En cada cambio de estado</td>
-            <td>En cada cambio de estado</td>
-            <td>En cada ciclo de deteccion</td>
-          </tr>
-          <tr>
-            <td><strong>Reactividad</strong></td>
-            <td><span class="win">Proxy ES6 nativo</span></td>
-            <td>Hooks + closures</td>
-            <td>Proxy ES6 + ref/reactive</td>
-            <td>Zone.js + decorators</td>
-          </tr>
-          <tr>
-            <td><strong>TypeScript</strong></td>
-            <td><span class="win">100% inferido e2e</span></td>
-            <td>Anotaciones manuales</td>
-            <td>Anotaciones manuales</td>
-            <td>Integrado (obligatorio)</td>
-          </tr>
-          <tr>
-            <td><strong>SSR/SSG/ISR</strong></td>
-            <td><span class="win">Integrado, sin config</span></td>
-            <td>Next.js (framework externo)</td>
-            <td>Nuxt.js (framework externo)</td>
-            <td>Angular Universal</td>
-          </tr>
-          <tr>
-            <td><strong>Data Fetching</strong></td>
-            <td><span class="win">server() RPC tipado</span></td>
-            <td>useEffect + fetch / React Query</td>
-            <td>onMounted + fetch / Vue Query</td>
-            <td>HttpClient + Services</td>
-          </tr>
-          <tr>
-            <td><strong>Routing</strong></td>
-            <td><span class="win">Guards booleanos reactivos</span></td>
-            <td>React Router (JSX/object)</td>
-            <td>Vue Router (objeto de config)</td>
-            <td>Angular Router (decorators)</td>
-          </tr>
-          <tr>
-            <td><strong>Estilos</strong></td>
-            <td><span class="win">css macro extraido en build</span></td>
-            <td>CSS Modules / styled-components</td>
-            <td>SFC scoped / CSS Modules</td>
-            <td>SFC styles / ViewEncapsulation</td>
-          </tr>
-          <tr>
-            <td><strong>Curva de aprendizaje</strong></td>
-            <td><span class="win">Baja — conceptos minimos</span></td>
-            <td>Media — hooks, reglas, memo</td>
-            <td>Media — SFC, reactivity</td>
-            <td>Alta — DI, decorators, RxJS</td>
-          </tr>
-          <tr>
-            <td><strong>Build tool</strong></td>
-            <td>Vite (plugin nativo)</td>
-            <td>Vite / Webpack / Turbopack</td>
-            <td>Vite (plugin nativo)</td>
-            <td>esbuild + Angular CLI</td>
-          </tr>
-          <tr>
-            <td><strong>Resumibilidad</strong></td>
-            <td><span class="win">Si — nativa</span></td>
-            <td>No — hidratacion</td>
-            <td>No — hidratacion</td>
-            <td>No — hidratacion</td>
-          </tr>
+          {[
+            ['cp.r1', 'cp.a1', 'cp.rx1', 'cp.v1', 'cp.ng1'],
+            ['cp.r2', 'cp.a2', 'cp.rx2', 'cp.v2', 'cp.ng2'],
+            ['cp.r3', 'cp.a3', 'cp.rx3', 'cp.v3', 'cp.ng3'],
+            ['cp.r4', 'cp.a4', 'cp.rx4', 'cp.v4', 'cp.ng4'],
+            ['cp.r5', 'cp.a5', 'cp.rx5', 'cp.v5', 'cp.ng5'],
+            ['cp.r6', 'cp.a6', 'cp.rx6', 'cp.v6', 'cp.ng6'],
+            ['cp.r7', 'cp.a7', 'cp.rx7', 'cp.v7', 'cp.ng7'],
+            ['cp.r8', 'cp.a8', 'cp.rx8', 'cp.v8', 'cp.ng8'],
+            ['cp.r9', 'cp.a9', 'cp.rx9', 'cp.v9', 'cp.ng9'],
+            ['cp.r10', 'cp.a10', 'cp.rx10', 'cp.v10', 'cp.ng10'],
+            ['cp.r11', 'cp.a11', 'cp.rx11', 'cp.v11', 'cp.ng11'],
+            ['cp.r12', 'cp.a12', 'cp.rx12', 'cp.v12', 'cp.ng12'],
+            ['cp.r13', 'cp.a13', 'cp.rx13', 'cp.v13', 'cp.ng13'],
+          ].map((row) => (
+            <tr>
+              <td><strong>{i18n.t(row[0])}</strong></td>
+              <td><span class="win">{i18n.t(row[1])}</span></td>
+              <td>{i18n.t(row[2])}</td>
+              <td>{i18n.t(row[3])}</td>
+              <td>{i18n.t(row[4])}</td>
+            </tr>
+          ))}
         </table>
 
         <h2 id="react-vs">React vs AstraJS</h2>
-        <p>React es el framework mas popular del ecosistema. Su modelo basado en Virtual DOM y hooks revoluciono el desarrollo frontend. Sin embargo, tiene limitaciones arquitectonicas que AstraJS resuelve desde el diseno.</p>
+        <p>{i18n.t('cp.react.p')}</p>
 
-        <h3>Virtual DOM vs DOM nativo</h3>
-        <p>React mantiene una representacion virtual del DOM en memoria. Cuando el estado cambia, React re-ejecuta el componente, genera un nuevo VDOM, lo compara con el anterior (diffing), y aplica las diferencias al DOM real (reconciliacion). Este proceso es O(n) — proporcional al tamano del arbol de componentes.</p>
+        <h3>{i18n.t('cp.react.vdom.title')}</h3>
+        <p>{i18n.t('cp.react.vdom.p')}</p>
         <pre><code>{`// React: re-ejecucion del componente ENTERO
 function Counter() {
   const [count, setCount] = useState(0);
@@ -164,8 +97,8 @@ const Counter = component(() => {
   );
 });`}</code></pre>
 
-        <h3>Hooks vs store()</h3>
-        <p>Los hooks de React tienen reglas estrictas: no pueden llamarse condicionalmente, requieren orden de llamado consistente, y necesitan <code>useCallback</code>/<code>useMemo</code> manual para evitar renders innecesarios. <code>store()</code> de AstraJS no tiene reglas — es un Proxy de JavaScript standard que podes usar en cualquier contexto.</p>
+        <h3>{i18n.t('cp.react.hooks.title')}</h3>
+        <p>{i18n.t('cp.hooks.a')}<code>useCallback</code>{i18n.t('cp.hooks.b')}<code>useMemo</code>{i18n.t('cp.hooks.c')}<code>store()</code>{i18n.t('cp.hooks.d')}</p>
         <pre><code>{`// React: reglas de hooks, memoizacion manual
 function SearchResults({ query }: { query: string }) {
   // ❌ No podes llamar hooks dentro de condicionales
@@ -193,14 +126,14 @@ function SearchResults({ query }: { query: string }) {
   return <ul>{results().map(r => <Item />)}</ul>;
 }`}</code></pre>
 
-        <h3>Next.js vs AstraJS full-stack</h3>
-        <p>React necesita Next.js para SSR, SSG, ISR, y data fetching. Next.js agrega ~80 KB adicionales y su propia complejidad (App Router vs Pages Router, Server Components, 'use client', etc.). AstraJS ofrece todo esto integrado en ~3 KB de core — sin framework externo, sin decision fatigue.</p>
+        <h3>{i18n.t('cp.react.next.title')}</h3>
+        <p>{i18n.t('cp.react.next.p')}</p>
 
         <h2 id="vue-vs">Vue.js vs AstraJS</h2>
-        <p>Vue comparte algunas ideas con AstraJS — reactividad basada en Proxy, SFCs, y un compilador que optimiza templates. Pero Vue sigue usando Virtual DOM para el diffing, lo que introduce overhead de runtime que AstraJS elimina completamente.</p>
+        <p>{i18n.t('cp.vue.p')}</p>
 
-        <h3>SFC vs funciones puras</h3>
-        <p>Vue popularizo los Single-File Components (<code>.vue</code>), que combinan template, script y estilo en un archivo. AstraJS adopta un enfoque diferente: funciones TypeScript puras que retornan DOM. Los estilos se definen con <code>css``</code> en el mismo archivo <code>.tsx</code> — sin DSL propietario.</p>
+        <h3>{i18n.t('cp.vue.sfc.title')}</h3>
+        <p>{i18n.t('cp.sfc.a')}<code>.vue</code>{i18n.t('cp.sfc.b')}<code>css</code>{i18n.t('cp.sfc.c')}<code>.tsx</code>{i18n.t('cp.sfc.d')}</p>
         <pre><code>{`<!-- Vue SFC -->
 <template>
   <button @click="increment">
@@ -236,14 +169,14 @@ export const Counter = component(() => {
   );
 });`}</code></pre>
 
-        <h3>reactivity transform vs store()</h3>
-        <p>Vue requiere <code>.value</code> para acceder a refs en JavaScript (aunque en templates se auto-desenvuelve). Esto crea una discrepancia entre template y logica. AstraJS usa Proxies sin <code>.value</code> — la propiedad se accede igual en JSX y en JavaScript.</p>
+        <h3>{i18n.t('cp.vue.react.title')}</h3>
+        <p>{i18n.t('cp.vr.a')}<code>.value</code>{i18n.t('cp.vr.b')}<code>.value</code>{i18n.t('cp.vr.c')}</p>
 
         <h2 id="angular-vs">Angular vs AstraJS</h2>
-        <p>Angular es un framework enterprise con baterias incluidas: dependency injection, RxJS, decorators, modulos, y un CLI completo. Su arquitectura es potente pero viene con una curva de aprendizaje pronunciada y un bundle base considerable.</p>
+        <p>{i18n.t('cp.angular.p')}</p>
 
-        <h3>Change Detection vs Granular Reactivity</h3>
-        <p>Angular usa Zone.js para interceptar eventos asincronos y disparar ciclos de change detection. Por defecto, verifica cada binding en cada componente — O(n) en el peor caso. AstraJS usa suscripciones de grano fino: solo el binding que cambio se actualiza, siempre O(1).</p>
+        <h3>{i18n.t('cp.angular.cd.title')}</h3>
+        <p>{i18n.t('cp.angular.cd.p')}</p>
         <pre><code>{`// Angular: Zone.js intercepta setTimeout, HTTP, eventos...
 // y dispara change detection en todo el arbol
 @Component({
@@ -268,29 +201,29 @@ const Counter = component(() => {
   );
 });`}</code></pre>
 
-        <h3>TypeScript</h3>
-        <p>Angular fue pionero en adoptar TypeScript como lenguaje principal. Sin embargo, la inferencia de tipos entre cliente y servidor no es automatica — necesitas definir interfaces duplicadas o usar codegen. AstraJS infiere los tipos de las funciones <code>server()</code> y los propaga al cliente sin pasos extra.</p>
+        <h3>{i18n.t('cp.angular.ts.title')}</h3>
+        <p>{i18n.t('cp.angular.ts.p')}<code>server()</code>{i18n.t('cp.angular.ts.p2')}</p>
 
-        <h2>Por que AstraJS es mejor</h2>
-        <p>No se trata de que AstraJS sea "mejor" en terminos absolutos — cada framework tiene su lugar. Pero AstraJS toma decisiones arquitectonicas fundamentales que lo diferencian:</p>
+        <h2>{i18n.t('cp.better.title')}</h2>
+        <p>{i18n.t('cp.better.p')}</p>
 
-        <h3>1. Zero Virtual DOM</h3>
-        <p>React, Vue, y Angular todos usan alguna forma de representacion intermedia entre tu codigo y el DOM. AstraJS elimina esa capa completamente. Tu codigo compila a operaciones directas del DOM. Menos abstraccion, mas rendimiento, codigo mas predecible.</p>
+        <h3>{i18n.t('cp.b1.title')}</h3>
+        <p>{i18n.t('cp.b1.p')}</p>
 
-        <h3>2. Full-stack sin framework externo</h3>
-        <p>React necesita Next.js. Vue necesita Nuxt. Angular necesita Universal. AstraJS incluye SSR, SSG, ISR, y RPC en su nucleo de 3 KB. Un solo set de conceptos, una sola forma de hacer las cosas.</p>
+        <h3>{i18n.t('cp.b2.title')}</h3>
+        <p>{i18n.t('cp.b2.p')}</p>
 
-        <h3>3. Tipos de extremo a extremo sin codegen</h3>
-        <p>Ningun otro framework logra type safety completo entre cliente y servidor sin duplicar tipos, sin codegen, y sin herramientas externas. AstraJS lo hace automaticamente mediante el compilador AST.</p>
+        <h3>{i18n.t('cp.b3.title')}</h3>
+        <p>{i18n.t('cp.b3.p')}</p>
 
-        <h3>4. Resumibilidad, no hidratacion</h3>
-        <p>Todos los demas frameworks usan hidratacion: el cliente descarga todo el JS y re-ejecuta los componentes para hacer interactivo el HTML del servidor. AstraJS serializa el estado en el HTML y "reanuda" la aplicacion — el JS se carga solo cuando interactuas.</p>
+        <h3>{i18n.t('cp.b4.title')}</h3>
+        <p>{i18n.t('cp.b4.p')}</p>
 
-        <h3>5. Curva de aprendizaje minima</h3>
-        <p>AstraJS tiene 3 conceptos fundamentales: <code>store()</code>, <code>component()</code>, <code>server()</code>. No hay hooks, no hay reactivity transform, no hay decorators, no hay dependency injection, no hay modulos. JavaScript puro, TypeScript puro, DOM nativo.</p>
+        <h3>{i18n.t('cp.b5.title')}</h3>
+        <p>{i18n.t('cp.b5.a')}<code>store()</code>{i18n.t('cp.b5.b')}<code>component()</code>{i18n.t('cp.b5.c')}<code>server()</code>{i18n.t('cp.b5.d')}</p>
 
         <div class="note">
-          <strong>En resumen:</strong> AstraJS no es "otro framework mas". Es un cambio de paradigma — de Virtual DOM y re-renders a compilacion AST y mutaciones quirurgicas del DOM. Si valoras el rendimiento, la simplicidad, y el type safety extremo a extremo, AstraJS es la opcion correcta.
+          <strong>{i18n.t('lbl.summary')}:</strong> {i18n.t('cp.note')}
         </div>
       </div>
     </main>

@@ -5,8 +5,9 @@
  * pre-construidos: featured, recientes, categorías, autores y stats.
  */
 import { component } from '@astrajs/core';
-import { Link } from '@astrajs/router';
+import { Link, navigate } from '@astrajs/router';
 import { db } from '../db.js';
+import { i18n } from '../i18n.js';
 import { PostCardMarkup } from '../components/post-card.js';
 
 export const HomePage = component(() => {
@@ -17,35 +18,49 @@ export const HomePage = component(() => {
     <div class="page page-home">
       {/* ── Hero ── */}
       <section class="hero">
-        <div class="hero-badge">100% pre-built requests · 0 fetch en runtime</div>
+        <div class="hero-badge">{i18n.t('hero.badge')}</div>
         <h1 class="hero-title">
-          {site.name} <span class="hero-accent">pre-construido</span>
+          {site.name} <span class="hero-accent">{i18n.t('hero.accent')}</span>
         </h1>
         <p class="hero-sub">{site.description}</p>
         <div class="hero-actions">
-          <Link href="/blog" class="btn btn-primary">
-            Leer el blog →
-          </Link>
-          <Link href="/about" class="btn btn-ghost">
-            Cómo funciona
-          </Link>
+          <a
+            href="/blog"
+            class="btn btn-primary"
+            onclick={(e: Event) => {
+              e.preventDefault();
+              navigate('/blog');
+            }}
+          >
+            {i18n.t('hero.read')}
+          </a>
+          <a
+            href="/about"
+            class="btn btn-ghost"
+            onclick={(e: Event) => {
+              e.preventDefault();
+              navigate('/about');
+            }}
+          >
+            {i18n.t('hero.how')}
+          </a>
         </div>
         <div class="hero-stats">
           <div class="hero-stat">
             <span class="hero-stat-num">{stats.posts}</span>
-            <span class="hero-stat-lbl">artículos</span>
+            <span class="hero-stat-lbl">{i18n.t('hero.posts')}</span>
           </div>
           <div class="hero-stat">
             <span class="hero-stat-num">{stats.words.toLocaleString('es')}</span>
-            <span class="hero-stat-lbl">palabras inlinadas</span>
+            <span class="hero-stat-lbl">{i18n.t('hero.words')}</span>
           </div>
           <div class="hero-stat">
             <span class="hero-stat-num">{stats.authors}</span>
-            <span class="hero-stat-lbl">autores</span>
+            <span class="hero-stat-lbl">{i18n.t('hero.authors')}</span>
           </div>
           <div class="hero-stat">
             <span class="hero-stat-num">{stats.categories}</span>
-            <span class="hero-stat-lbl">categorías</span>
+            <span class="hero-stat-lbl">{i18n.t('hero.categories')}</span>
           </div>
         </div>
       </section>
@@ -53,10 +68,17 @@ export const HomePage = component(() => {
       {/* ── Featured ── */}
       <section class="wrap section">
         <div class="section-head">
-          <h2 class="section-title">Destacados</h2>
-          <Link href="/blog" class="section-link">
-            Ver todos →
-          </Link>
+          <h2 class="section-title">{i18n.t('sec.featured')}</h2>
+          <a
+            href="/blog"
+            class="section-link"
+            onclick={(e: Event) => {
+              e.preventDefault();
+              navigate('/blog');
+            }}
+          >
+            {i18n.t('sec.all')}
+          </a>
         </div>
         <div class="card-grid">
           {db.featuredPosts(4).map((post) => PostCardMarkup(post))}
@@ -66,7 +88,7 @@ export const HomePage = component(() => {
       {/* ── Recientes + categorías ── */}
       <section class="wrap section split">
         <div class="split-main">
-          <h2 class="section-title">Recientes</h2>
+          <h2 class="section-title">{i18n.t('sec.recent')}</h2>
           <div class="recent-list">
             {db.recentPosts(6).map((post) => {
               const author = db.findAuthor(post.authorSlug);
@@ -86,7 +108,7 @@ export const HomePage = component(() => {
           </div>
         </div>
         <aside class="split-side">
-          <h2 class="section-title">Categorías</h2>
+          <h2 class="section-title">{i18n.t('sec.categories')}</h2>
           <div class="category-list">
             {db.listCategories().map((cat) => (
               <Link href={`/categories/${cat.slug}`} class="category-item">
@@ -99,7 +121,7 @@ export const HomePage = component(() => {
               </Link>
             ))}
           </div>
-          <h2 class="section-title section-title-mt">Tags populares</h2>
+          <h2 class="section-title section-title-mt">{i18n.t('sec.popularTags')}</h2>
           <div class="tag-cloud">
             {db.listTags().slice(0, 10).map((t) => (
               <Link href={`/tags/${t.slug}`} class="tag-chip tag-link">
@@ -112,14 +134,14 @@ export const HomePage = component(() => {
 
       {/* ── Autores ── */}
       <section class="wrap section">
-        <h2 class="section-title">Quiénes escriben</h2>
+        <h2 class="section-title">{i18n.t('sec.authors')}</h2>
         <div class="author-grid">
           {db.listAuthors().map((author) => (
             <Link href={`/authors/${author.slug}`} class="author-mini">
               <span class="author-avatar">{author.avatar}</span>
               <span class="author-mini-name">{author.name}</span>
               <span class="author-mini-role">{author.role}</span>
-              <span class="author-mini-count">{db.postsByAuthor(author.slug).length} artículos</span>
+              <span class="author-mini-count">{db.postsByAuthor(author.slug).length} {i18n.t('author.posts', { count: db.postsByAuthor(author.slug).length })}</span>
             </Link>
           ))}
         </div>
@@ -127,14 +149,18 @@ export const HomePage = component(() => {
 
       {/* ── CTA ── */}
       <section class="wrap section cta">
-        <h2>¿Todo esto sin un solo fetch?</h2>
-        <p>
-          Este sitio resolvió sus {stats.posts} artículos y {stats.words.toLocaleString('es')} palabras durante el
-          build. El navegador solo recibe las respuestas, impresas en el HTML.
-        </p>
-        <Link href="/blog/pre-build-requests" class="btn btn-primary">
-          Leer "Pre-built requests" →
-        </Link>
+        <h2>{i18n.t('cta.title')}</h2>
+        <p>{i18n.t('cta.text', { posts: stats.posts, words: stats.words.toLocaleString('es') })}</p>
+        <a
+          href="/blog/pre-build-requests"
+          class="btn btn-primary"
+          onclick={(e: Event) => {
+            e.preventDefault();
+            navigate('/blog/pre-build-requests');
+          }}
+        >
+          {i18n.t('cta.button')}
+        </a>
       </section>
     </div>
   );

@@ -1,60 +1,67 @@
 import { component, store, dynamic } from '@astrajs/core';
-import { Link, params } from '@astrajs/router';
+import { navigate } from '@astrajs/router';
+import { i18n } from '../i18n.js';
 
 interface DocSection {
+  /** Título literal (término técnico) o clave i18n cuando existe titleK. */
   title: string;
-  items: { label: string; href: string }[];
+  titleK?: string;
+  items: { label: string; k?: string; href: string }[];
 }
 
 const docSections: DocSection[] = [
   {
     title: 'Introducción',
+    titleK: 'sb.intro',
     items: [
-      { label: '¿Qué es AstraJS?', href: '/docs/introduction' },
-      { label: 'Instalación', href: '/docs/introduction#instalacion' },
-      { label: 'Primeros pasos', href: '/docs/introduction#primeros-pasos' },
-      { label: 'Conceptos clave', href: '/docs/introduction#conceptos-clave' },
+      { label: '', k: 'sb.what', href: '/docs/introduction' },
+      { label: '', k: 'sb.install', href: '/docs/introduction#instalacion' },
+      { label: '', k: 'sb.gettingStarted', href: '/docs/introduction#primeros-pasos' },
+      { label: '', k: 'sb.keyConcepts', href: '/docs/introduction#conceptos-clave' },
     ],
   },
   {
     title: 'Fundamentos',
+    titleK: 'sb.fund',
     items: [
-      { label: 'Componentes', href: '/docs/fundamentals#componentes' },
-      { label: 'Reactividad con store', href: '/docs/fundamentals#reactividad' },
-      { label: 'JSX sin VDOM', href: '/docs/fundamentals#jsx-sin-vdom' },
-      { label: 'Estilos con css', href: '/docs/fundamentals#estilos' },
-      { label: 'Eventos resumibles', href: '/docs/fundamentals#eventos' },
+      { label: '', k: 'sb.components', href: '/docs/fundamentals#componentes' },
+      { label: '', k: 'sb.reactivity', href: '/docs/fundamentals#reactividad' },
+      { label: '', k: 'sb.jsx', href: '/docs/fundamentals#jsx-sin-vdom' },
+      { label: '', k: 'sb.css', href: '/docs/fundamentals#estilos' },
+      { label: '', k: 'sb.events', href: '/docs/fundamentals#eventos' },
     ],
   },
   {
     title: 'Server & Data',
     items: [
       { label: 'server', href: '/docs/server-data#server' },
-      { label: 'Tipos pre-build vs dynamic', href: '/docs/server-data#tipos-server' },
-      { label: 'Revalidate & Caching', href: '/docs/server-data#caching' },
-      { label: 'autoSync y ETAGS', href: '/docs/server-data#autosync' },
+      { label: '', k: 'sb.serverTypes', href: '/docs/server-data#tipos-server' },
+      { label: '', k: 'sb.caching', href: '/docs/server-data#caching' },
+      { label: '', k: 'sb.autosync', href: '/docs/server-data#autosync' },
     ],
   },
   {
     title: 'Router',
     items: [
-      { label: 'Rutas y <Outlet />', href: '/docs/router#rutas' },
-      { label: 'Layouts anidados', href: '/docs/router#layouts' },
-      { label: 'Navegación', href: '/docs/router#navegacion' },
+      { label: '', k: 'sb.routes', href: '/docs/router#rutas' },
+      { label: '', k: 'sb.layouts', href: '/docs/router#layouts' },
+      { label: '', k: 'sb.navigation', href: '/docs/router#navegacion' },
       { label: 'View Transitions API', href: '/docs/router#view-transitions' },
     ],
   },
   {
     title: 'Renderizado',
+    titleK: 'sb.rendering',
     items: [
       { label: 'SSR', href: '/docs/rendering#ssr' },
       { label: 'SSG', href: '/docs/rendering#ssg' },
       { label: 'ISR', href: '/docs/rendering#isr' },
-      { label: 'Resumibilidad', href: '/docs/rendering#resumibilidad' },
+      { label: '', k: 'sb.resumability', href: '/docs/rendering#resumibilidad' },
     ],
   },
   {
     title: 'Ejemplos',
+    titleK: 'sb.examples',
     items: [
       { label: 'Frontend-only (10)', href: '/docs/examples#frontend' },
       { label: 'Fullstack (10)', href: '/docs/examples#fullstack' },
@@ -62,6 +69,7 @@ const docSections: DocSection[] = [
   },
   {
     title: 'Comparativa',
+    titleK: 'sb.compare',
     items: [
       { label: 'React vs AstraJS', href: '/docs/comparison#react-vs' },
       { label: 'Vue.js vs AstraJS', href: '/docs/comparison#vue-vs' },
@@ -71,33 +79,62 @@ const docSections: DocSection[] = [
   {
     title: 'CLI',
     items: [
-      { label: 'What is the CLI?', href: '/docs/cli#que-es' },
-      { label: 'Creating a project', href: '/docs/cli#crear-proyecto' },
-      { label: 'Templates', href: '/docs/cli#plantillas' },
-      { label: 'Options', href: '/docs/cli#opciones' },
+      { label: '', k: 'sb.cliWhat', href: '/docs/cli#que-es' },
+      { label: '', k: 'sb.cliCreate', href: '/docs/cli#crear-proyecto' },
+      { label: '', k: 'sb.cliTemplates', href: '/docs/cli#plantillas' },
+      { label: '', k: 'sb.cliOptions', href: '/docs/cli#opciones' },
     ],
   },
   {
     title: 'Pruebas',
+    titleK: 'sb.testing',
     items: [
-      { label: 'Unitarias con Vitest', href: '/docs/testing#unitarias' },
-      { label: 'Con Jest', href: '/docs/testing#jest' },
-      { label: 'E2E con Playwright', href: '/docs/testing#e2e-playwright' },
-      { label: 'E2E con Cypress', href: '/docs/testing#e2e-cypress' },
+      { label: '', k: 'sb.testUnit', href: '/docs/testing#unitarias' },
+      { label: '', k: 'sb.testJest', href: '/docs/testing#jest' },
+      { label: '', k: 'sb.testPlaywright', href: '/docs/testing#e2e-playwright' },
+      { label: '', k: 'sb.testCypress', href: '/docs/testing#e2e-cypress' },
       { label: 'server() RPC', href: '/docs/testing#server' },
-      { label: 'Comparativa', href: '/docs/testing#comparativa' },
+      { label: '', k: 'sb.testCompare', href: '/docs/testing#comparativa' },
+    ],
+  },
+  {
+    title: 'i18n',
+    items: [
+      { label: '', k: 'sb.i18nDemo', href: '/docs/i18n#demo' },
+      { label: '', k: 'sb.i18nSetup', href: '/docs/i18n#setup' },
+      { label: '', k: 'sb.i18nInterp', href: '/docs/i18n#interpolacion' },
+      { label: '', k: 'sb.i18nPlural', href: '/docs/i18n#pluralizacion' },
+      { label: '', k: 'sb.i18nFormat', href: '/docs/i18n#formato' },
+      { label: '', k: 'sb.i18nLangs', href: '/docs/i18n#idiomas' },
+    ],
+  },
+  {
+    title: 'Integraciones',
+    titleK: 'sb.integrations',
+    items: [
+      { label: 'Tailwind CSS', href: '/docs/integrations#tailwind' },
+      { label: 'Material UI (MUI)', href: '/docs/integrations#mui' },
+      { label: '', k: 'sb.intCharts', href: '/docs/integrations#graficos' },
+      { label: '', k: 'sb.intUtils', href: '/docs/integrations#utilidades' },
+      { label: '', k: 'sb.intAnim', href: '/docs/integrations#animaciones' },
+      { label: '', k: 'sb.intTable', href: '/docs/integrations#tabla' },
     ],
   },
   {
     title: 'Avanzado',
+    titleK: 'sb.advanced',
     items: [
-      { label: 'Compilador AST', href: '/docs/advanced#compilador' },
-      { label: 'Inferencia de tipos', href: '/docs/advanced#inferencia' },
-      { label: 'Integración con Vite', href: '/docs/advanced#vite' },
-      { label: 'Despliegue', href: '/docs/advanced#despliegue' },
+      { label: '', k: 'sb.advCompiler', href: '/docs/advanced#compilador' },
+      { label: '', k: 'sb.advInference', href: '/docs/advanced#inferencia' },
+      { label: '', k: 'sb.advVite', href: '/docs/advanced#vite' },
+      { label: '', k: 'sb.advDeploy', href: '/docs/advanced#despliegue' },
     ],
   },
 ];
+
+/** Resuelve el texto visible de una sección (clave i18n o literal). */
+const sectionTitle = (section: DocSection) =>
+  section.titleK ? i18n.t(section.titleK) : section.title;
 
 export const DocSidebar = component(() => {
   const state = store({ activeSection: '' });
@@ -123,11 +160,15 @@ export const DocSidebar = component(() => {
       <nav>
         {docSections.map(section => (
           <div class="docs-sidebar-section">
-            <div class="docs-sidebar-title">{section.title}</div>
+            <div class="docs-sidebar-title">{sectionTitle(section)}</div>
             {section.items.map(item => (
-              <Link href={item.href} class="docs-sidebar-item">
-                {item.label}
-              </Link>
+              <a
+                href={item.href}
+                class="docs-sidebar-item"
+                onclick={(e: Event) => { e.preventDefault(); navigate(item.href); }}
+              >
+                {item.k ? i18n.t(item.k) : item.label}
+              </a>
             ))}
           </div>
         ))}

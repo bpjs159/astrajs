@@ -1,5 +1,6 @@
 import { component, dynamic } from '@astrajs/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
+import { i18n } from '../../i18n.js';
 
 const s = `
   .docs-layout{display:flex;min-height:100vh}
@@ -27,10 +28,10 @@ export const DocsRouter = component(() => (
     <main class="docs-main">
       <div class="docs-content">
         <h1>Router</h1>
-        <p>Navegacion isomorfica con guards booleanos reactivos. Sin wrappers, sin HOCs, sin createBrowserRouter — solo funciones que retornan <code>true</code> o <code>false</code>.</p>
+        <p>{i18n.t('rt.hero.a')}<code>true</code>{i18n.t('rt.hero.b')}<code>false</code>{i18n.t('rt.hero.c')}</p>
 
-        <h2 id="rutas">Rutas con route()</h2>
-        <p><code>route()</code> es un guard booleano reactivo. Lee la URL actual del navegador (via <code>window.location</code>) y retorna <code>true</code> si coincide con el patron. Como internamente usa un <code>store()</code>, cualquier cambio de URL dispara una re-evaluacion:</p>
+        <h2 id="rutas">{i18n.t('sb.routes')}</h2>
+        <p><code>route()</code> {i18n.t('rt.a1')}<code>window.location</code>{i18n.t('rt.a2')}<code>true</code>{i18n.t('rt.a3')}<code>store()</code>{i18n.t('rt.a4')}</p>
         <pre><code>{`import { route, fallbackRoute } from '@astrajs/router';
 
 // routes.ts — un objeto con getters reactivos
@@ -54,23 +55,23 @@ function App() {
     </main>
   );
 }`}</code></pre>
-        <p>Los getters se evaluan en cada render cycle del router. Cuando llamas <code>navigate('/products')</code>, <code>window.history.pushState</code> actualiza la URL, el store interno del router cambia, y las expresiones condicionales se re-evaluan — mostrando el componente correcto.</p>
+        <p>{i18n.t('rt.g.a')}<code>navigate('/products')</code>{i18n.t('rt.g.b')}<code>window.history.pushState</code>{i18n.t('rt.g.c')}</p>
 
-        <h3>Patrones de ruta</h3>
+        <h3>{i18n.t('rt.patterns.title')}</h3>
         <pre><code>{`route('/')                  // exact match: solo "/"
 route('/products')          // prefix match: "/products", "/products/123"
 route('/products/:id')      // parametro: "/products/42" → params.id = "42"
 route('/blog/:slug')        // parametro: "/blog/hello-world" → params.slug
 route('/users/:uid/posts/:pid') // multiples params`}</code></pre>
 
-        <h3>Exact vs prefix matching</h3>
+        <h3>{i18n.t('rt.exact.title')}</h3>
         <pre><code>{`route('/', { exact: true })    // solo "/"
 route('/products')              // sin exact → "/products", "/products/42"
 route('/products/:id')          // "/products/42", "/products/42/reviews"
 route('/products/:id', { exact: true })  // solo "/products/42"`}</code></pre>
 
         <h2>params</h2>
-        <p>Los parametros de ruta (<code>:id</code>, <code>:slug</code>) se extraen automaticamente y estan disponibles en el objeto reactivo <code>params</code>:</p>
+        <p>{i18n.t('rt.p.a')}<code>:id</code>{i18n.t('rt.p.b')}<code>:slug</code>{i18n.t('rt.p.c')}<code>params</code>{i18n.t('rt.p.d')}</p>
         <pre><code>{`import { route, params } from '@astrajs/router';
 
 // Ruta: /products/:id
@@ -88,10 +89,10 @@ function ProductPage() {
   return <h1>Producto: {product.name}</h1>;
 }`}</code></pre>
 
-        <h2 id="navegacion">Navegacion</h2>
-        <p>Tienes dos formas de navegar: declarativa con <code>&lt;Link&gt;</code> e imperativa con <code>navigate()</code>.</p>
+        <h2 id="navegacion">{i18n.t('sb.navigation')}</h2>
+        <p>{i18n.t('rt.nav.a')}<code>&lt;Link&gt;</code>{i18n.t('rt.nav.b')}<code>navigate()</code>{i18n.t('rt.nav.c')}</p>
 
-        <h3>Link (declarativo)</h3>
+        <h3>{i18n.t('rt.link.title')}</h3>
         <pre><code>{`import { Link } from '@astrajs/router';
 
 // Navegacion basica
@@ -106,7 +107,7 @@ function ProductPage() {
   Dashboard
 </Link>`}</code></pre>
 
-        <h3>navigate() (imperativo)</h3>
+        <h3>{i18n.t('rt.navigate.title')}</h3>
         <pre><code>{`import { navigate } from '@astrajs/router';
 
 // Despues de una accion
@@ -125,8 +126,8 @@ async function handleCreate() {
   Ver instalacion
 </button>`}</code></pre>
 
-        <h2 id="layouts">Layouts con Outlet</h2>
-        <p><code>&lt;Outlet /&gt;</code> es el punto de insercion para rutas hijas. Te permite crear layouts persistentes que no se re-renderizan al navegar:</p>
+        <h2 id="layouts">{i18n.t('sb.layouts')}</h2>
+        <p><code>&lt;Outlet /&gt;</code> {i18n.t('rt.l.a')}</p>
         <pre><code>{`import { Outlet } from '@astrajs/router';
 
 function DashboardLayout() {
@@ -148,7 +149,7 @@ function DashboardLayout() {
 // /dashboard/settings  → SettingsPage en <Outlet />`}</code></pre>
 
         <h2 id="view-transitions">View Transitions API</h2>
-        <p>AstraJS integra nativamente la View Transitions API del navegador. Cuando navegas entre rutas, el navegador captura el estado visual anterior y anima la transicion — sin librerias de animacion, sin configuracion:</p>
+        <p>{i18n.t('rt.vt.p')}</p>
         <pre><code>{`// Se activa automaticamente con navigate() y <Link>
 // El navegador hace:
 //   1. Captura screenshot de la pagina actual
@@ -164,7 +165,7 @@ function DashboardLayout() {
 }`}</code></pre>
 
         <h2>onRouteChange</h2>
-        <p>Suscribete a cambios de ruta para analytics, scroll restoration, o efectos globales:</p>
+        <p>{i18n.t('rt.onroute.p')}</p>
         <pre><code>{`import { onRouteChange } from '@astrajs/router';
 
 onRouteChange((path) => {

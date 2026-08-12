@@ -1,6 +1,7 @@
 import { component, dynamic } from '@astrajs/core';
-import { Link } from '@astrajs/router';
+import { navigate } from '@astrajs/router';
 import { DocSidebar } from '../../components/docs-sidebar.js';
+import { i18n } from '../../i18n.js';
 
 const docLayoutStyle = `
   .docs-layout{display:flex;min-height:100vh}
@@ -67,61 +68,59 @@ export const DocsIntroduction = component(() => (
     <main class="docs-main">
       <div class="docs-content">
         <div class="docs-hero-badge">v1.0.0</div>
-        <h1>Bienvenido a AstraJS</h1>
+        <h1>{i18n.t('d.welcome')}</h1>
         <p class="docs-hero-text">
-          El framework full-stack que elimina el Virtual DOM. AstraJS compila tu codigo TypeScript 
-          a mutaciones directas del DOM usando un avanzado compilador AST. Mas rapido, mas ligero 
-          y sin configuraciones.
+          {i18n.t('d.hero')}
         </p>
         <div class="docs-buttons">
-          <a class="docs-btn-primary" href="/docs/introduction">Comenzar ahora →</a>
-          <a class="docs-btn-ghost" href="https://github.com" target="_blank" rel="noopener">Ver en GitHub</a>
+          <a class="docs-btn-primary" href="/docs/introduction">{i18n.t('d.start')} →</a>
+          <a class="docs-btn-ghost" href="https://github.com" target="_blank" rel="noopener">{i18n.t('d.github')}</a>
         </div>
         <div class="feature-pills">
-          <div class="feature-pill"><div class="feature-pill-icon">⚡</div><div class="feature-pill-label">Zero-VDOM</div><div class="feature-pill-desc">Mutaciones quirurgicas directas al DOM.</div></div>
-          <div class="feature-pill"><div class="feature-pill-icon">🔧</div><div class="feature-pill-label">Zero Config</div><div class="feature-pill-desc">Funciona out-of-the-box.</div></div>
-          <div class="feature-pill"><div class="feature-pill-icon">🌐</div><div class="feature-pill-label">Full-Stack</div><div class="feature-pill-desc">SSR, SSG, ISR y RPC integrados.</div></div>
-          <div class="feature-pill"><div class="feature-pill-icon">🔮</div><div class="feature-pill-label">100% TypeScript</div><div class="feature-pill-desc">Inferencia extrema de tipos.</div></div>
+          <div class="feature-pill"><div class="feature-pill-icon">⚡</div><div class="feature-pill-label">Zero-VDOM</div><div class="feature-pill-desc">{i18n.t('d2.pill1.desc')}</div></div>
+          <div class="feature-pill"><div class="feature-pill-icon">🔧</div><div class="feature-pill-label">Zero Config</div><div class="feature-pill-desc">{i18n.t('d2.pill2.desc')}</div></div>
+          <div class="feature-pill"><div class="feature-pill-icon">🌐</div><div class="feature-pill-label">Full-Stack</div><div class="feature-pill-desc">{i18n.t('d2.pill3.desc')}</div></div>
+          <div class="feature-pill"><div class="feature-pill-icon">🔮</div><div class="feature-pill-label">100% TypeScript</div><div class="feature-pill-desc">{i18n.t('d2.pill4.desc')}</div></div>
         </div>
-        <h2>Tu primer componente</h2>
-        <p>Escribe JSX. <strong>AstraJS se encarga del resto.</strong> El compilador AST transforma tu codigo en operaciones directas del DOM — sin Virtual DOM, sin diffing, sin reconciliacion. Cada expresion reactiva se convierte en una micro-suscripcion que actualiza unicamente el nodo del DOM que necesita cambiar.</p>
+        <h2>{i18n.t('d.first.title')}</h2>
+        <p>{i18n.t('d2.first.a')}<strong>{i18n.t('d2.first.b')}</strong>{i18n.t('d2.first.c')}</p>
         <div class="code-demo">
           <div class="code-demo-header"><span class="code-demo-tab active">Counter.tsx</span></div>
           <div class="code-demo-body"><pre>{demoCode}</pre></div>
-          <div class="code-demo-result">⚡ Solo se actualiza el <code>TextNode</code> de <code>state.count</code>. El componente <strong>no se re-ejecuta</strong>. Sin diffing, sin VDOM.</div>
+          <div class="code-demo-result">⚡ {i18n.t('d2.cr1')}<code>TextNode</code>{i18n.t('d2.cr2')}<code>state.count</code>{i18n.t('d2.cr3')}<strong>{i18n.t('d2.cr4')}</strong>{i18n.t('d2.cr5')}</div>
         </div>
-        <h2>Como funciona?</h2>
-        <p>El compilador de AstraJS procesa tu codigo TypeScript en tres fases principales durante el build, transformando JSX en operaciones nativas del DOM, extrayendo estilos, y dividiendo las funciones <code>server()</code> en stubs para el cliente y handlers para el servidor.</p>
+        <h2>{i18n.t('d.how.title')}</h2>
+        <p>{i18n.t('d2.how.p1')}<code>server()</code>{i18n.t('d2.how.p2')}</p>
         <div class="steps-list">
-          <div class="steps-list-item"><div class="steps-list-num">1</div><div class="steps-list-text"><h4>Escribes</h4><p>Usas TypeScript, JSX, <code>store()</code>, <code>server()</code> y el Router. Todo con tipos inferidos 100% de extremo a extremo.</p></div></div>
-          <div class="steps-list-item"><div class="steps-list-num">2</div><div class="steps-list-text"><h4>Compila (AST)</h4><p>El compilador analiza tu AST, transforma JSX en <code>document.createElement</code>, extrae CSS con ambito, y optimiza las queries de servidor.</p></div></div>
-          <div class="steps-list-item"><div class="steps-list-num">3</div><div class="steps-list-text"><h4>Build / Pre-build</h4><p>Evalua funciones <code>server()</code> con tipo pre-build en build time, inyecta el resultado en el HTML, y genera bundles ultra-ligeros.</p></div></div>
-          <div class="steps-list-item"><div class="steps-list-num">4</div><div class="steps-list-text"><h4>Entrega</h4><p>HTML renderizado en servidor + CSS minimo + JS Just-In-Time. Paginas estaticas con <strong>0 KB de JavaScript</strong>.</p></div></div>
-          <div class="steps-list-item"><div class="steps-list-num">5</div><div class="steps-list-text"><h4>Interactividad JIT</h4><p>Los event handlers y chunks de JS se cargan <strong>solo cuando el usuario interactua</strong>. Resumibilidad instantanea sin hidratacion pesada.</p></div></div>
+          <div class="steps-list-item"><div class="steps-list-num">1</div><div class="steps-list-text"><h4>{i18n.t('d.how.1.title')}</h4><p>{i18n.t('d2.step1.a')}<code>store()</code>, <code>server()</code>{i18n.t('d2.step1.b')}</p></div></div>
+          <div class="steps-list-item"><div class="steps-list-num">2</div><div class="steps-list-text"><h4>{i18n.t('d.how.2.title')}</h4><p>{i18n.t('d2.step2.a')}<code>document.createElement</code>{i18n.t('d2.step2.b')}</p></div></div>
+          <div class="steps-list-item"><div class="steps-list-num">3</div><div class="steps-list-text"><h4>{i18n.t('d.how.3.title')}</h4><p>{i18n.t('d2.step3.a')}<code>server()</code>{i18n.t('d2.step3.b')}</p></div></div>
+          <div class="steps-list-item"><div class="steps-list-num">4</div><div class="steps-list-text"><h4>{i18n.t('d.how.4.title')}</h4><p>{i18n.t('d2.step4.a')}<strong>{i18n.t('d2.step4.b')}</strong>{i18n.t('d2.step4.c')}</p></div></div>
+          <div class="steps-list-item"><div class="steps-list-num">5</div><div class="steps-list-text"><h4>{i18n.t('d.how.5.title')}</h4><p>{i18n.t('d2.step5.a')}<strong>{i18n.t('d2.step5.b')}</strong>{i18n.t('d2.step5.c')}</p></div></div>
         </div>
-        <h2>Por que sin Virtual DOM?</h2>
-        <p>Los frameworks basados en Virtual DOM introducen tres fuentes de overhead:</p>
+        <h2>{i18n.t('d.why.title')}</h2>
+        <p>{i18n.t('d2.why.p')}</p>
         <ol>
-          <li><strong>Diffing</strong> — Comparar el VDOM anterior con el nuevo para encontrar diferencias consume CPU en cada actualizacion.</li>
-          <li><strong>Reconciliacion</strong> — Traducir las diferencias encontradas a operaciones del DOM real requiere logica compleja y costosa.</li>
-          <li><strong>Re-renders en cascada</strong> — Un cambio de estado en un componente puede desencadenar la re-ejecucion de todo su sub-arbol.</li>
+          <li><strong>{i18n.t('d2.ol1.name')}</strong> — {i18n.t('d2.ol1.text')}</li>
+          <li><strong>{i18n.t('d2.ol2.name')}</strong> — {i18n.t('d2.ol2.text')}</li>
+          <li><strong>{i18n.t('d2.ol3.name')}</strong> — {i18n.t('d2.ol3.text')}</li>
         </ol>
-        <p>AstraJS elimina los tres. <strong>Cada expresion reactiva se compila en un effect independiente que actualiza exactamente un nodo del DOM.</strong> Cuando <code>state.count</code> cambia, solo el <code>TextNode</code> que muestra ese valor se actualiza. Nada mas. El componente no se re-ejecuta, los hijos no se re-renderizan, y no hay arbol virtual que comparar.</p>
-        <p>El resultado es un rendimiento <strong>O(1)</strong> por cambio — sin importar cuan profundo este el componente en el arbol o cuan grande sea tu aplicacion.</p>
-        <h2>Arquitectura de paquetes</h2>
-        <p>AstraJS esta organizado en paquetes independientes bajo <code>@astrajs/*</code>. Solo importas lo que necesitas:</p>
+        <p>{i18n.t('d2.why.a')}<strong>{i18n.t('d2.why.b')}</strong>{i18n.t('d2.why.c')}</p>
+        <p>{i18n.t('d.why.2a')}<strong>O(1)</strong>{i18n.t('d2.why2b')}</p>
+        <h2>{i18n.t('d2.arch.title')}</h2>
+        <p>{i18n.t('d2.arch.p')}</p>
         <ul>
-          <li><strong>@astrajs/core</strong> (~3KB) — <code>store()</code>, <code>component()</code>, bindings al DOM, <code>memo()</code>, <code>dynamic()</code>.</li>
-          <li><strong>@astrajs/compiler</strong> — Plugin de Vite. Transforma JSX → DOM, extrae CSS, genera RPC stubs.</li>
-          <li><strong>@astrajs/server</strong> — <code>server()</code>, <code>revalidate()</code>, <code>autoSync</code>, cache con tags.</li>
-          <li><strong>@astrajs/router</strong> — <code>route()</code>, <code>Link</code>, <code>navigate()</code>, <code>Outlet</code>, <code>params</code>.</li>
-          <li><strong>@astrajs/ssr</strong> — Renderizado en servidor, SSG, ISR, resumibilidad.</li>
-          <li><strong>@astrajs/form</strong> — Manejo reactivo de formularios con validacion nativa.</li>
+          <li><strong>@astrajs/core</strong> (~3KB) — {i18n.t('d2.pkg.core')}</li>
+          <li><strong>@astrajs/compiler</strong> — {i18n.t('d2.pkg.compiler')}</li>
+          <li><strong>@astrajs/server</strong> — {i18n.t('d2.pkg.server')}</li>
+          <li><strong>@astrajs/router</strong> — {i18n.t('d2.pkg.router')}</li>
+          <li><strong>@astrajs/ssr</strong> — {i18n.t('d2.pkg.ssr')}</li>
+          <li><strong>@astrajs/form</strong> — {i18n.t('d2.pkg.form')}</li>
         </ul>
-        <h2 id="instalacion">Instalacion</h2>
-        <p>La forma mas rapida de empezar es con el CLI:</p>
+        <h2 id="instalacion">{i18n.t('sb.install')}</h2>
+        <p>{i18n.t('d2.install1')}</p>
         <pre><code>npx @astrajs/cli@latest</code></pre>
-        <p>Esto crea un proyecto con Vite, TypeScript, y todos los paquetes de AstraJS configurados. Alternativamente, puedes anadir AstraJS a un proyecto Vite existente:</p>
+        <p>{i18n.t('d2.install2')}</p>
         <pre><code>pnpm add @astrajs/core @astrajs/compiler
 
 {`// vite.config.ts
@@ -131,15 +130,15 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   plugins: [astra()],
 });`}</code></pre>
-        <p>Asegurate de configurar el JSX en <code>tsconfig.json</code>:</p>
+        <p>{i18n.t('d2.tsconfig')}</p>
         <pre><code>{`{
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "@astrajs/core"
   }
 }`}</code></pre>
-        <h2 id="primeros-pasos">Primeros pasos</h2>
-        <p>Crea tu primer componente reactivo. Observa como <code>store()</code> y <code>component()</code> trabajan juntos:</p>
+        <h2 id="primeros-pasos">{i18n.t('sb.gettingStarted')}</h2>
+        <p>{i18n.t('d2.getting')}</p>
         <pre><code>{`import { component, store } from '@astrajs/core';
 
 export const Hello = component(() => {
@@ -155,30 +154,30 @@ export const Hello = component(() => {
     </div>
   );
 });`}</code></pre>
-        <p>Cada vez que el usuario escribe en el input:</p>
+        <p>{i18n.t('d2.each')}</p>
         <ul>
-          <li><code>name.value</code> se actualiza via el Proxy de ES6.</li>
-          <li>Solo el <code>TextNode</code> dentro del <code>&lt;h1&gt;</code> se actualiza.</li>
-          <li>El input mantiene su valor y el foco — <strong>no se re-crea</strong>.</li>
-          <li>El componente <strong>no se re-ejecuta</strong>. La funcion <code>Hello</code> corrio una sola vez.</li>
+          <li><code>name.value</code>{i18n.t('d2.each1')}</li>
+          <li>{i18n.t('d2.each2.a')}<code>TextNode</code>{i18n.t('d2.each2.b')}<code>&lt;h1&gt;</code>{i18n.t('d2.each2.c')}</li>
+          <li>{i18n.t('d2.each3.a')}<strong>{i18n.t('d2.each3.b')}</strong>{i18n.t('d2.each3.c')}</li>
+          <li>{i18n.t('d2.each4.a')}<strong>{i18n.t('d2.each4.b')}</strong>{i18n.t('d2.each4.c')}</li>
         </ul>
-        <h2 id="conceptos-clave">Conceptos clave</h2>
+        <h2 id="conceptos-clave">{i18n.t('d.concepts.title')}</h2>
         <ul>
-          <li><strong>store()</strong> — Crea un proxy reactivo de ES6. Cada acceso a una propiedad se registra como dependencia. Cada escritura notifica solo a los suscriptores exactos de esa propiedad. O(1) updates.</li>
-          <li><strong>component()</strong> — Envuelve una funcion que retorna JSX. La funcion se ejecuta <strong>una sola vez</strong>. El DOM resultante es real, no virtual. La reactividad viene de los bindings individuales que el compilador inyecta.</li>
-          <li><strong>server()</strong> — Define una funcion que se ejecuta en el servidor. El compilador genera automaticamente el stub RPC para el cliente y registra el handler en el servidor. Tipos compartidos extremo a extremo.</li>
-          <li><strong>route()</strong> — Guard booleano reactivo. Retorna <code>true</code> si la URL actual coincide con el patron. Sin wrappers, sin HOCs, sin contexto magico.</li>
-          <li><strong>css``</strong> — Template literal tag para CSS con ambito de componente. El compilador extrae y optimiza los estilos en build time.</li>
+          <li><strong>store()</strong> — {i18n.t('d2.c1')}</li>
+          <li><strong>component()</strong> — {i18n.t('d2.c2.a')}<strong>{i18n.t('d2.c2.b')}</strong>{i18n.t('d2.c2.c')}</li>
+          <li><strong>server()</strong> — {i18n.t('d2.c3')}</li>
+          <li><strong>route()</strong> — {i18n.t('d2.c4')}</li>
+          <li><strong>css``</strong> — {i18n.t('d2.c5')}</li>
         </ul>
         <div class="promo-card">
-          <h4>⚡ Compila en tiempo de build. Ejecuta a maxima velocidad.</h4>
-          <p>El compilador AST de AstraJS transforma tu codigo en operaciones nativas del DOM. Sin overhead en runtime.</p>
-          <Link href="/docs/advanced">Mas sobre el compilador →</Link>
+          <h4>{i18n.t('d.promo1.title')}</h4>
+          <p>{i18n.t('d2.promo1.text')}</p>
+          <a href="/docs/advanced" onclick={(e: Event) => { e.preventDefault(); navigate('/docs/advanced'); }}>{i18n.t('d.promo1.link')} →</a>
         </div>
         <div class="promo-card" style="margin-top:16px;background:linear-gradient(135deg,rgba(0,223,255,.06),rgba(139,77,255,.04));border-color:rgba(0,223,255,.15)">
-          <h4>🚀 Listo para construir?</h4>
-          <p>Aprende los fundamentos: componentes, reactividad, estilos y eventos.</p>
-          <Link href="/docs/fundamentals">Ir a Fundamentos →</Link>
+          <h4>{i18n.t('d2.promo2.title')}</h4>
+          <p>{i18n.t('d2.promo2.text')}</p>
+          <a href="/docs/fundamentals" onclick={(e: Event) => { e.preventDefault(); navigate('/docs/fundamentals'); }}>{i18n.t('d2.promo2.link')} →</a>
         </div>
       </div>
     </main>

@@ -1,21 +1,22 @@
 # astra-blog — Full example: Pre-Built Requests
 
-> Un blog completo construido **exclusivamente con peticiones pre-construidas**
-> (`server({ type: 'pre-build' })`). Cero fetch en runtime, cero API en vivo.
+> **Flores del Mundo** — un atlas floral completo construido **exclusivamente con
+> peticiones pre-construidas** (`server({ type: 'pre-build' })`). Cero fetch en
+> runtime, cero API en vivo.
 
 ## Qué demuestra
 
-- **Base de datos emulada** — Las "tablas" (autores, categorías, tags, posts,
+- **Base de datos emulada** — Las "tablas" (botánicos, categorías, tags, flores,
   cuerpos, comentarios, páginas fijas) se generan dentro de los cuerpos de las
   funciones pre-build y se consultan durante el build.
-- **Páginas fijas con mucha información** — Home (hero + stats + destacados +
-  recientes + categorías + tags + autores + CTA), About (misión, historia,
+- **Páginas fijas con mucha información** — Home (hero + stats + destacadas +
+  recientes + regiones + tags + autores + CTA), About (misión, historia,
   pilares, equipo, FAQ) y Contact (email, dirección, horario, redes).
 - **Rutas dinámicas bien resueltas** —
-  - `/blog/:slug` — detalle de artículo con cuerpo completo, comentarios y relacionados
-  - `/authors/:authorSlug` — perfil de autor con stats y sus artículos
-  - `/categories/:categorySlug` — artículos por categoría
-  - `/tags/:tagSlug` — artículos por tag
+  - `/blog/:slug` — artículo floral con ficha técnica, comentarios y relacionados
+  - `/authors/:authorSlug` — perfil de botánico con stats y sus artículos
+  - `/categories/:categorySlug` — flores por región (asia, europa, america, africa, cuidados, curiosidades)
+  - `/tags/:tagSlug` — flores por tag (sakura, tulipan, girasol, protea…)
 - **Rutas dinámicas sobre rutas dinámicas** (la complejidad pedida) —
   - `/authors/:authorSlug/posts/:postSlug` — resuelve autor → post → pertenencia;
     si el post es de otro autor muestra un 404 contextual con la URL correcta.
@@ -88,12 +89,12 @@ que delega en vite/vitest resolviendo los binarios locales.
 
 - `/` — home
 - `/blog` — índice con búsqueda y filtros
-- `/blog/que-es-astrajs` — post dinámico
-- `/authors/luna-vega` — autor dinámico
-- `/authors/luna-vega/posts/reactividad-store` — **dinámica sobre dinámica** (ok)
-- `/authors/luna-vega/posts/server-rpc` — **404 contextual** (post de otro autor)
-- `/categories/guias` — categoría dinámica
-- `/categories/guias/tags/compiler` — **intersección dinámica sobre dinámica**
-- `/tags/ssg` — tag dinámico
+- `/blog/sakura-japon` — artículo floral dinámico
+- `/authors/luna-vega` — botánica dinámica
+- `/authors/luna-vega/posts/sakura-japon` — **dinámica sobre dinámica** (ok)
+- `/authors/luna-vega/posts/tulipanes-holanda` — **404 contextual** (flor de otra autora)
+- `/categories/asia` — región dinámica
+- `/categories/asia/tags/loto` — **intersección dinámica sobre dinámica**
+- `/tags/girasol` — tag dinámico
 - `/about`, `/contact` — páginas fijas
 - `/cualquier/cosa` — 404 por fallbackRoute()

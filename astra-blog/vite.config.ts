@@ -17,6 +17,7 @@ export default defineConfig({
       '@astrajs/compiler': path.resolve(__dirname, '../packages/compiler/src'),
       '@astrajs/router': path.resolve(__dirname, '../packages/router/src'),
       '@astrajs/server': path.resolve(__dirname, '../packages/server/src'),
+      '@astrajs/i18n': path.resolve(__dirname, '../packages/i18n/src'),
     },
   },
 });

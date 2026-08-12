@@ -7,6 +7,7 @@
  */
 import { component, store } from '@astrajs/core';
 import { db } from '../db.js';
+import { i18n } from '../i18n.js';
 import { PostCardMarkup } from '../components/post-card.js';
 
 export const BlogIndexPage = component(() => {
@@ -15,16 +16,13 @@ export const BlogIndexPage = component(() => {
   return (
     <div class="page wrap">
       <section class="static-hero static-hero-sm">
-        <h1>Blog</h1>
-        <p class="static-sub">
-          {db.stats().posts} artículos pre-construidos. La búsqueda filtra constantes ya inlinadas:
-          cero peticiones, cero latencia.
-        </p>
+        <h1>{i18n.t('nav.blog')}</h1>
+        <p class="static-sub">{i18n.t('blog.subtitle', { posts: db.stats().posts })}</p>
         <div class="blog-tools">
           <input
             class="search-input"
             type="search"
-            placeholder="Buscar por título, extracto o tag…"
+            placeholder={i18n.t('blog.search')}
             onInput={(e: Event) => {
               state.q = (e.target as HTMLInputElement).value;
             }}
@@ -36,7 +34,7 @@ export const BlogIndexPage = component(() => {
                 state.cat = null;
               }}
             >
-              Todas
+              {i18n.t('blog.all')}
             </button>
             {db.listCategories().map((cat) => (
               <button
@@ -59,16 +57,14 @@ export const BlogIndexPage = component(() => {
           return (
             <div>
               <p class="result-count">
-                {list.length} {list.length === 1 ? 'resultado' : 'resultados'}
-                {state.q ? ` para "${state.q}"` : ''}
+                {list.length} {i18n.t('blog.results', { count: list.length })}
+                {state.q ? i18n.t('blog.resultsFor', { q: state.q }) : ''}
               </p>
               {list.length === 0 ? (
                 <div class="empty-state">
                   <span class="empty-icon">🔍</span>
-                  <h3>Sin resultados</h3>
-                  <p>
-                    Nada coincide con "{state.q}". Prueba con otro término o limpia el filtro de categoría.
-                  </p>
+                  <h3>{i18n.t('blog.empty.title')}</h3>
+                  <p>{i18n.t('blog.empty.text', { q: state.q })}</p>
                 </div>
               ) : (
                 <div class="card-grid">{list.map((post) => PostCardMarkup(post))}</div>

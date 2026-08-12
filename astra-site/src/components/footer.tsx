@@ -1,4 +1,5 @@
-import { Link } from '@astrajs/router';
+import { Link, navigate } from '@astrajs/router';
+import { i18n } from '../i18n.js';
 
 export function Footer(): JSX.Element {
   const style = `
@@ -26,13 +27,13 @@ export function Footer(): JSX.Element {
           <span>ASTRAJS</span>
         </div>
         <div class="footer-links">
-          <Link href="/docs/introduction">Docs</Link>
-          <Link href="/docs/server-data">API</Link>
+          <a href="/docs/introduction" onclick={(e: Event) => { e.preventDefault(); navigate('/docs/introduction'); }}>{i18n.t('footer.docs')}</a>
+          <a href="/docs/server-data" onclick={(e: Event) => { e.preventDefault(); navigate('/docs/server-data'); }}>API</a>
           <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
           <a href="https://discord.com" target="_blank" rel="noopener">Discord</a>
           <a href="https://x.com" target="_blank" rel="noopener">X (Twitter)</a>
         </div>
-        <p class="footer-copy">© {new Date().getFullYear()} AstraJS. MIT License.</p>
+        <p class="footer-copy">© {new Date().getFullYear()} AstraJS. {i18n.t('footer.license')}.</p>
       </div>
     </footer>
   );

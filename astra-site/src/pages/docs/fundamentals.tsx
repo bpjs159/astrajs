@@ -1,5 +1,6 @@
 import { component, dynamic } from '@astrajs/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
+import { i18n } from '../../i18n.js';
 
 const s = `
   .docs-layout{display:flex;min-height:100vh}
@@ -26,14 +27,14 @@ export const DocsFundamentals = component(() => (
     <DocSidebar />
     <main class="docs-main">
       <div class="docs-content">
-        <h1>Fundamentos</h1>
-        <p>Los bloques esenciales para construir aplicaciones con AstraJS. Cada concepto esta disenado para ser minimalista, predecible y de maximo rendimiento.</p>
+        <h1>{i18n.t('sb.fund')}</h1>
+        <p>{i18n.t('f.hero')}</p>
 
-        <h2 id="componentes">Componentes</h2>
-        <p>En AstraJS, un componente es una funcion que retorna elementos del <strong>DOM real</strong>. No hay Virtual DOM: lo que retornas se inserta directamente en el documento. Esto significa que puedes usar <code>document.querySelector</code>, <code>addEventListener</code> nativo, y cualquier API del DOM directamente.</p>
+        <h2 id="componentes">{i18n.t('sb.components')}</h2>
+        <p>{i18n.t('f.c1a')}<strong>{i18n.t('f.c1b')}</strong>{i18n.t('f.c1c')}<code>document.querySelector</code>{i18n.t('f.c1d')}<code>addEventListener</code>{i18n.t('f.c1e')}</p>
 
-        <h3>Componentes sin estado (funcion pura)</h3>
-        <p>Si tu componente no necesita estado reactivo, simplemente escribe una funcion que retorne JSX. No necesitas <code>component()</code>:</p>
+        <h3>{i18n.t('f.st.title')}</h3>
+        <p>{i18n.t('f.st.p1')}<code>component()</code>{i18n.t('f.st.p2')}</p>
         <pre><code>{`// Funcion pura — sin estado, sin wrapping
 function Greeting({ name }: { name: string }) {
   return <h2>Hola, {name}!</h2>;
@@ -42,8 +43,8 @@ function Greeting({ name }: { name: string }) {
 // Uso directo:
 document.body.appendChild(<Greeting name="Ada" /> as any);`}</code></pre>
 
-        <h3>Componentes con estado (component wrapper)</h3>
-        <p>Cuando necesitas estado reactivo, usa <code>component()</code>. La funcion que pasas se ejecuta <strong>una sola vez</strong>. La reactividad viene de los bindings individuales que el compilador genera — no de re-ejecutar el componente:</p>
+        <h3>{i18n.t('f.sf.title')}</h3>
+        <p>{i18n.t('f.sf.a')}<code>component()</code>{i18n.t('f.sf.mid')}<strong>{i18n.t('f.sf.b')}</strong>{i18n.t('f.sf.c')}</p>
         <pre><code>{`import { component, store } from '@astrajs/core';
 
 export const Counter = component(() => {
@@ -64,13 +65,13 @@ export const Counter = component(() => {
   // Solo ese TextNode se actualiza cuando count cambia.
 });`}</code></pre>
         <div class="note">
-          <strong>Importante:</strong> <code>component()</code> envuelve tu funcion en un <code>&lt;span style="display:contents"&gt;</code> invisible. Esto permite que el compilador detecte cuando el componente entra al DOM y dispare los callbacks de <code>mounted()</code>.
+          <strong>{i18n.t('lbl.important')}:</strong> <code>component()</code> {i18n.t('f.note.a')}<code>&lt;span style="display:contents"&gt;</code>{i18n.t('f.note.b')}<code>mounted()</code>{i18n.t('f.note.c')}
         </div>
 
-        <h2 id="reactividad">Reactividad con store</h2>
-        <p><code>store()</code> es el corazon de la reactividad en AstraJS. Crea un <strong>Proxy de ES6</strong> que intercepta cada lectura y escritura de propiedades. No hay scheduler, no hay cola de updates, no hay batching manual — todo es automatico y transparente.</p>
+        <h2 id="reactividad">{i18n.t('sb.reactivity')}</h2>
+        <p><code>store()</code> {i18n.t('f.react.a')}<strong>{i18n.t('f.react.b')}</strong>{i18n.t('f.react.c')}</p>
 
-        <h3>Como funciona el Proxy</h3>
+        <h3>{i18n.t('f.proxy.title')}</h3>
         <pre><code>{`import { store } from '@astrajs/core';
 
 const user = store({
@@ -98,8 +99,8 @@ user.name = 'Grace';
 user.profile.bio = 'Senior Developer';
 // → solo se actualizan los suscriptores de "profile.bio"`}</code></pre>
 
-        <h3>Arrays y colecciones</h3>
-        <p>Los arrays dentro de un store tambien son reactivos. Las mutaciones como <code>push</code>, <code>splice</code>, y asignacion por indice disparan actualizaciones:</p>
+        <h3>{i18n.t('f.arrays.title')}</h3>
+        <p>{i18n.t('f.arr.a')}<code>push</code>{i18n.t('f.arr.b')}<code>splice</code>{i18n.t('f.arr.c')}</p>
         <pre><code>{`const app = store({
   items: ['A', 'B', 'C'],
   selected: null as string | null
@@ -110,8 +111,8 @@ app.items.push('D');       // notifica a suscriptores de "items" y "items.length
 app.items[0] = 'Z';       // notifica a suscriptores de "items[0]"
 app.items = [...app.items]; // reemplazo completo → notifica a suscriptores de "items"`}</code></pre>
 
-        <h3>Auto-batching</h3>
-        <p>Multiples mutaciones sincronas se agrupan automaticamente en un solo ciclo de actualizacion via <code>queueMicrotask()</code>. No necesitas <code>batch()</code> manual:</p>
+        <h3>{i18n.t('f.batch.title')}</h3>
+        <p>{i18n.t('f.bat.a')}<code>queueMicrotask()</code>{i18n.t('f.bat.b')}<code>batch()</code>{i18n.t('f.bat.c')}</p>
         <pre><code>{`// Estas 3 mutaciones → 1 solo ciclo de DOM update
 user.name = 'Grace';
 user.age = 29;
@@ -120,10 +121,10 @@ user.profile.bio = 'Senior';
 // Los efectos se ejecutan una vez, no tres.
 // Los nodos del DOM se actualizan en un solo microtask.`}</code></pre>
 
-        <h2 id="jsx-sin-vdom">JSX sin VDOM</h2>
-        <p>El compilador de AstraJS transforma JSX en operaciones directas de creacion de DOM. No hay <code>createElement</code> virtual, no hay fiber, no hay reconciliation.</p>
+        <h2 id="jsx-sin-vdom">{i18n.t('sb.jsx')}</h2>
+        <p>{i18n.t('f.jsx.a')}<code>createElement</code>{i18n.t('f.jsx.b')}</p>
 
-        <h3>La transformacion</h3>
+        <h3>{i18n.t('f.trans.title')}</h3>
         <pre><code>{`// === TU CODIGO (JSX) ===
 function Saludo({ nombre }: { nombre: string }) {
   return (
@@ -156,8 +157,8 @@ function Saludo({ nombre }: { nombre: string }) {
   return div;
 }`}</code></pre>
 
-        <h3>Expresiones condicionales</h3>
-        <p>El compilador detecta operadores ternarios y logical AND/OR en expresiones JSX y los convierte en <code>bindConditional</code>:</p>
+        <h3>{i18n.t('f.cond.title')}</h3>
+        <p>{i18n.t('f.cond.a')}<code>bindConditional</code>{i18n.t('f.cond.b')}</p>
         <pre><code>{`// Escribes:
 <div>{show && <span>Visible!</span>}</div>
 
@@ -169,8 +170,8 @@ bindConditional(marker, () => show,
 // Cuando show cambia, el <span> se inserta/remueve del DOM
 // sin re-crear el <div> padre.`}</code></pre>
 
-        <h3>Listas</h3>
-        <p>El patron <code>array.map()</code> en JSX se transforma en <code>bindList</code> con diffing por keys para reconciliacion eficiente:</p>
+        <h3>{i18n.t('f.list.title')}</h3>
+        <p>{i18n.t('f.list.a')}<code>array.map()</code>{i18n.t('f.list.b')}<code>bindList</code>{i18n.t('f.list.c')}</p>
         <pre><code>{`// Escribes:
 <ul>
   {items.map(item => <li key={item.id}>{item.name}</li>)}
@@ -182,8 +183,8 @@ bindConditional(marker, () => show,
 // - Items reordenados → se mueven (sin re-crear)
 // - Items con misma key → se preservan`}</code></pre>
 
-        <h2 id="estilos">Estilos con css</h2>
-        <p>El macro <code>css</code> permite definir estilos con ambito de componente. El compilador los extrae, les genera nombres unicos, y los inyecta en el documento. Soporta anidacion al estilo CSS-in-JS:</p>
+        <h2 id="estilos">{i18n.t('sb.css')}</h2>
+        <p>{i18n.t('f.css.a')}<code>css</code>{i18n.t('f.css.b')}</p>
         <pre><code>{`import { css } from '@astrajs/core';
 
 const cardStyle = css\`
@@ -217,15 +218,15 @@ function Card({ title, featured }: { title: string; featured?: boolean }) {
     </div>
   );
 }`}</code></pre>
-        <p>Tambien puedes usar la utilidad <code>classes()</code> para componer clases condicionalmente:</p>
+        <p>{i18n.t('f.cls.a')}<code>classes()</code>{i18n.t('f.cls.b')}</p>
         <pre><code>{`import { classes } from '@astrajs/core';
 
 <div class={classes(cardStyle, featured && 'featured', 'mb-4')}>
   ...
 </div>`}</code></pre>
 
-        <h2 id="eventos">Eventos resumibles</h2>
-        <p>AstraJS introduce el concepto de <strong>eventos resumibles</strong>: los handlers de eventos se serializan en el HTML como referencias, y el codigo JavaScript correspondiente solo se descarga y ejecuta cuando el usuario interactua con el elemento. Esto permite paginas con 0 KB de JS hasta que el usuario hace clic.</p>
+        <h2 id="eventos">{i18n.t('sb.events')}</h2>
+        <p>{i18n.t('f.ev.a')}<strong>{i18n.t('f.ev.b')}</strong>{i18n.t('f.ev.c')}</p>
         <pre><code>{`// Eventos nativos — se ejecutan inmediatamente
 <button onclick={() => state.count++}>
   Incrementar
@@ -236,7 +237,7 @@ function Card({ title, featured }: { title: string; featured?: boolean }) {
   Accion compleja (codigo cargado on-demand)
 </button>`}</code></pre>
         <div class="note">
-          <strong>Diferencia clave:</strong> <code>onclick</code> empaqueta el handler en el bundle inicial. <code>astra-on:click</code> serializa una referencia y carga el codigo solo cuando el usuario hace clic. Ideal para interacciones poco frecuentes pero con logica pesada.
+          <strong>{i18n.t('lbl.keydiff')}:</strong> <code>onclick</code> {i18n.t('f.ev.n1')}<code>astra-on:click</code>{i18n.t('f.ev.n2')}
         </div>
       </div>
     </main>

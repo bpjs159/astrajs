@@ -1,5 +1,6 @@
 import { component, dynamic } from '@astrajs/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
+import { i18n } from '../../i18n.js';
 
 const s = `
   .docs-layout{display:flex;min-height:100vh}
@@ -29,11 +30,11 @@ export const DocsTesting = component(() => (
     <DocSidebar />
     <main class="docs-main">
       <div class="docs-content">
-        <h1>Pruebas</h1>
-        <p>Probar aplicaciones AstraJS es trivial porque los componentes retornan <strong>DOM real</strong>. No hay VDOM, no hay un renderer propietario que emular: montas el nodo en <code>jsdom</code>, disparas eventos, y verificas el resultado. Cualquier runner de JavaScript funciona.</p>
+        <h1>{i18n.t('sb.testing')}</h1>
+        <p>{i18n.t('t.intro1')}<strong>{i18n.t('t.intro2')}</strong>{i18n.t('t.intro3')}<code>jsdom</code>{i18n.t('t.intro4')}</p>
 
-        <h2 id="unitarias">Unitarias con Vitest</h2>
-        <p><strong>Vitest</strong> es el runner recomendado: misma sintaxis que Jest, esbuild para TypeScript sin configurar, y <code>jsdom</code> incluido. Solo agrega la configuración:</p>
+        <h2 id="unitarias">{i18n.t('sb.testUnit')}</h2>
+        <p><strong>Vitest</strong>{i18n.t('t.vitest1')}<code>jsdom</code>{i18n.t('t.vitest2')}</p>
         <pre><code>{`// vitest.config.ts
 import { defineConfig } from 'vitest/config';
 
@@ -44,8 +45,8 @@ export default defineConfig({
   },
 });`}</code></pre>
 
-        <h3>Probar un store</h3>
-        <p>Los stores son objetos con un Proxy — puedes leerlos, mutarlos y observar la reactividad con <code>effect()</code> fuera de cualquier componente:</p>
+        <h3>{i18n.t('t.store.title')}</h3>
+        <p>{i18n.t('t.store.p1')}<code>effect()</code>{i18n.t('t.store.p2')}</p>
         <pre><code>{`import { describe, it, expect } from 'vitest';
 import { store, effect } from '@astrajs/core';
 
@@ -70,8 +71,8 @@ describe('store', () => {
   });
 });`}</code></pre>
 
-        <h3>Probar un componente</h3>
-        <p>Monta el nodo retornado por el componente, dispara eventos del navegador y verifica el DOM:</p>
+        <h3>{i18n.t('t.comp.title')}</h3>
+        <p>{i18n.t('t.comp.p')}</p>
         <pre><code>{`import { describe, it, expect } from 'vitest';
 import { Counter } from '../main.js';
 
@@ -98,11 +99,11 @@ describe('Counter', () => {
 });`}</code></pre>
 
         <div class="note">
-          <strong>Tip:</strong> los 20 ejemplos del repo (<code>examples/frontend-only/</code> y <code>examples/fullstack/</code>) ya incluyen suites Vitest en <code>src/__tests__/</code> — render, clics, listas condicionales, ciclos de vida y RPC.
+          <strong>{i18n.t('lbl.tip')}:</strong> {i18n.t('t.note1')}<code>examples/frontend-only/</code>{i18n.t('t.note2')}<code>examples/fullstack/</code>{i18n.t('t.note3')}<code>src/__tests__/</code>{i18n.t('t.note4')}
         </div>
 
-        <h2 id="jest">Con Jest</h2>
-        <p>Jest funciona exactamente igual. La unica diferencia es la configuracion de TypeScript con <code>ts-jest</code>:</p>
+        <h2 id="jest">{i18n.t('sb.testJest')}</h2>
+        <p>{i18n.t('t.jest.p1')}<code>ts-jest</code>{i18n.t('t.jest.p2')}</p>
         <pre><code>{`// jest.config.js
 module.exports = {
   testEnvironment: 'jsdom',
@@ -125,8 +126,8 @@ test('el contador incrementa de 0 a 1', () => {
   expect(el.querySelector('strong')?.textContent).toBe('1');
 });`}</code></pre>
 
-        <h2 id="e2e-playwright">E2E con Playwright</h2>
-        <p>Para flujos completos en un navegador real. Levanta la app con el <code>webServer</code> y Playwright se encarga del resto:</p>
+        <h2 id="e2e-playwright">{i18n.t('sb.testPlaywright')}</h2>
+        <p>{i18n.t('t.pw.p1')}<code>webServer</code>{i18n.t('t.pw.p2')}</p>
         <pre><code>{`// playwright.config.ts
 import { defineConfig } from '@playwright/test';
 
@@ -153,8 +154,8 @@ test('el carrito persiste entre rutas', async ({ page }) => {
   await expect(page.locator('.cart-line')).toHaveCount(1);
 });`}</code></pre>
 
-        <h2 id="e2e-cypress">E2E con Cypress</h2>
-        <p>La misma idea con Cypress — los selectores apuntan a tu DOM real porque no hay <code>shadow-dom</code> ni IDs generados:</p>
+        <h2 id="e2e-cypress">{i18n.t('sb.testCypress')}</h2>
+        <p>{i18n.t('t.cy.p1')}<code>shadow-dom</code>{i18n.t('t.cy.p2')}</p>
         <pre><code>{`// cypress.config.ts
 import { defineConfig } from 'cypress';
 
@@ -172,7 +173,7 @@ describe('Counter', () => {
 });`}</code></pre>
 
         <h2 id="server">server() RPC</h2>
-        <p>Las funciones <code>server()</code> son fetch wrappers tipados en el cliente — puedes mockear <code>fetch</code> sin tocar el servidor:</p>
+        <p>{i18n.t('t.rpc.p1')}<code>server()</code>{i18n.t('t.rpc.p2')}<code>fetch</code>{i18n.t('t.rpc.p3')}</p>
         <pre><code>{`import { describe, it, expect, vi } from 'vitest';
 import { listProducts } from '../server/products.server.js';
 
@@ -190,15 +191,15 @@ describe('listProducts', () => {
   });
 });`}</code></pre>
 
-        <h2 id="comparativa">Comparativa de librerías</h2>
+        <h2 id="comparativa">{i18n.t('sb.testCompare')}</h2>
         <table>
-          <tr><th>Librería</th><th>Nivel</th><th>Entorno</th><th>Ideal para</th></tr>
-          <tr><td><strong>Vitest</strong></td><td>Unit + integración</td><td>jsdom / node</td><td>Default: stores, componentes, RPC</td></tr>
-          <tr><td><strong>Jest</strong></td><td>Unit + integración</td><td>jsdom / node</td><td>Equipos con Jest existente</td></tr>
-          <tr><td><strong>Playwright</strong></td><td>E2E</td><td>Navegador real</td><td>Flujos completos, multi-browser</td></tr>
-          <tr><td><strong>Cypress</strong></td><td>E2E</td><td>Navegador real</td><td>Flujos con depuración visual</td></tr>
+          <tr><th>{i18n.t('t.th1')}</th><th>{i18n.t('t.th2')}</th><th>{i18n.t('t.th3')}</th><th>{i18n.t('t.th4')}</th></tr>
+          <tr><td><strong>Vitest</strong></td><td>{i18n.t('t.cell.unit')}</td><td>{i18n.t('t.cell.env')}</td><td>{i18n.t('t.cell.vitest')}</td></tr>
+          <tr><td><strong>Jest</strong></td><td>{i18n.t('t.cell.unit')}</td><td>{i18n.t('t.cell.env')}</td><td>{i18n.t('t.cell.jest')}</td></tr>
+          <tr><td><strong>Playwright</strong></td><td>{i18n.t('t.cell.e2e')}</td><td>{i18n.t('t.cell.browser')}</td><td>{i18n.t('t.cell.pw')}</td></tr>
+          <tr><td><strong>Cypress</strong></td><td>{i18n.t('t.cell.e2e')}</td><td>{i18n.t('t.cell.browser')}</td><td>{i18n.t('t.cell.cy')}</td></tr>
         </table>
-        <p>Como AstraJS produce <strong>DOM real y sin VDOM</strong>, ninguna librería necesita adaptadores, renderers extra ni snapshots de árboles virtuales. Pruebas de componentes = montar nodo + eventos DOM + asserts.</p>
+        <p>{i18n.t('t.final1')}<strong>{i18n.t('t.final2')}</strong>{i18n.t('t.final3')}</p>
       </div>
     </main>
   </div>

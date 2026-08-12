@@ -1,7 +1,7 @@
 import { component, store, dynamic } from '@astrajs/core';
-import { Link } from '@astrajs/router';
 import { DocSidebar } from '../../components/docs-sidebar.js';
 import { frontendExamples, fullstackExamples, type LiveExample } from './examples-live.js';
+import { i18n } from '../../i18n.js';
 
 const s = `
   .docs-layout{display:flex;min-height:100vh}
@@ -75,11 +75,11 @@ export const DocsExamples = component(() => {
       <DocSidebar />
       <main class="docs-main">
         <div class="docs-content">
-          <h1 id="ejemplos">Ejemplos</h1>
+          <h1 id="ejemplos">{i18n.t('sb.examples')}</h1>
           <p>
-            20 ejemplos completos y funcionales que cubren cada concepto del framework.
-            Cada tarjeta abre un visor: <strong>codigo a la izquierda, ejemplo renderizado en vivo a la derecha</strong>.
-            Estan en <code>examples/frontend-only/</code> y <code>examples/fullstack/</code>.
+            {i18n.t('ex.h.a')}
+            <strong>{i18n.t('ex.h.b')}</strong>
+            {i18n.t('ex.h.c')}<code>examples/frontend-only/</code>{i18n.t('ex.h.d')}<code>examples/fullstack/</code>{i18n.t('ex.h.e')}
           </p>
 
           <div class="ex-tabs">
@@ -111,15 +111,15 @@ export const DocsExamples = component(() => {
                     <div class="ex-card" onclick={() => { state.selectedNum = ex.num; }}>
                       <div class="ex-card-top">
                         <span class="ex-num">{ex.num}</span>
-                        <h3>{ex.title}</h3>
+                        <h3>{i18n.t(ex.title)}</h3>
                       </div>
-                      <p>{ex.description}</p>
+                      <p>{i18n.t(ex.description)}</p>
                       <div class="ex-card-tags">
                         {ex.concepts.map((c) => (
                           <span class="ex-tag">{c}</span>
                         ))}
                       </div>
-                      <span class="ex-card-open">Ver codigo + demo →</span>
+                      <span class="ex-card-open">{i18n.t('ex.open')}</span>
                     </div>
                   );
 
@@ -130,17 +130,17 @@ export const DocsExamples = component(() => {
                       <div class="ex-viewer">
                         <div class="ex-viewer-header">
                           <span class="ex-num">{ex.num}</span>
-                          <h3>{ex.title}</h3>
+                          <h3>{i18n.t(ex.title)}</h3>
                           <button class="ex-viewer-close" onclick={() => { state.selectedNum = null; }}>
-                            ✕ Cerrar
+                            {i18n.t('ex.close')}
                           </button>
                         </div>
                         <div class="ex-viewer-code">
-                          <div class="ex-viewer-code-label">Codigo</div>
+                          <div class="ex-viewer-code-label">{i18n.t('ex.code')}</div>
                           <pre><code>{ex.code}</code></pre>
                         </div>
                         <div class="ex-viewer-preview">
-                          <div class="ex-viewer-preview-label">Renderizado en vivo</div>
+                          <div class="ex-viewer-preview-label">{i18n.t('ex.live')}</div>
                           <div class="ex-viewer-preview-body">
                             {ex.render()}
                           </div>

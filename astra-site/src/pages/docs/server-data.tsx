@@ -1,5 +1,6 @@
 import { component, dynamic } from '@astrajs/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
+import { i18n } from '../../i18n.js';
 
 const s = `
   .docs-layout{display:flex;min-height:100vh}
@@ -26,13 +27,13 @@ export const DocsServerData = component(() => (
     <DocSidebar />
     <main class="docs-main">
       <div class="docs-content">
-        <h1>Server & Data</h1>
-        <p>Comunicacion tipada entre cliente y servidor sin friccion. Una funcion, dos contextos: el compilador se encarga de todo.</p>
+        <h1>Server &amp; Data</h1>
+        <p>{i18n.t('sd.hero')}</p>
 
         <h2 id="server">server</h2>
-        <p>El corazon del data fetching en AstraJS. Escribe <strong>una funcion</strong> — el compilador la divide automaticamente en un stub para el cliente (RPC via <code>fetch</code>) y un handler para el servidor. Los tipos de TypeScript se comparten extremo a extremo sin codegen.</p>
+        <p>{i18n.t('sd.a')}<strong>{i18n.t('sd.b')}</strong>{i18n.t('sd.c')}<code>fetch</code>{i18n.t('sd.d')}</p>
 
-        <h3>Funcionamiento basico</h3>
+        <h3>{i18n.t('sd.basic.title')}</h3>
         <pre><code>{`import { server } from '@astrajs/server';
 
 // Defines la funcion UNA VEZ
@@ -51,14 +52,14 @@ const admins = await getUsers('admin');
 // ↑ Esto es un fetch a /api/astra/getUsers?args=["admin"]
 // Los tipos se infieren automaticamente — admins es User[]`}</code></pre>
 
-        <h3>Que hace el compilador</h3>
+        <h3>{i18n.t('sd.compiler.title')}</h3>
         <ol>
-          <li><strong>Cliente:</strong> Genera un wrapper que serializa los argumentos y hace <code>fetch()</code> al endpoint <code>/api/astra/getUsers</code>.</li>
-          <li><strong>Servidor:</strong> Registra el handler original en el middleware de Vite (dev) o como serverless function (produccion).</li>
-          <li><strong>Tipos:</strong> El tipo de retorno de la funcion se propaga automaticamente al cliente. Sin duplicacion, sin codegen.</li>
+          <li><strong>{i18n.t('lbl.client')}:</strong> {i18n.t('sd.ol1.a')}<code>fetch()</code>{i18n.t('sd.ol1.b')}<code>/api/astra/getUsers</code>{i18n.t('sd.ol1.c')}</li>
+          <li><strong>{i18n.t('lbl.server')}:</strong> {i18n.t('sd.ol2')}</li>
+          <li><strong>{i18n.t('lbl.types')}:</strong> {i18n.t('sd.ol3')}</li>
         </ol>
 
-        <h3>Opciones de configuracion</h3>
+        <h3>{i18n.t('sd.config.title')}</h3>
         <pre><code>{`interface ServerConfig {
   // Tipo de ejecucion
   type?: 'pre-build' | 'dynamic';  // default: 'dynamic'
@@ -75,11 +76,11 @@ const admins = await getUsers('admin');
   transform?: (data: T) => U;   // Transforma datos antes de enviar al cliente
 }`}</code></pre>
 
-        <h2 id="tipos-server">Tipos pre-build vs dynamic</h2>
-        <p>Controla <strong>cuando</strong> se ejecuta tu funcion server:</p>
+        <h2 id="tipos-server">{i18n.t('sb.serverTypes')}</h2>
+        <p>{i18n.t('sd.when.a')}<strong>{i18n.t('sd.when.b')}</strong>{i18n.t('sd.when.c')}</p>
 
         <h3>pre-build</h3>
-        <p>La funcion se ejecuta <strong>en tiempo de build</strong>. El resultado se serializa e incrusta directamente en el HTML generado. La pagina se sirve con los datos ya incluidos — cero llamadas de red, cero loading states.</p>
+        <p>{i18n.t('sd.pre.a')}<strong>{i18n.t('sd.pre.b')}</strong>{i18n.t('sd.pre.c')}</p>
         <pre><code>{`// Ideal para: menus, configuraciones, contenido estatico
 const siteNav = server(
   { type: 'pre-build', tags: ['navigation'] },
@@ -91,7 +92,7 @@ const siteNav = server(
 // Se re-genera en cada build o con ISR`}</code></pre>
 
         <h3>dynamic</h3>
-        <p>La funcion se ejecuta <strong>en cada request</strong> del cliente. Ideal para datos personalizados, sesiones de usuario, o datos que cambian frecuentemente.</p>
+        <p>{i18n.t('sd.dyn.a')}<strong>{i18n.t('sd.dyn.b')}</strong>{i18n.t('sd.dyn.c')}</p>
         <pre><code>{`// Ideal para: sesiones, datos de usuario, busquedas
 const userDashboard = server(
   { type: 'dynamic', maxAge: 60 },
@@ -104,10 +105,10 @@ const userDashboard = server(
   }
 );`}</code></pre>
 
-        <h2 id="caching">Revalidate & Caching</h2>
-        <p>AstraJS ofrece un sistema de cache con <strong>invalidacion quirurgica por etiquetas</strong>. Cuando mutas datos, solo las queries con las etiquetas afectadas se revalidan — nada de "invalidar todo".</p>
+        <h2 id="caching">{i18n.t('sb.caching')}</h2>
+        <p>{i18n.t('sd.cache.a')}<strong>{i18n.t('sd.cache.b')}</strong>{i18n.t('sd.cache.c')}</p>
 
-        <h3>Cache con tags</h3>
+        <h3>{i18n.t('sd.cache.tags.title')}</h3>
         <pre><code>{`// Servicios con tags
 const getProducts = server(
   { tags: ['products'], maxAge: 3600 },
@@ -124,7 +125,7 @@ const getCategories = server(
   () => db.category.findMany()
 );`}</code></pre>
 
-        <h3>Invalidacion quirurgica</h3>
+        <h3>{i18n.t('sd.inv.title')}</h3>
         <pre><code>{`import { revalidate } from '@astrajs/server';
 
 // Despues de crear un producto:
@@ -142,19 +143,19 @@ await revalidate(['categories']);
 // ↑ Solo getCategories se revalida`}</code></pre>
 
         <div class="note">
-          <strong>Mejor practica:</strong> Usa tags semanticos y granulares. Agrupa por entidad (<code>'products'</code>, <code>'users'</code>) y por contexto (<code>'product-detail'</code>, <code>'user-profile'</code>). Esto maximiza el cache hit rate y minimiza las revalidaciones innecesarias.
+          <strong>{i18n.t('lbl.best')}:</strong> {i18n.t('sd.note.a')}<code>'products'</code>{i18n.t('sd.note.b')}<code>'users'</code>{i18n.t('sd.note.c')}<code>'product-detail'</code>{i18n.t('sd.note.d')}<code>'user-profile'</code>{i18n.t('sd.note.e')}
         </div>
 
-        <h2 id="autosync">autoSync y ETAGS</h2>
-        <p>Para datos que necesitan estar actualizados en tiempo real, <code>autoSync</code> mantiene el cliente sincronizado con el servidor mediante <strong>ETags</strong>. No es WebSocket, no es Server-Sent Events — es HTTP puro con polling inteligente.</p>
+        <h2 id="autosync">{i18n.t('sb.autosync')}</h2>
+        <p>{i18n.t('sd.auto.a')}<code>autoSync</code>{i18n.t('sd.auto.b')}<strong>{i18n.t('sd.auto.c')}</strong>{i18n.t('sd.auto.d')}</p>
 
-        <h3>Como funciona</h3>
+        <h3>{i18n.t('sd.auto.how')}</h3>
         <ol>
-          <li>El cliente hace un fetch inicial y recibe los datos + un ETag.</li>
-          <li>En cada intervalo, el cliente envia el ETag en un header <code>If-None-Match</code>.</li>
-          <li>Si los datos no cambiaron, el servidor responde <code>304 Not Modified</code> — sin cuerpo, sin transferencia de datos.</li>
-          <li>Si los datos cambiaron, el servidor responde con los nuevos datos + un nuevo ETag.</li>
-          <li>El DOM se actualiza automaticamente — sin codigo manual, sin suscripciones.</li>
+          <li>{i18n.t('sd.auto.ol1')}</li>
+          <li>{i18n.t('sd.auto.ol2.a')}<code>If-None-Match</code>{i18n.t('sd.auto.ol2.b')}</li>
+          <li>{i18n.t('sd.auto.ol3.a')}<code>304 Not Modified</code>{i18n.t('sd.auto.ol3.b')}</li>
+          <li>{i18n.t('sd.auto.ol4')}</li>
+          <li>{i18n.t('sd.auto.ol5')}</li>
         </ol>
 
         <pre><code>{`// Datos que se auto-sincronizan cada 3 segundos
@@ -170,19 +171,19 @@ const liveStats = server(
 // En el componente:
 <div>
   <h3>Ventas en tiempo real</h3>
-  <p>${liveStats.totalSales}</p>
+  <p>\${liveStats.totalSales}</p>
   {/* ↑ Se actualiza solo cuando el servidor devuelve datos nuevos */}
   {/* Sin polling manual, sin useEffect, sin suscripciones */}
 </div>`}</code></pre>
 
-        <h3>Cuanto usar autoSync vs revalidate</h3>
+        <h3>{i18n.t('sd.auto.vs')}</h3>
         <ul>
-          <li><strong>autoSync</strong>: Datos que cambian frecuentemente y necesitas ver en tiempo real (dashboards, precios de mercado, notificaciones).</li>
-          <li><strong>revalidate</strong>: Datos que cambian por acciones del usuario y necesitas refrescar despues de una mutacion (listas tras crear/editar/eliminar).</li>
+          <li><strong>autoSync</strong>: {i18n.t('sd.auto.vs1')}</li>
+          <li><strong>revalidate</strong>: {i18n.t('sd.auto.vs2')}</li>
         </ul>
 
-        <h2>Mutaciones (server actions)</h2>
-        <p>Asi como <code>server()</code> maneja lecturas, puedes usar el mismo patron para mutaciones. La unica diferencia es que las mutaciones tipicamente no tienen cache:</p>
+        <h2>{i18n.t('sd.mut.title')}</h2>
+        <p>{i18n.t('sd.mut.a')}<code>server()</code>{i18n.t('sd.mut.b')}</p>
         <pre><code>{`const createProduct = server(
   { tags: ['products'] }, // tags a revalidar tras la mutacion
   async (data: CreateProductInput) => {

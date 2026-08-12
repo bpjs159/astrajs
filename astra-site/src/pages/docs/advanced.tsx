@@ -1,5 +1,6 @@
 import { component, dynamic } from '@astrajs/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
+import { i18n } from '../../i18n.js';
 
 const s = `
   .docs-layout{display:flex;min-height:100vh}
@@ -26,14 +27,14 @@ export const DocsAdvanced = component(() => (
     <DocSidebar />
     <main class="docs-main">
       <div class="docs-content">
-        <h1>Avanzado</h1>
-        <p>Conceptos avanzados para entender a fondo como funciona AstraJS internamente y como aprovechar al maximo sus capacidades.</p>
+        <h1>{i18n.t('sb.advanced')}</h1>
+        <p>{i18n.t('av.hero')}</p>
 
-        <h2 id="compilador">Compilador AST</h2>
-        <p>El compilador de AstraJS es un plugin de Vite que analiza tu codigo TypeScript usando el AST parser nativo de TypeScript. Opera en <strong>tres fases</strong> durante el build:</p>
+        <h2 id="compilador">{i18n.t('sb.advCompiler')}</h2>
+        <p>{i18n.t('av.comp.a')}<strong>{i18n.t('av.comp.b')}</strong>{i18n.t('av.comp.c')}</p>
 
-        <h3>Fase 1: JSX → DOM nativo</h3>
-        <p>Cada elemento JSX se transforma en llamadas a <code>document.createElement</code>. Las expresiones reactivas (<code>{'{store.value}'}</code>) se convierten en efectos de grano fino (<code>effect(() =&gt; {'{'} textNode.nodeValue = store.value {'}'})</code>). No hay fabrica virtual, no hay fiber, no hay reconciliacion.</p>
+        <h3>{i18n.t('av.p1.title')}</h3>
+        <p>{i18n.t('av.p1.a')}<code>document.createElement</code>{i18n.t('av.p1.b')}<code>{'{store.value}'}</code>{i18n.t('av.p1.c')}<code>effect(() =&gt; {'{'} textNode.nodeValue = store.value {'}'})</code>{i18n.t('av.p1.d')}</p>
         <pre><code>{`// Entrada (JSX):
 <span class="greeting">Hola {name}</span>
 
@@ -45,8 +46,8 @@ const t2 = document.createTextNode('');
 span.append(t1, t2);
 effect(() => { t2.nodeValue = String(name); });`}</code></pre>
 
-        <h3>Fase 2: Extraccion de CSS</h3>
-        <p>Los templates <code>css``</code> se extraen del codigo, se les genera un identificador unico (hash), y se inyectan en el documento. En produccion, se extraen a archivos CSS separados con content-hash en el nombre para caching inmutable.</p>
+        <h3>{i18n.t('av.p2.title')}</h3>
+        <p>{i18n.t('av.p2.a')}<code>css</code>{i18n.t('av.p2.b')}</p>
         <pre><code>{`// Entrada:
 const styles = css\`.card { padding: 16px; }\`;
 
@@ -56,8 +57,8 @@ const styles = css\`.card { padding: 16px; }\`;
 const styles = 'card_a1b2c3';
 // 3. En el HTML: <link rel="stylesheet" href="/assets/card-a1b2c3.css">`}</code></pre>
 
-        <h3>Fase 3: server() → RPC</h3>
-        <p>Las funciones <code>server()</code> se dividen en dos partes: un stub para el cliente (fetch wrapper) y un handler para el servidor. El compilador analiza los tipos de TypeScript para garantizar type safety extremo a extremo.</p>
+        <h3>{i18n.t('av.p3.title')}</h3>
+        <p>{i18n.t('av.p3.a')}<code>server()</code>{i18n.t('av.p3.b')}</p>
         <pre><code>{`// Entrada:
 export const getUsers = server(
   { tags: ['users'] },
@@ -78,11 +79,11 @@ registerHandler('getUsers', async ([role]) => {
   return db.user.findMany({ where: { role } });
 });`}</code></pre>
 
-        <h3>Modos del compilador</h3>
-        <p>El plugin de Vite acepta un parametro <code>transformMode</code>:</p>
+        <h3>{i18n.t('av.modes.title')}</h3>
+        <p>{i18n.t('av.modes.a')}<code>transformMode</code>{i18n.t('av.modes.b')}</p>
         <ul>
-          <li><strong><code>'dynamic'</code> (default)</strong> — Envuelve todas las expresiones JSX en <code>dynamic()</code>. La reactividad es completamente transparente para el desarrollador. Ideal para aplicaciones interactivas.</li>
-          <li><strong><code>'vanilla'</code></strong> — Genera DOM nativo sin wrappers de reactividad. Usa <code>bindText</code>, <code>bindAttr</code>, etc. directamente. Ideal para paginas de contenido estatico con minima interactividad.</li>
+          <li><strong><code>'dynamic'</code> (default)</strong> — {i18n.t('av.m1.a')}<code>dynamic()</code>{i18n.t('av.m1.b')}</li>
+          <li><strong><code>'vanilla'</code></strong> — {i18n.t('av.m2.a')}<code>bindText</code>{i18n.t('av.m2.b')}<code>bindAttr</code>{i18n.t('av.m2.c')}</li>
         </ul>
         <pre><code>{`// vite.config.ts
 import astra from '@astrajs/compiler';
@@ -96,10 +97,10 @@ export default defineConfig({
   ],
 });`}</code></pre>
 
-        <h2 id="inferencia">Inferencia de tipos</h2>
-        <p>AstraJS logra <strong>100% de inferencia de tipos de extremo a extremo</strong> sin codegen, sin duplicacion de tipos, y sin anotaciones redundantes. Esto es posible gracias a tres mecanismos:</p>
+        <h2 id="inferencia">{i18n.t('sb.advInference')}</h2>
+        <p>{i18n.t('av.inf.a')}<strong>{i18n.t('av.inf.b')}</strong>{i18n.t('av.inf.c')}</p>
 
-        <h3>1. Tipos inferidos de store()</h3>
+        <h3>{i18n.t('av.inf1.title')}</h3>
         <pre><code>{`const user = store({
   name: 'Ada',        // → string
   age: 28,            // → number
@@ -114,7 +115,7 @@ export default defineConfig({
 // user.profile.bio es string (inferido en profundidad)
 // user.tags es string[] (inferido del array inicial)`}</code></pre>
 
-        <h3>2. Tipos inferidos de server()</h3>
+        <h3>{i18n.t('av.inf2.title')}</h3>
         <pre><code>{`const getProduct = server(
   { tags: ['products'] },
   async (id: string) => {
@@ -127,7 +128,7 @@ export default defineConfig({
 // const getProduct: (id: string) => Promise<Product | null>
 // Sin anotaciones manuales, sin duplicacion`}</code></pre>
 
-        <h3>3. Tipos entre cliente y servidor</h3>
+        <h3>{i18n.t('av.inf3.title')}</h3>
         <pre><code>{`// types/products.ts (compartido)
 export interface Product {
   id: string;
@@ -149,10 +150,10 @@ const products = await listProducts();
 // ↑ products es Product[] — el tipo viaja del servidor al cliente
 // automaticamente, sin codegen, sin duplicar definiciones`}</code></pre>
 
-        <h2 id="vite">Integracion con Vite</h2>
-        <p>AstraJS funciona como un plugin de Vite, lo que significa que hereda todas las capacidades del ecosistema Vite: HMR instantaneo, code splitting automatico, optimizacion de dependencias con esbuild, y compatibilidad con plugins de la comunidad.</p>
+        <h2 id="vite">{i18n.t('sb.advVite')}</h2>
+        <p>{i18n.t('av.vite.p')}</p>
 
-        <h3>Configuracion minima</h3>
+        <h3>{i18n.t('av.config.title')}</h3>
         <pre><code>{`// vite.config.ts
 import { defineConfig } from 'vite';
 import astra from '@astrajs/compiler';
@@ -173,24 +174,24 @@ export default defineConfig({
   },
 });`}</code></pre>
 
-        <h3>HMR (Hot Module Replacement)</h3>
-        <p>Los cambios en componentes, stores, y estilos se reflejan instantaneamente sin perder el estado. El HMR de Vite funciona nativamente con AstraJS porque los componentes producen DOM real — Vite puede reemplazar modulos sin romper la aplicacion.</p>
+        <h3>{i18n.t('av.hmr.title')}</h3>
+        <p>{i18n.t('av.hmr.p')}</p>
 
         <div class="note">
-          <strong>Tip:</strong> Si editas el codigo fuente del compilador (<code>packages/compiler/src/</code>), necesitas ejecutar <code>npm run build</code> en ese paquete. El plugin de Vite siempre carga desde <code>dist/</code>, no desde <code>src/</code>.
+          <strong>{i18n.t('lbl.tip')}:</strong> {i18n.t('av.note.a')}<code>packages/compiler/src/</code>{i18n.t('av.note.b')}<code>npm run build</code>{i18n.t('av.note.c')}<code>dist/</code>{i18n.t('av.note.d')}<code>src/</code>{i18n.t('av.note.e')}
         </div>
 
-        <h2 id="despliegue">Despliegue</h2>
-        <p>AstraJS genera una carpeta <code>dist/</code> lista para produccion que contiene:</p>
+        <h2 id="despliegue">{i18n.t('sb.advDeploy')}</h2>
+        <p>{i18n.t('av.dep.a')}<code>dist/</code>{i18n.t('av.dep.b')}</p>
         <ul>
-          <li><strong>HTML estatico</strong> — Paginas SSG/ISR pre-renderizadas.</li>
-          <li><strong>Server handlers</strong> — Funciones server compiladas como endpoints HTTP.</li>
-          <li><strong>Assets optimizados</strong> — JS con tree-shaking, CSS con content-hash, imports dinamicos.</li>
+          <li><strong>{i18n.t('av.dep1.name')}</strong> — {i18n.t('av.dep1')}</li>
+          <li><strong>{i18n.t('av.dep2.name')}</strong> — {i18n.t('av.dep2')}</li>
+          <li><strong>{i18n.t('av.dep3.name')}</strong> — {i18n.t('av.dep3')}</li>
         </ul>
 
-        <h3>Plataformas soportadas</h3>
+        <h3>{i18n.t('av.plat.title')}</h3>
         <table>
-          <tr><th>Plataforma</th><th>SSR</th><th>SSG/ISR</th><th>server()</th></tr>
+          <tr><th>{i18n.t('av.plat.th')}</th><th>SSR</th><th>SSG/ISR</th><th>server()</th></tr>
           <tr><td><strong>Node.js</strong></td><td>✅</td><td>✅</td><td>✅</td></tr>
           <tr><td><strong>Vercel</strong></td><td>✅</td><td>✅</td><td>✅ Serverless</td></tr>
           <tr><td><strong>Netlify</strong></td><td>✅</td><td>✅</td><td>✅ Functions</td></tr>
@@ -199,7 +200,7 @@ export default defineConfig({
           <tr><td><strong>Docker</strong></td><td>✅</td><td>✅</td><td>✅</td></tr>
         </table>
 
-        <h3>Build para produccion</h3>
+        <h3>{i18n.t('av.build.title')}</h3>
         <pre><code>{`# Desarrollo
 pnpm dev
 

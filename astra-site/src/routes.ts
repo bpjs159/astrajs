@@ -11,6 +11,8 @@ export const routes = {
   get docsExamples() { return route('/docs/examples'); },
   get docsCli() { return route('/docs/cli'); },
   get docsTesting() { return route('/docs/testing'); },
+  get docsI18n() { return route('/docs/i18n'); },
+  get docsIntegrations() { return route('/docs/integrations'); },
   get docsAdvanced() { return route('/docs/advanced'); },
   get docs() { return route('/docs', { exact: true }); },
   get fallback() { return fallbackRoute(); },

@@ -1,5 +1,6 @@
 import { component, dynamic } from '@astrajs/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
+import { i18n } from '../../i18n.js';
 
 const s = `
   .docs-layout{display:flex;min-height:100vh}
@@ -28,19 +29,19 @@ export const DocsRendering = component(() => (
     <DocSidebar />
     <main class="docs-main">
       <div class="docs-content">
-        <h1>Renderizado</h1>
-        <p>AstraJS soporta cuatro estrategias de renderizado que puedes combinar en una misma aplicacion, pagina por pagina. Sin configuracion adicional, sin plugins extra.</p>
+        <h1>{i18n.t('sb.rendering')}</h1>
+        <p>{i18n.t('rr.hero')}</p>
 
         <h2 id="ssr">SSR (Server-Side Rendering)</h2>
-        <p>El servidor renderiza el HTML en cada request. El cliente recibe la pagina completamente formada — SEO-friendly, fast First Contentful Paint, excelente para contenido dinamico.</p>
+        <p>{i18n.t('rr.ssr.p')}</p>
 
-        <h3>Como funciona</h3>
+        <h3>{i18n.t('rr.how')}</h3>
         <ol>
-          <li>El usuario solicita <code>/products</code>.</li>
-          <li>El servidor ejecuta los componentes AstraJS y genera el HTML completo.</li>
-          <li>Las funciones <code>server()</code> de tipo dynamic se ejecutan en cada request.</li>
-          <li>El HTML se envia al navegador con los datos ya incluidos.</li>
-          <li>El cliente "resume" el estado — sin re-ejecutar componentes, sin re-fetching de datos.</li>
+          <li>{i18n.t('rr.ol1.a')}<code>/products</code>{i18n.t('rr.ol1.b')}</li>
+          <li>{i18n.t('rr.ol2')}</li>
+          <li>{i18n.t('rr.ol3.a')}<code>server()</code>{i18n.t('rr.ol3.b')}</li>
+          <li>{i18n.t('rr.ol4')}</li>
+          <li>{i18n.t('rr.ol5')}</li>
         </ol>
 
         <pre><code>{`// SSR se activa por defecto en el servidor
@@ -58,7 +59,7 @@ export default function ProductPage() {
 }`}</code></pre>
 
         <h2 id="ssg">SSG (Static Site Generation)</h2>
-        <p>Las paginas se generan como HTML estatico <strong>en tiempo de build</strong>. Ideales para blogs, documentacion, landing pages — contenido que no cambia entre deploys. El resultado es HTML puro con <strong>0 KB de JavaScript</strong>.</p>
+        <p>{i18n.t('rr.ssg.a')}<strong>{i18n.t('rr.ssg.b')}</strong>{i18n.t('rr.ssg.c')}<strong>{i18n.t('rr.ssg.d')}</strong>{i18n.t('rr.ssg.e')}</p>
 
         <pre><code>{`// Las paginas SSG usan server({ type: 'pre-build' })
 // El resultado se incrusta en el HTML durante el build
@@ -73,7 +74,7 @@ const posts = server(
 // En produccion: se sirve HTML estatico, sin consultas a BD`}</code></pre>
 
         <h2 id="isr">ISR (Incremental Static Regeneration)</h2>
-        <p>Combina la velocidad del SSG con la frescura del SSR. Las paginas se generan estaticamente, pero se <strong>re-generan en el servidor</strong> cuando expira el TTL o cuando se invalidan sus tags. La primera persona que visita tras la expiracion recibe la pagina stale (rapida), y dispara una re-generacion en background. El siguiente visitante ya recibe la pagina actualizada.</p>
+        <p>{i18n.t('rr.isr.a')}<strong>{i18n.t('rr.isr.b')}</strong>{i18n.t('rr.isr.c')}</p>
 
         <pre><code>{`// ISR: maxAge controla cada cuanto se re-genera
 const featuredProducts = server(
@@ -91,22 +92,22 @@ const featuredProducts = server(
 // t=61min: Cache expiro → se sirve stale + re-generacion en bg
 // t=62min: Siguiente visita → HTML fresco con nuevos datos`}</code></pre>
 
-        <h2>Comparativa de estrategias</h2>
+        <h2>{i18n.t('rr.comp.title')}</h2>
         <table>
-          <tr><th>Estrategia</th><th>Render</th><th>JS en cliente</th><th>Ideal para</th><th>Frescura datos</th></tr>
-          <tr><td><strong>SSR</strong></td><td>Por request</td><td>Minimo (JIT)</td><td>Dashboards, datos de usuario</td><td>Tiempo real</td></tr>
-          <tr><td><strong>SSG</strong></td><td>En build</td><td>0 KB</td><td>Blogs, docs, landing pages</td><td>Solo en deploy</td></tr>
-          <tr><td><strong>ISR</strong></td><td>Build + re-gen</td><td>0 KB (stale) / Minimo</td><td>E-commerce, catalogos</td><td>TTL configurable</td></tr>
-          <tr><td><strong>SPA</strong></td><td>Cliente</td><td>Mayor</td><td>Apps interactivas</td><td>Por request</td></tr>
+          <tr><th>{i18n.t('rr.th1')}</th><th>{i18n.t('rr.th2')}</th><th>{i18n.t('rr.th3')}</th><th>{i18n.t('rr.th4')}</th><th>{i18n.t('rr.th5')}</th></tr>
+          <tr><td><strong>SSR</strong></td><td>{i18n.t('rr.cell.request')}</td><td>{i18n.t('rr.cell.jit')}</td><td>{i18n.t('rr.cell.dash')}</td><td>{i18n.t('rr.cell.realtime')}</td></tr>
+          <tr><td><strong>SSG</strong></td><td>{i18n.t('rr.cell.build')}</td><td>{i18n.t('rr.cell.zero')}</td><td>{i18n.t('rr.cell.blogs')}</td><td>{i18n.t('rr.cell.deploy')}</td></tr>
+          <tr><td><strong>ISR</strong></td><td>{i18n.t('rr.cell.regen')}</td><td>{i18n.t('rr.cell.stale')}</td><td>{i18n.t('rr.cell.ecom')}</td><td>{i18n.t('rr.cell.ttl')}</td></tr>
+          <tr><td><strong>SPA</strong></td><td>{i18n.t('rr.cell.client')}</td><td>{i18n.t('rr.cell.more')}</td><td>{i18n.t('rr.cell.apps')}</td><td>{i18n.t('rr.cell.request')}</td></tr>
         </table>
 
-        <h2 id="resumibilidad">Resumibilidad</h2>
-        <p>La resumibilidad es la alternativa de AstraJS a la hidratacion tradicional. En lugar de re-ejecutar todos los componentes en el cliente para "hidratar" el HTML del servidor, AstraJS serializa el estado minimo necesario en el HTML y <strong>reanuda</strong> la aplicacion exactamente donde el servidor la dejo.</p>
+        <h2 id="resumibilidad">{i18n.t('sb.resumability')}</h2>
+        <p>{i18n.t('rr.res.a')}<strong>{i18n.t('rr.res.b')}</strong>{i18n.t('rr.res.c')}</p>
 
-        <h3>Hidratacion tradicional vs Resumibilidad</h3>
+        <h3>{i18n.t('rr.vs.title')}</h3>
         <ul>
-          <li><strong>Hidratacion:</strong> El cliente descarga todo el JS, re-ejecuta cada componente, compara el VDOM con el HTML, y reconcilia diferencias. Costoso en CPU y tiempo.</li>
-          <li><strong>Resumibilidad:</strong> El HTML incluye referencias a los stores y handlers. El cliente carga JS solo cuando interactuas. No hay re-ejecucion de componentes. El estado ya esta en el HTML.</li>
+          <li><strong>{i18n.t('rr.vs1.name')}:</strong> {i18n.t('rr.vs1')}</li>
+          <li><strong>{i18n.t('rr.vs2.name')}:</strong> {i18n.t('rr.vs2')}</li>
         </ul>
 
         <pre><code>{`// El HTML generado por el servidor incluye:

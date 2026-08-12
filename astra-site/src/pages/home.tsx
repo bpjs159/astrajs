@@ -1,8 +1,12 @@
 import { component, store, dynamic } from '@astrajs/core';
-import { Link, navigate } from '@astrajs/router';
+import { navigate } from '@astrajs/router';
+import { i18n } from '../i18n.js';
 
 export const HomePage = component(() => {
   const tabsState = store({ activeTab: 'store' as 'store' | 'server' | 'css' | 'router' });
+
+  /** Divide claves con <br/> en líneas para renderizarlas con salto real. */
+  const br = (key: string) => i18n.t(key).split('<br/>');
 
   // ── Dashboard reactive state ──
   const dash = store({
@@ -21,7 +25,7 @@ export const HomePage = component(() => {
     ],
   });
 
-  const periods = ['Today', 'This Week', 'This Month'];
+  const periods = ['home.dash.today', 'home.dash.week', 'home.dash.month'];
   const periodMultiplier = [1, 7, 30];
 
   const getStatValue = (base: number, decimals = 0) => {
@@ -37,7 +41,14 @@ export const HomePage = component(() => {
       : dash.products;
   };
 
-  const navItems = ['Overview', 'Orders', 'Products', 'Customers', 'Analytics', 'Settings'];
+  const navItems = [
+    'home.dash.overview',
+    'home.dash.orders',
+    'home.dash.products',
+    'home.dash.customers',
+    'home.dash.analytics',
+    'home.dash.settings',
+  ];
   const allProducts = dash.products;
 
   const randomizeChart = () => {
@@ -288,19 +299,19 @@ export const routes = {
             <img src="/images/logo.png" alt="AstraJS Logo" />
           </div>
           <h1 class="hero-brand">ASTRA<span style="background:linear-gradient(135deg,#8d4dff,#4d7cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">JS</span></h1>
-          <p class="hero-tagline">The Full-Stack Framework<br/>that Ships Zero <span style="background:linear-gradient(135deg,#8d4dff,#4d7cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">JavaScript</span>.</p>
-          <p class="hero-sub">AstraJS elimina el Virtual DOM y compila tu código TypeScript a mutaciones directas del DOM. Más rápido, más ligero, más simple.</p>
+          <p class="hero-tagline">{i18n.t('hero.tagline1')}<br/>{i18n.t('hero.tagline2')}<span style="background:linear-gradient(135deg,#8d4dff,#4d7cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">{i18n.t('hero.tagline.js')}</span>.</p>
+          <p class="hero-sub">{i18n.t('hero.sub')}</p>
           <div class="hero-buttons">
             <button class="btn-primary" onclick={() => navigate('/docs/introduction')}>
-              Comenzar ahora <span>→</span>
+              {i18n.t('hero.start')} <span>→</span>
             </button>
             <a class="btn-secondary" href="https://github.com" target="_blank" rel="noopener">
-              <span>⌂</span> Ver en GitHub
+              <span>⌂</span> {i18n.t('hero.github')}
             </a>
           </div>
         </div>
         <div class="scroll-down" onclick={() => window.scrollBy({ top: window.innerHeight, behavior: 'smooth' })}>
-          <span>Discover more</span>
+          <span>{i18n.t('hero.discover')}</span>
           <div class="scroll-down-arrow"></div>
         </div>
       </section>
@@ -310,19 +321,19 @@ export const routes = {
         <div class="stats-bar">
           <div class="stat-item">
             <div class="stat-num gradient">0KB</div>
-            <div class="stat-desc">JS innecesario</div>
+            <div class="stat-desc">{i18n.t('stats.unused')}</div>
           </div>
           <div class="stat-item">
-            <div class="stat-num gradient">Fine-grained</div>
-            <div class="stat-desc">Reactivity</div>
+            <div class="stat-num gradient">{i18n.t('stats.finegrained')}</div>
+            <div class="stat-desc">{i18n.t('stats.reactivity')}</div>
           </div>
           <div class="stat-item">
-            <div class="stat-num gradient">Zero Config</div>
-            <div class="stat-desc">Type Inference</div>
+            <div class="stat-num gradient">{i18n.t('stats.zeroconfig')}</div>
+            <div class="stat-desc">{i18n.t('stats.inference')}</div>
           </div>
           <div class="stat-item">
             <div class="stat-num gradient">SSR • SSG • ISR</div>
-            <div class="stat-desc">Built-in</div>
+            <div class="stat-desc">{i18n.t('stats.builtin')}</div>
           </div>
         </div>
       </div>
@@ -332,10 +343,10 @@ export const routes = {
         <div class="section-inner">
           <div class="feature-showcase">
             <div class="feature-text">
-              <div class="section-label">Sin Virtual DOM</div>
-              <h3>Sin Virtual DOM.<br/>Actualizaciones quirúrgicas.</h3>
-              <p>AstraJS convierte tu JSX en DOM nativo en tiempo de compilación y suscribe únicamente los nodos que cambian. <strong>O(1)</strong> actualizaciones. Máxima velocidad.</p>
-              <Link href="/docs/fundamentals" class="feature-link">Saber más sobre la reactividad</Link>
+              <div class="section-label">{i18n.t('home.novdom.label')}</div>
+              <h3>{br('home.novdom.title')[0]}<br/>{br('home.novdom.title')[1]}</h3>
+              <p>{i18n.t('home.novdom.text1')}<strong>O(1)</strong>{i18n.t('home.novdom.text2')}</p>
+              <a href="/docs/fundamentals" class="feature-link" onclick={(e: Event) => { e.preventDefault(); navigate('/docs/fundamentals'); }}>{i18n.t('home.novdom.link')}</a>
             </div>
             <div class="code-compare">
               <div class="code-box" style="grid-column:1/-1">
@@ -359,38 +370,38 @@ export const routes = {
       {/* ── FEATURES GRID ── */}
       <section class="section" style="padding-top:0">
         <div class="section-inner">
-          <div class="section-label">Todo lo que necesitas</div>
-          <h2 class="section-title">Sin configuración.<br/>AstraJS es full-stack por defecto.</h2>
+          <div class="section-label">{i18n.t('home.features.label')}</div>
+          <h2 class="section-title">{br('home.features.title')[0]}<br/>{br('home.features.title')[1]}</h2>
           <div class="features-grid">
             <div class="feature-card">
               <div class="feature-card-icon">⚡</div>
-              <h4>Compilación AST Avanzada</h4>
-              <p>Tu código se transforma en mutaciones directas del DOM, extrayendo estilos, rutas y consultas en tiempo de build.</p>
+              <h4>{i18n.t('home.f1.title')}</h4>
+              <p>{i18n.t('home.f1.text')}</p>
             </div>
             <div class="feature-card">
               <div class="feature-card-icon">🎯</div>
-              <h4>Reactividad de grano fino</h4>
-              <p>Basada en Proxies de ES6. Cada propiedad se vincula al nodo exacto que la usa. Sin re-ejecución de componentes.</p>
+              <h4>{i18n.t('home.f2.title')}</h4>
+              <p>{i18n.t('home.f2.text')}</p>
             </div>
             <div class="feature-card">
               <div class="feature-card-icon">⚙️</div>
-              <h4>Server Functions</h4>
-              <p>RPC tipado con server. Caching, revalidación e invalidación quirúrgica con etiquetas.</p>
+              <h4>{i18n.t('home.f3.title')}</h4>
+              <p>{i18n.t('home.f3.text')}</p>
             </div>
             <div class="feature-card">
               <div class="feature-card-icon">🌐</div>
-              <h4>SSR, SSG e ISR</h4>
-              <p>Renderizado, generación estática e incremental transparentes. 0 JS para páginas estáticas.</p>
+              <h4>{i18n.t('home.f4.title')}</h4>
+              <p>{i18n.t('home.f4.text')}</p>
             </div>
             <div class="feature-card">
               <div class="feature-card-icon">📐</div>
-              <h4>Layouts Persistentes</h4>
-              <p>Router isomórfico con &lt;Outlet /&gt;. Preserva estado entre rutas y soporta View Transitions API.</p>
+              <h4>{i18n.t('home.f5.title')}</h4>
+              <p>{i18n.t('home.f5.text')}</p>
             </div>
             <div class="feature-card">
               <div class="feature-card-icon">🔮</div>
-              <h4>Inferencia de Tipos Extrema</h4>
-              <p>100% inferido de extremo a extremo. Seguridad de tipos estricta sin escribir tipos redundantes.</p>
+              <h4>{i18n.t('home.f6.title')}</h4>
+              <p>{i18n.t('home.f6.text')}</p>
             </div>
           </div>
         </div>
@@ -399,33 +410,33 @@ export const routes = {
       {/* ── HOW IT WORKS ── */}
       <section class="section" style="background:rgba(255,255,255,.01)">
         <div class="section-inner" style="text-align:center">
-          <div class="section-label">¿Cómo funciona?</div>
-          <h2 class="section-title">Escribes. Compilamos. Entregamos.</h2>
+          <div class="section-label">{i18n.t('home.how.label')}</div>
+          <h2 class="section-title">{i18n.t('home.how.title')}</h2>
           <div class="steps">
             <div class="step">
               <div class="step-num">1</div>
-              <h4>Escribes en TypeScript</h4>
-              <p>Usas JSX, stores, server, css`` y el Router.</p>
+              <h4>{i18n.t('home.step1.title')}</h4>
+              <p>{i18n.t('home.step1.text')}</p>
             </div>
             <div class="step">
               <div class="step-num">2</div>
-              <h4>Astra Compiler (AST)</h4>
-              <p>Transforma JSX a DOM nativo, extrae CSS y optimiza consultas.</p>
+              <h4>{i18n.t('home.step2.title')}</h4>
+              <p>{i18n.t('home.step2.text')}</p>
             </div>
             <div class="step">
               <div class="step-num">3</div>
-              <h4>Build / Pre-build</h4>
-              <p>Pre-renderiza lo estático. Inyecta estado en HTML. (Zero JS).</p>
+              <h4>{i18n.t('home.step3.title')}</h4>
+              <p>{i18n.t('home.step3.text')}</p>
             </div>
             <div class="step">
               <div class="step-num">4</div>
-              <h4>Entrega ultra rápida</h4>
-              <p>HTML + CSS + JS mínimo (Just-In-Time). Resumible al instante.</p>
+              <h4>{i18n.t('home.step4.title')}</h4>
+              <p>{i18n.t('home.step4.text')}</p>
             </div>
             <div class="step">
               <div class="step-num">5</div>
-              <h4>Interactividad JIT</h4>
-              <p>Eventos y chunks se cargan solo cuando el usuario interactúa.</p>
+              <h4>{i18n.t('home.step5.title')}</h4>
+              <p>{i18n.t('home.step5.text')}</p>
             </div>
           </div>
         </div>
@@ -434,13 +445,13 @@ export const routes = {
       {/* ── CODE PREVIEW ── */}
       <section class="section">
         <div class="section-inner">
-          <div class="section-label">Un vistazo al código</div>
+          <div class="section-label">{i18n.t('home.code.label')}</div>
           <h2 class="section-title">Store · server · CSS · Router</h2>
           <div class="code-tabs">
             <div class="tabs-nav">
               {(['store','server','css','router'] as const).map(tab => (
                 <button class={`tab-btn${tabsState.activeTab === tab ? ' active' : ''}`} onclick={() => { tabsState.activeTab = tab; }}>
-                  {tab === 'server' ? 'server' : tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  {tab}
                 </button>
               ))}
             </div>
@@ -454,9 +465,9 @@ export const routes = {
       {/* ── DASHBOARD PREVIEW ── */}
       <section class="section" style="padding-top:0">
         <div class="section-inner">
-          <div class="section-label">Ejemplo</div>
+          <div class="section-label">{i18n.t('home.demo.label')}</div>
           <h2 class="section-title">Dashboard E-commerce</h2>
-          <p style="font-size:.84rem;color:#64748b;margin-bottom:8px">Construido con <code style="background:rgba(139,77,255,.1);color:#c4a0ff;padding:2px 6px;border-radius:4px;font-size:.78rem">store()</code> de AstraJS — cada interacción actualiza solo los nodos necesarios.</p>
+          <p style="font-size:.84rem;color:#64748b;margin-bottom:8px">{i18n.t('home.demo.sub1')}<code style="background:rgba(139,77,255,.1);color:#c4a0ff;padding:2px 6px;border-radius:4px;font-size:.78rem">store()</code>{i18n.t('home.demo.sub2')}</p>
           <div class="dashboard-preview">
             <div class="dash-header">
               <span class="dash-logo">
@@ -469,14 +480,14 @@ export const routes = {
                     class={`dash-nav-item${dash.activeNav === item ? ' active' : ''}`}
                     onclick={() => { dash.activeNav = item; }}
                   >
-                    {item}
+                    {i18n.t(item)}
                   </button>
                 ))}
               </div>
               <div class="dash-search">
                 <span>🔍</span>
                 <input
-                  placeholder="Search products..."
+                  placeholder={i18n.t('home.dash.search')}
                   onInput={(e: Event) => { dash.search = (e.target as HTMLInputElement).value; }}
                 />
               </div>
@@ -489,35 +500,35 @@ export const routes = {
                       class={`dash-period-btn${dash.period === i ? ' active' : ''}`}
                       onclick={() => { dash.period = i; }}
                     >
-                      {p}
+                      {i18n.t(p)}
                     </button>
                   ))}
                 </div>
                 <div class="dash-stats">
                   <div class="dash-stat" onclick={() => { dash.period = (dash.period + 1) % 3; }}>
-                    <div class="dash-stat-lbl">Total Sales</div>
+                    <div class="dash-stat-lbl">{i18n.t('home.dash.totalSales')}</div>
                     <div class="dash-stat-val">${getStatValue(54780)}</div>
                     <div class="dash-stat-up">↑ {getStatChange(12.3)}%</div>
                   </div>
                   <div class="dash-stat" onclick={() => { dash.period = (dash.period + 1) % 3; }}>
-                    <div class="dash-stat-lbl">Orders</div>
+                    <div class="dash-stat-lbl">{i18n.t('home.dash.orders')}</div>
                     <div class="dash-stat-val">{getStatValue(1428)}</div>
                     <div class="dash-stat-up">↑ {getStatChange(8.3)}%</div>
                   </div>
                   <div class="dash-stat" onclick={() => { dash.period = (dash.period + 1) % 3; }}>
-                    <div class="dash-stat-lbl">Customers</div>
+                    <div class="dash-stat-lbl">{i18n.t('home.dash.customers')}</div>
                     <div class="dash-stat-val">{getStatValue(3987)}</div>
                     <div class="dash-stat-up">↑ {getStatChange(8.2)}%</div>
                   </div>
                   <div class="dash-stat" onclick={() => { dash.period = (dash.period + 1) % 3; }}>
-                    <div class="dash-stat-lbl">Conversion</div>
+                    <div class="dash-stat-lbl">{i18n.t('home.dash.conversion')}</div>
                     <div class="dash-stat-val">{getStatValue(2.43, 2)}%</div>
                     <div class="dash-stat-up">↑ {getStatChange(4.1)}%</div>
                   </div>
                 </div>
                 <div class="dash-chart-label">
-                  <span>Sales over time</span>
-                  <button class="dash-chart-refresh" onclick={randomizeChart}>↻ Refresh</button>
+                  <span>{i18n.t('home.dash.chart')}</span>
+                  <button class="dash-chart-refresh" onclick={randomizeChart}>↻ {i18n.t('home.dash.refresh')}</button>
                 </div>
                 <div class="dash-chart">
                   {dash.chartData.map((h: number, i: number) => (
@@ -527,14 +538,14 @@ export const routes = {
                       onclick={() => { dash.selectedBar = i; }}
                     >
                       {dash.selectedBar === i && (
-                        <div class="chart-tooltip">Day {i + 1}: {h}%</div>
+                        <div class="chart-tooltip">{i18n.t('home.dash.tooltip', { day: i + 1, value: h })}</div>
                       )}
                     </div>
                   ))}
                 </div>
               </div>
               <div class="dash-sidebar">
-                <div class="dash-side-title">Top Products</div>
+                <div class="dash-side-title">{i18n.t('home.dash.top')}</div>
                 {(() => {
                   const items = filteredProducts();
                   return items.length > 0
@@ -543,11 +554,11 @@ export const routes = {
                           <span class="dash-product-name">{p.name}</span>
                           <span>
                             <span class="dash-product-price">${p.price.toFixed(2)}</span>
-                            <span class="dash-product-sales">{p.sales} sold</span>
+                            <span class="dash-product-sales">{i18n.t('home.dash.sold', { count: p.sales })}</span>
                           </span>
                         </div>
                       ))
-                    : <div class="dash-empty">No products found</div>;
+                    : <div class="dash-empty">{i18n.t('home.dash.empty')}</div>;
                 })()}
               </div>
             </div>
@@ -558,14 +569,14 @@ export const routes = {
       {/* ── CTA ── */}
       <section class="cta-section" style="background:rgba(255,255,255,.01)">
         <div class="container">
-          <h2>Listo para construir el futuro de la web.</h2>
-          <p>Rendimiento máximo. DX moderno. Zero compromisos.</p>
+          <h2>{i18n.t('home.cta.title')}</h2>
+          <p>{i18n.t('home.cta.sub')}</p>
           <div class="cta-code">
             <span>npx @astrajs/cli@latest</span>
           </div>
           <br/>
           <button class="btn-primary" onclick={() => navigate('/docs/introduction')} style="font-size:.92rem;padding:14px 36px">
-            Instalar AstraJS <span>→</span>
+            {i18n.t('home.cta.btn')} <span>→</span>
           </button>
         </div>
       </section>

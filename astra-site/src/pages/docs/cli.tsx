@@ -1,5 +1,6 @@
 import { component, dynamic } from '@astrajs/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
+import { i18n } from '../../i18n.js';
 
 const s = `
   .docs-layout{display:flex;min-height:100vh}
@@ -30,27 +31,27 @@ export const DocsCli = component(() => (
     <main class="docs-main">
       <div class="docs-content">
         <h1>CLI</h1>
-        <p><code>astra</code> is the official command-line tool for AstraJS. It scaffolds new projects AND runs them — <code>astra dev</code>, <code>astra build</code>, <code>astra test</code>. Zero dependencies, zero configuration, and zero JavaScript shipped to the browser — the CLI follows the same philosophy as the framework.</p>
+        <p><code>astra</code> {i18n.t('cl.hero.a')}<code>astra dev</code>{i18n.t('cl.hero.b')}<code>astra build</code>{i18n.t('cl.hero.c')}<code>astra test</code>{i18n.t('cl.hero.d')}</p>
 
-        <h2 id="que-es">What is the CLI?</h2>
-        <p>The CLI generates a complete, working AstraJS project in seconds: Vite configuration, TypeScript configuration, package manifest, and example source files with reactive stores, routing, and typed RPC. You pick a template, it does the rest.</p>
-        <p>It is a pure Node.js program (≥20) with <strong>no runtime dependencies</strong> — interactive prompts are built on <code>readline</code>, colors are ANSI codes.</p>
+        <h2 id="que-es">{i18n.t('sb.cliWhat')}</h2>
+        <p>{i18n.t('cl.what.p1')}</p>
+        <p>{i18n.t('cl.what.p2.a')}<strong>{i18n.t('cl.what.p2.b')}</strong>{i18n.t('cl.what.p2.c')}<code>readline</code>{i18n.t('cl.what.p2.d')}</p>
 
-        <h2 id="crear-proyecto">Creating a project</h2>
-        <p>Run the CLI with a project name to scaffold:</p>
+        <h2 id="crear-proyecto">{i18n.t('sb.cliCreate')}</h2>
+        <p>{i18n.t('cl.create.p')}</p>
         <pre><code>{`astra my-app
 npx @astrajs/cli@latest my-app
 pnpm create astrajs my-app`}</code></pre>
 
-        <h3>Running an existing project</h3>
-        <p>Inside an AstraJS project, the same binary drives your toolchain:</p>
+        <h3>{i18n.t('cl.run.title')}</h3>
+        <p>{i18n.t('cl.run.p')}</p>
         <pre><code>{`astra dev        # vite dev server with HMR
 astra build      # production build (pre-built requests run here)
 astra preview    # preview the production build
 astra test       # vitest run`}</code></pre>
 
-        <h3>The interactive wizard</h3>
-        <p>Run it without arguments and the CLI asks you a few questions:</p>
+        <h3>{i18n.t('cl.wizard.title')}</h3>
+        <p>{i18n.t('cl.wizard.p')}</p>
         <pre><code>{`$ astra
 
 ◇ Project name: my-app
@@ -68,39 +69,39 @@ astra test       # vitest run`}</code></pre>
 
 Happy building! 🚀`}</code></pre>
 
-        <h2 id="plantillas">Templates</h2>
+        <h2 id="plantillas">{i18n.t('sb.cliTemplates')}</h2>
         <table>
-          <tr><th>Template</th><th>Packages</th><th>Ideal for</th></tr>
+          <tr><th>Template</th><th>Packages</th><th>{i18n.t('rr.th4')}</th></tr>
           <tr>
             <td><strong>minimal</strong></td>
             <td><code>@astrajs/core</code> + <code>@astrajs/compiler</code></td>
-            <td>Hello worlds, demos, benchmarks</td>
+            <td>{i18n.t('cl.cell.minimal')}</td>
           </tr>
           <tr>
             <td><strong>frontend</strong></td>
             <td>+ <code>@astrajs/router</code>, <code>@astrajs/form</code>, <code>@astrajs/schema</code>, <code>@astrajs/validation</code></td>
-            <td>Interactive SPAs with routing and forms</td>
+            <td>{i18n.t('cl.cell.frontend')}</td>
           </tr>
           <tr>
             <td><strong>fullstack</strong></td>
             <td>+ <code>@astrajs/server</code>, <code>@astrajs/ssr</code></td>
-            <td>Complete apps with typed RPC and SSR/SSG/ISR</td>
+            <td>{i18n.t('cl.cell.fullstack')}</td>
           </tr>
         </table>
 
-        <h3>Select a template directly</h3>
+        <h3>{i18n.t('cl.select.title')}</h3>
         <pre><code>{`astra my-app --template fullstack
 astra my-app -t minimal`}</code></pre>
 
-        <h2 id="opciones">Options</h2>
+        <h2 id="opciones">{i18n.t('sb.cliOptions')}</h2>
         <table>
           <tr><th>Option</th><th>Description</th></tr>
-          <tr><td><code>-t, --template &lt;name&gt;</code></td><td>Template: <code>minimal</code> | <code>frontend</code> | <code>fullstack</code></td></tr>
-          <tr><td><code>-y, --yes</code></td><td>Skip all prompts, use defaults (fullstack + install)</td></tr>
-          <tr><td><code>--no-install</code></td><td>Only generate files, skip dependency installation</td></tr>
-          <tr><td><code>--dry-run</code></td><td>Print the file tree without writing anything</td></tr>
-          <tr><td><code>-h, --help</code></td><td>Show help</td></tr>
-          <tr><td><code>-v, --version</code></td><td>Print the CLI version</td></tr>
+          <tr><td><code>-t, --template &lt;name&gt;</code></td><td>{i18n.t('cl.op.template')} <code>minimal</code> | <code>frontend</code> | <code>fullstack</code></td></tr>
+          <tr><td><code>-y, --yes</code></td><td>{i18n.t('cl.op.yes')}</td></tr>
+          <tr><td><code>--no-install</code></td><td>{i18n.t('cl.op.noinstall')}</td></tr>
+          <tr><td><code>--dry-run</code></td><td>{i18n.t('cl.op.dry')}</td></tr>
+          <tr><td><code>-h, --help</code></td><td>{i18n.t('cl.op.help')}</td></tr>
+          <tr><td><code>-v, --version</code></td><td>{i18n.t('cl.op.version')}</td></tr>
         </table>
 
         <pre><code>{`# Skip prompts entirely
@@ -112,8 +113,8 @@ astra my-app --template frontend --no-install
 # Preview the file tree first
 astra my-app --dry-run`}</code></pre>
 
-        <h2>Project structure</h2>
-        <p>This is what <code>--template fullstack</code> generates:</p>
+        <h2>{i18n.t('cl.structure.title')}</h2>
+        <p>{i18n.t('cl.structure.p.a')}<code>--template fullstack</code>{i18n.t('cl.structure.p.b')}</p>
         <pre><code>{`my-app/
 ├── index.html          → points to /src/app.tsx
 ├── package.json        → @astrajs/* deps + dev/build scripts
@@ -130,11 +131,11 @@ astra my-app --dry-run`}</code></pre>
     └── server/
         └── posts.server.ts → typed RPC with cache tags`}</code></pre>
 
-        <h3>Inside a monorepo</h3>
-        <p>When you scaffold a project inside the AstraJS repository itself, the CLI detects the <code>packages/</code> directory and injects Vite aliases that point at the local package sources — so the app works before the packages are published. The aliases are marked with a comment and should be removed once <code>@astrajs/*</code> is on npm.</p>
+        <h3>{i18n.t('cl.mono.title')}</h3>
+        <p>{i18n.t('cl.mono.a')}<code>packages/</code>{i18n.t('cl.mono.b')}<code>@astrajs/*</code>{i18n.t('cl.mono.c')}</p>
 
-        <h2>The generated code</h2>
-        <p>Every template includes a working, documented example. The fullstack template ships a complete <code>server()</code> round-trip:</p>
+        <h2>{i18n.t('cl.gen.title')}</h2>
+        <p>{i18n.t('cl.gen.a')}<code>server()</code>{i18n.t('cl.gen.b')}</p>
         <pre><code>{`// src/server/posts.server.ts — ONE function, split by the compiler
 import { server } from '@astrajs/server';
 
@@ -153,15 +154,15 @@ mounted(() => {
   getPosts().then(posts => { state.posts = posts; });
 });`}</code></pre>
 
-        <h2>Package manager detection</h2>
-        <p>The CLI reads <code>npm_config_user_agent</code> to detect how it was invoked, so <code>pnpm dlx astra</code> installs with pnpm, <code>npx astra</code> with npm, and so on. You never need to configure it.</p>
+        <h2>{i18n.t('cl.pm.title')}</h2>
+        <p>{i18n.t('cl.pm.a')}<code>npm_config_user_agent</code>{i18n.t('cl.pm.b')}<code>pnpm dlx astra</code>{i18n.t('cl.pm.c')}<code>npx astra</code>{i18n.t('cl.pm.d')}</p>
 
         <div class="note">
-          <strong>Legacy note:</strong> the first CLI release named the SPA template <code>basic</code>. The alias is still accepted — <code>--template basic</code> resolves to <code>frontend</code>.
+          <strong>{i18n.t('lbl.legacy')}:</strong> {i18n.t('cl.legacy.a')}<code>basic</code>{i18n.t('cl.legacy.b')}<code>--template basic</code>{i18n.t('cl.legacy.c')}<code>frontend</code>{i18n.t('cl.legacy.d')}
         </div>
 
-        <h2>Next steps</h2>
-        <p>After scaffolding, follow the <a href="/docs/introduction">getting-started guide</a> to understand stores, components, and routing, then check <a href="/docs/server-data">Server &amp; Data</a> to master typed RPC.</p>
+        <h2>{i18n.t('cl.next.title')}</h2>
+        <p>{i18n.t('cl.next.a')}<a href="/docs/introduction">{i18n.t('cl.next.b')}</a>{i18n.t('cl.next.c')}<a href="/docs/server-data">Server &amp; Data</a>{i18n.t('cl.next.d')}</p>
       </div>
     </main>
   </div>
