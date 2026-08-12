@@ -62,6 +62,15 @@ const docSections: DocSection[] = [
     ],
   },
   {
+    title: 'CLI',
+    items: [
+      { label: 'What is the CLI?', href: '/docs/cli' },
+      { label: 'Creating a project', href: '/docs/cli' },
+      { label: 'Templates', href: '/docs/cli' },
+      { label: 'Options', href: '/docs/cli' },
+    ],
+  },
+  {
     title: 'Avanzado',
     items: [
       { label: 'Compilador AST', href: '/docs/advanced' },
