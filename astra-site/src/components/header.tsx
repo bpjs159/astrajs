@@ -19,7 +19,7 @@ export const Header = component(() => {
   }
 
   const navStyle = `
-    .site-header{position:sticky;top:0;z-index:1000;background:rgba(4,6,13,.55);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid rgba(255,255,255,.04)}
+    .site-header{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(4,6,13,.55);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid rgba(255,255,255,.04)}
     .header-inner{display:flex;align-items:center;justify-content:space-between;height:64px;max-width:100%;margin:0 auto;padding:0 24px}
     .header-logo{display:flex;align-items:center;cursor:pointer;position:relative}
     .header-logo img{position:absolute;left:0;top:50%;height:28px;width:auto;object-fit:contain;opacity:0;transform:translateY(-50%) scale(.8);transition:opacity .3s ease,transform .3s ease;filter:drop-shadow(0 0 20px rgba(184,76,255,.5)) drop-shadow(0 0 50px rgba(77,124,255,.3)) drop-shadow(0 0 90px rgba(0,223,255,.15))}

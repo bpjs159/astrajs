@@ -63,8 +63,8 @@ style.textContent = `
 
   /* === RESET === */
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-  body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#04060d;color:#e2e8f0;line-height:1.6;overflow-x:hidden}
+  html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#04060d;color:#e2e8f0;line-height:1.6;padding-top:64px}
   a{color:inherit;text-decoration:none}
   img{max-width:100%;display:block}
   code{font-family:'JetBrains Mono','Fira Code',monospace}
