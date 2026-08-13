@@ -1,6 +1,8 @@
 import { component, dynamic } from '@astrajs/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
+import { DocRightToc } from '../../components/doc-right-toc.js';
 import { i18n } from '../../i18n.js';
+import { CodeBlock } from '../../components/code-block.js';
 
 const s = `
   .docs-layout{display:flex;min-height:100vh}
@@ -34,7 +36,7 @@ export const DocsServerData = component(() => (
         <p>{i18n.t('sd.a')}<strong>{i18n.t('sd.b')}</strong>{i18n.t('sd.c')}<code>fetch</code>{i18n.t('sd.d')}</p>
 
         <h3>{i18n.t('sd.basic.title')}</h3>
-        <pre><code>{`import { server } from '@astrajs/server';
+        <CodeBlock code={`import { server } from '@astrajs/server';
 
 // Defines la funcion UNA VEZ
 export const getUsers = server({
@@ -50,7 +52,7 @@ export const getUsers = server({
 // En el CLIENTE — se ve como una llamada async normal
 const admins = await getUsers('admin');
 // ↑ Esto es un fetch a /api/astra/getUsers?args=["admin"]
-// Los tipos se infieren automaticamente — admins es User[]`}</code></pre>
+// Los tipos se infieren automaticamente — admins es User[]`} />
 
         <h3>{i18n.t('sd.compiler.title')}</h3>
         <ol>
@@ -60,7 +62,7 @@ const admins = await getUsers('admin');
         </ol>
 
         <h3>{i18n.t('sd.config.title')}</h3>
-        <pre><code>{`interface ServerConfig {
+        <CodeBlock code={`interface ServerConfig {
   // Tipo de ejecucion
   type?: 'pre-build' | 'dynamic';  // default: 'dynamic'
   
@@ -74,14 +76,14 @@ const admins = await getUsers('admin');
   
   // Transformacion
   transform?: (data: T) => U;   // Transforma datos antes de enviar al cliente
-}`}</code></pre>
+}`} />
 
         <h2 id="tipos-server">{i18n.t('sb.serverTypes')}</h2>
         <p>{i18n.t('sd.when.a')}<strong>{i18n.t('sd.when.b')}</strong>{i18n.t('sd.when.c')}</p>
 
         <h3>pre-build</h3>
         <p>{i18n.t('sd.pre.a')}<strong>{i18n.t('sd.pre.b')}</strong>{i18n.t('sd.pre.c')}</p>
-        <pre><code>{`// Ideal para: menus, configuraciones, contenido estatico
+        <CodeBlock code={`// Ideal para: menus, configuraciones, contenido estatico
 const siteNav = server(
   { type: 'pre-build', tags: ['navigation'] },
   () => db.menu.findMany({ orderBy: { position: 'asc' } })
@@ -89,11 +91,11 @@ const siteNav = server(
 
 // En build time: db.menu.findMany() → resultado serializado en HTML
 // En el cliente: siteNav() → datos ya disponibles, sin fetch
-// Se re-genera en cada build o con ISR`}</code></pre>
+// Se re-genera en cada build o con ISR`} />
 
         <h3>dynamic</h3>
         <p>{i18n.t('sd.dyn.a')}<strong>{i18n.t('sd.dyn.b')}</strong>{i18n.t('sd.dyn.c')}</p>
-        <pre><code>{`// Ideal para: sesiones, datos de usuario, busquedas
+        <CodeBlock code={`// Ideal para: sesiones, datos de usuario, busquedas
 const userDashboard = server(
   { type: 'dynamic', maxAge: 60 },
   async (userId: string) => {
@@ -103,13 +105,13 @@ const userDashboard = server(
     ]);
     return { stats, notifications };
   }
-);`}</code></pre>
+);`} />
 
         <h2 id="caching">{i18n.t('sb.caching')}</h2>
         <p>{i18n.t('sd.cache.a')}<strong>{i18n.t('sd.cache.b')}</strong>{i18n.t('sd.cache.c')}</p>
 
         <h3>{i18n.t('sd.cache.tags.title')}</h3>
-        <pre><code>{`// Servicios con tags
+        <CodeBlock code={`// Servicios con tags
 const getProducts = server(
   { tags: ['products'], maxAge: 3600 },
   () => db.product.findMany()
@@ -123,10 +125,10 @@ const getProductById = server(
 const getCategories = server(
   { tags: ['categories'], maxAge: 86400 },
   () => db.category.findMany()
-);`}</code></pre>
+);`} />
 
         <h3>{i18n.t('sd.inv.title')}</h3>
-        <pre><code>{`import { revalidate } from '@astrajs/server';
+        <CodeBlock code={`import { revalidate } from '@astrajs/server';
 
 // Despues de crear un producto:
 await db.product.create({ data: newProduct });
@@ -135,12 +137,12 @@ await db.product.create({ data: newProduct });
 await revalidate(['products']);
 // ↑ getProducts se revalida (tiene tag 'products')
 // ↑ getProductById se revalida (tiene tag 'products')
-// ✗ getCategories NO se revalida (no tiene 'products')
+// getCategories NO se revalida (no tiene 'products')
 
 // Despues de actualizar una categoria:
 await db.category.update({ where: { id }, data: update });
 await revalidate(['categories']);
-// ↑ Solo getCategories se revalida`}</code></pre>
+// ↑ Solo getCategories se revalida`} />
 
         <div class="note">
           <strong>{i18n.t('lbl.best')}:</strong> {i18n.t('sd.note.a')}<code>'products'</code>{i18n.t('sd.note.b')}<code>'users'</code>{i18n.t('sd.note.c')}<code>'product-detail'</code>{i18n.t('sd.note.d')}<code>'user-profile'</code>{i18n.t('sd.note.e')}
@@ -158,7 +160,7 @@ await revalidate(['categories']);
           <li>{i18n.t('sd.auto.ol5')}</li>
         </ol>
 
-        <pre><code>{`// Datos que se auto-sincronizan cada 3 segundos
+        <CodeBlock code={`// Datos que se auto-sincronizan cada 3 segundos
 const liveStats = server(
   { 
     autoSync: true, 
@@ -170,11 +172,11 @@ const liveStats = server(
 
 // En el componente:
 <div>
-  <h3>Ventas en tiempo real</h3>
+  <h3>Real-time sales</h3>
   <p>\${liveStats.totalSales}</p>
   {/* ↑ Se actualiza solo cuando el servidor devuelve datos nuevos */}
   {/* Sin polling manual, sin useEffect, sin suscripciones */}
-</div>`}</code></pre>
+</div>`} />
 
         <h3>{i18n.t('sd.auto.vs')}</h3>
         <ul>
@@ -184,7 +186,7 @@ const liveStats = server(
 
         <h2>{i18n.t('sd.mut.title')}</h2>
         <p>{i18n.t('sd.mut.a')}<code>server()</code>{i18n.t('sd.mut.b')}</p>
-        <pre><code>{`const createProduct = server(
+        <CodeBlock code={`const createProduct = server(
   { tags: ['products'] }, // tags a revalidar tras la mutacion
   async (data: CreateProductInput) => {
     const product = await db.product.create({ data });
@@ -198,8 +200,14 @@ async function handleCreate(formData: CreateProductInput) {
   // ↑ La mutacion se ejecuta en el servidor
   // ↑ Los tags ['products'] se revalidan automaticamente tras la mutacion
   // ↑ La UI se actualiza sin codigo adicional
-}`}</code></pre>
+}`} />
       </div>
     </main>
+    <DocRightToc items={[
+      { href: '/docs/server-data#server', label: 'server' },
+      { href: '/docs/server-data#tipos-server', k: 'sb.serverTypes' },
+      { href: '/docs/server-data#caching', k: 'sb.caching' },
+      { href: '/docs/server-data#autosync', k: 'sb.autosync' },
+    ]} />
   </div>
 ));

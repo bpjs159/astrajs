@@ -1,6 +1,8 @@
 import { component, store, dynamic } from '@astrajs/core';
 import { navigate } from '@astrajs/router';
 import { i18n } from '../i18n.js';
+import { Icon } from '../components/icon.js';
+import { CodeBlock } from '../components/code-block.js';
 
 export const HomePage = component(() => {
   const tabsState = store({ activeTab: 'store' as 'store' | 'server' | 'css' | 'router' });
@@ -10,11 +12,26 @@ export const HomePage = component(() => {
 
   // ── Dashboard reactive state ──
   const dash = store({
-    activeNav: 'Overview' as string,
+    activeNav: 'home.dash.overview' as string,
     period: 0, // 0=Today, 1=Week, 2=Month
     search: '',
     chartData: [60,75,45,90,55,80,70,95,65,85,50,72,88,68,92,78,62,85,95,72],
     selectedBar: -1,
+    orders: [
+      { id: '#10241', customer: 'Ana Torres', total: 129.99, paid: true },
+      { id: '#10240', customer: 'Luis Vega', total: 89.5, paid: true },
+      { id: '#10239', customer: 'Marta Ruiz', total: 312, paid: false },
+      { id: '#10238', customer: 'Carlos Peña', total: 47.2, paid: true },
+      { id: '#10237', customer: 'Sofía Gil', total: 199.99, paid: false },
+    ],
+    customers: [
+      { name: 'Ana Torres', country: 'México' },
+      { name: 'Luis Vega', country: 'España' },
+      { name: 'Marta Ruiz', country: 'Colombia' },
+      { name: 'Carlos Peña', country: 'Chile' },
+      { name: 'Sofía Gil', country: 'Argentina' },
+    ],
+    settings: { notif: true, mail: false, dark: true },
     products: [
       { name: 'Wireless Headphones', price: 42.50, sales: 1240 },
       { name: 'Mechanical Keyboard', price: 3120, sales: 890 },
@@ -147,12 +164,14 @@ export const routes = {
     @keyframes bounce{0%,100%{transform:rotate(45deg) translate(0,0);opacity:.4}50%{transform:rotate(45deg) translate(3px,3px);opacity:1}}
 
     /* === STATS BAR === */
-    .stats-bar{display:flex;justify-content:center;flex-wrap:wrap;gap:32px 48px;padding:32px 0;border-top:1px solid rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.05);margin-bottom:80px}
-    .stat-item{text-align:center}
-    .stat-num{font-size:1.15rem;font-weight:800;color:#f7f7ff;letter-spacing:-.01em}
-    .stat-num.gradient{background:linear-gradient(135deg,#b84cff,#4d7cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .stat-desc{font-size:.72rem;color:#64748b;font-weight:500;margin-top:2px}
-    @media(max-width:640px){.stats-bar{gap:20px 28px}}
+    .stats-bar{display:flex;justify-content:center;flex-wrap:wrap;gap:40px 64px;padding:56px 0;border-top:1px solid rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.05);margin-bottom:80px}
+    .stat-item{text-align:center;display:flex;flex-direction:column;align-items:center}
+    .stat-icon{width:58px;height:58px;border-radius:16px;background:rgba(139,77,255,.08);border:1px solid rgba(139,77,255,.16);display:flex;align-items:center;justify-content:center;margin-bottom:14px;box-shadow:0 0 24px rgba(139,77,255,.12)}
+    .stat-icon img{width:30px;height:30px}
+    .stat-num{font-size:1.35rem;font-weight:800;color:#f7f7ff;letter-spacing:-.01em;display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:5px}
+    .stat-num .grad-text{background:linear-gradient(135deg,#b84cff,#4d7cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .stat-desc{font-size:.76rem;color:#64748b;font-weight:500;display:flex;align-items:center;justify-content:center;gap:6px}
+    @media(max-width:640px){.stats-bar{gap:28px 36px}}
 
     /* === SECTION === */
     .section{padding:80px 0}
@@ -175,10 +194,6 @@ export const routes = {
     .code-box-header{padding:10px 18px;font-size:.66rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.01)}
     .code-box-header span{font-weight:600}
     .code-box-body{padding:18px 20px;overflow-x:auto}
-    .code-box-body pre{font-size:.72rem;line-height:1.85;color:#cbd5e1;font-family:'JetBrains Mono',monospace;white-space:pre;margin:0;tab-size:2}
-    .code-highlight{color:#b84cff;font-weight:500}
-    .code-keyword{color:#4d7cff}
-    .code-string{color:#00dfff}
     @media(max-width:900px){.feature-showcase{grid-template-columns:1fr;gap:32px}}
 
     /* === FEATURES GRID === */
@@ -186,6 +201,7 @@ export const routes = {
     .feature-card{background:#0a0f1a;border:1px solid rgba(255,255,255,.05);border-radius:14px;padding:28px;transition:border-color .2s,transform .2s}
     .feature-card:hover{border-color:rgba(139,77,255,.2);transform:translateY(-2px)}
     .feature-card-icon{font-size:1.4rem;margin-bottom:16px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:rgba(139,77,255,.08);border-radius:10px}
+    .feature-card-icon img{width:24px;height:24px}
     .feature-card h4{font-size:.95rem;font-weight:700;color:#f7f7ff;margin-bottom:8px;letter-spacing:-.01em}
     .feature-card p{font-size:.8rem;color:#64748b;line-height:1.6}
     @media(max-width:900px){.features-grid{grid-template-columns:repeat(2,1fr)}}
@@ -195,7 +211,8 @@ export const routes = {
     .steps{display:flex;gap:20px;margin-top:48px;position:relative}
     .steps::before{content:'';position:absolute;top:40px;left:0;right:0;height:1px;background:linear-gradient(90deg,rgba(139,77,255,.3),rgba(0,223,255,.3),rgba(139,77,255,.3))}
     .step{flex:1;text-align:center;position:relative;z-index:1}
-    .step-num{width:80px;height:80px;margin:0 auto 16px;border-radius:50%;background:#0a0f1a;border:2px solid rgba(139,77,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;color:#b84cff}
+    .step-num{width:80px;height:80px;margin:0 auto 16px;border-radius:50%;background:#0a0f1a;border:2px solid rgba(139,77,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;color:#b84cff;position:relative}
+    .step-idx{position:absolute;top:-5px;right:-5px;width:21px;height:21px;border-radius:50%;background:linear-gradient(135deg,#8d4dff,#4d7cff);color:#fff;font-size:.62rem;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #060b14}
     .step h4{font-size:.88rem;font-weight:700;color:#f7f7ff;margin-bottom:6px}
     .step p{font-size:.76rem;color:#64748b;line-height:1.5}
     @media(max-width:768px){.steps{flex-direction:column;gap:24px}.steps::before{display:none}}
@@ -207,12 +224,6 @@ export const routes = {
     .tab-btn:hover{color:#94a3b8;background:rgba(255,255,255,.03)}
     .tab-btn.active{color:#b84cff;background:#060b14;border-color:rgba(255,255,255,.07);border-bottom-color:#060b14;position:relative;z-index:1}
     .tab-content{background:#060b14;border:1px solid rgba(255,255,255,.07);border-radius:0 12px 12px 12px;padding:28px;overflow-x:auto}
-    .tab-content pre{font-size:.78rem;line-height:1.85;color:#cbd5e1;font-family:'JetBrains Mono',monospace;white-space:pre;margin:0;tab-size:2}
-    .hl-kw{color:#b84cff}
-    .hl-str{color:#00dfff}
-    .hl-fn{color:#4d7cff}
-    .hl-cmt{color:#475569}
-    .hl-num{color:#f59e0b}
 
     /* === DASHBOARD PREVIEW === */
     .dashboard-preview{background:#060b14;border:1px solid rgba(255,255,255,.07);border-radius:16px;overflow:hidden;margin-top:48px}
@@ -228,6 +239,20 @@ export const routes = {
     .dash-search input::placeholder{color:#475569}
     .dash-body{display:grid;grid-template-columns:1fr 300px;min-height:420px}
     .dash-main{padding:24px}
+    .dash-panel-title{font-size:.72rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+    .dash-list{display:flex;flex-direction:column;gap:4px}
+    .dash-list-row{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:10px 14px;font-size:.78rem;transition:border-color .15s}
+    .dash-list-row:hover{border-color:rgba(139,77,255,.2)}
+    .dash-row-id{color:#64748b;font-weight:600;font-family:'JetBrains Mono',monospace;font-size:.72rem;min-width:56px}
+    .dash-row-name{color:#e2e8f0;flex:1}
+    .dash-row-total{color:#f7f7ff;font-weight:600}
+    .dash-badge{font-size:.62rem;font-weight:700;padding:2px 10px;border-radius:10px;color:#b84cff;background:rgba(139,77,255,.1);border:1px solid rgba(139,77,255,.2)}
+    .dash-badge.paid{color:#34d399;background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.2)}
+    .dash-badge.pending{color:#fbbf24;background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.2)}
+    .dash-toggle{width:34px;height:18px;border-radius:10px;background:rgba(255,255,255,.1);position:relative;transition:background .15s;flex-shrink:0}
+    .dash-toggle::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#94a3b8;transition:left .15s,background .15s}
+    .dash-toggle.on{background:linear-gradient(135deg,#8d4dff,#4d7cff)}
+    .dash-toggle.on::after{left:18px;background:#fff}
     .dash-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
     .dash-stat{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:18px 20px;cursor:pointer;transition:border-color .15s,background .15s;user-select:none}
     .dash-stat:hover{border-color:rgba(139,77,255,.2);background:rgba(139,77,255,.04)}
@@ -303,10 +328,10 @@ export const routes = {
           <p class="hero-sub">{i18n.t('hero.sub')}</p>
           <div class="hero-buttons">
             <button class="btn-primary" onclick={() => navigate('/docs/introduction')}>
-              {i18n.t('hero.start')} <span>→</span>
+              {i18n.t('hero.start')} <Icon name="arrow-right" size={13} color="#fff" />
             </button>
             <a class="btn-secondary" href="https://github.com" target="_blank" rel="noopener">
-              <span>⌂</span> {i18n.t('hero.github')}
+              <Icon name="github" size={14} /> {i18n.t('hero.github')}
             </a>
           </div>
         </div>
@@ -320,20 +345,24 @@ export const routes = {
       <div class="container">
         <div class="stats-bar">
           <div class="stat-item">
-            <div class="stat-num gradient">0KB</div>
+            <div class="stat-icon"><Icon name="js-off" size={30} /></div>
+            <div class="stat-num"><span class="grad-text">0KB</span></div>
             <div class="stat-desc">{i18n.t('stats.unused')}</div>
           </div>
           <div class="stat-item">
-            <div class="stat-num gradient">{i18n.t('stats.finegrained')}</div>
+            <div class="stat-icon"><Icon name="bolt" size={30} /></div>
+            <div class="stat-num"><span class="grad-text">{i18n.t('stats.finegrained')}</span></div>
             <div class="stat-desc">{i18n.t('stats.reactivity')}</div>
           </div>
           <div class="stat-item">
-            <div class="stat-num gradient">{i18n.t('stats.zeroconfig')}</div>
-            <div class="stat-desc">{i18n.t('stats.inference')}</div>
+            <div class="stat-icon"><Icon name="wrench" size={30} /></div>
+            <div class="stat-num"><span class="grad-text">{i18n.t('stats.zeroconfig')}</span></div>
+            <div class="stat-desc"><Icon name="sparkles" size={12} /> {i18n.t('stats.inference')}</div>
           </div>
           <div class="stat-item">
-            <div class="stat-num gradient">SSR • SSG • ISR</div>
-            <div class="stat-desc">{i18n.t('stats.builtin')}</div>
+            <div class="stat-icon"><Icon name="ssr" size={30} /></div>
+            <div class="stat-num"><span class="grad-text">SSR • SSG • ISR</span></div>
+            <div class="stat-desc"><Icon name="check" size={12} /> {i18n.t('stats.builtin')}</div>
           </div>
         </div>
       </div>
@@ -352,14 +381,17 @@ export const routes = {
               <div class="code-box" style="grid-column:1/-1">
                 <div class="code-box-header"><span style="color:#b84cff">TypeScript • JSX</span></div>
                 <div class="code-box-body">
-                  <pre><span class="code-keyword">function</span> <span class="code-highlight">Counter</span>() {'{'}</pre>
-                  <pre>    <span class="code-keyword">const</span> state = <span class="code-highlight">store</span>({'{'} count: 0 {'}'});</pre>
-                  <pre>    <span class="code-keyword">return</span> (</pre>
-                  <pre>        {'<button'} onclick={'{() =>'} state.count++{'}>'}</pre>
-                  <pre>            Count: {'{'}state.count{'}'}</pre>
-                  <pre>        {'</button>'}</pre>
-                  <pre>    );</pre>
-                  <pre>{'}'}</pre>
+                  <CodeBlock
+                    bare
+                    code={`function Counter() {
+    const state = store({ count: 0 });
+    return (
+        <button onclick={() => state.count++}>
+            Count: \${state.count}
+        </button>
+    );
+}`}
+                  />
                 </div>
               </div>
             </div>
@@ -374,32 +406,32 @@ export const routes = {
           <h2 class="section-title">{br('home.features.title')[0]}<br/>{br('home.features.title')[1]}</h2>
           <div class="features-grid">
             <div class="feature-card">
-              <div class="feature-card-icon">⚡</div>
+              <div class="feature-card-icon"><Icon name="ast" size={24} /></div>
               <h4>{i18n.t('home.f1.title')}</h4>
               <p>{i18n.t('home.f1.text')}</p>
             </div>
             <div class="feature-card">
-              <div class="feature-card-icon">🎯</div>
+              <div class="feature-card-icon"><Icon name="bolt" size={24} /></div>
               <h4>{i18n.t('home.f2.title')}</h4>
               <p>{i18n.t('home.f2.text')}</p>
             </div>
             <div class="feature-card">
-              <div class="feature-card-icon">⚙️</div>
+              <div class="feature-card-icon"><Icon name="server" size={24} /></div>
               <h4>{i18n.t('home.f3.title')}</h4>
               <p>{i18n.t('home.f3.text')}</p>
             </div>
             <div class="feature-card">
-              <div class="feature-card-icon">🌐</div>
+              <div class="feature-card-icon"><Icon name="ssr" size={24} /></div>
               <h4>{i18n.t('home.f4.title')}</h4>
               <p>{i18n.t('home.f4.text')}</p>
             </div>
             <div class="feature-card">
-              <div class="feature-card-icon">📐</div>
+              <div class="feature-card-icon"><Icon name="layout-pages" size={24} /></div>
               <h4>{i18n.t('home.f5.title')}</h4>
               <p>{i18n.t('home.f5.text')}</p>
             </div>
             <div class="feature-card">
-              <div class="feature-card-icon">🔮</div>
+              <div class="feature-card-icon"><Icon name="sparkles" size={24} /></div>
               <h4>{i18n.t('home.f6.title')}</h4>
               <p>{i18n.t('home.f6.text')}</p>
             </div>
@@ -414,27 +446,42 @@ export const routes = {
           <h2 class="section-title">{i18n.t('home.how.title')}</h2>
           <div class="steps">
             <div class="step">
-              <div class="step-num">1</div>
+              <div class="step-num">
+                <Icon name="code" size={26} />
+                <span class="step-idx">1</span>
+              </div>
               <h4>{i18n.t('home.step1.title')}</h4>
               <p>{i18n.t('home.step1.text')}</p>
             </div>
             <div class="step">
-              <div class="step-num">2</div>
+              <div class="step-num">
+                <Icon name="ast" size={26} />
+                <span class="step-idx">2</span>
+              </div>
               <h4>{i18n.t('home.step2.title')}</h4>
               <p>{i18n.t('home.step2.text')}</p>
             </div>
             <div class="step">
-              <div class="step-num">3</div>
+              <div class="step-num">
+                <Icon name="terminal" size={26} />
+                <span class="step-idx">3</span>
+              </div>
               <h4>{i18n.t('home.step3.title')}</h4>
               <p>{i18n.t('home.step3.text')}</p>
             </div>
             <div class="step">
-              <div class="step-num">4</div>
+              <div class="step-num">
+                <Icon name="bolt" size={26} />
+                <span class="step-idx">4</span>
+              </div>
               <h4>{i18n.t('home.step4.title')}</h4>
               <p>{i18n.t('home.step4.text')}</p>
             </div>
             <div class="step">
-              <div class="step-num">5</div>
+              <div class="step-num">
+                <Icon name="pointer" size={26} />
+                <span class="step-idx">5</span>
+              </div>
               <h4>{i18n.t('home.step5.title')}</h4>
               <p>{i18n.t('home.step5.text')}</p>
             </div>
@@ -446,7 +493,7 @@ export const routes = {
       <section class="section">
         <div class="section-inner">
           <div class="section-label">{i18n.t('home.code.label')}</div>
-          <h2 class="section-title">Store · server · CSS · Router</h2>
+          <h2 class="section-title">store · server · CSS · router</h2>
           <div class="code-tabs">
             <div class="tabs-nav">
               {(['store','server','css','router'] as const).map(tab => (
@@ -456,7 +503,7 @@ export const routes = {
               ))}
             </div>
             <div class="tab-content">
-              <pre>{tabCode[tabsState.activeTab]}</pre>
+              {(() => <CodeBlock bare code={tabCode[tabsState.activeTab]} />)()}
             </div>
           </div>
         </div>
@@ -485,7 +532,7 @@ export const routes = {
                 ))}
               </div>
               <div class="dash-search">
-                <span>🔍</span>
+                <Icon name="search" size={13} cls="dash-search-ic" />
                 <input
                   placeholder={i18n.t('home.dash.search')}
                   onInput={(e: Event) => { dash.search = (e.target as HTMLInputElement).value; }}
@@ -494,55 +541,132 @@ export const routes = {
             </div>
             <div class="dash-body">
               <div class="dash-main">
-                <div class="dash-period">
-                  {periods.map((p, i) => (
-                    <button
-                      class={`dash-period-btn${dash.period === i ? ' active' : ''}`}
-                      onclick={() => { dash.period = i; }}
-                    >
-                      {i18n.t(p)}
-                    </button>
-                  ))}
-                </div>
-                <div class="dash-stats">
-                  <div class="dash-stat" onclick={() => { dash.period = (dash.period + 1) % 3; }}>
-                    <div class="dash-stat-lbl">{i18n.t('home.dash.totalSales')}</div>
-                    <div class="dash-stat-val">${getStatValue(54780)}</div>
-                    <div class="dash-stat-up">↑ {getStatChange(12.3)}%</div>
-                  </div>
-                  <div class="dash-stat" onclick={() => { dash.period = (dash.period + 1) % 3; }}>
-                    <div class="dash-stat-lbl">{i18n.t('home.dash.orders')}</div>
-                    <div class="dash-stat-val">{getStatValue(1428)}</div>
-                    <div class="dash-stat-up">↑ {getStatChange(8.3)}%</div>
-                  </div>
-                  <div class="dash-stat" onclick={() => { dash.period = (dash.period + 1) % 3; }}>
-                    <div class="dash-stat-lbl">{i18n.t('home.dash.customers')}</div>
-                    <div class="dash-stat-val">{getStatValue(3987)}</div>
-                    <div class="dash-stat-up">↑ {getStatChange(8.2)}%</div>
-                  </div>
-                  <div class="dash-stat" onclick={() => { dash.period = (dash.period + 1) % 3; }}>
-                    <div class="dash-stat-lbl">{i18n.t('home.dash.conversion')}</div>
-                    <div class="dash-stat-val">{getStatValue(2.43, 2)}%</div>
-                    <div class="dash-stat-up">↑ {getStatChange(4.1)}%</div>
-                  </div>
-                </div>
-                <div class="dash-chart-label">
-                  <span>{i18n.t('home.dash.chart')}</span>
-                  <button class="dash-chart-refresh" onclick={randomizeChart}>↻ {i18n.t('home.dash.refresh')}</button>
-                </div>
-                <div class="dash-chart">
-                  {dash.chartData.map((h: number, i: number) => (
-                    <div
-                      class={`chart-bar${dash.selectedBar === i ? ' selected' : ''}`}
-                      style={`height:${h}%`}
-                      onclick={() => { dash.selectedBar = i; }}
-                    >
-                      {dash.selectedBar === i && (
-                        <div class="chart-tooltip">{i18n.t('home.dash.tooltip', { day: i + 1, value: h })}</div>
-                      )}
+                {dash.activeNav === 'home.dash.overview' && (
+                  <div class="dash-panel">
+                    <div class="dash-period">
+                      {periods.map((p, i) => (
+                        <button
+                          class={`dash-period-btn${dash.period === i ? ' active' : ''}`}
+                          onclick={() => { dash.period = i; }}
+                        >
+                          {i18n.t(p)}
+                        </button>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                    <div class="dash-stats">
+                      <div class="dash-stat" onclick={() => { dash.period = (dash.period + 1) % 3; }}>
+                        <div class="dash-stat-lbl">{i18n.t('home.dash.totalSales')}</div>
+                        <div class="dash-stat-val">${getStatValue(54780)}</div>
+                        <div class="dash-stat-up">↑ {getStatChange(12.3)}%</div>
+                      </div>
+                      <div class="dash-stat" onclick={() => { dash.period = (dash.period + 1) % 3; }}>
+                        <div class="dash-stat-lbl">{i18n.t('home.dash.orders')}</div>
+                        <div class="dash-stat-val">{getStatValue(1428)}</div>
+                        <div class="dash-stat-up">↑ {getStatChange(8.3)}%</div>
+                      </div>
+                      <div class="dash-stat" onclick={() => { dash.period = (dash.period + 1) % 3; }}>
+                        <div class="dash-stat-lbl">{i18n.t('home.dash.customers')}</div>
+                        <div class="dash-stat-val">{getStatValue(3987)}</div>
+                        <div class="dash-stat-up">↑ {getStatChange(8.2)}%</div>
+                      </div>
+                      <div class="dash-stat" onclick={() => { dash.period = (dash.period + 1) % 3; }}>
+                        <div class="dash-stat-lbl">{i18n.t('home.dash.conversion')}</div>
+                        <div class="dash-stat-val">{getStatValue(2.43, 2)}%</div>
+                        <div class="dash-stat-up">↑ {getStatChange(4.1)}%</div>
+                      </div>
+                    </div>
+                    <div class="dash-chart-label">
+                      <span>{i18n.t('home.dash.chart')}</span>
+                      <button class="dash-chart-refresh" onclick={randomizeChart}>↻ {i18n.t('home.dash.refresh')}</button>
+                    </div>
+                    <div class="dash-chart">
+                      {dash.chartData.map((h: number, i: number) => (
+                        <div
+                          class={`chart-bar${dash.selectedBar === i ? ' selected' : ''}`}
+                          style={`height:${h}%`}
+                          onclick={() => { dash.selectedBar = i; }}
+                        >
+                          {dash.selectedBar === i && (
+                            <div class="chart-tooltip">{i18n.t('home.dash.tooltip', { day: i + 1, value: h })}</div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {dash.activeNav === 'home.dash.orders' && (
+                  <div class="dash-panel">
+                    <div class="dash-panel-title">{i18n.t('dash.panel.orders')}</div>
+                    <div class="dash-list">
+                      {dash.orders.map((o) => (
+                        <div class="dash-list-row">
+                          <span class="dash-row-id">{o.id}</span>
+                          <span class="dash-row-name">{o.customer}</span>
+                          <span class="dash-row-total">${o.total.toFixed(2)}</span>
+                          <span class={`dash-badge ${o.paid ? 'paid' : 'pending'}`}>{i18n.t(o.paid ? 'dash.status.paid' : 'dash.status.pending')}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {dash.activeNav === 'home.dash.products' && (
+                  <div class="dash-panel">
+                    <div class="dash-panel-title">{i18n.t('dash.panel.products')}</div>
+                    <div class="dash-list">
+                      {dash.products.map((p) => (
+                        <div class="dash-list-row">
+                          <span class="dash-row-name">{p.name}</span>
+                          <span class="dash-row-total">${p.price.toFixed(2)}</span>
+                          <span class="dash-badge">{i18n.t('home.dash.sold', { count: p.sales })}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {dash.activeNav === 'home.dash.customers' && (
+                  <div class="dash-panel">
+                    <div class="dash-panel-title">{i18n.t('dash.panel.customers')}</div>
+                    <div class="dash-list">
+                      {dash.customers.map((c) => (
+                        <div class="dash-list-row">
+                          <span class="dash-row-name">{c.name}</span>
+                          <span class="dash-row-total">{c.country}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {dash.activeNav === 'home.dash.analytics' && (
+                  <div class="dash-panel">
+                    <div class="dash-panel-title">{i18n.t('dash.panel.analytics')}</div>
+                    <div class="dash-chart" style="height:260px">
+                      {dash.chartData.map((h: number, i: number) => (
+                        <div
+                          class={`chart-bar${dash.selectedBar === i ? ' selected' : ''}`}
+                          style={`height:${h}%`}
+                          onclick={() => { dash.selectedBar = i; }}
+                        >
+                          {dash.selectedBar === i && (
+                            <div class="chart-tooltip">{i18n.t('home.dash.tooltip', { day: i + 1, value: h })}</div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {dash.activeNav === 'home.dash.settings' && (
+                  <div class="dash-panel">
+                    <div class="dash-panel-title">{i18n.t('dash.panel.settings')}</div>
+                    <div class="dash-list">
+                      {(['notif', 'mail', 'dark'] as const).map((k) => (
+                        <div class="dash-list-row" style="cursor:pointer" onclick={() => { dash.settings[k] = !dash.settings[k]; }}>
+                          <span class="dash-row-name">{i18n.t(`dash.settings.${k}`)}</span>
+                          <span class={`dash-toggle${dash.settings[k] ? ' on' : ''}`}></span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
               <div class="dash-sidebar">
                 <div class="dash-side-title">{i18n.t('home.dash.top')}</div>
@@ -576,7 +700,7 @@ export const routes = {
           </div>
           <br/>
           <button class="btn-primary" onclick={() => navigate('/docs/introduction')} style="font-size:.92rem;padding:14px 36px">
-            {i18n.t('home.cta.btn')} <span>→</span>
+            {i18n.t('home.cta.btn')} <Icon name="arrow-right" size={13} color="#fff" />
           </button>
         </div>
       </section>

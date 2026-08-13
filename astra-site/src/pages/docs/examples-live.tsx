@@ -6,6 +6,7 @@
  */
 import { component, store, mounted } from '@astrajs/core';
 import { css } from '@astrajs/compiler/css';
+import { Icon } from '../../components/icon.js';
 
 export interface LiveExample {
   num: string;
@@ -60,7 +61,7 @@ const ex01 = component(() => {
           <button class="lv-btn" onclick={() => counter.value++}>+ 1</button>
         </div>
       </div>
-      <p>⏱ Solo el número se actualiza. El componente no se re-ejecuta.</p>
+      <p><Icon name="clock" size={13} /> Solo el número se actualiza. El componente no se re-ejecuta.</p>
     </div>
   );
 });
@@ -78,7 +79,7 @@ const ex02 = component(() => (
     <div class="lv-card">
       <div class="lv-row" style="justify-content:space-between">
         <span class="lv-tag">Componente B (Badge)</span>
-        <strong style="color:#fff">🛒 {cartStore.items} items</strong>
+        <strong style="color:#fff"><Icon name="cart" size={14} /> {cartStore.items} items</strong>
       </div>
     </div>
     <p>Sin context, sin props drilling — el store es el canal único.</p>
@@ -115,8 +116,8 @@ const ex04 = component(() => {
         <button class={`lv-btn ${nav.page === '404' ? '' : 'ghost'}`} onclick={() => { nav.page = '404'; }}>Ruta inválida</button>
       </div>
       <div class="lv-card">
-        {nav.page === 'home' && <p>🏠 Home — route('/', {'{ exact: true }'})</p>}
-        {nav.page === 'about' && <p>ℹ️ About — route('/about')</p>}
+        {nav.page === 'home' && <p><Icon name="home" size={13} /> Home — route('/', {'{ exact: true }'})</p>}
+        {nav.page === 'about' && <p><Icon name="info" size={13} /> About — route('/about')</p>}
         {nav.page === '404' && <p class="lv-err">404 — fallbackRoute()</p>}
       </div>
     </div>
@@ -209,7 +210,7 @@ const ex07 = component(() => {
           <p>Sin datos. Pulsa "Cargar datos".</p>
         ) : (
           <div class="lv-list">
-            {state.data.map((d) => <div class="lv-item"><span>{d}</span><span class="lv-ok">✓</span></div>)}
+            {state.data.map((d) => <div class="lv-item"><span>{d}</span><span class="lv-ok"><Icon name="check" size={12} /></span></div>)}
           </div>
         )}
       </div>
@@ -260,7 +261,7 @@ const ex10 = component(() => {
         </button>
       </div>
       <div class="lv-card" style={ui.active ? 'border-color:#b84cff;box-shadow:0 0 16px rgba(184,76,255,.25)' : ''}>
-        <p class={ui.active ? 'lv-ok' : ''}>{ui.active ? '● Activo' : '○ Inactivo'}</p>
+        <p class={ui.active ? 'lv-ok' : ''}>{ui.active && <span><Icon name="check" size={12} /> Activo</span>}{!ui.active && <span><Icon name="square" size={12} /> Inactivo</span>}</p>
       </div>
       <button class="lv-btn" disabled={!ui.active}>
         {ui.active ? 'Botón habilitado' : 'Botón deshabilitado (disabled={!active})'}
@@ -293,7 +294,10 @@ const ex11 = component(() => {
             {state.users.map((u) => <div class="lv-item"><span>{u}</span><span class="lv-tag">User</span></div>)}
           </div>
         ) : (
-          <p>{state.loading ? '⏳ RPC en vuelo...' : 'Llama a getUsers() — el compilador generó el stub fetch + handler.'}</p>
+          <p>
+            {state.loading && <span><Icon name="loader" size={13} /> RPC en vuelo...</span>}
+            {!state.loading && <span>Llama a getUsers() — el compilador generó el stub fetch + handler.</span>}
+          </p>
         )}
       </div>
     </div>
@@ -317,8 +321,8 @@ const ex12 = component(() => {
       <button class="lv-btn" onclick={load}>getProducts()</button>
       <div class="lv-card">
         {state.status === 'idle' && <p>Haz clic para consumir la API.</p>}
-        {state.status === 'cached' && <p class="lv-ok">⚡ Respuesta instantánea desde caché (SWR)...</p>}
-        {state.status === 'revalidated' && <p class="lv-ok">🔄 Revalidado en background — v{state.version}</p>}
+        {state.status === 'cached' && <p class="lv-ok"><Icon name="bolt" size={13} /> Respuesta instantánea desde caché (SWR)...</p>}
+        {state.status === 'revalidated' && <p class="lv-ok"><Icon name="refresh" size={13} /> Revalidado en background — v{state.version}</p>}
       </div>
       <p>Primera llamada: red. Luego: caché + revalidación silenciosa.</p>
     </div>
@@ -340,7 +344,7 @@ const ex13 = component(() => {
       </button>
       {form.sent && (
         <div class="lv-card">
-          <p class="lv-ok">✓ Post creado en el servidor</p>
+          <p class="lv-ok"><Icon name="check" size={13} /> Post creado en el servidor</p>
           <p><strong style="color:#fff">{form.title}</strong> — {form.body}</p>
           <p>Tags ['posts'] revalidados automáticamente.</p>
         </div>
@@ -406,9 +410,9 @@ const ex15 = component(() => {
       <input class="lv-input" placeholder="Edad (min 18)" value={form.age}
         onInput={(e: Event) => { form.age = (e.target as HTMLInputElement).value; }} />
       {errs.length === 0 ? (
-        <p class="lv-ok">✓ Sin errores — schema validado</p>
+        <p class="lv-ok"><Icon name="check" size={13} /> Sin errores — schema validado</p>
       ) : (
-        errs.map((e) => <p class="lv-err">✖ {e}</p>)
+        errs.map((e) => <p class="lv-err"><Icon name="x" size={12} /> {e}</p>)
       )}
     </div>
   );
@@ -439,7 +443,7 @@ const ex16 = component(() => {
         {todos.items.map((t) => (
           <div class="lv-item" style="cursor:pointer" onclick={() => toggle(t.id)}>
             <span style={t.done ? 'text-decoration:line-through;color:#64748b' : ''}>{t.text}</span>
-            <span>{t.done ? '✅' : '⬜'}</span>
+            <span>{t.done && <Icon name="check" size={14} />}{!t.done && <Icon name="square" size={14} />}</span>
           </div>
         ))}
       </div>
@@ -477,7 +481,7 @@ const ex17 = component(() => {
           <div class="lv-bar" style="margin-top:8px">
             <div class="lv-bar-fill" style={`width:${state.progress}%`}></div>
           </div>
-          {state.done && <p class="lv-ok">✓ Subido al servidor</p>}
+          {state.done && <p class="lv-ok"><Icon name="check" size={13} /> Subido al servidor</p>}
         </div>
       )}
     </div>
@@ -505,7 +509,8 @@ const ex18 = component(() => {
         <p>Ventas en tiempo real</p>
       </div>
       <div class="lv-row">
-        <span class="lv-tag">{state.syncing ? '⏳ Sincronizando...' : '● Sincronizado'}</span>
+        {state.syncing && <span class="lv-tag"><Icon name="loader" size={11} /> Sincronizando...</span>}
+        {!state.syncing && <span class="lv-tag"><Icon name="check" size={11} /> Sincronizado</span>}
         <span class="lv-tag">syncs: {state.syncs}</span>
       </div>
       <p>Polling con If-None-Match — el servidor responde 304 si no hay cambios.</p>
@@ -528,7 +533,7 @@ const ex19 = component(() => {
       </button>
       {state.resumed && (
         <div class="lv-card">
-          <p class="lv-ok">✓ App reanudada — sin re-ejecutar componentes, sin hidratación.</p>
+          <p class="lv-ok"><Icon name="check" size={13} /> App reanudada — sin re-ejecutar componentes, sin hidratación.</p>
           <div class="lv-list">
             <div class="lv-item"><span>items</span><span>3</span></div>
             <div class="lv-item"><span>total</span><span>$42</span></div>
@@ -561,7 +566,7 @@ const ex20 = component(() => {
           ))}
         </div>
       </div>
-      <p>⏱ Build time: {builtAt} — esta página no hizo ningún fetch: los datos ya estaban en el HTML.</p>
+      <p><Icon name="clock" size={13} /> Build time: {builtAt} — esta página no hizo ningún fetch: los datos ya estaban en el HTML.</p>
     </div>
   );
 });
@@ -585,11 +590,11 @@ export const cart = store({ items: 0 });
 
 // Componente A
 <button onclick={() => cart.items++}>
-  Agregar ({cart.items})
+  Add ({cart.items})
 </button>
 
 // Componente B — se actualiza solo
-<p>🛒 {cart.items} items</p>` },
+<p>{cart.items} items</p>` },
   { num: '03', title: 'ex3.title', description: 'ex3.desc', concepts: ['bindValue', 'onInput'], docsHref: '/docs/fundamentals#eventos', render: ex03,
     code: `const form = store({ name: '', email: '' });
 
@@ -598,7 +603,7 @@ export const cart = store({ items: 0 });
   onInput={(e) => { form.name = e.target.value; }}
 />
 
-<p>Hola, {form.name}!</p>` },
+<p>Hello, {form.name}!</p>` },
   { num: '04', title: 'ex4.title', description: 'ex4.desc', concepts: ['route()', 'fallbackRoute()'], docsHref: '/docs/router#rutas', render: ex04,
     code: `export const routes = {
   get home()     { return route('/', { exact: true }); },
@@ -674,14 +679,14 @@ mounted(() => {
   );
 }
 
-<Layout title="Mi App">
-  <p>Contenido</p>
+<Layout title="My App">
+  <p>Content</p>
 </Layout>` },
   { num: '10', title: 'ex10.title', description: 'ex10.desc', concepts: ['bindAttr', 'bindClass'], docsHref: '/docs/fundamentals#jsx-sin-vdom', render: ex10,
     code: `const ui = store({ active: false });
 
 <div class={ui.active ? 'card active' : 'card'}>
-  <button disabled={!ui.active}>Enviar</button>
+  <button disabled={!ui.active}>Send</button>
 </div>
 
 // Solo cambia el class/disabled

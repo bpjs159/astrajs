@@ -1,7 +1,9 @@
 import { component, dynamic } from '@astrajs/core';
 import { Link } from '@astrajs/router';
 import { DocSidebar } from '../components/docs-sidebar.js';
+import { Icon } from '../components/icon.js';
 import { i18n } from '../i18n.js';
+import { CodeBlock } from '../components/code-block.js';
 
 export const DocsPage = component(() => {
   /** Divide claves con <br/> en líneas para renderizarlas con salto real. */
@@ -44,9 +46,10 @@ export const DocsPage = component(() => {
     .docs-btn-ghost{display:inline-flex;align-items:center;gap:6px;font-size:.82rem;font-weight:600;color:#e2e8f0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);padding:10px 24px;border-radius:8px;transition:background .15s}
     .docs-btn-ghost:hover{background:rgba(255,255,255,.1)}
 
-    .feature-pills{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:40px}
-    .feature-pill{background:rgba(139,77,255,.06);border:1px solid rgba(139,77,255,.12);border-radius:8px;padding:14px 20px;min-width:140px;text-align:center}
-    .feature-pill-icon{font-size:1.1rem;margin-bottom:4px}
+    .feature-pills{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:40px}
+    .feature-pill{background:rgba(139,77,255,.06);border:1px solid rgba(139,77,255,.12);border-radius:8px;padding:16px 20px;min-width:0;text-align:center}
+    .feature-pill-icon{margin-bottom:6px;display:flex;justify-content:center}
+    @media(max-width:600px){.feature-pills{grid-template-columns:1fr}}
     .feature-pill-label{font-size:.72rem;font-weight:700;color:#f7f7ff}
     .feature-pill-desc{font-size:.66rem;color:#64748b;margin-top:2px}
 
@@ -117,22 +120,22 @@ export default function Counter() {
 
           <div class="feature-pills">
             <div class="feature-pill">
-              <div class="feature-pill-icon">⚡</div>
+              <div class="feature-pill-icon"><Icon name="bolt" size={24} /></div>
               <div class="feature-pill-label">Zero-VDOM</div>
               <div class="feature-pill-desc">{br('d.pill1.desc')[0]}<br/>{br('d.pill1.desc')[1]}</div>
             </div>
             <div class="feature-pill">
-              <div class="feature-pill-icon">🔧</div>
+              <div class="feature-pill-icon"><Icon name="wrench" size={24} /></div>
               <div class="feature-pill-label">Zero Config</div>
               <div class="feature-pill-desc">{br('d.pill2.desc')[0]}<br/>{br('d.pill2.desc')[1]}</div>
             </div>
             <div class="feature-pill">
-              <div class="feature-pill-icon">🌐</div>
+              <div class="feature-pill-icon"><Icon name="layers" size={24} /></div>
               <div class="feature-pill-label">Full-Stack</div>
               <div class="feature-pill-desc">{br('d.pill3.desc')[0]}<br/>{br('d.pill3.desc')[1]}</div>
             </div>
             <div class="feature-pill">
-              <div class="feature-pill-icon">🔮</div>
+              <div class="feature-pill-icon"><Icon name="code" size={24} /></div>
               <div class="feature-pill-label">100% TypeScript</div>
               <div class="feature-pill-desc">{br('d.pill4.desc')[0]}<br/>{br('d.pill4.desc')[1]}</div>
             </div>
@@ -150,7 +153,7 @@ export default function Counter() {
               <span class="code-demo-tab">HTML</span>
             </div>
             <div class="code-demo-body">
-              <pre>{demoCode}</pre>
+              <CodeBlock code={demoCode} bare />
             </div>
             <div class="code-demo-result">
               <span class="code-demo-result-label">{i18n.t('d.first.result')}</span>
@@ -226,13 +229,13 @@ export default function Counter() {
 
           {/* ── Promo card ── */}
           <div class="promo-card">
-            <h4>{i18n.t('d.promo1.title')}</h4>
+            <h4><Icon name="bolt" size={15} /> {i18n.t('d.promo1.title')}</h4>
             <p>{i18n.t('d.promo1.text')}</p>
             <a href="/docs#compilador">{i18n.t('d.promo1.link')} →</a>
           </div>
 
           <div class="promo-card" style="margin-top:16px;background:linear-gradient(135deg,rgba(0,223,255,.06),rgba(139,77,255,.04));border-color:rgba(0,223,255,.15)">
-            <h4>{i18n.t('d.promo2.title')}</h4>
+            <h4><Icon name="play" size={15} /> {i18n.t('d.promo2.title')}</h4>
             <p>{i18n.t('d.promo2.text')}</p>
             <a href="/docs#primeros-pasos">{i18n.t('d.promo2.link')} →</a>
           </div>
@@ -240,19 +243,19 @@ export default function Counter() {
           {/* Placeholder sections for sidebar nav */}
           <h2 id="instalacion">{i18n.t('sb.install')}</h2>
           <p>{i18n.t('d.install1')}</p>
-          <pre><code>npx @astrajs/cli@latest</code></pre>
+          <CodeBlock code={`npx @astrajs/cli@latest`} />
           <p>{i18n.t('d.install2')}</p>
-          <pre><code>pnpm add @astrajs/core @astrajs/compiler
-{`// vite.config.ts
+          <CodeBlock code={`pnpm add @astrajs/core @astrajs/compiler
+// vite.config.ts
 import astra from '@astrajs/compiler';
 
 export default {
   plugins: [astra()],
-};`}</code></pre>
+};`} />
 
           <h2 id="primeros-pasos">{i18n.t('sb.gettingStarted')}</h2>
           <p>{i18n.t('d.getting')}</p>
-          <pre><code>{`import { component, store } from '@astrajs/core';
+          <CodeBlock code={`import { component, store } from '@astrajs/core';
 
 export const Hello = component(() => {
   const name = store({ value: 'AstraJS' });
@@ -266,7 +269,7 @@ export const Hello = component(() => {
       />
     </div>
   );
-});`}</code></pre>
+});`} />
           <p>
             {i18n.t('d.getting2a')}
             <strong>{i18n.t('d.getting2b')} <code>&lt;h1&gt;</code> {i18n.t('d.getting2c')}</strong>
@@ -284,9 +287,9 @@ export const Hello = component(() => {
 
           <h2 id="componentes">{i18n.t('sb.components')}</h2>
           <p>{i18n.t('d.components.p')}</p>
-          <pre><code>{`// Sin estado → función pura
+          <CodeBlock code={`// Sin estado → función pura
 function Greeting({ name }: { name: string }) {
-  return <h2>Hola, {name}</h2>;
+  return <h2>Hello, {name}</h2>;
 }
 
 // Con estado → component()
@@ -297,11 +300,11 @@ export const Counter = component(() => {
       {state.count}
     </button>
   );
-});`}</code></pre>
+});`} />
 
           <h2 id="reactividad">{i18n.t('sb.reactivity')}</h2>
           <p>{i18n.t('d.reactivity.p')}</p>
-          <pre><code>{`const user = store({
+          <CodeBlock code={`const user = store({
   name: 'Ada',
   profile: { bio: 'Dev' }
 });
@@ -312,24 +315,24 @@ export const Counter = component(() => {
 
 // Escritura → notificación quirúrgica
 user.name = 'Grace';     
-// → solo se actualiza el nodo de "name", nada más`}</code></pre>
+// → solo se actualiza el nodo de "name", nada más`} />
 
           <h2 id="jsx-sin-vdom">{i18n.t('sb.jsx')}</h2>
           <p>{i18n.t('d.jsx.p')}</p>
-          <pre><code>{`// Escribes:
-<span>Hola {name}</span>
+          <CodeBlock code={`// Escribes:
+<span>Hello {name}</span>
 
 // El compilador genera:
 const span = document.createElement('span');
-const text1 = document.createTextNode('Hola ');
+const text1 = document.createTextNode('Hello ');
 const text2 = document.createTextNode('');
 span.append(text1, text2);
-effect(() => { text2.nodeValue = String(name); });`}</code></pre>
+effect(() => { text2.nodeValue = String(name); });`} />
           <p><strong>{i18n.t('d.jsx.note')}</strong></p>
 
           <h2 id="server">server</h2>
           <p>{i18n.t('d.server.p')}</p>
-          <pre><code>{`import { server } from '@astrajs/server';
+          <CodeBlock code={`import { server } from '@astrajs/server';
 
 export const getUsers = server({
   tags: ['users'],
@@ -343,7 +346,7 @@ export const getUsers = server({
 
 // En el cliente:
 const admins = await getUsers('admin');
-// ↑ RPC tipado. getUsers se ejecuta en el servidor.`}</code></pre>
+// ↑ RPC tipado. getUsers se ejecuta en el servidor.`} />
 
           <h2 id="resumibilidad">{i18n.t('sb.resumability')}</h2>
           <p>{i18n.t('d.resum.p1')}</p>
@@ -351,7 +354,7 @@ const admins = await getUsers('admin');
 
           <h2 id="estilos">{i18n.t('sb.css')}</h2>
           <p>{i18n.t('d.css.p')}</p>
-          <pre><code>{`import { css } from '@astrajs/core';
+          <CodeBlock code={`import { css } from '@astrajs/core';
 
 const card = css\`
   background: #0f172a;
@@ -362,42 +365,42 @@ const card = css\`
 
 function Card() {
   return <div class={card}>...</div>;
-}`}</code></pre>
+}`} />
 
           <h2 id="eventos">{i18n.t('sb.events')}</h2>
           <p>{i18n.t('d.events.p')}</p>
-          <pre><code>{`<button astra-on:click={handler}>
+          <CodeBlock code={`<button astra-on:click={handler}>
   Click me
-</button>`}</code></pre>
+</button>`} />
 
           <h2 id="tipos-server">{i18n.t('sb.serverTypes')}</h2>
           <p><strong>pre-build</strong>: {i18n.t('d.types.p1')}</p>
           <p><strong>dynamic</strong>: {i18n.t('d.types.p2')}</p>
-          <pre><code>{`// pre-build: ejecutado en build time
+          <CodeBlock code={`// pre-build: ejecutado en build time
 const menu = server({ type: 'pre-build' }, () => db.menu.findMany());
 
 // dynamic: ejecutado en cada request  
-const session = server({ type: 'dynamic' }, (req) => getSession(req));`}</code></pre>
+const session = server({ type: 'dynamic' }, (req) => getSession(req));`} />
 
           <h2 id="caching">{i18n.t('sb.caching')}</h2>
           <p>{i18n.t('d.caching.p')}</p>
-          <pre><code>{`// Definir con tags
+          <CodeBlock code={`// Definir con tags
 const products = server({ tags: ['products'] }, () => db.product.findMany());
 
 // Invalidar quirúrgicamente
 import { revalidate } from '@astrajs/server';
-await revalidate(['products']);`}</code></pre>
+await revalidate(['products']);`} />
 
           <h2 id="autosync">{i18n.t('sb.autosync')}</h2>
           <p>{i18n.t('d.autosync.p')}</p>
-          <pre><code>{`const liveData = server(
+          <CodeBlock code={`const liveData = server(
   { autoSync: true, autoSyncInterval: 3000 },
   () => db.stats.latest()
-);`}</code></pre>
+);`} />
 
           <h2 id="rutas">{i18n.t('sb.routes')}</h2>
           <p>{i18n.t('d.routes.p')}</p>
-          <pre><code>{`import { route, Outlet } from '@astrajs/router';
+          <CodeBlock code={`import { route, Outlet } from '@astrajs/router';
 
 function Layout() {
   return (
@@ -406,17 +409,17 @@ function Layout() {
       <Outlet />
     </div>
   );
-}`}</code></pre>
+}`} />
 
           <h2 id="layouts">{i18n.t('sb.layouts')}</h2>
           <p>{i18n.t('d.layouts.p')}</p>
 
           <h2 id="navegacion">{i18n.t('sb.navigation')}</h2>
           <p>{i18n.t('d.nav.p')}</p>
-          <pre><code>{`import { Link, navigate } from '@astrajs/router';
+          <CodeBlock code={`import { Link, navigate } from '@astrajs/router';
 
 <Link href="/products">Products</Link>
-<button onclick={() => navigate('/cart')}>Cart</button>`}</code></pre>
+<button onclick={() => navigate('/cart')}>Cart</button>`} />
 
           <h2 id="view-transitions">View Transitions API</h2>
           <p>{i18n.t('d.vt.p')}</p>
@@ -443,17 +446,17 @@ function Layout() {
 
           <h2 id="vite">{i18n.t('sb.advVite')}</h2>
           <p>{i18n.t('d.vite.p')}</p>
-          <pre><code>{`// vite.config.ts
+          <CodeBlock code={`// vite.config.ts
 import astra from '@astrajs/compiler';
 
 export default defineConfig({
   plugins: [astra()],
-});`}</code></pre>
+});`} />
 
           <h2 id="despliegue">{i18n.t('sb.advDeploy')}</h2>
           <p>{i18n.t('d.deploy.p')}</p>
-          <pre><code>{`pnpm build
-# Output: dist/ con HTML estático + server handlers`}</code></pre>
+          <CodeBlock code={`pnpm build
+# Output: dist/ con HTML estático + server handlers`} />
         </div>
       </main>
 

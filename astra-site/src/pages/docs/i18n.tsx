@@ -8,6 +8,9 @@
 import { component, store, dynamic } from '@astrajs/core';
 import { createI18n, WORLD_LOCALES } from '@astrajs/i18n';
 import { DocSidebar } from '../../components/docs-sidebar.js';
+import { DocRightToc } from '../../components/doc-right-toc.js';
+import { CodeBlock } from '../../components/code-block.js';
+import { i18n as siteI18n } from '../../i18n.js';
 
 const s = `
   .docs-layout{display:flex;min-height:100vh}
@@ -175,14 +178,14 @@ export const DocsI18n = component(() => (
         </div>
 
         <h2 id="instalacion">{siteI18n.t('sb.install')}</h2>
-        <pre><code>{`// package.json
+        <CodeBlock code={`// package.json
 "dependencies": { "@astrajs/i18n": "0.1.0" }
 
 // vite.config.ts
-resolve: { alias: { '@astrajs/i18n': '@astrajs/i18n/src' } } // solo monorepo`}</code></pre>
+resolve: { alias: { '@astrajs/i18n': '@astrajs/i18n/src' } } // solo monorepo`} />
 
         <h2 id="setup">{siteI18n.t('sb.i18nSetup')}</h2>
-        <pre><code>{`import { createI18n } from '@astrajs/i18n';
+        <CodeBlock code={`import { createI18n } from '@astrajs/i18n';
 
 export const i18n = createI18n({
   locale: 'es',            // idioma inicial
@@ -191,34 +194,34 @@ export const i18n = createI18n({
     en: { 'hero.title': 'Ship zero JavaScript' },
     es: { 'hero.title': 'Cero JavaScript enviado' },
   },
-});`}</code></pre>
+});`} />
 
         <h2 id="reactividad">{siteI18n.t('id.react.title')}</h2>
         <p>{siteI18n.t('id.react.a')}<code>t()</code>{siteI18n.t('id.react.b')}<code>dynamic()</code>{siteI18n.t('id.react.c')}</p>
-        <pre><code>{`<h1>{i18n.t('hero.title')}</h1>           // ← solo este nodo cambia
-<button onClick={() => i18n.setLocale('en')}>EN</button>`}</code></pre>
+        <CodeBlock code={`<h1>{i18n.t('hero.title')}</h1>           // ← solo este nodo cambia
+<button onClick={() => i18n.setLocale('en')}>EN</button>`} />
 
         <h2 id="interpolacion">{siteI18n.t('sb.i18nInterp')}</h2>
-        <pre><code>{`messages: { es: { greeting: '¡Hola, {name}!' } }
+        <CodeBlock code={`messages: { es: { greeting: '¡Hola, {name}!' } }
 
-i18n.t('greeting', { name: 'Ada' });  // → "¡Hola, Ada!"`}</code></pre>
+i18n.t('greeting', { name: 'Ada' });  // → "¡Hola, Ada!"`} />
 
         <h2 id="pluralizacion">{siteI18n.t('sb.i18nPlural')}</h2>
         <p>{siteI18n.t('id.plural.a')}<code>{'{count}'}</code>{siteI18n.t('id.plural.b')}<code>t()</code>{siteI18n.t('id.plural.c')}<code>Intl.PluralRules</code>{siteI18n.t('id.plural.d')}<code>key.one</code>{siteI18n.t('id.plural.e')}<code>key.other</code>{siteI18n.t('id.plural.f')}<code>key.few</code>{siteI18n.t('id.plural.g')}<code>key.many</code>{siteI18n.t('id.plural.h')}<code>other</code>{siteI18n.t('id.plural.i')}</p>
-        <pre><code>{`messages: {
+        <CodeBlock code={`messages: {
   es: { 'items.one': 'Un artículo', 'items.other': '{count} artículos' },
   ru: { 'items.one': 'одна статья', 'items.few': '{count} статьи', 'items.other': '{count} статей' },
   ja: { 'items.other': '{count}件' },
 },
 
-i18n.t('items', { count: 5 });`}</code></pre>
+i18n.t('items', { count: 5 });`} />
 
         <h2 id="formato">{siteI18n.t('sb.i18nFormat')}</h2>
         <p>{siteI18n.t('id.format.p')}</p>
-        <pre><code>{`i18n.n(1234567.89);   // es → "1.234.567,89" · en → "1,234,567.89"
+        <CodeBlock code={`i18n.n(1234567.89);   // es → "1.234.567,89" · en → "1,234,567.89"
 i18n.d(new Date());    // fecha con formato local
 i18n.l(['TS', 'JSX']); // listas con conjunciones locales
-i18n.dir();            // 'rtl' para ar/he/fa/ur, 'ltr' en el resto`}</code></pre>
+i18n.dir();            // 'rtl' para ar/he/fa/ur, 'ltr' en el resto`} />
 
         <h2 id="idiomas">{siteI18n.t('sb.i18nLangs')}</h2>
         <p>{siteI18n.t('id.langs.a')}<code>Intl</code>{siteI18n.t('id.langs.b')}<code>WORLD_LOCALES</code>{siteI18n.t('id.langs.c')}</p>
@@ -237,5 +240,13 @@ i18n.dir();            // 'rtl' para ar/he/fa/ur, 'ltr' en el resto`}</code></pr
         <p>{siteI18n.t('id.site.a')}<code>astra-site/src/i18n.ts</code>{siteI18n.t('id.site.b')}<code>astra-blog/src/i18n.ts</code>{siteI18n.t('id.site.c')}</p>
       </div>
     </main>
+    <DocRightToc items={[
+      { href: '/docs/i18n#demo', k: 'sb.i18nDemo' },
+      { href: '/docs/i18n#setup', k: 'sb.i18nSetup' },
+      { href: '/docs/i18n#interpolacion', k: 'sb.i18nInterp' },
+      { href: '/docs/i18n#pluralizacion', k: 'sb.i18nPlural' },
+      { href: '/docs/i18n#formato', k: 'sb.i18nFormat' },
+      { href: '/docs/i18n#idiomas', k: 'sb.i18nLangs' },
+    ]} />
   </div>
 ));

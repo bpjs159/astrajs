@@ -1,6 +1,7 @@
 import { component, dynamic } from '@astrajs/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
 import { i18n } from '../../i18n.js';
+import { CodeBlock } from '../../components/code-block.js';
 
 const s = `
   .docs-layout{display:flex;min-height:100vh}
@@ -70,7 +71,7 @@ export const DocsComparison = component(() => (
 
         <h3>{i18n.t('cp.react.vdom.title')}</h3>
         <p>{i18n.t('cp.react.vdom.p')}</p>
-        <pre><code>{`// React: re-ejecucion del componente ENTERO
+        <CodeBlock code={`// React: re-ejecucion del componente ENTERO
 function Counter() {
   const [count, setCount] = useState(0);
   // TODO este cuerpo se ejecuta en cada render
@@ -95,15 +96,15 @@ const Counter = component(() => {
     </button>
     // Solo el TextNode de state.count se actualiza
   );
-});`}</code></pre>
+});`} />
 
         <h3>{i18n.t('cp.react.hooks.title')}</h3>
         <p>{i18n.t('cp.hooks.a')}<code>useCallback</code>{i18n.t('cp.hooks.b')}<code>useMemo</code>{i18n.t('cp.hooks.c')}<code>store()</code>{i18n.t('cp.hooks.d')}</p>
-        <pre><code>{`// React: reglas de hooks, memoizacion manual
+        <CodeBlock code={`// React: reglas de hooks, memoizacion manual
 function SearchResults({ query }: { query: string }) {
-  // ❌ No podes llamar hooks dentro de condicionales
-  // ❌ Necesitas useCallback para referencias estables
-  // ❌ Necesitas useMemo para valores derivados
+  // No podes llamar hooks dentro de condicionales
+  // Necesitas useCallback para referencias estables
+  // Necesitas useMemo para valores derivados
   
   const results = useMemo(() => 
     searchData(query), [query]
@@ -124,7 +125,7 @@ function SearchResults({ query }: { query: string }) {
   const results = memo(() => searchData(query));
   
   return <ul>{results().map(r => <Item />)}</ul>;
-}`}</code></pre>
+}`} />
 
         <h3>{i18n.t('cp.react.next.title')}</h3>
         <p>{i18n.t('cp.react.next.p')}</p>
@@ -134,7 +135,7 @@ function SearchResults({ query }: { query: string }) {
 
         <h3>{i18n.t('cp.vue.sfc.title')}</h3>
         <p>{i18n.t('cp.sfc.a')}<code>.vue</code>{i18n.t('cp.sfc.b')}<code>css</code>{i18n.t('cp.sfc.c')}<code>.tsx</code>{i18n.t('cp.sfc.d')}</p>
-        <pre><code>{`<!-- Vue SFC -->
+        <CodeBlock code={`<!-- Vue SFC -->
 <template>
   <button @click="increment">
     Count: {{ count }}
@@ -167,7 +168,7 @@ export const Counter = component(() => {
       Count: {state.count}
     </button>
   );
-});`}</code></pre>
+});`} />
 
         <h3>{i18n.t('cp.vue.react.title')}</h3>
         <p>{i18n.t('cp.vr.a')}<code>.value</code>{i18n.t('cp.vr.b')}<code>.value</code>{i18n.t('cp.vr.c')}</p>
@@ -177,7 +178,7 @@ export const Counter = component(() => {
 
         <h3>{i18n.t('cp.angular.cd.title')}</h3>
         <p>{i18n.t('cp.angular.cd.p')}</p>
-        <pre><code>{`// Angular: Zone.js intercepta setTimeout, HTTP, eventos...
+        <CodeBlock code={`// Angular: Zone.js intercepta setTimeout, HTTP, eventos...
 // y dispara change detection en todo el arbol
 @Component({
   template: \`<button (click)="increment()">
@@ -199,7 +200,7 @@ const Counter = component(() => {
     </button>
     // Solo este TextNode se actualiza. Nada mas.
   );
-});`}</code></pre>
+});`} />
 
         <h3>{i18n.t('cp.angular.ts.title')}</h3>
         <p>{i18n.t('cp.angular.ts.p')}<code>server()</code>{i18n.t('cp.angular.ts.p2')}</p>

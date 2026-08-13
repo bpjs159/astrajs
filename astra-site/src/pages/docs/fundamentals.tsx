@@ -1,6 +1,8 @@
 import { component, dynamic } from '@astrajs/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
+import { DocRightToc } from '../../components/doc-right-toc.js';
 import { i18n } from '../../i18n.js';
+import { CodeBlock } from '../../components/code-block.js';
 
 const s = `
   .docs-layout{display:flex;min-height:100vh}
@@ -35,17 +37,17 @@ export const DocsFundamentals = component(() => (
 
         <h3>{i18n.t('f.st.title')}</h3>
         <p>{i18n.t('f.st.p1')}<code>component()</code>{i18n.t('f.st.p2')}</p>
-        <pre><code>{`// Funcion pura — sin estado, sin wrapping
+        <CodeBlock code={`// Funcion pura — sin estado, sin wrapping
 function Greeting({ name }: { name: string }) {
-  return <h2>Hola, {name}!</h2>;
+  return <h2>Hello, {name}!</h2>;
 }
 
 // Uso directo:
-document.body.appendChild(<Greeting name="Ada" /> as any);`}</code></pre>
+document.body.appendChild(<Greeting name="Ada" /> as any);`} />
 
         <h3>{i18n.t('f.sf.title')}</h3>
         <p>{i18n.t('f.sf.a')}<code>component()</code>{i18n.t('f.sf.mid')}<strong>{i18n.t('f.sf.b')}</strong>{i18n.t('f.sf.c')}</p>
-        <pre><code>{`import { component, store } from '@astrajs/core';
+        <CodeBlock code={`import { component, store } from '@astrajs/core';
 
 export const Counter = component(() => {
   // store() crea un Proxy reactivo
@@ -54,16 +56,16 @@ export const Counter = component(() => {
   // Esta funcion se ejecuta UNA SOLA VEZ
   return (
     <div>
-      <h2>Contador: {state.count}</h2>
+      <h2>Counter: {state.count}</h2>
       <button onclick={() => state.count++}>
-        Incrementar
+        Increment
       </button>
     </div>
   );
   // El compilador transforma {state.count}
   // en: effect(() => { textNode.nodeValue = state.count; })
   // Solo ese TextNode se actualiza cuando count cambia.
-});`}</code></pre>
+});`} />
         <div class="note">
           <strong>{i18n.t('lbl.important')}:</strong> <code>component()</code> {i18n.t('f.note.a')}<code>&lt;span style="display:contents"&gt;</code>{i18n.t('f.note.b')}<code>mounted()</code>{i18n.t('f.note.c')}
         </div>
@@ -72,13 +74,13 @@ export const Counter = component(() => {
         <p><code>store()</code> {i18n.t('f.react.a')}<strong>{i18n.t('f.react.b')}</strong>{i18n.t('f.react.c')}</p>
 
         <h3>{i18n.t('f.proxy.title')}</h3>
-        <pre><code>{`import { store } from '@astrajs/core';
+        <CodeBlock code={`import { store } from '@astrajs/core';
 
 const user = store({
   name: 'Ada',
   age: 28,
   profile: {
-    bio: 'Desarrolladora',
+    bio: 'Developer',
     avatar: '/ada.jpg'
   }
 });
@@ -97,11 +99,11 @@ user.name = 'Grace';
 
 // Objetos anidados tambien son reactivos (lazy proxy)
 user.profile.bio = 'Senior Developer';
-// → solo se actualizan los suscriptores de "profile.bio"`}</code></pre>
+// → solo se actualizan los suscriptores de "profile.bio"`} />
 
         <h3>{i18n.t('f.arrays.title')}</h3>
         <p>{i18n.t('f.arr.a')}<code>push</code>{i18n.t('f.arr.b')}<code>splice</code>{i18n.t('f.arr.c')}</p>
-        <pre><code>{`const app = store({
+        <CodeBlock code={`const app = store({
   items: ['A', 'B', 'C'],
   selected: null as string | null
 });
@@ -109,39 +111,39 @@ user.profile.bio = 'Senior Developer';
 // Mutaciones de array → reactivas
 app.items.push('D');       // notifica a suscriptores de "items" y "items.length"
 app.items[0] = 'Z';       // notifica a suscriptores de "items[0]"
-app.items = [...app.items]; // reemplazo completo → notifica a suscriptores de "items"`}</code></pre>
+app.items = [...app.items]; // reemplazo completo → notifica a suscriptores de "items"`} />
 
         <h3>{i18n.t('f.batch.title')}</h3>
         <p>{i18n.t('f.bat.a')}<code>queueMicrotask()</code>{i18n.t('f.bat.b')}<code>batch()</code>{i18n.t('f.bat.c')}</p>
-        <pre><code>{`// Estas 3 mutaciones → 1 solo ciclo de DOM update
+        <CodeBlock code={`// Estas 3 mutaciones → 1 solo ciclo de DOM update
 user.name = 'Grace';
 user.age = 29;
 user.profile.bio = 'Senior';
 
 // Los efectos se ejecutan una vez, no tres.
-// Los nodos del DOM se actualizan en un solo microtask.`}</code></pre>
+// Los nodos del DOM se actualizan en un solo microtask.`} />
 
         <h2 id="jsx-sin-vdom">{i18n.t('sb.jsx')}</h2>
         <p>{i18n.t('f.jsx.a')}<code>createElement</code>{i18n.t('f.jsx.b')}</p>
 
         <h3>{i18n.t('f.trans.title')}</h3>
-        <pre><code>{`// === TU CODIGO (JSX) ===
-function Saludo({ nombre }: { nombre: string }) {
+        <CodeBlock code={`// === TU CODIGO (JSX) ===
+function Greeting({ name }: { name: string }) {
   return (
-    <div class="saludo">
-      <span>Hola, </span>
-      <strong>{nombre}</strong>
+    <div class="greeting">
+      <span>Hello, </span>
+      <strong>{name}</strong>
     </div>
   );
 }
 
 // === LO QUE GENERA EL COMPILADOR (aproximado) ===
-function Saludo({ nombre }: { nombre: string }) {
+function Greeting({ name }: { name: string }) {
   const div = document.createElement('div');
-  div.className = 'saludo';
+  div.className = 'greeting';
   
   const span = document.createElement('span');
-  span.textContent = 'Hola, ';
+  span.textContent = 'Hello, ';
   div.appendChild(span);
   
   const strong = document.createElement('strong');
@@ -151,15 +153,15 @@ function Saludo({ nombre }: { nombre: string }) {
   
   // Binding reactivo de grano fino
   effect(() => {
-    text.nodeValue = String(nombre);
+    text.nodeValue = String(name);
   });
   
   return div;
-}`}</code></pre>
+}`} />
 
         <h3>{i18n.t('f.cond.title')}</h3>
         <p>{i18n.t('f.cond.a')}<code>bindConditional</code>{i18n.t('f.cond.b')}</p>
-        <pre><code>{`// Escribes:
+        <CodeBlock code={`// Escribes:
 <div>{show && <span>Visible!</span>}</div>
 
 // El compilador genera:
@@ -168,11 +170,11 @@ bindConditional(marker, () => show,
   () => <span>Visible!</span>
 );
 // Cuando show cambia, el <span> se inserta/remueve del DOM
-// sin re-crear el <div> padre.`}</code></pre>
+// sin re-crear el <div> padre.`} />
 
         <h3>{i18n.t('f.list.title')}</h3>
         <p>{i18n.t('f.list.a')}<code>array.map()</code>{i18n.t('f.list.b')}<code>bindList</code>{i18n.t('f.list.c')}</p>
-        <pre><code>{`// Escribes:
+        <CodeBlock code={`// Escribes:
 <ul>
   {items.map(item => <li key={item.id}>{item.name}</li>)}
 </ul>
@@ -181,11 +183,11 @@ bindConditional(marker, () => show,
 // - Items nuevos → se crean
 // - Items removidos → se eliminan
 // - Items reordenados → se mueven (sin re-crear)
-// - Items con misma key → se preservan`}</code></pre>
+// - Items con misma key → se preservan`} />
 
         <h2 id="estilos">{i18n.t('sb.css')}</h2>
         <p>{i18n.t('f.css.a')}<code>css</code>{i18n.t('f.css.b')}</p>
-        <pre><code>{`import { css } from '@astrajs/core';
+        <CodeBlock code={`import { css } from '@astrajs/core';
 
 const cardStyle = css\`
   background: #0f172a;
@@ -217,29 +219,36 @@ function Card({ title, featured }: { title: string; featured?: boolean }) {
       <span class="title">{title}</span>
     </div>
   );
-}`}</code></pre>
+}`} />
         <p>{i18n.t('f.cls.a')}<code>classes()</code>{i18n.t('f.cls.b')}</p>
-        <pre><code>{`import { classes } from '@astrajs/core';
+        <CodeBlock code={`import { classes } from '@astrajs/core';
 
 <div class={classes(cardStyle, featured && 'featured', 'mb-4')}>
   ...
-</div>`}</code></pre>
+</div>`} />
 
         <h2 id="eventos">{i18n.t('sb.events')}</h2>
         <p>{i18n.t('f.ev.a')}<strong>{i18n.t('f.ev.b')}</strong>{i18n.t('f.ev.c')}</p>
-        <pre><code>{`// Eventos nativos — se ejecutan inmediatamente
+        <CodeBlock code={`// Eventos nativos — se ejecutan inmediatamente
 <button onclick={() => state.count++}>
-  Incrementar
+  Increment
 </button>
 
 // Eventos resumibles — el JS se carga JIT
 <button astra-on:click={heavyHandler}>
-  Accion compleja (codigo cargado on-demand)
-</button>`}</code></pre>
+  Complex action (code loaded on-demand)
+</button>`} />
         <div class="note">
           <strong>{i18n.t('lbl.keydiff')}:</strong> <code>onclick</code> {i18n.t('f.ev.n1')}<code>astra-on:click</code>{i18n.t('f.ev.n2')}
         </div>
       </div>
     </main>
+    <DocRightToc items={[
+      { href: '/docs/fundamentals#componentes', k: 'sb.components' },
+      { href: '/docs/fundamentals#reactividad', k: 'sb.reactivity' },
+      { href: '/docs/fundamentals#jsx-sin-vdom', k: 'sb.jsx' },
+      { href: '/docs/fundamentals#estilos', k: 'sb.css' },
+      { href: '/docs/fundamentals#eventos', k: 'sb.events' },
+    ]} />
   </div>
 ));

@@ -1,6 +1,7 @@
-import { component, store, dynamic } from '@astrajs/core';
+import { component, store } from '@astrajs/core';
 import { navigate } from '@astrajs/router';
 import { i18n } from '../i18n.js';
+import { Icon } from './icon.js';
 
 interface DocSection {
   /** Título literal (término técnico) o clave i18n cuando existe titleK. */
@@ -140,42 +141,93 @@ export const DocSidebar = component(() => {
   const state = store({ activeSection: '' });
 
   const style = `
-    .docs-sidebar{position:fixed;top:64px;left:0;bottom:0;width:260px;background:#060b14;border-right:1px solid rgba(255,255,255,.06);overflow-y:auto;padding:24px 0 40px;z-index:50}
+    .docs-sidebar{position:fixed;top:64px;left:0;bottom:0;width:260px;background:#060b14;border-right:1px solid rgba(255,255,255,.06);overflow-y:auto;padding:24px 0 40px;z-index:50;overscroll-behavior:contain}
     .docs-sidebar-section{margin-bottom:8px}
     .docs-sidebar-title{padding:8px 28px;font-size:.68rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.08em}
+    .docs-sidebar-title.active{color:#b84cff;font-weight:800}
     .docs-sidebar-item{display:block;padding:7px 28px;font-size:.8rem;color:#94a3b8;font-weight:500;transition:color .12s,background .12s;border-left:2px solid transparent}
     .docs-sidebar-item:hover{color:#e2e8f0;background:rgba(255,255,255,.02)}
-    .docs-sidebar-item.active{color:#b84cff;background:rgba(184,76,255,.06);border-left-color:#b84cff}
+    .docs-sidebar-item.active{color:#b84cff;background:rgba(184,76,255,.06);border-left-color:#b84cff;font-weight:700}
     .docs-sidebar-footer{padding:20px 28px;border-top:1px solid rgba(255,255,255,.06);margin-top:16px}
     .docs-sidebar-footer a{display:flex;align-items:center;gap:8px;font-size:.78rem;color:#64748b;font-weight:500;transition:color .15s}
     .docs-sidebar-footer a:hover{color:#e2e8f0}
+    [id]{scroll-margin-top:84px}
     @media(max-width:960px){
       .docs-sidebar{display:none}
     }
   `;
 
+  const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+  const currentHref = typeof window !== 'undefined' ? window.location.pathname + window.location.hash : '';
+
+  // Wheel over the sidebar must never scroll the page content.
+  // - If the sidebar has overflow, native scroll handles it and
+  //   overscroll-behavior:contain stops the chaining to the page.
+  // - If it has no overflow (short pages), swallow the event.
+  if (typeof document !== 'undefined') {
+    const w = window as unknown as { __sbWheel?: boolean };
+    if (!w.__sbWheel) {
+      w.__sbWheel = true;
+      document.addEventListener('wheel', (e: WheelEvent) => {
+        const aside = document.querySelector('.docs-sidebar');
+        if (!aside) return;
+        if (!aside.contains(e.target as Node)) return;
+        if (aside.scrollHeight <= aside.clientHeight) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+    }
+  }
+
   return (
     <aside class="docs-sidebar">
       <style>{style}</style>
       <nav>
-        {docSections.map(section => (
-          <div class="docs-sidebar-section">
-            <div class="docs-sidebar-title">{sectionTitle(section)}</div>
-            {section.items.map(item => (
-              <a
-                href={item.href}
-                class="docs-sidebar-item"
-                onclick={(e: Event) => { e.preventDefault(); navigate(item.href); }}
-              >
-                {item.k ? i18n.t(item.k) : item.label}
-              </a>
-            ))}
-          </div>
-        ))}
+        {docSections.map(section => {
+          const sectionActive = section.items.some((it) => it.href.split('#')[0] === currentPath);
+          return (
+            <div class="docs-sidebar-section">
+              <div class={`docs-sidebar-title${sectionActive ? ' active' : ''}`}>{sectionTitle(section)}</div>
+              {section.items.map((item, idx) => {
+                const isActive =
+                  currentHref === item.href ||
+                  (!currentHref.includes('#') && idx === 0 && currentHref === item.href.split('#')[0]);
+                return (
+                  <a
+                    href={item.href}
+                    class={`docs-sidebar-item${isActive ? ' active' : ''}`}
+                    onclick={(e: Event) => {
+                      e.preventDefault();
+                      const parts = item.href.split('#');
+                      navigate(parts[0]);
+                      if (parts[1]) {
+                        const hash = parts[1];
+                        const scrollToHash = () => {
+                          const el = document.getElementById(hash);
+                          if (!el) return;
+                          const html = document.documentElement;
+                          const prev = html.style.scrollBehavior;
+                          html.style.scrollBehavior = 'auto';
+                          el.scrollIntoView({ block: 'start' });
+                          html.style.scrollBehavior = prev;
+                        };
+                        // After the router re-render (it also resets scroll).
+                        setTimeout(scrollToHash, 80);
+                        setTimeout(scrollToHash, 350);
+                      }
+                    }}
+                  >
+                    {item.k ? i18n.t(item.k) : item.label}
+                  </a>
+                );
+              })}
+            </div>
+          );
+        })}
       </nav>
       <div class="docs-sidebar-footer">
         <a href="https://github.com" target="_blank" rel="noopener">
-          <span>⭐</span> 26.1k GitHub
+          <Icon name="star" size={13} /> 0.0 GitHub
         </a>
       </div>
     </aside>

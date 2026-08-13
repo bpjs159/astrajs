@@ -7,7 +7,10 @@
  */
 import { component, dynamic } from '@astrajs/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
+import { DocRightToc } from '../../components/doc-right-toc.js';
+import { Icon } from '../../components/icon.js';
 import { i18n } from '../../i18n.js';
+import { CodeBlock } from '../../components/code-block.js';
 
 const s = `
   .docs-layout{display:flex;min-height:100vh}
@@ -47,7 +50,7 @@ export const DocsIntegrations = component(() => (
 
         <h3>{i18n.t('ig.tw4.title')}</h3>
         <p>{i18n.t('ig.tw4.p')}</p>
-        <pre><code>{`// vite.config.ts
+        <CodeBlock code={`// vite.config.ts
 import { defineConfig } from 'vite';
 import astra from '@astrajs/compiler';
 import tailwindcss from '@tailwindcss/vite';
@@ -57,15 +60,15 @@ export default defineConfig({
     astra(),          // compilador JSX → DOM
     tailwindcss(),    // Tailwind v4
   ],
-});`}</code></pre>
-        <pre><code>{`/* src/main.css */
+});`} />
+        <CodeBlock code={`/* src/main.css */
 @import "tailwindcss";
 
 /* en tu entry: */
-import './main.css';`}</code></pre>
+import './main.css';`} />
 
         <h3>{i18n.t('ig.tw3.title')}</h3>
-        <pre><code>{`// tailwind.config.js — escanea también tus .tsx
+        <CodeBlock code={`// tailwind.config.js — escanea también tus .tsx
 export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: { extend: {} },
@@ -75,19 +78,19 @@ export default {
 // postcss.config.js
 export default {
   plugins: { tailwindcss: {}, autoprefixer: {} },
-};`}</code></pre>
+};`} />
 
         <h3>{i18n.t('ig.use.title')}</h3>
-        <pre><code>{`export const Card = component(() => (
+        <CodeBlock code={`export const Card = component(() => (
   <div class="p-6 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10">
-    <h2 class="text-xl font-bold text-white">Título</h2>
-    <p class="text-sm text-slate-400 leading-relaxed">Descripción</p>
+    <h2 class="text-xl font-bold text-white">Title</h2>
+    <p class="text-sm text-slate-400 leading-relaxed">Description</p>
   </div>
-));`}</code></pre>
+));`} />
 
         <h3>{i18n.t('ig.dyn.title')}</h3>
         <p>{i18n.t('ig.dyn.a')}<code>class</code>{i18n.t('ig.dyn.b')}</p>
-        <pre><code>{`import { component, store, classes } from '@astrajs/core';
+        <CodeBlock code={`import { component, store, classes } from '@astrajs/core';
 
 const state = store({ active: false });
 
@@ -99,9 +102,9 @@ export const Button = component(() => (
     )}
     onclick={() => { state.active = !state.active; }}
   >
-    {state.active ? 'Activo' : 'Inactivo'}
+    {state.active ? 'Active' : 'Inactive'}
   </button>
-));`}</code></pre>
+));`} />
 
         <div class="note">
           <strong>{i18n.t('lbl.tip')}:</strong> {i18n.t('ig.note.a')}<code>css</code>{i18n.t('ig.note.b')}<code>.card {'{@apply p-6 rounded-2xl;}'}</code>{i18n.t('ig.note.c')}
@@ -113,7 +116,7 @@ export const Button = component(() => (
 
         <h3>{i18n.t('ig.mw.title')}</h3>
         <p><strong>Material Web</strong> {i18n.t('ig.mw.a')}<code>@material/web</code>{i18n.t('ig.mw.b')}<strong>{i18n.t('ig.mw.c')}</strong>{i18n.t('ig.mw.d')}</p>
-        <pre><code>{`// npm install @material/web
+        <CodeBlock code={`// npm install @material/web
 import '@material/web/button/filled-button.js';
 import '@material/web/button/outlined-button.js';
 import '@material/web/textfield/filled-text-field.js';
@@ -121,20 +124,20 @@ import '@material/web/textfield/filled-text-field.js';
 export const Form = component(() => (
   <div class="flex flex-col gap-4 p-8">
     <md-filled-text-field label="Email" type="email" />
-    <md-filled-text-field label="Contraseña" type="password" />
+    <md-filled-text-field label="Password" type="password" />
     <div class="flex gap-3">
-      <md-filled-button onclick={() => console.log('Guardar')}>Guardar</md-filled-button>
-      <md-outlined-button>Cancelar</md-outlined-button>
+      <md-filled-button onclick={() => console.log('Save')}>Save</md-filled-button>
+      <md-outlined-button>Cancel</md-outlined-button>
     </div>
   </div>
-));`}</code></pre>
+));`} />
 
         <h3>{i18n.t('ig.wc.title')}</h3>
         <p>{i18n.t('ig.wc.a')}<strong>Shoelace</strong>{i18n.t('ig.wc.b')}<strong>Carbon Web Components</strong>{i18n.t('ig.wc.c')}<strong>Spectrum</strong>{i18n.t('ig.wc.d')}<strong>Fluent</strong>{i18n.t('ig.wc.e')}</p>
-        <pre><code>{`// Shoelace
+        <CodeBlock code={`// Shoelace
 import '@shoelace-style/shoelace/dist/components/button/button.js';
 
-<sl-button variant="primary" onclick={guardar}>Guardar</sl-button>`}</code></pre>
+<sl-button variant="primary" onclick={save}>Save</sl-button>`} />
 
         <div class="note">
           <strong>{i18n.t('lbl.note')}:</strong> {i18n.t('ig.wcn.a')}<code>mounted()</code>{i18n.t('ig.wcn.b')}
@@ -142,16 +145,16 @@ import '@shoelace-style/shoelace/dist/components/button/button.js';
 
         <h2 id="graficos">{i18n.t('ig.charts.title')}</h2>
         <p>{i18n.t('ig.ch.a')}<code>canvas</code>{i18n.t('ig.ch.b')}<code>SVG</code>{i18n.t('ig.ch.c')}<code>mounted()</code>{i18n.t('ig.ch.d')}</p>
-        <pre><code>{`import Chart from 'chart.js/auto';
+        <CodeBlock code={`import Chart from 'chart.js/auto';
 
-export const Grafico = component(() => {
+export const SalesChart = component(() => {
   mounted(() => {
-    const canvas = document.querySelector('#grafico-ventas') as HTMLCanvasElement;
+    const canvas = document.querySelector('#sales-chart') as HTMLCanvasElement;
     const chart = new Chart(canvas, {
       type: 'line',
       data: {
-        labels: ['Ene', 'Feb', 'Mar', 'Abr'],
-        datasets: [{ label: 'Ventas', data: [12, 19, 8, 24] }],
+        labels: ['Jan', 'Feb', 'Mar', 'Apr'],
+        datasets: [{ label: 'Sales', data: [12, 19, 8, 24] }],
       },
     });
 
@@ -159,36 +162,36 @@ export const Grafico = component(() => {
     return () => chart.destroy();
   });
 
-  return <canvas id="grafico-ventas" />;
-});`}</code></pre>
+  return <canvas id="sales-chart" />;
+});`} />
 
         <h2 id="utilidades">{i18n.t('sb.intUtils')}</h2>
         <p>{i18n.t('ig.utils.p')}</p>
-        <pre><code>{`import { formatDistance } from 'date-fns';
+        <CodeBlock code={`import { formatDistance } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-<span>{formatDistance(new Date(), post.fecha, { addSuffix: true, locale: es })}</span>`}</code></pre>
+<span>{formatDistance(new Date(), post.date, { addSuffix: true, locale: es })}</span>`} />
 
         <h2 id="animaciones">{i18n.t('sb.intAnim')}</h2>
         <p>{i18n.t('ig.anim.p')}</p>
-        <pre><code>{`import { animate } from 'motion';
+        <CodeBlock code={`import { animate } from 'motion';
 
 mounted(() => {
-  const el = document.querySelector('.tarjeta');
+  const el = document.querySelector('.card');
   animate(el, { opacity: [0, 1], y: [24, 0] }, { duration: 0.4 });
-});`}</code></pre>
+});`} />
 
         <h2 id="tabla">{i18n.t('sb.intTable')}</h2>
         <table>
           <tr><th>{i18n.t('ig.th1')}</th><th>{i18n.t('ig.th2')}</th><th>{i18n.t('ig.th3')}</th><th>{i18n.t('ig.th4')}</th></tr>
-          <tr><td><strong>Tailwind CSS</strong></td><td>{i18n.t('ig.cell.css')}</td><td class="ok">{i18n.t('ig.ok')}</td><td>{i18n.t('ig.n0.a')}<code>classes()</code></td></tr>
-          <tr><td><strong>Bootstrap / Bulma / UnoCSS</strong></td><td>{i18n.t('ig.cell.fw')}</td><td class="ok">{i18n.t('ig.ok')}</td><td>{i18n.t('ig.n1')}</td></tr>
-          <tr><td><strong>MUI (@mui/material)</strong></td><td>{i18n.t('ig.cell.react')}</td><td class="no">{i18n.t('ig.no')}</td><td>{i18n.t('ig.n2')}</td></tr>
-          <tr><td><strong>Material Web / Shoelace / Carbon / Fluent</strong></td><td>{i18n.t('ig.cell.wc')}</td><td class="ok">{i18n.t('ig.ok')}</td><td>{i18n.t('ig.n3')}</td></tr>
-          <tr><td><strong>Chart.js / ECharts / D3</strong></td><td>{i18n.t('ig.cell.canvas')}</td><td class="ok">{i18n.t('ig.ok')}</td><td>{i18n.t('ig.n4.a')}<code>mounted()</code>{i18n.t('ig.n4.b')}</td></tr>
-          <tr><td><strong>date-fns / dayjs / zod</strong></td><td>{i18n.t('ig.cell.pure')}</td><td class="ok">{i18n.t('ig.ok')}</td><td>{i18n.t('ig.n5')}</td></tr>
-          <tr><td><strong>Motion One / anime.js</strong></td><td>{i18n.t('ig.cell.anim')}</td><td class="ok">{i18n.t('ig.ok')}</td><td>{i18n.t('ig.n6')}</td></tr>
-          <tr><td><strong>i18next / formatjs</strong></td><td>{i18n.t('ig.cell.i18n')}</td><td class="ok">{i18n.t('ig.bridge')}</td><td>{i18n.t('ig.n7.a')}<code>@astrajs/i18n</code></td></tr>
+          <tr><td><strong>Tailwind CSS</strong></td><td>{i18n.t('ig.cell.css')}</td><td class="ok"><Icon name="check" size={12} /> {i18n.t('ig.ok')}</td><td>{i18n.t('ig.n0.a')}<code>classes()</code></td></tr>
+          <tr><td><strong>Bootstrap / Bulma / UnoCSS</strong></td><td>{i18n.t('ig.cell.fw')}</td><td class="ok"><Icon name="check" size={12} /> {i18n.t('ig.ok')}</td><td>{i18n.t('ig.n1')}</td></tr>
+          <tr><td><strong>MUI (@mui/material)</strong></td><td>{i18n.t('ig.cell.react')}</td><td class="no"><Icon name="x" size={12} /> {i18n.t('ig.no')}</td><td>{i18n.t('ig.n2')}</td></tr>
+          <tr><td><strong>Material Web / Shoelace / Carbon / Fluent</strong></td><td>{i18n.t('ig.cell.wc')}</td><td class="ok"><Icon name="check" size={12} /> {i18n.t('ig.ok')}</td><td>{i18n.t('ig.n3')}</td></tr>
+          <tr><td><strong>Chart.js / ECharts / D3</strong></td><td>{i18n.t('ig.cell.canvas')}</td><td class="ok"><Icon name="check" size={12} /> {i18n.t('ig.ok')}</td><td>{i18n.t('ig.n4.a')}<code>mounted()</code>{i18n.t('ig.n4.b')}</td></tr>
+          <tr><td><strong>date-fns / dayjs / zod</strong></td><td>{i18n.t('ig.cell.pure')}</td><td class="ok"><Icon name="check" size={12} /> {i18n.t('ig.ok')}</td><td>{i18n.t('ig.n5')}</td></tr>
+          <tr><td><strong>Motion One / anime.js</strong></td><td>{i18n.t('ig.cell.anim')}</td><td class="ok"><Icon name="check" size={12} /> {i18n.t('ig.ok')}</td><td>{i18n.t('ig.n6')}</td></tr>
+          <tr><td><strong>i18next / formatjs</strong></td><td>{i18n.t('ig.cell.i18n')}</td><td class="ok"><Icon name="layers" size={12} /> {i18n.t('ig.bridge')}</td><td>{i18n.t('ig.n7.a')}<code>@astrajs/i18n</code></td></tr>
         </table>
 
         <h2 id="regla">{i18n.t('ig.rule.title')}</h2>
@@ -199,5 +202,13 @@ mounted(() => {
         </ul>
       </div>
     </main>
+    <DocRightToc items={[
+      { href: '/docs/integrations#tailwind', label: 'Tailwind CSS' },
+      { href: '/docs/integrations#mui', label: 'Material UI (MUI)' },
+      { href: '/docs/integrations#graficos', k: 'ig.charts.title' },
+      { href: '/docs/integrations#utilidades', k: 'sb.intUtils' },
+      { href: '/docs/integrations#animaciones', k: 'sb.intAnim' },
+      { href: '/docs/integrations#tabla', k: 'sb.intTable' },
+    ]} />
   </div>
 ));

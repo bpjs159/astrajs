@@ -1,6 +1,9 @@
 import { component, dynamic } from '@astrajs/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
+import { DocRightToc } from '../../components/doc-right-toc.js';
+import { Icon } from '../../components/icon.js';
 import { i18n } from '../../i18n.js';
+import { CodeBlock } from '../../components/code-block.js';
 
 const s = `
   .docs-layout{display:flex;min-height:100vh}
@@ -35,7 +38,7 @@ export const DocsAdvanced = component(() => (
 
         <h3>{i18n.t('av.p1.title')}</h3>
         <p>{i18n.t('av.p1.a')}<code>document.createElement</code>{i18n.t('av.p1.b')}<code>{'{store.value}'}</code>{i18n.t('av.p1.c')}<code>effect(() =&gt; {'{'} textNode.nodeValue = store.value {'}'})</code>{i18n.t('av.p1.d')}</p>
-        <pre><code>{`// Entrada (JSX):
+        <CodeBlock code={`// Entrada (JSX):
 <span class="greeting">Hola {name}</span>
 
 // Salida del compilador (aproximado):
@@ -44,22 +47,22 @@ span.className = 'greeting';
 const t1 = document.createTextNode('Hola ');
 const t2 = document.createTextNode('');
 span.append(t1, t2);
-effect(() => { t2.nodeValue = String(name); });`}</code></pre>
+effect(() => { t2.nodeValue = String(name); });`} />
 
         <h3>{i18n.t('av.p2.title')}</h3>
         <p>{i18n.t('av.p2.a')}<code>css</code>{i18n.t('av.p2.b')}</p>
-        <pre><code>{`// Entrada:
+        <CodeBlock code={`// Entrada:
 const styles = css\`.card { padding: 16px; }\`;
 
 // Salida:
 // 1. Se extrae el CSS a un archivo: assets/card-a1b2c3.css
 // 2. Se reemplaza el template por una referencia:
 const styles = 'card_a1b2c3';
-// 3. En el HTML: <link rel="stylesheet" href="/assets/card-a1b2c3.css">`}</code></pre>
+// 3. En el HTML: <link rel="stylesheet" href="/assets/card-a1b2c3.css">`} />
 
         <h3>{i18n.t('av.p3.title')}</h3>
         <p>{i18n.t('av.p3.a')}<code>server()</code>{i18n.t('av.p3.b')}</p>
-        <pre><code>{`// Entrada:
+        <CodeBlock code={`// Entrada:
 export const getUsers = server(
   { tags: ['users'] },
   async (role?: string) => {
@@ -77,7 +80,7 @@ export const getUsers = (role?: string) =>
 // Salida — Servidor (registrado en el middleware):
 registerHandler('getUsers', async ([role]) => {
   return db.user.findMany({ where: { role } });
-});`}</code></pre>
+});`} />
 
         <h3>{i18n.t('av.modes.title')}</h3>
         <p>{i18n.t('av.modes.a')}<code>transformMode</code>{i18n.t('av.modes.b')}</p>
@@ -85,7 +88,7 @@ registerHandler('getUsers', async ([role]) => {
           <li><strong><code>'dynamic'</code> (default)</strong> — {i18n.t('av.m1.a')}<code>dynamic()</code>{i18n.t('av.m1.b')}</li>
           <li><strong><code>'vanilla'</code></strong> — {i18n.t('av.m2.a')}<code>bindText</code>{i18n.t('av.m2.b')}<code>bindAttr</code>{i18n.t('av.m2.c')}</li>
         </ul>
-        <pre><code>{`// vite.config.ts
+        <CodeBlock code={`// vite.config.ts
 import astra from '@astrajs/compiler';
 
 export default defineConfig({
@@ -95,13 +98,13 @@ export default defineConfig({
       apiPrefix: '/api/astra',  // prefijo para endpoints RPC
     }),
   ],
-});`}</code></pre>
+});`} />
 
         <h2 id="inferencia">{i18n.t('sb.advInference')}</h2>
         <p>{i18n.t('av.inf.a')}<strong>{i18n.t('av.inf.b')}</strong>{i18n.t('av.inf.c')}</p>
 
         <h3>{i18n.t('av.inf1.title')}</h3>
-        <pre><code>{`const user = store({
+        <CodeBlock code={`const user = store({
   name: 'Ada',        // → string
   age: 28,            // → number
   profile: {          // → { bio: string; avatar: string }
@@ -113,10 +116,10 @@ export default defineConfig({
 
 // user.name es string (inferido, no anotado)
 // user.profile.bio es string (inferido en profundidad)
-// user.tags es string[] (inferido del array inicial)`}</code></pre>
+// user.tags es string[] (inferido del array inicial)`} />
 
         <h3>{i18n.t('av.inf2.title')}</h3>
-        <pre><code>{`const getProduct = server(
+        <CodeBlock code={`const getProduct = server(
   { tags: ['products'] },
   async (id: string) => {
     // db.product.findUnique retorna Product | null
@@ -126,10 +129,10 @@ export default defineConfig({
 
 // El tipo de retorno se infiere y se propaga al cliente:
 // const getProduct: (id: string) => Promise<Product | null>
-// Sin anotaciones manuales, sin duplicacion`}</code></pre>
+// Sin anotaciones manuales, sin duplicacion`} />
 
         <h3>{i18n.t('av.inf3.title')}</h3>
-        <pre><code>{`// types/products.ts (compartido)
+        <CodeBlock code={`// types/products.ts (compartido)
 export interface Product {
   id: string;
   name: string;
@@ -148,13 +151,13 @@ export const listProducts = server(
 // pages/products.tsx (cliente)
 const products = await listProducts();
 // ↑ products es Product[] — el tipo viaja del servidor al cliente
-// automaticamente, sin codegen, sin duplicar definiciones`}</code></pre>
+// automaticamente, sin codegen, sin duplicar definiciones`} />
 
         <h2 id="vite">{i18n.t('sb.advVite')}</h2>
         <p>{i18n.t('av.vite.p')}</p>
 
         <h3>{i18n.t('av.config.title')}</h3>
-        <pre><code>{`// vite.config.ts
+        <CodeBlock code={`// vite.config.ts
 import { defineConfig } from 'vite';
 import astra from '@astrajs/compiler';
 import path from 'path';
@@ -172,7 +175,7 @@ export default defineConfig({
       '@astrajs/core': path.resolve(__dirname, '../packages/core/src'),
     },
   },
-});`}</code></pre>
+});`} />
 
         <h3>{i18n.t('av.hmr.title')}</h3>
         <p>{i18n.t('av.hmr.p')}</p>
@@ -192,16 +195,16 @@ export default defineConfig({
         <h3>{i18n.t('av.plat.title')}</h3>
         <table>
           <tr><th>{i18n.t('av.plat.th')}</th><th>SSR</th><th>SSG/ISR</th><th>server()</th></tr>
-          <tr><td><strong>Node.js</strong></td><td>✅</td><td>✅</td><td>✅</td></tr>
-          <tr><td><strong>Vercel</strong></td><td>✅</td><td>✅</td><td>✅ Serverless</td></tr>
-          <tr><td><strong>Netlify</strong></td><td>✅</td><td>✅</td><td>✅ Functions</td></tr>
-          <tr><td><strong>Cloudflare Workers</strong></td><td>✅</td><td>✅</td><td>✅ Workers</td></tr>
-          <tr><td><strong>AWS Lambda</strong></td><td>✅</td><td>✅</td><td>✅ Lambda</td></tr>
-          <tr><td><strong>Docker</strong></td><td>✅</td><td>✅</td><td>✅</td></tr>
+          <tr><td><strong>Node.js</strong></td><td><Icon name="check" size={13} /></td><td><Icon name="check" size={13} /></td><td><Icon name="check" size={13} /></td></tr>
+          <tr><td><strong>Vercel</strong></td><td><Icon name="check" size={13} /></td><td><Icon name="check" size={13} /></td><td><Icon name="check" size={13} /> Serverless</td></tr>
+          <tr><td><strong>Netlify</strong></td><td><Icon name="check" size={13} /></td><td><Icon name="check" size={13} /></td><td><Icon name="check" size={13} /> Functions</td></tr>
+          <tr><td><strong>Cloudflare Workers</strong></td><td><Icon name="check" size={13} /></td><td><Icon name="check" size={13} /></td><td><Icon name="check" size={13} /> Workers</td></tr>
+          <tr><td><strong>AWS Lambda</strong></td><td><Icon name="check" size={13} /></td><td><Icon name="check" size={13} /></td><td><Icon name="check" size={13} /> Lambda</td></tr>
+          <tr><td><strong>Docker</strong></td><td><Icon name="check" size={13} /></td><td><Icon name="check" size={13} /></td><td><Icon name="check" size={13} /></td></tr>
         </table>
 
         <h3>{i18n.t('av.build.title')}</h3>
-        <pre><code>{`# Desarrollo
+        <CodeBlock code={`# Desarrollo
 pnpm dev
 
 # Build de produccion
@@ -212,8 +215,14 @@ pnpm build
 #   └── server/             (handlers server())
 
 # Preview de produccion
-pnpm preview`}</code></pre>
+pnpm preview`} />
       </div>
     </main>
+    <DocRightToc items={[
+      { href: '/docs/advanced#compilador', k: 'sb.advCompiler' },
+      { href: '/docs/advanced#inferencia', k: 'sb.advInference' },
+      { href: '/docs/advanced#vite', k: 'sb.advVite' },
+      { href: '/docs/advanced#despliegue', k: 'sb.advDeploy' },
+    ]} />
   </div>
 ));

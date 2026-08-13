@@ -1,6 +1,8 @@
 import { component, dynamic } from '@astrajs/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
+import { DocRightToc } from '../../components/doc-right-toc.js';
 import { i18n } from '../../i18n.js';
+import { CodeBlock } from '../../components/code-block.js';
 
 const s = `
   .docs-layout{display:flex;min-height:100vh}
@@ -32,7 +34,7 @@ export const DocsRouter = component(() => (
 
         <h2 id="rutas">{i18n.t('sb.routes')}</h2>
         <p><code>route()</code> {i18n.t('rt.a1')}<code>window.location</code>{i18n.t('rt.a2')}<code>true</code>{i18n.t('rt.a3')}<code>store()</code>{i18n.t('rt.a4')}</p>
-        <pre><code>{`import { route, fallbackRoute } from '@astrajs/router';
+        <CodeBlock code={`import { route, fallbackRoute } from '@astrajs/router';
 
 // routes.ts — un objeto con getters reactivos
 export const routes = {
@@ -54,25 +56,25 @@ function App() {
       {routes.fallback  && <NotFound />}
     </main>
   );
-}`}</code></pre>
+}`} />
         <p>{i18n.t('rt.g.a')}<code>navigate('/products')</code>{i18n.t('rt.g.b')}<code>window.history.pushState</code>{i18n.t('rt.g.c')}</p>
 
         <h3>{i18n.t('rt.patterns.title')}</h3>
-        <pre><code>{`route('/')                  // exact match: solo "/"
+        <CodeBlock code={`route('/')                  // exact match: solo "/"
 route('/products')          // prefix match: "/products", "/products/123"
 route('/products/:id')      // parametro: "/products/42" → params.id = "42"
 route('/blog/:slug')        // parametro: "/blog/hello-world" → params.slug
-route('/users/:uid/posts/:pid') // multiples params`}</code></pre>
+route('/users/:uid/posts/:pid') // multiples params`} />
 
         <h3>{i18n.t('rt.exact.title')}</h3>
-        <pre><code>{`route('/', { exact: true })    // solo "/"
+        <CodeBlock code={`route('/', { exact: true })    // solo "/"
 route('/products')              // sin exact → "/products", "/products/42"
 route('/products/:id')          // "/products/42", "/products/42/reviews"
-route('/products/:id', { exact: true })  // solo "/products/42"`}</code></pre>
+route('/products/:id', { exact: true })  // solo "/products/42"`} />
 
         <h2>params</h2>
         <p>{i18n.t('rt.p.a')}<code>:id</code>{i18n.t('rt.p.b')}<code>:slug</code>{i18n.t('rt.p.c')}<code>params</code>{i18n.t('rt.p.d')}</p>
-        <pre><code>{`import { route, params } from '@astrajs/router';
+        <CodeBlock code={`import { route, params } from '@astrajs/router';
 
 // Ruta: /products/:id
 export const routes = {
@@ -86,29 +88,29 @@ function ProductPage() {
   // Usalo con server() para cargar datos
   const product = await getProductById(productId);
   
-  return <h1>Producto: {product.name}</h1>;
-}`}</code></pre>
+  return <h1>Product: {product.name}</h1>;
+}`} />
 
         <h2 id="navegacion">{i18n.t('sb.navigation')}</h2>
         <p>{i18n.t('rt.nav.a')}<code>&lt;Link&gt;</code>{i18n.t('rt.nav.b')}<code>navigate()</code>{i18n.t('rt.nav.c')}</p>
 
         <h3>{i18n.t('rt.link.title')}</h3>
-        <pre><code>{`import { Link } from '@astrajs/router';
+        <CodeBlock code={`import { Link } from '@astrajs/router';
 
 // Navegacion basica
-<Link href="/products">Productos</Link>
+<Link href="/products">Products</Link>
 
 // Con clases y estilos
-<Link href="/cart" class="nav-link active">Carrito</Link>
+<Link href="/cart" class="nav-link active">Cart</Link>
 
 // Con children (funciona como <a>)
 <Link href="/dashboard">
   <span class="icon">📊</span>
   Dashboard
-</Link>`}</code></pre>
+</Link>`} />
 
         <h3>{i18n.t('rt.navigate.title')}</h3>
-        <pre><code>{`import { navigate } from '@astrajs/router';
+        <CodeBlock code={`import { navigate } from '@astrajs/router';
 
 // Despues de una accion
 async function handleCreate() {
@@ -118,17 +120,17 @@ async function handleCreate() {
 
 // En handlers de eventos
 <button onclick={() => navigate('/cart')}>
-  Ir al carrito
+  Go to cart
 </button>
 
 // Con hash para scroll
 <button onclick={() => navigate('/docs#instalacion')}>
-  Ver instalacion
-</button>`}</code></pre>
+  View installation
+</button>`} />
 
         <h2 id="layouts">{i18n.t('sb.layouts')}</h2>
         <p><code>&lt;Outlet /&gt;</code> {i18n.t('rt.l.a')}</p>
-        <pre><code>{`import { Outlet } from '@astrajs/router';
+        <CodeBlock code={`import { Outlet } from '@astrajs/router';
 
 function DashboardLayout() {
   return (
@@ -146,11 +148,11 @@ function DashboardLayout() {
 // Rutas hijas:
 // /dashboard/overview  → OverviewPage en <Outlet />
 // /dashboard/analytics → AnalyticsPage en <Outlet />
-// /dashboard/settings  → SettingsPage en <Outlet />`}</code></pre>
+// /dashboard/settings  → SettingsPage en <Outlet />`} />
 
         <h2 id="view-transitions">View Transitions API</h2>
         <p>{i18n.t('rt.vt.p')}</p>
-        <pre><code>{`// Se activa automaticamente con navigate() y <Link>
+        <CodeBlock code={`// Se activa automaticamente con navigate() y <Link>
 // El navegador hace:
 //   1. Captura screenshot de la pagina actual
 //   2. Renderiza la nueva pagina
@@ -162,11 +164,11 @@ function DashboardLayout() {
 }
 ::view-transition-new(root) {
   animation: fade-in .3s ease;
-}`}</code></pre>
+}`} />
 
         <h2>onRouteChange</h2>
         <p>{i18n.t('rt.onroute.p')}</p>
-        <pre><code>{`import { onRouteChange } from '@astrajs/router';
+        <CodeBlock code={`import { onRouteChange } from '@astrajs/router';
 
 onRouteChange((path) => {
   // Analytics
@@ -177,8 +179,14 @@ onRouteChange((path) => {
   
   // Actualizar titulo
   document.title = \`AstraJS — \${path}\`;
-});`}</code></pre>
+});`} />
       </div>
     </main>
+    <DocRightToc items={[
+      { href: '/docs/router#rutas', k: 'sb.routes' },
+      { href: '/docs/router#layouts', k: 'sb.layouts' },
+      { href: '/docs/router#navegacion', k: 'sb.navigation' },
+      { href: '/docs/router#view-transitions', label: 'View Transitions API' },
+    ]} />
   </div>
 ));

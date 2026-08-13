@@ -1,6 +1,8 @@
 import { component, dynamic } from '@astrajs/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
+import { DocRightToc } from '../../components/doc-right-toc.js';
 import { i18n } from '../../i18n.js';
+import { CodeBlock } from '../../components/code-block.js';
 
 const s = `
   .docs-layout{display:flex;min-height:100vh}
@@ -39,20 +41,20 @@ export const DocsCli = component(() => (
 
         <h2 id="crear-proyecto">{i18n.t('sb.cliCreate')}</h2>
         <p>{i18n.t('cl.create.p')}</p>
-        <pre><code>{`astra my-app
+        <CodeBlock code={`astra my-app
 npx @astrajs/cli@latest my-app
-pnpm create astrajs my-app`}</code></pre>
+pnpm create astrajs my-app`} />
 
         <h3>{i18n.t('cl.run.title')}</h3>
         <p>{i18n.t('cl.run.p')}</p>
-        <pre><code>{`astra dev        # vite dev server with HMR
+        <CodeBlock code={`astra dev        # vite dev server with HMR
 astra build      # production build (pre-built requests run here)
 astra preview    # preview the production build
-astra test       # vitest run`}</code></pre>
+astra test       # vitest run`} />
 
         <h3>{i18n.t('cl.wizard.title')}</h3>
         <p>{i18n.t('cl.wizard.p')}</p>
-        <pre><code>{`$ astra
+        <CodeBlock code={`$ astra
 
 ◇ Project name: my-app
 ◇ Select a template:
@@ -62,12 +64,12 @@ astra test       # vitest run`}</code></pre>
    Enter a number (1-3): 3
 ◇ Install dependencies with pnpm? (Y/n): y
 
-✔ Generated 11 files in ./my-app
+Generated 11 files in ./my-app
 ◇ Next steps:
   cd my-app
   astra dev
 
-Happy building! 🚀`}</code></pre>
+Happy building!`} />
 
         <h2 id="plantillas">{i18n.t('sb.cliTemplates')}</h2>
         <table>
@@ -90,8 +92,8 @@ Happy building! 🚀`}</code></pre>
         </table>
 
         <h3>{i18n.t('cl.select.title')}</h3>
-        <pre><code>{`astra my-app --template fullstack
-astra my-app -t minimal`}</code></pre>
+        <CodeBlock code={`astra my-app --template fullstack
+astra my-app -t minimal`} />
 
         <h2 id="opciones">{i18n.t('sb.cliOptions')}</h2>
         <table>
@@ -104,18 +106,18 @@ astra my-app -t minimal`}</code></pre>
           <tr><td><code>-v, --version</code></td><td>{i18n.t('cl.op.version')}</td></tr>
         </table>
 
-        <pre><code>{`# Skip prompts entirely
+        <CodeBlock code={`# Skip prompts entirely
 astra my-app --yes
 
 # Scaffold without installing
 astra my-app --template frontend --no-install
 
 # Preview the file tree first
-astra my-app --dry-run`}</code></pre>
+astra my-app --dry-run`} />
 
         <h2>{i18n.t('cl.structure.title')}</h2>
         <p>{i18n.t('cl.structure.p.a')}<code>--template fullstack</code>{i18n.t('cl.structure.p.b')}</p>
-        <pre><code>{`my-app/
+        <CodeBlock code={`my-app/
 ├── index.html          → points to /src/app.tsx
 ├── package.json        → @astrajs/* deps + dev/build scripts
 ├── tsconfig.json       → jsx: react-jsx, jsxImportSource: @astrajs/core
@@ -129,14 +131,14 @@ astra my-app --dry-run`}</code></pre>
     │   ├── home.tsx    → landing page
     │   └── posts.tsx   → consumes a server() function
     └── server/
-        └── posts.server.ts → typed RPC with cache tags`}</code></pre>
+        └── posts.server.ts → typed RPC with cache tags`} />
 
         <h3>{i18n.t('cl.mono.title')}</h3>
         <p>{i18n.t('cl.mono.a')}<code>packages/</code>{i18n.t('cl.mono.b')}<code>@astrajs/*</code>{i18n.t('cl.mono.c')}</p>
 
         <h2>{i18n.t('cl.gen.title')}</h2>
         <p>{i18n.t('cl.gen.a')}<code>server()</code>{i18n.t('cl.gen.b')}</p>
-        <pre><code>{`// src/server/posts.server.ts — ONE function, split by the compiler
+        <CodeBlock code={`// src/server/posts.server.ts — ONE function, split by the compiler
 import { server } from '@astrajs/server';
 
 export const getPosts = server(
@@ -152,7 +154,7 @@ import { getPosts } from '../server/posts.server.js';
 
 mounted(() => {
   getPosts().then(posts => { state.posts = posts; });
-});`}</code></pre>
+});`} />
 
         <h2>{i18n.t('cl.pm.title')}</h2>
         <p>{i18n.t('cl.pm.a')}<code>npm_config_user_agent</code>{i18n.t('cl.pm.b')}<code>pnpm dlx astra</code>{i18n.t('cl.pm.c')}<code>npx astra</code>{i18n.t('cl.pm.d')}</p>
@@ -165,5 +167,11 @@ mounted(() => {
         <p>{i18n.t('cl.next.a')}<a href="/docs/introduction">{i18n.t('cl.next.b')}</a>{i18n.t('cl.next.c')}<a href="/docs/server-data">Server &amp; Data</a>{i18n.t('cl.next.d')}</p>
       </div>
     </main>
+    <DocRightToc items={[
+      { href: '/docs/cli#que-es', k: 'sb.cliWhat' },
+      { href: '/docs/cli#crear-proyecto', k: 'sb.cliCreate' },
+      { href: '/docs/cli#plantillas', k: 'sb.cliTemplates' },
+      { href: '/docs/cli#opciones', k: 'sb.cliOptions' },
+    ]} />
   </div>
 ));

@@ -1,6 +1,8 @@
 import { component, dynamic } from '@astrajs/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
+import { DocRightToc } from '../../components/doc-right-toc.js';
 import { i18n } from '../../i18n.js';
+import { CodeBlock } from '../../components/code-block.js';
 
 const s = `
   .docs-layout{display:flex;min-height:100vh}
@@ -35,7 +37,7 @@ export const DocsTesting = component(() => (
 
         <h2 id="unitarias">{i18n.t('sb.testUnit')}</h2>
         <p><strong>Vitest</strong>{i18n.t('t.vitest1')}<code>jsdom</code>{i18n.t('t.vitest2')}</p>
-        <pre><code>{`// vitest.config.ts
+        <CodeBlock code={`// vitest.config.ts
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
@@ -43,17 +45,17 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
   },
-});`}</code></pre>
+});`} />
 
         <h3>{i18n.t('t.store.title')}</h3>
         <p>{i18n.t('t.store.p1')}<code>effect()</code>{i18n.t('t.store.p2')}</p>
-        <pre><code>{`import { describe, it, expect } from 'vitest';
+        <CodeBlock code={`import { describe, it, expect } from 'vitest';
 import { store, effect } from '@astrajs/core';
 
 const cart = store({ items: [] as string[] });
 
 describe('store', () => {
-  it('dispara efectos quirurgicos al mutar', () => {
+  it('fires surgical effects on mutation', () => {
     let runs = 0;
     effect(() => {
       void cart.items.length; // suscripcion a la propiedad 'items'
@@ -62,31 +64,31 @@ describe('store', () => {
 
     expect(runs).toBe(1); // el efecto corre al suscribirse
 
-    cart.items = ['camiseta', 'gorra'];
+    cart.items = ['t-shirt', 'cap'];
     expect(runs).toBe(2); // re-corre solo por 'items'
 
-    cart.items.push('taza');
+    cart.items.push('mug');
     expect(runs).toBe(3);
     expect(cart.items).toHaveLength(3);
   });
-});`}</code></pre>
+});`} />
 
         <h3>{i18n.t('t.comp.title')}</h3>
         <p>{i18n.t('t.comp.p')}</p>
-        <pre><code>{`import { describe, it, expect } from 'vitest';
+        <CodeBlock code={`import { describe, it, expect } from 'vitest';
 import { Counter } from '../main.js';
 
 // Los efectos de AstraJS se ejecutan en microtareas
 const flush = () => new Promise((r) => setTimeout(r, 0));
 
 describe('Counter', () => {
-  it('renderiza DOM real, no un objeto virtual', () => {
+  it('renders real DOM, not a virtual object', () => {
     const el = Counter({}) as HTMLElement;
     expect(el).toBeInstanceOf(HTMLElement);
     expect(el.querySelector('strong')?.textContent).toBe('0');
   });
 
-  it('actualiza solo el TextNode al hacer clic', async () => {
+  it('updates only the TextNode on click', async () => {
     const el = Counter({}) as HTMLElement;
     document.body.appendChild(el);
 
@@ -96,7 +98,7 @@ describe('Counter', () => {
 
     expect(el.querySelector('strong')?.textContent).toBe('1');
   });
-});`}</code></pre>
+});`} />
 
         <div class="note">
           <strong>{i18n.t('lbl.tip')}:</strong> {i18n.t('t.note1')}<code>examples/frontend-only/</code>{i18n.t('t.note2')}<code>examples/fullstack/</code>{i18n.t('t.note3')}<code>src/__tests__/</code>{i18n.t('t.note4')}
@@ -104,7 +106,7 @@ describe('Counter', () => {
 
         <h2 id="jest">{i18n.t('sb.testJest')}</h2>
         <p>{i18n.t('t.jest.p1')}<code>ts-jest</code>{i18n.t('t.jest.p2')}</p>
-        <pre><code>{`// jest.config.js
+        <CodeBlock code={`// jest.config.js
 module.exports = {
   testEnvironment: 'jsdom',
   transform: {
@@ -112,11 +114,11 @@ module.exports = {
       tsconfig: { jsx: 'react-jsx', jsxImportSource: '@astrajs/core' },
     }],
   },
-};`}</code></pre>
-        <pre><code>{`// __tests__/counter.test.tsx
+};`} />
+        <CodeBlock code={`// __tests__/counter.test.tsx
 import { Counter } from '../src/main';
 
-test('el contador incrementa de 0 a 1', () => {
+test('the counter increments from 0 to 1', () => {
   const el = Counter({}) as HTMLElement;
   document.body.appendChild(el);
 
@@ -124,11 +126,11 @@ test('el contador incrementa de 0 a 1', () => {
   inc.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
   expect(el.querySelector('strong')?.textContent).toBe('1');
-});`}</code></pre>
+});`} />
 
         <h2 id="e2e-playwright">{i18n.t('sb.testPlaywright')}</h2>
         <p>{i18n.t('t.pw.p1')}<code>webServer</code>{i18n.t('t.pw.p2')}</p>
-        <pre><code>{`// playwright.config.ts
+        <CodeBlock code={`// playwright.config.ts
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
@@ -141,22 +143,22 @@ export default defineConfig({
 // e2e/counter.spec.ts
 import { test, expect } from '@playwright/test';
 
-test('el contador incrementa', async ({ page }) => {
+test('the counter increments', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: '+ 1' }).click();
   await expect(page.locator('.count strong')).toHaveText('1');
 });
 
-test('el carrito persiste entre rutas', async ({ page }) => {
+test('the cart persists across routes', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Añadir al carrito' }).first().click();
+  await page.getByRole('button', { name: 'Add to cart' }).first().click();
   await page.getByRole('link', { name: 'Cart' }).click();
   await expect(page.locator('.cart-line')).toHaveCount(1);
-});`}</code></pre>
+});`} />
 
         <h2 id="e2e-cypress">{i18n.t('sb.testCypress')}</h2>
         <p>{i18n.t('t.cy.p1')}<code>shadow-dom</code>{i18n.t('t.cy.p2')}</p>
-        <pre><code>{`// cypress.config.ts
+        <CodeBlock code={`// cypress.config.ts
 import { defineConfig } from 'cypress';
 
 export default defineConfig({
@@ -165,20 +167,20 @@ export default defineConfig({
 
 // cypress/e2e/counter.cy.ts
 describe('Counter', () => {
-  it('incrementa', () => {
+  it('increments', () => {
     cy.visit('/');
     cy.contains('button', '+ 1').click();
     cy.get('.count strong').should('have.text', '1');
   });
-});`}</code></pre>
+});`} />
 
         <h2 id="server">server() RPC</h2>
         <p>{i18n.t('t.rpc.p1')}<code>server()</code>{i18n.t('t.rpc.p2')}<code>fetch</code>{i18n.t('t.rpc.p3')}</p>
-        <pre><code>{`import { describe, it, expect, vi } from 'vitest';
+        <CodeBlock code={`import { describe, it, expect, vi } from 'vitest';
 import { listProducts } from '../server/products.server.js';
 
 describe('listProducts', () => {
-  it('tipa y resuelve la respuesta', async () => {
+  it('types and resolves the response', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => ({
       ok: true,
       json: async () => [{ id: 1, name: 'Widget', price: 19.9 }],
@@ -189,7 +191,7 @@ describe('listProducts', () => {
     expect(products[0].name).toBe('Widget');
     expect(products[0].price).toBeGreaterThan(0);
   });
-});`}</code></pre>
+});`} />
 
         <h2 id="comparativa">{i18n.t('sb.testCompare')}</h2>
         <table>
@@ -202,5 +204,13 @@ describe('listProducts', () => {
         <p>{i18n.t('t.final1')}<strong>{i18n.t('t.final2')}</strong>{i18n.t('t.final3')}</p>
       </div>
     </main>
+    <DocRightToc items={[
+      { href: '/docs/testing#unitarias', k: 'sb.testUnit' },
+      { href: '/docs/testing#jest', k: 'sb.testJest' },
+      { href: '/docs/testing#e2e-playwright', k: 'sb.testPlaywright' },
+      { href: '/docs/testing#e2e-cypress', k: 'sb.testCypress' },
+      { href: '/docs/testing#server', label: 'server() RPC' },
+      { href: '/docs/testing#comparativa', k: 'sb.testCompare' },
+    ]} />
   </div>
 ));

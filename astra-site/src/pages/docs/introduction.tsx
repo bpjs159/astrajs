@@ -1,7 +1,9 @@
 import { component, dynamic } from '@astrajs/core';
 import { navigate } from '@astrajs/router';
 import { DocSidebar } from '../../components/docs-sidebar.js';
+import { Icon } from '../../components/icon.js';
 import { i18n } from '../../i18n.js';
+import { CodeBlock } from '../../components/code-block.js';
 
 const docLayoutStyle = `
   .docs-layout{display:flex;min-height:100vh}
@@ -26,9 +28,10 @@ const docLayoutStyle = `
   .docs-btn-primary:hover{opacity:.9;transform:translateY(-1px)}
   .docs-btn-ghost{display:inline-flex;align-items:center;gap:6px;font-size:.82rem;font-weight:600;color:#e2e8f0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);padding:10px 24px;border-radius:8px;transition:background .15s;text-decoration:none}
   .docs-btn-ghost:hover{background:rgba(255,255,255,.1)}
-  .feature-pills{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:40px}
-  .feature-pill{background:rgba(139,77,255,.06);border:1px solid rgba(139,77,255,.12);border-radius:8px;padding:14px 20px;min-width:140px;text-align:center}
-  .feature-pill-icon{font-size:1.1rem;margin-bottom:4px}
+  .feature-pills{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:40px}
+  .feature-pill{background:rgba(139,77,255,.06);border:1px solid rgba(139,77,255,.12);border-radius:8px;padding:16px 20px;min-width:0;text-align:center}
+  .feature-pill-icon{margin-bottom:6px;display:flex;justify-content:center}
+  @media(max-width:600px){.feature-pills{grid-template-columns:1fr}}
   .feature-pill-label{font-size:.72rem;font-weight:700;color:#f7f7ff}
   .feature-pill-desc{font-size:.66rem;color:#64748b;margin-top:2px}
   .code-demo{background:#060b14;border:1px solid rgba(255,255,255,.07);border-radius:12px;overflow:hidden;margin-bottom:28px}
@@ -47,6 +50,12 @@ const docLayoutStyle = `
   .promo-card h4{font-size:.9rem;font-weight:700;color:#f7f7ff;margin-bottom:8px}
   .promo-card p{font-size:.8rem;color:#94a3b8;margin-bottom:12px;line-height:1.6}
   .promo-card a{font-size:.78rem;font-weight:600;color:#b84cff}
+  .docs-right{position:fixed;top:64px;right:0;width:280px;padding:48px 36px;display:none}
+  @media(min-width:1280px){.docs-right{display:block}}
+  .toc-label{font-size:.64rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px}
+  .toc-item{display:block;font-size:.76rem;color:#64748b;padding:5px 0 5px 12px;font-weight:500;transition:color .12s;border-left:2px solid transparent;text-decoration:none}
+  .toc-item:hover{color:#e2e8f0}
+  .toc-item.active{color:#b84cff;border-left-color:#b84cff}
 `;
 
 const demoCode = `import { store } from '@astrajs/core';
@@ -77,19 +86,19 @@ export const DocsIntroduction = component(() => (
           <a class="docs-btn-ghost" href="https://github.com" target="_blank" rel="noopener">{i18n.t('d.github')}</a>
         </div>
         <div class="feature-pills">
-          <div class="feature-pill"><div class="feature-pill-icon">⚡</div><div class="feature-pill-label">Zero-VDOM</div><div class="feature-pill-desc">{i18n.t('d2.pill1.desc')}</div></div>
-          <div class="feature-pill"><div class="feature-pill-icon">🔧</div><div class="feature-pill-label">Zero Config</div><div class="feature-pill-desc">{i18n.t('d2.pill2.desc')}</div></div>
-          <div class="feature-pill"><div class="feature-pill-icon">🌐</div><div class="feature-pill-label">Full-Stack</div><div class="feature-pill-desc">{i18n.t('d2.pill3.desc')}</div></div>
-          <div class="feature-pill"><div class="feature-pill-icon">🔮</div><div class="feature-pill-label">100% TypeScript</div><div class="feature-pill-desc">{i18n.t('d2.pill4.desc')}</div></div>
+          <div class="feature-pill"><div class="feature-pill-icon"><Icon name="bolt" size={24} /></div><div class="feature-pill-label">Zero-VDOM</div><div class="feature-pill-desc">{i18n.t('d2.pill1.desc')}</div></div>
+          <div class="feature-pill"><div class="feature-pill-icon"><Icon name="wrench" size={24} /></div><div class="feature-pill-label">Zero Config</div><div class="feature-pill-desc">{i18n.t('d2.pill2.desc')}</div></div>
+          <div class="feature-pill"><div class="feature-pill-icon"><Icon name="layers" size={24} /></div><div class="feature-pill-label">Full-Stack</div><div class="feature-pill-desc">{i18n.t('d2.pill3.desc')}</div></div>
+          <div class="feature-pill"><div class="feature-pill-icon"><Icon name="code" size={24} /></div><div class="feature-pill-label">100% TypeScript</div><div class="feature-pill-desc">{i18n.t('d2.pill4.desc')}</div></div>
         </div>
-        <h2>{i18n.t('d.first.title')}</h2>
+        <h2 id="primer-componente">{i18n.t('d.first.title')}</h2>
         <p>{i18n.t('d2.first.a')}<strong>{i18n.t('d2.first.b')}</strong>{i18n.t('d2.first.c')}</p>
         <div class="code-demo">
           <div class="code-demo-header"><span class="code-demo-tab active">Counter.tsx</span></div>
-          <div class="code-demo-body"><pre>{demoCode}</pre></div>
-          <div class="code-demo-result">⚡ {i18n.t('d2.cr1')}<code>TextNode</code>{i18n.t('d2.cr2')}<code>state.count</code>{i18n.t('d2.cr3')}<strong>{i18n.t('d2.cr4')}</strong>{i18n.t('d2.cr5')}</div>
+          <div class="code-demo-body"><CodeBlock code={demoCode} bare /></div>
+          <div class="code-demo-result"><Icon name="bolt" size={13} /> {i18n.t('d2.cr1')}<code>TextNode</code>{i18n.t('d2.cr2')}<code>state.count</code>{i18n.t('d2.cr3')}<strong>{i18n.t('d2.cr4')}</strong>{i18n.t('d2.cr5')}</div>
         </div>
-        <h2>{i18n.t('d.how.title')}</h2>
+        <h2 id="como-funciona">{i18n.t('d.how.title')}</h2>
         <p>{i18n.t('d2.how.p1')}<code>server()</code>{i18n.t('d2.how.p2')}</p>
         <div class="steps-list">
           <div class="steps-list-item"><div class="steps-list-num">1</div><div class="steps-list-text"><h4>{i18n.t('d.how.1.title')}</h4><p>{i18n.t('d2.step1.a')}<code>store()</code>, <code>server()</code>{i18n.t('d2.step1.b')}</p></div></div>
@@ -119,27 +128,27 @@ export const DocsIntroduction = component(() => (
         </ul>
         <h2 id="instalacion">{i18n.t('sb.install')}</h2>
         <p>{i18n.t('d2.install1')}</p>
-        <pre><code>npx @astrajs/cli@latest</code></pre>
+        <CodeBlock code={`npx @astrajs/cli@latest`} />
         <p>{i18n.t('d2.install2')}</p>
-        <pre><code>pnpm add @astrajs/core @astrajs/compiler
+        <CodeBlock code={`pnpm add @astrajs/core @astrajs/compiler
 
-{`// vite.config.ts
+// vite.config.ts
 import astra from '@astrajs/compiler';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
   plugins: [astra()],
-});`}</code></pre>
+});`} />
         <p>{i18n.t('d2.tsconfig')}</p>
-        <pre><code>{`{
+        <CodeBlock code={`{
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "@astrajs/core"
   }
-}`}</code></pre>
+}`} />
         <h2 id="primeros-pasos">{i18n.t('sb.gettingStarted')}</h2>
         <p>{i18n.t('d2.getting')}</p>
-        <pre><code>{`import { component, store } from '@astrajs/core';
+        <CodeBlock code={`import { component, store } from '@astrajs/core';
 
 export const Hello = component(() => {
   const name = store({ value: 'AstraJS' });
@@ -153,7 +162,7 @@ export const Hello = component(() => {
       />
     </div>
   );
-});`}</code></pre>
+});`} />
         <p>{i18n.t('d2.each')}</p>
         <ul>
           <li><code>name.value</code>{i18n.t('d2.each1')}</li>
@@ -175,11 +184,19 @@ export const Hello = component(() => {
           <a href="/docs/advanced" onclick={(e: Event) => { e.preventDefault(); navigate('/docs/advanced'); }}>{i18n.t('d.promo1.link')} →</a>
         </div>
         <div class="promo-card" style="margin-top:16px;background:linear-gradient(135deg,rgba(0,223,255,.06),rgba(139,77,255,.04));border-color:rgba(0,223,255,.15)">
-          <h4>{i18n.t('d2.promo2.title')}</h4>
+          <h4><Icon name="play" size={15} /> {i18n.t('d2.promo2.title')}</h4>
           <p>{i18n.t('d2.promo2.text')}</p>
           <a href="/docs/fundamentals" onclick={(e: Event) => { e.preventDefault(); navigate('/docs/fundamentals'); }}>{i18n.t('d2.promo2.link')} →</a>
         </div>
       </div>
     </main>
+    <aside class="docs-right">
+      <div class="toc-label">{i18n.t('d.toc')}</div>
+      <a href="/docs/introduction#primer-componente" class="toc-item">{i18n.t('d.first.title')}</a>
+      <a href="/docs/introduction#como-funciona" class="toc-item">{i18n.t('d.how.title')}</a>
+      <a href="/docs/introduction#instalacion" class="toc-item">{i18n.t('sb.install')}</a>
+      <a href="/docs/introduction#primeros-pasos" class="toc-item">{i18n.t('sb.gettingStarted')}</a>
+      <a href="/docs/introduction#conceptos-clave" class="toc-item">{i18n.t('d.concepts.title')}</a>
+    </aside>
   </div>
 ));

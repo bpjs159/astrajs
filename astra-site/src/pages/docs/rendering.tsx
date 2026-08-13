@@ -1,6 +1,8 @@
 import { component, dynamic } from '@astrajs/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
+import { DocRightToc } from '../../components/doc-right-toc.js';
 import { i18n } from '../../i18n.js';
+import { CodeBlock } from '../../components/code-block.js';
 
 const s = `
   .docs-layout{display:flex;min-height:100vh}
@@ -44,7 +46,7 @@ export const DocsRendering = component(() => (
           <li>{i18n.t('rr.ol5')}</li>
         </ol>
 
-        <pre><code>{`// SSR se activa por defecto en el servidor
+        <CodeBlock code={`// SSR se activa por defecto en el servidor
 // No necesitas configuracion especial
 
 export default function ProductPage() {
@@ -53,15 +55,15 @@ export default function ProductPage() {
     <article>
       <h1>{product.name}</h1>
       <p>{product.description}</p>
-      <span>${product.price}</span>
+      <span>\${product.price}</span>
     </article>
   );
-}`}</code></pre>
+}`} />
 
         <h2 id="ssg">SSG (Static Site Generation)</h2>
         <p>{i18n.t('rr.ssg.a')}<strong>{i18n.t('rr.ssg.b')}</strong>{i18n.t('rr.ssg.c')}<strong>{i18n.t('rr.ssg.d')}</strong>{i18n.t('rr.ssg.e')}</p>
 
-        <pre><code>{`// Las paginas SSG usan server({ type: 'pre-build' })
+        <CodeBlock code={`// Las paginas SSG usan server({ type: 'pre-build' })
 // El resultado se incrusta en el HTML durante el build
 
 const posts = server(
@@ -71,12 +73,12 @@ const posts = server(
 
 // En build time: db.post.findMany() se ejecuta
 // El HTML generado incluye los posts serializados
-// En produccion: se sirve HTML estatico, sin consultas a BD`}</code></pre>
+// En produccion: se sirve HTML estatico, sin consultas a BD`} />
 
         <h2 id="isr">ISR (Incremental Static Regeneration)</h2>
         <p>{i18n.t('rr.isr.a')}<strong>{i18n.t('rr.isr.b')}</strong>{i18n.t('rr.isr.c')}</p>
 
-        <pre><code>{`// ISR: maxAge controla cada cuanto se re-genera
+        <CodeBlock code={`// ISR: maxAge controla cada cuanto se re-genera
 const featuredProducts = server(
   { 
     type: 'pre-build',   // generado en build
@@ -90,7 +92,7 @@ const featuredProducts = server(
 // t=0: Build → HTML con datos incluidos
 // t=30min: Usuario visita → recibe HTML cacheado (rapido)
 // t=61min: Cache expiro → se sirve stale + re-generacion en bg
-// t=62min: Siguiente visita → HTML fresco con nuevos datos`}</code></pre>
+// t=62min: Siguiente visita → HTML fresco con nuevos datos`} />
 
         <h2>{i18n.t('rr.comp.title')}</h2>
         <table>
@@ -110,7 +112,7 @@ const featuredProducts = server(
           <li><strong>{i18n.t('rr.vs2.name')}:</strong> {i18n.t('rr.vs2')}</li>
         </ul>
 
-        <pre><code>{`// El HTML generado por el servidor incluye:
+        <CodeBlock code={`// El HTML generado por el servidor incluye:
 //   <div id="app">
 //     <span data-astra-store="counter" data-astra-value="42">
 //       Contador: 42
@@ -124,8 +126,14 @@ const featuredProducts = server(
 //   1. Lee data-astra-store → inicializa el store con valor 42
 //   2. Lee data-astra-handler → sabe que hay un onclick pendiente
 //   3. No ejecuta componentes, no hace diffing
-//   4. El JS del handler se carga solo cuando haces clic en "+"`}</code></pre>
+//   4. El JS del handler se carga solo cuando haces clic en "+"`} />
       </div>
     </main>
+    <DocRightToc items={[
+      { href: '/docs/rendering#ssr', label: 'SSR' },
+      { href: '/docs/rendering#ssg', label: 'SSG' },
+      { href: '/docs/rendering#isr', label: 'ISR' },
+      { href: '/docs/rendering#resumibilidad', k: 'sb.resumability' },
+    ]} />
   </div>
 ));

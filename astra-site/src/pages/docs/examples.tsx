@@ -1,7 +1,10 @@
 import { component, store, dynamic } from '@astrajs/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
+import { DocRightToc } from '../../components/doc-right-toc.js';
+import { Icon } from '../../components/icon.js';
 import { frontendExamples, fullstackExamples, type LiveExample } from './examples-live.js';
 import { i18n } from '../../i18n.js';
+import { CodeBlock } from '../../components/code-block.js';
 
 const s = `
   .docs-layout{display:flex;min-height:100vh}
@@ -132,12 +135,12 @@ export const DocsExamples = component(() => {
                           <span class="ex-num">{ex.num}</span>
                           <h3>{i18n.t(ex.title)}</h3>
                           <button class="ex-viewer-close" onclick={() => { state.selectedNum = null; }}>
-                            {i18n.t('ex.close')}
+                            <Icon name="x" size={11} /> {i18n.t('ex.close')}
                           </button>
                         </div>
                         <div class="ex-viewer-code">
                           <div class="ex-viewer-code-label">{i18n.t('ex.code')}</div>
-                          <pre><code>{ex.code}</code></pre>
+                          <CodeBlock code={ex.code} />
                         </div>
                         <div class="ex-viewer-preview">
                           <div class="ex-viewer-preview-label">{i18n.t('ex.live')}</div>
@@ -156,6 +159,10 @@ export const DocsExamples = component(() => {
           </div>
         </div>
       </main>
+      <DocRightToc items={[
+        { href: '/docs/examples#frontend', label: 'Frontend-only (10)' },
+        { href: '/docs/examples#fullstack', label: 'Fullstack (10)' },
+      ]} />
     </div>
   );
 });
