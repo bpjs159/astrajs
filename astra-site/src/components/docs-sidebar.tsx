@@ -1,5 +1,5 @@
-import { component, store } from '@astrajs/core';
-import { navigate } from '@astrajs/router';
+import { component, store, dynamic } from '@astrajs/core';
+import { navigate, onRouteChange } from '@astrajs/router';
 import { i18n } from '../i18n.js';
 import { Icon } from './icon.js';
 
@@ -137,9 +137,83 @@ const docSections: DocSection[] = [
 const sectionTitle = (section: DocSection) =>
   section.titleK ? i18n.t(section.titleK) : section.title;
 
-export const DocSidebar = component(() => {
-  const state = store({ activeSection: '' });
+// ── Estado activo del sidebar ─────────────────────────────────────────────
+// La URL actual (path + hash) vive en un store compartido: los bindings
+// dynamic() de items y secciones se actualizan solos al navegar o al hacer
+// clic en un item. Se registra una sola vez (los módulos ES se ejecutan una
+// vez por sesión, aunque el sidebar se re-monte en cada página de docs).
+const navHref = store({
+  href:
+    typeof window !== 'undefined'
+      ? window.location.pathname + (window.location.hash || '')
+      : '',
+});
 
+if (typeof window !== 'undefined') {
+  const syncNavHref = () => {
+    navHref.href = window.location.pathname + (window.location.hash || '');
+  };
+  // Navegación por router (desde cualquier parte), back/forward y hash manual.
+  onRouteChange(syncNavHref);
+  window.addEventListener('popstate', syncNavHref);
+  window.addEventListener('hashchange', syncNavHref);
+}
+
+if (typeof window !== 'undefined') {
+  // ── Scroll-spy ──────────────────────────────────────────────────────────
+  // Al hacer scroll en el contenido, el item activo sigue la sección que está
+  // en pantalla (no solo al hacer clic). Solo actúa en páginas de docs.
+  let spyQueued = false;
+  const runScrollSpy = () => {
+    spyQueued = false;
+    if (!document.querySelector('.docs-sidebar')) return;
+    const path = window.location.pathname;
+    // Secciones de ESTA página, en el orden real del DOM (el orden del
+    // sidebar puede diferir del orden del contenido).
+    const els = docSections
+      .flatMap((s) => s.items)
+      .filter((it) => it.href.includes('#') && it.href.split('#')[0] === path)
+      .map((it) => document.getElementById(it.href.split('#')[1]))
+      .filter((el): el is HTMLElement => el !== null)
+      .sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
+    if (!els.length) return;
+    const line = 100; // línea de detección, debajo del header sticky
+    let current = '';
+    for (const el of els) {
+      if (el.getBoundingClientRect().top <= line) current = el.id;
+    }
+    // Al llegar al final de la página, la última sección queda activa.
+    const atBottom =
+      window.scrollY + window.innerHeight >=
+      document.documentElement.scrollHeight - 4;
+    if (atBottom) current = els[els.length - 1].id;
+    const target = current ? path + '#' + current : path;
+    if (navHref.href === target) return;
+    navHref.href = target;
+    // Mantén el hash de la URL sincronizado sin ensuciar el historial.
+    if ((window.location.hash || '') !== (current ? '#' + current : '')) {
+      window.history.replaceState(null, '', target);
+    }
+  };
+  const onScrollSpy = () => {
+    if (spyQueued) return;
+    spyQueued = true;
+    requestAnimationFrame(runScrollSpy);
+  };
+  window.addEventListener('scroll', onScrollSpy, { passive: true });
+}
+
+/** Un item está activo si su href coincide con la URL, o si es el primer
+ *  item de su sección y la URL apunta a esa página sin hash. */
+const isItemActive = (currentHref: string, itemHref: string, idx: number) =>
+  currentHref === itemHref ||
+  (!currentHref.includes('#') && idx === 0 && currentHref === itemHref.split('#')[0]);
+
+/** Una sección está activa si su página coincide con la URL actual. */
+const isSectionActive = (currentHref: string, section: DocSection) =>
+  section.items.some((it) => it.href.split('#')[0] === currentHref.split('#')[0]);
+
+export const DocSidebar = component(() => {
   const style = `
     .docs-sidebar{position:fixed;top:64px;left:0;bottom:0;width:260px;background:#060b14;border-right:1px solid rgba(255,255,255,.06);overflow-y:auto;padding:24px 0 40px;z-index:50;overscroll-behavior:contain}
     .docs-sidebar-section{margin-bottom:8px}
@@ -157,52 +231,61 @@ export const DocSidebar = component(() => {
     }
   `;
 
-  const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
-  const currentHref = typeof window !== 'undefined' ? window.location.pathname + window.location.hash : '';
-
-  // Wheel over the sidebar must never scroll the page content.
-  // - If the sidebar has overflow, native scroll handles it and
-  //   overscroll-behavior:contain stops the chaining to the page.
-  // - If it has no overflow (short pages), swallow the event.
+  // Wheel over the sidebar must scroll the SIDEBAR, never the page.
+  // Native wheel hit-testing over a fixed scroll container is unreliable
+  // across browsers (some chain the event to the document even mid-scroll,
+  // leaving the sidebar stuck while the content moves), so we take the
+  // wheel over completely and drive the scroll ourselves:
+  //   - preventDefault → the page can never move from a wheel here;
+  //   - aside.scrollTop += delta → the sidebar always follows the wheel
+  //     (each wheel event, including trackpad inertia events, moves it).
   if (typeof document !== 'undefined') {
-    const w = window as unknown as { __sbWheel?: boolean };
-    if (!w.__sbWheel) {
-      w.__sbWheel = true;
-      document.addEventListener('wheel', (e: WheelEvent) => {
-        const aside = document.querySelector('.docs-sidebar');
-        if (!aside) return;
-        if (!aside.contains(e.target as Node)) return;
-        if (aside.scrollHeight <= aside.clientHeight) {
-          e.preventDefault();
-        }
-      }, { passive: false });
-    }
+    const w = window as unknown as { __sbWheel?: (e: WheelEvent) => void };
+    const handler = (e: WheelEvent) => {
+      const aside = document.querySelector('.docs-sidebar') as HTMLElement | null;
+      if (!aside) return;
+      if (!aside.contains(e.target as Node)) return;
+      // Trackpad pinch-zoom arrives as ctrl+wheel: let it behave natively.
+      if (e.ctrlKey || e.deltaY === 0) return;
+      e.preventDefault();
+      const step =
+        e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? aside.clientHeight : 1;
+      aside.scrollTop += e.deltaY * step;
+    };
+    // Replace any previously installed handler (HMR re-runs this module
+    // without reloading the page — the old listener must not linger).
+    if (w.__sbWheel) document.removeEventListener('wheel', w.__sbWheel);
+    w.__sbWheel = handler;
+    document.addEventListener('wheel', handler, { passive: false });
   }
 
   return (
     <aside class="docs-sidebar">
       <style>{style}</style>
       <nav>
-        {docSections.map(section => {
-          const sectionActive = section.items.some((it) => it.href.split('#')[0] === currentPath);
-          return (
-            <div class="docs-sidebar-section">
-              <div class={`docs-sidebar-title${sectionActive ? ' active' : ''}`}>{sectionTitle(section)}</div>
-              {section.items.map((item, idx) => {
-                const isActive =
-                  currentHref === item.href ||
-                  (!currentHref.includes('#') && idx === 0 && currentHref === item.href.split('#')[0]);
-                return (
-                  <a
-                    href={item.href}
-                    class={`docs-sidebar-item${isActive ? ' active' : ''}`}
-                    onclick={(e: Event) => {
-                      e.preventDefault();
-                      const parts = item.href.split('#');
-                      navigate(parts[0]);
-                      if (parts[1]) {
-                        const hash = parts[1];
-                        const scrollToHash = () => {
+        {docSections.map(section => (
+          <div class="docs-sidebar-section">
+            <div class={dynamic(() => `docs-sidebar-title${isSectionActive(navHref.href, section) ? ' active' : ''}`)}>
+              {sectionTitle(section)}
+            </div>
+            {section.items.map((item, idx) => (
+              <a
+                href={item.href}
+                class={dynamic(() => `docs-sidebar-item${isItemActive(navHref.href, item.href, idx) ? ' active' : ''}`)}
+                onclick={(e: Event) => {
+                  e.preventDefault();
+                  const parts = item.href.split('#');
+                  navigate(parts[0]);
+                  if (parts[1]) {
+                    const hash = parts[1];
+                    // navigate() solo empuja el path: sincroniza el hash en la
+                    // URL para que el estado activo refleje la sección.
+                    const full = window.location.pathname + '#' + hash;
+                    if (window.location.pathname + window.location.hash !== full) {
+                      window.history.replaceState(null, '', full);
+                    }
+                    navHref.href = full;
+                    const scrollToHash = () => {
                           const el = document.getElementById(hash);
                           if (!el) return;
                           const html = document.documentElement;
@@ -212,18 +295,29 @@ export const DocSidebar = component(() => {
                           html.style.scrollBehavior = prev;
                         };
                         // After the router re-render (it also resets scroll).
-                        setTimeout(scrollToHash, 80);
-                        setTimeout(scrollToHash, 350);
+                        // The second pass covers slower renders. If the user
+                        // starts scrolling before a pending pass fires, cancel
+                        // it — the page must never yank away while the user
+                        // is interacting with the sidebar.
+                        const timers = [
+                          window.setTimeout(scrollToHash, 80),
+                          window.setTimeout(scrollToHash, 350),
+                        ];
+                        const cancelPendingScroll = () => {
+                          timers.forEach((t) => window.clearTimeout(t));
+                          window.removeEventListener('wheel', cancelPendingScroll);
+                        };
+                        window.addEventListener('wheel', cancelPendingScroll, { passive: true });
+                      } else {
+                        navHref.href = window.location.pathname;
                       }
                     }}
                   >
                     {item.k ? i18n.t(item.k) : item.label}
                   </a>
-                );
-              })}
+                ))}
             </div>
-          );
-        })}
+          ))}
       </nav>
       <div class="docs-sidebar-footer">
         <a href="https://github.com" target="_blank" rel="noopener">

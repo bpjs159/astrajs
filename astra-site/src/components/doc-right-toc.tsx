@@ -46,8 +46,17 @@ export const DocRightToc = component((props: { items: TocItem[] }) => {
     // Keep the URL in sync without triggering a full hash navigation
     // (the native hash scroll is unreliable under the SPA router).
     history.replaceState(null, '', '#' + hash);
-    setTimeout(() => scrollToHash(hash), 50);
-    setTimeout(() => scrollToHash(hash), 300);
+    // The second pass covers slower renders. If the user starts scrolling
+    // before a pending pass fires, cancel it so the page never yanks away.
+    const timers = [
+      window.setTimeout(() => scrollToHash(hash), 50),
+      window.setTimeout(() => scrollToHash(hash), 300),
+    ];
+    const cancelPendingScroll = () => {
+      timers.forEach((t) => window.clearTimeout(t));
+      window.removeEventListener('wheel', cancelPendingScroll);
+    };
+    window.addEventListener('wheel', cancelPendingScroll, { passive: true });
     document.querySelectorAll('.toc-item').forEach((a) => {
       a.classList.toggle('active', a.getAttribute('href')?.includes('#' + hash) ?? false);
     });

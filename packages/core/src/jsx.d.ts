@@ -158,7 +158,7 @@ declare namespace JSX {
    */
   interface HTMLAttributes<T> {
     // --- Standard ---
-    class?: string;
+    class?: string | (() => string | null | undefined);
     id?: string;
     title?: string;
     lang?: string;
