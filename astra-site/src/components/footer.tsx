@@ -5,6 +5,8 @@ import { BrandLogo } from './brand-logo.js';
 export function Footer(): JSX.Element {
   const style = `
     .site-footer{border-top:1px solid rgba(255,255,255,.06);background:rgba(4,6,13,.6);padding:48px 0 32px;margin-top:80px}
+    /* Docs pages: keep the footer clear of the fixed 260px sidebar. */
+    main:has(.docs-sidebar) + .site-footer{padding-left:260px}
     .footer-inner{max-width:1400px;margin:0 auto;padding:0 32px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:24px}
     .footer-brand{display:flex;align-items:center;gap:10px}
     .footer-brand .footer-wordmark{font-size:1.15rem;font-weight:700}
@@ -12,6 +14,9 @@ export function Footer(): JSX.Element {
     .footer-links a{font-size:.8rem;color:#64748b;font-weight:500;transition:color .15s}
     .footer-links a:hover{color:#e2e8f0}
     .footer-copy{font-size:.78rem;color:#475569}
+    @media(max-width:960px){
+      main:has(.docs-sidebar) + .site-footer{padding-left:0}
+    }
     @media(max-width:640px){
       .footer-inner{flex-direction:column;text-align:center}
       .footer-links{flex-wrap:wrap;justify-content:center}
