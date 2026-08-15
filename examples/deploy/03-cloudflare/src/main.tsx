@@ -1,0 +1,16 @@
+/**
+ * Deploy 03 — Cloudflare · entry
+ */
+import { DeployApp } from './app.js';
+
+const style = document.createElement('style');
+style.textContent = `
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+`;
+document.head.appendChild(style);
+
+const root = document.getElementById('app');
+if (root) {
+  root.appendChild(DeployApp({}) as unknown as Node);
+}

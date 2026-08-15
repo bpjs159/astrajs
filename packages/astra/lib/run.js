@@ -16,17 +16,17 @@ import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { colors, paint } from './colors.js';
+import { buildProject } from './build.js';
 
 /** Subcommand → underlying tool + default arguments. */
 const COMMANDS = {
   dev: { tool: 'vite', args: [] },
-  build: { tool: 'vite', args: ['build'] },
   preview: { tool: 'vite', args: ['preview'] },
   test: { tool: 'vitest', args: ['run'] },
 };
 
 /** Walks up from cwd looking for node_modules/.bin/<name>. */
-function findBin(name) {
+export function findBin(name) {
   let dir = process.cwd();
   for (;;) {
     const base = path.join(dir, 'node_modules', '.bin');
@@ -45,6 +45,14 @@ function findBin(name) {
  * (so the caller skips the scaffolding flow), false otherwise.
  */
 export function runAstraCommand(command, extraArgs) {
+  // `astra build` has its own orchestrator: client build + SSR bundle +
+  // deployment adapter output (see build.js).
+  if (command === 'build') {
+    const { adapter, rest } = splitAdapterFlag(extraArgs);
+    void buildProject({ adapterFlag: adapter, extraArgs: rest });
+    return true;
+  }
+
   const spec = COMMANDS[command];
   if (!spec) return false;
 
@@ -83,4 +91,22 @@ export function runAstraCommand(command, extraArgs) {
   });
 
   return true;
+}
+
+/** Splits `--adapter=x` / `--adapter x` out of the extra args. */
+function splitAdapterFlag(extraArgs) {
+  const rest = [];
+  let adapter = null;
+  for (let i = 0; i < extraArgs.length; i++) {
+    const arg = extraArgs[i];
+    if (arg === '--adapter' && extraArgs[i + 1]) {
+      adapter = extraArgs[i + 1];
+      i++;
+    } else if (arg.startsWith('--adapter=')) {
+      adapter = arg.slice('--adapter='.length);
+    } else {
+      rest.push(arg);
+    }
+  }
+  return { adapter, rest };
 }

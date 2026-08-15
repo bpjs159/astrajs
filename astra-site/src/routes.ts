@@ -14,6 +14,7 @@ export const routes = {
   get docsI18n() { return route('/docs/i18n'); },
   get docsIntegrations() { return route('/docs/integrations'); },
   get docsAdvanced() { return route('/docs/advanced'); },
+  get docsDeployment() { return route('/docs/deployment'); },
   get docs() { return route('/docs', { exact: true }); },
   get fallback() { return fallbackRoute(); },
 };

@@ -131,6 +131,20 @@ const docSections: DocSection[] = [
       { label: '', k: 'sb.advDeploy', href: '/docs/advanced#despliegue' },
     ],
   },
+  {
+    title: 'Deployment',
+    titleK: 'sb.deploy',
+    items: [
+      { label: '', k: 'sb.deployWhy', href: '/docs/deployment#why' },
+      { label: '', k: 'sb.deployBuild', href: '/docs/deployment#build' },
+      { label: '', k: 'sb.deployAdapters', href: '/docs/deployment#adapters' },
+      { label: '', k: 'sb.deployNode', href: '/docs/deployment#node' },
+      { label: '', k: 'sb.deployVercel', href: '/docs/deployment#vercel' },
+      { label: '', k: 'sb.deployCloudflare', href: '/docs/deployment#cloudflare' },
+      { label: '', k: 'sb.deployStatic', href: '/docs/deployment#static' },
+      { label: '', k: 'sb.deployEnv', href: '/docs/deployment#env' },
+    ],
+  },
 ];
 
 /** Resuelve el texto visible de una sección (clave i18n o literal). */

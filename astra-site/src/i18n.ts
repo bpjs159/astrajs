@@ -23,6 +23,7 @@ import { INTEG_STRINGS } from './i18n-integrations.js';
 import { I18NDOC_STRINGS } from './i18n-i18ndoc.js';
 import { EXAMPLES_STRINGS } from './i18n-examples.js';
 import { EXAMPLES_DATA_STRINGS } from './i18n-examples-data.js';
+import { DEPLOY_STRINGS } from './i18n-deployment.js';
 
 const BASE: Record<string, Record<string, string>> = {
     en: {
@@ -218,6 +219,7 @@ for (const loc of LOCALES) {
     ...(I18NDOC_STRINGS[loc] ?? {}),
     ...(EXAMPLES_STRINGS[loc] ?? {}),
     ...(EXAMPLES_DATA_STRINGS[loc] ?? {}),
+    ...(DEPLOY_STRINGS[loc] ?? {}),
   };
 }
 

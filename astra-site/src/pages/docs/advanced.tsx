@@ -186,6 +186,7 @@ export default defineConfig({
 
         <h2 id="despliegue">{i18n.t('sb.advDeploy')}</h2>
         <p>{i18n.t('av.dep.a')}<code>dist/</code>{i18n.t('av.dep.b')}</p>
+        <p><a href="/docs/deployment"><strong>→ Deployment</strong></a></p>
         <ul>
           <li><strong>{i18n.t('av.dep1.name')}</strong> — {i18n.t('av.dep1')}</li>
           <li><strong>{i18n.t('av.dep2.name')}</strong> — {i18n.t('av.dep2')}</li>

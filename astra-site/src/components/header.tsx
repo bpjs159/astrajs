@@ -3,6 +3,7 @@ import { navigate } from '@astrajs/router';
 import { i18n } from '../i18n.js';
 import { WORLD_LOCALES } from '@astrajs/i18n';
 import { Icon } from './icon.js';
+import { BrandLogo } from './brand-logo.js';
 
 export const Header = component(() => {
   const state = store({ mobileOpen: false, scrolled: false });
@@ -22,13 +23,14 @@ export const Header = component(() => {
     .site-header{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(4,6,13,.55);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid rgba(255,255,255,.04)}
     .header-inner{display:flex;align-items:center;justify-content:space-between;height:64px;max-width:100%;margin:0 auto;padding:0 24px}
     .header-logo{display:flex;align-items:center;cursor:pointer;position:relative}
-    .header-logo img{position:absolute;left:0;top:50%;height:28px;width:auto;object-fit:contain;opacity:0;transform:translateY(-50%) scale(.8);transition:opacity .3s ease,transform .3s ease;filter:drop-shadow(0 0 20px rgba(184,76,255,.5)) drop-shadow(0 0 50px rgba(77,124,255,.3)) drop-shadow(0 0 90px rgba(0,223,255,.15))}
-    .header-logo.scrolled img{opacity:1;transform:translateY(-50%) scale(1)}
+    .header-logo .header-isotype{position:absolute;left:0;top:50%;height:28px;width:auto;object-fit:contain;opacity:0;transform:translateY(-50%) scale(.8);transition:opacity .3s ease,transform .3s ease;filter:drop-shadow(0 0 20px rgba(184,76,255,.5)) drop-shadow(0 0 50px rgba(77,124,255,.3)) drop-shadow(0 0 90px rgba(0,223,255,.15))}
+    .header-logo.scrolled .header-isotype{opacity:1;transform:translateY(-50%) scale(1)}
     .header-logo::after{content:'';position:absolute;left:-12px;top:50%;transform:translateY(-50%);width:48px;height:48px;background:radial-gradient(circle,rgba(139,77,255,.15) 0%,transparent 70%);border-radius:50%;pointer-events:none;z-index:-1;opacity:0;transition:opacity .3s ease}
     .header-logo.scrolled::after{opacity:1}
-    .header-logo span{font-family:'Fauna Pro',serif;font-size:1.25rem;font-weight:500;color:#ffffff;letter-spacing:.06em;text-shadow:0 0 80px rgba(255,255,255,.15),0 0 160px rgba(255,255,255,.05);transition:opacity .3s ease,transform .3s ease}
-    .header-logo.scrolled span{opacity:0;transform:translateX(-12px)}
-    .header-logo .header-beta{margin-left:10px;font-size:.58rem;font-weight:700;color:#c4a0ff;background:rgba(139,77,255,.12);border:1px solid rgba(139,77,255,.35);border-radius:999px;padding:2px 8px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;box-shadow:0 0 12px rgba(139,77,255,.25)}
+    .header-logo .header-wordmark{font-size:1.25rem;transition:opacity .3s ease,transform .3s ease}
+    .header-logo.scrolled .header-wordmark{opacity:0;transform:translateX(-12px)}
+    .header-logo .header-beta{margin-left:10px;font-size:.58rem;font-weight:700;color:#c4a0ff;background:rgba(139,77,255,.12);border:1px solid rgba(139,77,255,.35);border-radius:999px;padding:2px 8px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;box-shadow:0 0 12px rgba(139,77,255,.25);transition:opacity .3s ease,transform .3s ease}
+    .header-logo.scrolled .header-beta{opacity:0;transform:translateX(-12px)}
     .header-nav{display:flex;align-items:center;gap:2px}
     .header-nav .nav-divider{width:1px;height:20px;background:rgba(255,255,255,.12);margin:0 14px;flex-shrink:0}
     .header-nav .nav-right{display:flex;align-items:center;gap:10px}
@@ -58,8 +60,8 @@ export const Header = component(() => {
       <style>{navStyle}</style>
       <div class="header-inner">
         <a class={`header-logo${state.scrolled ? ' scrolled' : ''}`} onclick={() => { navigate('/'); closeMenu(); }}>
-          <img src="/images/logo.png" alt="AstraJS" />
-          <span>ASTRA<span style="background:linear-gradient(135deg,#8d4dff,#4d7cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">JS</span></span>
+          <img class="header-isotype" src="/images/logo.png" alt="AstraJS" />
+          <BrandLogo cls="header-wordmark" />
           <span class="header-beta">beta · v0.1.0</span>
         </a>
         <button class="header-mobile-btn" onclick={toggleMenu} aria-label="Menu">

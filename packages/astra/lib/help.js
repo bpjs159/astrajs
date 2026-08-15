@@ -14,7 +14,9 @@ export function printHelp() {
 
   ${colors.bold}Project runner${colors.reset} (inside an AstraJS project):
     astra dev [args…]        Start the dev server (vite)
-    astra build [args…]      Production build (vite build)
+    astra build [args…]      Production build + deploy adapter output
+                             (--adapter static|node|vercel|cloudflare,
+                              or "adapter" in astra.config.json)
     astra preview [args…]    Preview the production build (vite preview)
     astra test [args…]       Run tests (vitest run)
 
@@ -39,6 +41,8 @@ export function printHelp() {
   ${colors.bold}Examples:${colors.reset}
     astra dev
     astra build
+    astra build --adapter vercel
+    astra build --adapter cloudflare
     astra test --watch
     astra my-app
     astra my-app --template frontend

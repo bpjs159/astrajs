@@ -1,0 +1,39 @@
+{
+  "name": "@astrajs/adapters",
+  "version": "0.1.0",
+  "description": "AstraJS deployment adapters — Node, Vercel, Cloudflare, static",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "development": "./src/index.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./edge": {
+      "types": "./dist/edge.d.ts",
+      "development": "./src/edge.ts",
+      "import": "./dist/edge.js",
+      "default": "./dist/edge.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "src"],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@astrajs/server": "0.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  },
+  "keywords": ["astrajs", "adapters", "vercel", "cloudflare", "serverless", "node"],
+  "license": "MIT"
+}

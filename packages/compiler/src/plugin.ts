@@ -30,7 +30,7 @@ import type { Plugin, ResolvedConfig } from 'vite';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { AstraViteConfig } from './index.js';
 import { existsSync, readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { relative, resolve } from 'node:path';
 import { transformJSX, autoWrapDynamic, autoMemoDerivedFunctions } from './transformers/jsx.js';
 import { transformServerRPC, findServerCalls } from './transformers/server-rpc.js';
 import type { ServerCallInfo } from './transformers/server-rpc.js';
@@ -305,7 +305,13 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
 
         const regs = calls
           .filter((c) => !c.isPreBuild && c.varName)
-          .map((c) => `rpcHandler(${JSON.stringify(c.id)}, ${c.varName});`);
+          .map((c) => {
+            const { type: _type, ...handlerOptions } = c.config;
+            const hasOptions = Object.keys(handlerOptions).length > 0;
+            return `rpcHandler(${JSON.stringify(c.id)}, ${c.varName}${
+              hasOptions ? `, ${JSON.stringify(handlerOptions)}` : ''
+            });`;
+          });
 
         if (regs.length > 0) {
           transformed = ensureImport(transformed, '@astrajs/server', ['rpcHandler']);
@@ -493,6 +499,27 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
           type: 'asset',
           fileName: 'astra-prebuild-manifest.json',
           source: JSON.stringify(state.preBuildIds, null, 2),
+        });
+      }
+
+      // Write the server module map (handler id → defining module) so the
+      // CLI can generate a production server entry that IMPORTS the real
+      // handler modules (closures with module scope — no `new Function`).
+      if (state.handlerModules.size > 0) {
+        const root = state.resolvedConfig?.root ?? process.cwd();
+        const modules: Record<string, string> = {};
+        for (const [id, moduleId] of state.handlerModules) {
+          const rel = relative(root, moduleId).replace(/\\/g, '/');
+          modules[id] = rel.startsWith('.') ? rel : `./${rel}`;
+        }
+        this.emitFile({
+          type: 'asset',
+          fileName: 'astra-server-modules.json',
+          source: JSON.stringify(
+            { apiPrefix: config.apiPrefix ?? '/api/astra', modules },
+            null,
+            2
+          ),
         });
       }
     },
