@@ -20,6 +20,11 @@ export function printHelp() {
     astra preview [args…]    Preview the production build (vite preview)
     astra test [args…]       Run tests (vitest run)
 
+  ${colors.bold}AI helpers${colors.reset}:
+    astra ai chat <prompt>                One-shot completion
+    astra ai translate <locale> <file>    Translate a JSON i18n catalog
+    astra ai --help                       AI usage
+
   ${colors.bold}Scaffold a new project:${colors.reset}
     astra [project-name] [options]
     npx @astrajs/cli@latest [project-name] [options]
@@ -44,6 +49,8 @@ export function printHelp() {
     astra build --adapter vercel
     astra build --adapter cloudflare
     astra test --watch
+    astra ai chat "explain direct DOM mutations"
+    astra ai translate fr src/i18n-en.json
     astra my-app
     astra my-app --template frontend
     astra my-app --yes

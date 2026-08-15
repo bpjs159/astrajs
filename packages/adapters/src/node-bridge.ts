@@ -37,8 +37,19 @@ export async function writeResponse(res: ServerResponse, response: Response): Pr
   response.headers.forEach((value: string, key: string) => {
     res.setHeader(key, value);
   });
-  const body = new Uint8Array(await response.arrayBuffer());
-  res.end(body.length > 0 ? Buffer.from(body) : undefined);
+
+  // Pipe the body chunk-by-chunk instead of buffering — streaming AI
+  // responses (aiStream) arrive token by token and must reach the client
+  // progressively. Buffered JSON bodies pipe identically.
+  if (response.body) {
+    const reader = response.body.getReader();
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      res.write(Buffer.from(value as Uint8Array));
+    }
+  }
+  res.end();
 }
 
 /** Writes the standard Astra error contract as a 500 JSON response. */

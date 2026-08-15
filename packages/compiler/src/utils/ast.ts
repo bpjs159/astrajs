@@ -266,12 +266,36 @@ export function ensureImport(
 
   const importStmt = `import { ${needed.join(', ')} } from '${moduleSpecifier}';\n`;
 
-  // Insert after the last existing import
-  const lastImportMatch = source.match(/^import\s.+$/gm);
-  if (lastImportMatch && lastImportMatch.length > 0) {
-    const lastImport = lastImportMatch[lastImportMatch.length - 1]!;
-    const lastIdx = source.lastIndexOf(lastImport) + lastImport.length;
-    return spliceSource(source, lastIdx, lastIdx, '\n' + importStmt);
+  // Insert after the top-of-file import block. We scan ONLY the leading
+  // section of the file (imports + blank lines + comments) and stop at the
+  // first real statement — otherwise `import`-looking lines inside template
+  // literals (e.g. code snippets on docs pages) would swallow the insertion
+  // point and bury the new import inside a string.
+  const lines = source.split('\n');
+  let lastImportIdx = -1;
+  let inBlockComment = false;
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i]!.trim();
+    if (inBlockComment) {
+      if (trimmed.includes('*/')) inBlockComment = false;
+      continue;
+    }
+    if (trimmed.startsWith('/*')) {
+      if (!trimmed.includes('*/')) inBlockComment = true;
+      continue;
+    }
+    if (trimmed.startsWith('//') || trimmed === '') continue;
+    if (/^import\s.+/.test(trimmed)) {
+      lastImportIdx = i;
+      continue;
+    }
+    // First real statement — the import block ends here.
+    break;
+  }
+
+  if (lastImportIdx !== -1) {
+    const endOffset = lines.slice(0, lastImportIdx + 1).join('\n').length;
+    return spliceSource(source, endOffset, endOffset, '\n' + importStmt);
   }
 
   // No imports yet — prepend

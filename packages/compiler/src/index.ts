@@ -117,6 +117,25 @@ export interface AstraViteConfig {
    * @default false
    */
   resumability?: boolean;
+
+  /**
+   * AI defaults (provider, model, credentials env var).
+   * Applied at runtime through `configureAi()` — the API key is read from
+   * the environment variable named by `apiKeyEnv` and never embedded.
+   *
+   * Can also be set via `astra.config.json`:
+   * ```json
+   * { "ai": { "provider": "ollama", "model": "qwen2.5-coder:7b", "apiKeyEnv": "OLLAMA_API_KEY" } }
+   * ```
+   */
+  ai?: {
+    provider?: 'ollama' | 'openai' | 'mock';
+    baseURL?: string;
+    /** Name of the environment variable holding the API key / credentials. */
+    apiKeyEnv?: string;
+    model?: string;
+    embedModel?: string;
+  };
 }
 
 // ─── CSS Macro (Compile-Time Only) ───────────────────────────────────────────

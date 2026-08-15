@@ -435,6 +435,11 @@ export const routes = {
               <h4>{i18n.t('home.f6.title')}</h4>
               <p>{i18n.t('home.f6.text')}</p>
             </div>
+            <div class="feature-card">
+              <div class="feature-card-icon"><Icon name="chip" size={24} /></div>
+              <h4>{i18n.t('home.f7.title')}</h4>
+              <p>{i18n.t('home.f7.text')}</p>
+            </div>
           </div>
         </div>
       </section>

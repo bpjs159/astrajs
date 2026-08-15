@@ -12,12 +12,16 @@
  */
 import { colors } from '../lib/colors.js';
 import { runAstraCommand } from '../lib/run.js';
+import { runAiCommand } from '../lib/ai-cli.js';
 import { main } from '../lib/index.js';
 
-const RUN_COMMANDS = new Set(['dev', 'build', 'preview', 'test']);
+const RUN_COMMANDS = new Set(['dev', 'build', 'preview', 'test', 'ai']);
 const [first, ...rest] = process.argv.slice(2);
 
-if (first && RUN_COMMANDS.has(first)) {
+if (first === 'ai') {
+  // AI helpers — async command with its own output.
+  runAiCommand(rest);
+} else if (first && RUN_COMMANDS.has(first)) {
   // Project runner mode — never falls through to scaffolding.
   runAstraCommand(first, rest);
 } else {

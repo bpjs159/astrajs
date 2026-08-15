@@ -144,14 +144,16 @@ export interface RPCError extends Error {
  * A registered RPC handler on the server.
  */
 interface RegisteredHandler {
-  /** The handler function. */
-  fn: (...args: unknown[]) => Promise<unknown>;
+  /** The handler function (or async generator for stream handlers). */
+  fn: (...args: unknown[]) => Promise<unknown> | AsyncGenerator<string> | unknown;
   /** Cache tags for invalidation. */
   tags: string[];
   /** Auto-sync enabled flag. */
   autoSync: boolean;
   /** Max age in seconds for ISR. */
   maxAge: number;
+  /** Stream handlers yield text chunks instead of returning JSON. */
+  stream: boolean;
 }
 
 /**
@@ -179,11 +181,13 @@ const handlerRegistry = new Map<string, RegisteredHandler>();
  */
 export function rpcHandler(
   id: string,
-  fn: (...args: unknown[]) => Promise<unknown>,
+  fn: (...args: unknown[]) => Promise<unknown> | AsyncGenerator<string> | unknown,
   options: {
     tags?: string[];
     autoSync?: boolean;
     maxAge?: number;
+    /** Marks the handler as a text-stream (each chunk is a token). */
+    stream?: boolean;
   } = {}
 ): void {
   handlerRegistry.set(id, {
@@ -191,6 +195,7 @@ export function rpcHandler(
     tags: options.tags ?? [],
     autoSync: options.autoSync ?? false,
     maxAge: options.maxAge ?? 0,
+    stream: options.stream ?? false,
   });
 }
 
@@ -277,6 +282,47 @@ export async function handleRPCRequest(
     }
 
     const result = await handler.fn(...args);
+
+    // ── Streaming handlers (aiStream etc.) ────────────────────────────
+    // The handler is an async generator of text chunks; respond with a
+    // chunked text/plain stream. Proxies/dev servers must pipe the body
+    // (do not buffer) — detected via the `X-Astra-Stream` marker header.
+    if (handler.stream) {
+      const encoder = new TextEncoder();
+      const gen = result as AsyncGenerator<string>;
+      const body = new ReadableStream<Uint8Array>({
+        async start(controller) {
+          try {
+            for await (const chunk of gen) {
+              if (typeof chunk === 'string' && chunk.length > 0) {
+                controller.enqueue(encoder.encode(chunk));
+              }
+            }
+          } catch (err) {
+            const message =
+              err instanceof Error ? err.message : 'Internal stream error';
+            controller.enqueue(encoder.encode(`\n[AstraJS stream error] ${message}`));
+          } finally {
+            controller.close();
+          }
+        },
+      });
+
+      const streamHeaders: Record<string, string> = {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'no-cache',
+        'X-Astra-Stream': '1',
+      };
+      if (handler.maxAge > 0) {
+        streamHeaders['Cache-Control'] =
+          `public, max-age=${handler.maxAge}, stale-while-revalidate=${handler.maxAge * 2}`;
+        streamHeaders['CDN-Cache-Control'] = `max-age=${handler.maxAge}`;
+        if (handler.tags.length > 0) {
+          streamHeaders['Cache-Tag'] = handler.tags.join(',');
+        }
+      }
+      return new Response(body, { status: 200, headers: streamHeaders });
+    }
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',

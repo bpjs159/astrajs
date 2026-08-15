@@ -72,3 +72,59 @@ describe('rpcClient() error handling', () => {
     );
   });
 });
+
+describe('handleRPCRequest() — stream handlers', () => {
+  it('streams text chunks with the marker header', async () => {
+    rpcHandler(
+      'streamTest',
+      async function* (): AsyncGenerator<string> {
+        yield 'He';
+        yield 'llo';
+      },
+      { stream: true, maxAge: 60, tags: ['ai'] }
+    );
+
+    const response = await import('../rpc.js').then((m) =>
+      m.handleRPCRequest(
+        new Request('http://x/api/astra/streamTest', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: '[]',
+        }),
+        'streamTest'
+      )
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('x-astra-stream')).toBe('1');
+    expect(response.headers.get('cache-control')).toContain('max-age=60');
+    expect(response.headers.get('cache-tag')).toBe('ai');
+
+    const text = await response.text();
+    expect(text).toBe('Hello');
+  });
+
+  it('appends a stream error marker when the generator throws', async () => {
+    rpcHandler(
+      'streamError',
+      async function* (): AsyncGenerator<string> {
+        yield 'ok';
+        throw new Error('model exploded');
+      },
+      { stream: true }
+    );
+
+    const { handleRPCRequest } = await import('../rpc.js');
+    const response = await handleRPCRequest(
+      new Request('http://x/api/astra/streamError', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '[]',
+      }),
+      'streamError'
+    );
+    const text = await response.text();
+    expect(text).toContain('ok');
+    expect(text).toContain('model exploded');
+  });
+});

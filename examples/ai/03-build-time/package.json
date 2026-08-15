@@ -1,0 +1,20 @@
+{
+  "name": "ai-03-build-time",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astra dev",
+    "build": "astra build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@astrajs/core": "0.1.0",
+    "@astrajs/ai": "0.1.0"
+  },
+  "devDependencies": {
+    "@astrajs/cli": "0.1.0",
+    "vite": "^5.4.0",
+    "typescript": "^5.5.0"
+  }
+}

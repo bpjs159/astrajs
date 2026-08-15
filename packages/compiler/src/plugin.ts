@@ -34,6 +34,12 @@ import { relative, resolve } from 'node:path';
 import { transformJSX, autoWrapDynamic, autoMemoDerivedFunctions } from './transformers/jsx.js';
 import { transformServerRPC, findServerCalls } from './transformers/server-rpc.js';
 import type { ServerCallInfo } from './transformers/server-rpc.js';
+import {
+  transformAiRPC,
+  findAiCalls,
+  generateAiServerRegistration,
+  executeAiPreBuildCall,
+} from './transformers/ai-rpc.js';
 import { autoWrapMountedCleanup } from './transformers/mounted-cleanup.js';
 import { autoWireAutoSyncCalls } from './transformers/autosync-wire.js';
 import type { AutoSyncCallInfo } from './transformers/autosync-wire.js';
@@ -66,6 +72,8 @@ interface PluginState {
    * `server()` functions take effect without a dev-server restart.
    */
   handlerDirty: Set<string>;
+  /** In-memory AI pre-build prompt cache (prompt hash → folded text). */
+  aiCache: Map<string, string>;
 }
 
 // ─── File Filter ─────────────────────────────────────────────────────────────
@@ -109,6 +117,9 @@ function readConfigFile(root: string): Partial<AstraViteConfig> {
     if (typeof parsed.apiPrefix === 'string') out.apiPrefix = parsed.apiPrefix;
     if (typeof parsed.cssPrefix === 'string') out.cssPrefix = parsed.cssPrefix;
     if (typeof parsed.transformMode === 'string') out.transformMode = parsed.transformMode as AstraViteConfig['transformMode'];
+    if (typeof parsed.ai === 'object' && parsed.ai !== null) {
+      out.ai = parsed.ai as AstraViteConfig['ai'];
+    }
     return out;
   } catch {
     console.warn('[AstraJS] Failed to parse astra.config.json — ignoring file config');
@@ -159,6 +170,7 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
     resolvedConfig: null,
     handlerModules: new Map(),
     handlerDirty: new Set(),
+    aiCache: new Map(),
   };
 
   return {
@@ -188,6 +200,29 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
       // In dev mode, source maps are more useful
       if (resolvedConfig.command === 'serve') {
         config.sourceMaps = true;
+      }
+
+      // Apply the `ai` section of astra.config.json to the runtime so dev
+      // and build share one provider configuration (apiKey read from env).
+      if (config.ai) {
+        const ai = config.ai;
+        import('@astrajs/ai')
+          .then(({ configureAi }) => {
+            configureAi({
+              ...(ai.provider ? { provider: ai.provider } : {}),
+              ...(ai.baseURL ? { baseURL: ai.baseURL } : {}),
+              ...(ai.apiKeyEnv
+                ? { apiKey: process.env[ai.apiKeyEnv] ?? undefined }
+                : {}),
+              ...(ai.model ? { model: ai.model } : {}),
+              ...(ai.embedModel ? { embedModel: ai.embedModel } : {}),
+            });
+          })
+          .catch(() => {
+            console.warn(
+              '[AstraJS] @astrajs/ai not found — install it to use ai() endpoints.'
+            );
+          });
       }
     },
 
@@ -266,7 +301,16 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
           response.headers.forEach((value: string, key: string) => {
             res.setHeader(key, value);
           });
-          res.end(await response.text());
+          // Streaming handlers (aiStream) must be PIPED, not buffered —
+          // the browser reads tokens progressively from the fetch body.
+          if (response.headers.get('x-astra-stream') === '1' && response.body) {
+            for await (const chunk of response.body) {
+              res.write(Buffer.from(chunk));
+            }
+            res.end();
+          } else {
+            res.end(await response.text());
+          }
         } catch (err) {
           const message = err instanceof Error ? err.message : 'Internal AstraJS RPC error';
           if (!res.headersSent) {
@@ -318,6 +362,35 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
           transformed +=
             '\n\n// @astrajs dev: register server() handlers (SSR graph)\n' +
             regs.join('\n') +
+            '\n';
+          hasChanges = true;
+        }
+
+        // ── AI macro registrations (SSR graph) ────────────────────────
+        // `ai()`/`aiStream()` stay intact (runtime passthrough returns the
+        // real prompt function) and we register the wrapped handler through
+        // `rpcHandler` — so both the dev middleware and production adapters
+        // dispatch them through the exact same path as `server()`.
+        const aiCalls = findAiCalls(code);
+        for (const call of aiCalls) {
+          if (!call.isPreBuild) state.handlerModules.set(call.id, id);
+        }
+
+        const aiRegs = aiCalls
+          .filter((c) => !c.isPreBuild && c.varName)
+          .map((c) => generateAiServerRegistration(c));
+
+        if (aiRegs.length > 0) {
+          if (aiCalls.some((c) => !c.isPreBuild && !c.isStream && c.varName)) {
+            transformed = ensureImport(transformed, '@astrajs/ai', ['complete']);
+          }
+          if (aiCalls.some((c) => !c.isPreBuild && c.isStream && c.varName)) {
+            transformed = ensureImport(transformed, '@astrajs/ai', ['stream']);
+          }
+          transformed = ensureImport(transformed, '@astrajs/server', ['rpcHandler']);
+          transformed +=
+            '\n\n// @astrajs dev: register ai()/aiStream() handlers (SSR graph)\n' +
+            aiRegs.join('\n') +
             '\n';
           hasChanges = true;
         }
@@ -376,6 +449,33 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
               endpoint: `${apiPrefix}/${call.id}`,
               interval: call.config.autoSyncInterval ?? 3000,
             });
+          }
+        }
+      }
+
+      // Phase 2.5: AI compilation — ai()/aiStream() → typed fetch wrappers
+      // (pre-build AI calls are executed here, cached by prompt hash, and
+      // folded into JSON constants — Phase 3 of the AI feature set).
+      const aiCallsAll = findAiCalls(transformed);
+      if (aiCallsAll.length > 0) {
+        const root = state.resolvedConfig?.root ?? process.cwd();
+        const aiPreBuild = new Map<string, string>();
+        for (const call of aiCallsAll) {
+          if (!call.isPreBuild) continue;
+          const folded = await executeAiPreBuildCall(call, root, state.aiCache);
+          if (folded !== undefined) aiPreBuild.set(call.id, folded);
+        }
+
+        const aiResult = transformAiRPC(transformed, id, config, aiPreBuild);
+        if (aiResult.calls.length > 0) {
+          transformed = aiResult.clientCode;
+          hasChanges = true;
+
+          // Remember which module defines each AI handler so the dev RPC
+          // middleware can SSR-load it on demand (same as server()).
+          for (const call of aiResult.calls) {
+            if (call.isPreBuild) continue;
+            state.handlerModules.set(call.id, id);
           }
         }
       }

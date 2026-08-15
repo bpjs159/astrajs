@@ -1,0 +1,4 @@
+{
+  "adapter": "static",
+  "apiPrefix": "/api/astra"
+}

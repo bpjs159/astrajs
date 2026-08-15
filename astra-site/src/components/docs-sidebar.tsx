@@ -145,6 +145,20 @@ const docSections: DocSection[] = [
       { label: '', k: 'sb.deployEnv', href: '/docs/deployment#env' },
     ],
   },
+  {
+    title: 'IA',
+    titleK: 'sb.ai',
+    items: [
+      { label: '', k: 'sb.aiEndpoints', href: '/docs/ai#endpoints' },
+      { label: '', k: 'sb.aiStreaming', href: '/docs/ai#streaming' },
+      { label: '', k: 'sb.aiBuildTime', href: '/docs/ai#build-time' },
+      { label: '', k: 'sb.aiCaching', href: '/docs/ai#caching' },
+      { label: '', k: 'sb.aiTools', href: '/docs/ai#tools' },
+      { label: '', k: 'sb.aiRag', href: '/docs/ai#rag' },
+      { label: '', k: 'sb.aiCli', href: '/docs/ai#cli' },
+      { label: '', k: 'sb.aiConfig', href: '/docs/ai#config' },
+    ],
+  },
 ];
 
 /** Resuelve el texto visible de una sección (clave i18n o literal). */

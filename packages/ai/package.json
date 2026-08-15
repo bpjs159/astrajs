@@ -1,0 +1,36 @@
+{
+  "name": "@astrajs/ai",
+  "version": "0.1.0",
+  "description": "AstraJS AI — typed AI endpoints, streaming, tools and RAG. Edge-safe, provider-agnostic.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "development": "./src/index.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./rag": {
+      "types": "./dist/rag.d.ts",
+      "development": "./src/rag.ts",
+      "import": "./dist/rag.js",
+      "default": "./dist/rag.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "src"],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  },
+  "keywords": ["astrajs", "ai", "llm", "ollama", "openai", "streaming", "rag"],
+  "license": "MIT"
+}

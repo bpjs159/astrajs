@@ -125,7 +125,7 @@ function parseServerConfig(configSource: string): ServerConfig {
  * stripTypeAnnotation('updates: { price: number }')  // → 'updates'
  * stripTypeAnnotation('{ price }: { price: number }') // → '{ price }'
  */
-function stripTypeAnnotation(param: string): string {
+export function stripTypeAnnotation(param: string): string {
   let depth = 0;
   for (let i = 0; i < param.length; i++) {
     const ch = param[i];
@@ -151,7 +151,7 @@ function stripTypeAnnotation(param: string): string {
  * @param source — The original source code.
  * @returns The source with comments and strings blanked out (preserving length).
  */
-function stripCommentsAndStrings(source: string): string {
+export function stripCommentsAndStrings(source: string): string {
   const len = source.length;
   const output: string[] = new Array(len);
   let i = 0;
@@ -327,7 +327,7 @@ export function findServerCalls(source: string): ServerCallInfo[] {
  * @param openIdx — The index of the opening '('.
  * @returns The index of the matching ')', or -1 if not found.
  */
-function findMatchingParen(source: string, openIdx: number): number {
+export function findMatchingParen(source: string, openIdx: number): number {
   let depth = 0;
   for (let i = openIdx; i < source.length; i++) {
     const ch = source[i];
@@ -399,7 +399,7 @@ function parseServerCallArgs(
  * - Concise body: `expr` or `(expr)` — synthesized into `return (expr);` so
  *   it can be interpolated as statements the same way a block body is.
  */
-function extractArrowFunctionBody(rest: string): string | null {
+export function extractArrowFunctionBody(rest: string): string | null {
   const trimmed = rest.trim();
   if (trimmed.length === 0) return null;
 

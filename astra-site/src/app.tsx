@@ -19,6 +19,7 @@ import { DocsI18n } from './pages/docs/i18n.js';
 import { DocsIntegrations } from './pages/docs/integrations.js';
 import { DocsAdvanced } from './pages/docs/advanced.js';
 import { DocsDeployment } from './pages/docs/deployment.js';
+import { DocsAi } from './pages/docs/ai.js';
 import { routes } from './routes.js';
 
 /* ── Global Styles ── */
@@ -103,6 +104,7 @@ export const App = component(() => (
         if (routes.docsIntegrations) return <DocsIntegrations />;
         if (routes.docsAdvanced) return <DocsAdvanced />;
         if (routes.docsDeployment) return <DocsDeployment />;
+        if (routes.docsAi) return <DocsAi />;
         if (routes.docs) return <DocsIntroduction />;
         return <HomePage />;
       })()}
