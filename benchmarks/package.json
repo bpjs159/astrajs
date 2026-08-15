@@ -1,0 +1,23 @@
+{
+  "name": "astrajs-benchmarks",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AstraJS vs React vs Vue vs Solid — DOM benchmark PoC (jsdom, no paint). Used to feed the /docs/comparison benchmarks section.",
+  "type": "module",
+  "scripts": {
+    "start": "NODE_ENV=production node --import ./register-solid.mjs run.mjs"
+  },
+  "dependencies": {
+    "@angular/common": "^19.2.25",
+    "@angular/compiler": "^19.2.25",
+    "@angular/core": "^19.2.25",
+    "@angular/platform-browser": "^19.2.25",
+    "@angular/platform-browser-dynamic": "^19.2.25",
+    "jsdom": "^29.1.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "solid-js": "^1.9.14",
+    "vue": "^3.5.41",
+    "zone.js": "^0.15.1"
+  }
+}

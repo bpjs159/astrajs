@@ -3,6 +3,22 @@ import { DocSidebar } from '../../components/docs-sidebar.js';
 import { i18n } from '../../i18n.js';
 import { CodeBlock } from '../../components/code-block.js';
 
+// ── Benchmarks (benchmarks/ PoC — results.json, Node 22 + jsdom, production
+//    builds, averaged medians of repeated runs) ──
+const BENCH_FRAMEWORKS = ['AstraJS', 'React', 'Vue', 'Angular', 'Solid'] as const;
+type BenchFramework = (typeof BENCH_FRAMEWORKS)[number];
+interface BenchOp {
+  key: string;
+  ms: Record<BenchFramework, number>;
+}
+const BENCH_RESULTS: BenchOp[] = [
+  { key: 'cp.bm.op.render', ms: { AstraJS: 325.56, React: 555.63, Vue: 359.92, Angular: 2279.3, Solid: 504.96 } },
+  { key: 'cp.bm.op.update', ms: { AstraJS: 0.09, React: 20.94, Vue: 24.08, Angular: 4.77, Solid: 1.61 } },
+  { key: 'cp.bm.op.append', ms: { AstraJS: 41.01, React: 56.25, Vue: 65.96, Angular: 557.21, Solid: 43.62 } },
+  { key: 'cp.bm.op.remove', ms: { AstraJS: 48.64, React: 47.88, Vue: 65.5, Angular: 51.15, Solid: 491.68 } },
+  { key: 'cp.bm.op.replace', ms: { AstraJS: 548.19, React: 798.16, Vue: 594.73, Angular: 2842.9, Solid: 71.32 } },
+];
+
 const s = `
   .docs-layout{display:flex;min-height:100vh}
   .docs-main{flex:1;min-width:0;margin-left:260px;padding:48px 56px;max-width:860px}
@@ -28,6 +44,17 @@ const s = `
   .docs-content .win{color:#34d399;font-weight:700}
   .docs-content .lose{color:#f87171}
   .docs-content .neutral{color:#f59e0b}
+  .docs-content .bench-chart{margin:4px 0 28px}
+  .docs-content .bench-row{padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+  .docs-content .bench-row:last-child{border-bottom:none}
+  .docs-content .bench-op-label{font-size:.8rem;font-weight:700;color:#e2e8f0;margin-bottom:8px}
+  .docs-content .bench-unit{font-size:.68rem;font-weight:500;color:#64748b;margin-left:8px}
+  .docs-content .bench-line{display:flex;align-items:center;gap:10px;margin:4px 0}
+  .docs-content .bench-name{width:64px;font-size:.72rem;color:#94a3b8;flex-shrink:0;text-align:right}
+  .docs-content .bench-track{flex:1;height:10px;background:rgba(255,255,255,.05);border-radius:5px;overflow:hidden}
+  .docs-content .bench-bar{height:100%;border-radius:5px;background:#64748b}
+  .docs-content .bench-bar.astra{background:linear-gradient(90deg,#8b4dff,#6366f1)}
+  .docs-content .bench-val{width:76px;font-size:.72rem;color:#cbd5e1;flex-shrink:0;font-variant-numeric:tabular-nums}
 `;
 
 export const DocsComparison = component(() => (
@@ -38,6 +65,56 @@ export const DocsComparison = component(() => (
       <div class="docs-content">
         <h1>{i18n.t('sb.compare')}</h1>
         <p>{i18n.t('cp.hero')}</p>
+
+        <h2 id="benchmarks">{i18n.t('cp.bm.title')}</h2>
+        <p>{i18n.t('cp.bm.intro')}</p>
+
+        <h3>{i18n.t('cp.bm.table.title')}</h3>
+        <table>
+          <tr><th>{i18n.t('cp.bm.op')}</th><th><strong>AstraJS</strong></th><th>React</th><th>Vue</th><th>Angular</th><th>Solid</th></tr>
+          {BENCH_RESULTS.map((b) => (
+            <tr>
+              <td><strong>{i18n.t(b.key)}</strong></td>
+              <td><span class="win">{b.ms.AstraJS.toFixed(2)} ms</span></td>
+              <td>{b.ms.React.toFixed(2)} ms</td>
+              <td>{b.ms.Vue.toFixed(2)} ms</td>
+              <td>{b.ms.Angular.toFixed(2)} ms</td>
+              <td>{b.ms.Solid.toFixed(2)} ms</td>
+            </tr>
+          ))}
+        </table>
+
+        <div class="bench-chart">
+          {BENCH_RESULTS.map((b) => {
+            const max = Math.max(...BENCH_FRAMEWORKS.map((f) => b.ms[f]));
+            return (
+              <div class="bench-row">
+                <div class="bench-op-label">{i18n.t(b.key)}<span class="bench-unit">{i18n.t('cp.bm.ms')}</span></div>
+                {BENCH_FRAMEWORKS.map((f) => (
+                  <div class="bench-line">
+                    <span class="bench-name">{f}</span>
+                    <div class="bench-track">
+                      <div class={`bench-bar${f === 'AstraJS' ? ' astra' : ''}`} style={{ width: `${Math.max(1.2, (b.ms[f] / max) * 100)}%` }}></div>
+                    </div>
+                    <span class="bench-val">{b.ms[f].toFixed(2)} ms</span>
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+
+        <h3>{i18n.t('cp.bm.key.title')}</h3>
+        <ul>
+          <li>{i18n.t('cp.bm.k1')}</li>
+          <li>{i18n.t('cp.bm.k2')}</li>
+          <li>{i18n.t('cp.bm.k3')}</li>
+          <li>{i18n.t('cp.bm.k4')}</li>
+        </ul>
+
+        <div class="note">
+          <strong>PoC:</strong> {i18n.t('cp.bm.repro')}
+        </div>
 
         <h2>{i18n.t('cp.table.title')}</h2>
         <table>

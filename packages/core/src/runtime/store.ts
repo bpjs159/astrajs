@@ -318,6 +318,14 @@ function isProxyable(value: object): boolean {
 }
 
 /**
+ * Whether `prop` is a valid array index string ("0", "1", … < 2^32-1).
+ */
+function isArrayIndex(prop: string): boolean {
+  const n = Number(prop);
+  return Number.isInteger(n) && n >= 0 && n < 4294967295;
+}
+
+/**
  * Wraps a plain object in a reactive Proxy.
  *
  * - `get` trap: records dependency if inside a tracker, and recursively
@@ -389,10 +397,27 @@ function createReactiveProxy<T extends object>(raw: T): T {
       // not for modifying reactive state that affects rendering.
       if (_lifecyclePhase) return true;
 
+      // Writing an array index beyond the current end extends `length`
+      // IMMEDIATELY inside Reflect.set. The explicit `length` write that
+      // `push()` performs right after therefore hits the
+      // `oldValue === value` early-return above and `length` subscribers
+      // would NEVER be notified (e.g. bindList() would not re-render on
+      // push). Capture the old length so we can notify them here instead.
+      const isArrayIndexWrite =
+        Array.isArray(target) && typeof prop === 'string' && isArrayIndex(prop);
+      const oldLength = isArrayIndexWrite
+        ? (Reflect.get(target, 'length', receiver) as number)
+        : 0;
+
       const result = Reflect.set(target, prop, value, receiver);
 
       // Notify subscribers
       trigger(target, prop);
+
+      // The array grew: notify `length` subscribers (see note above).
+      if (isArrayIndexWrite && Number(prop) >= oldLength) {
+        trigger(target, 'length');
+      }
 
       return result;
     },

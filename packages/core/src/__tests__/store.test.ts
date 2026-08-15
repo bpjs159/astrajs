@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { store, toRaw, toProxy } from '../runtime/store.js';
+import { store, toRaw, toProxy, flushPending } from '../runtime/store.js';
 import { effect } from '../runtime/effect.js';
 
 describe('store()', () => {
@@ -34,6 +34,38 @@ describe('store()', () => {
     state.items.push('a');
     state.items.push('b');
     expect(state.items).toEqual(['a', 'b']);
+  });
+
+  // Regression (2026-08-15, found via benchmarks/ PoC): Array.prototype.push
+  // on a proxy sets the new index FIRST — that write extends the raw array's
+  // `length` immediately — and THEN writes `length` to the same value. The
+  // `oldValue === value` early-return silently skipped the notification, so
+  // effects/bindList() subscribed to `length` never re-ran on push (unshift/
+  // splice did work). The set trap now notifies `length` subscribers when an
+  // index write grows the array.
+  it('push notifies subscribers of array length', () => {
+    const state = store({ items: [] as string[] });
+    let runs = 0;
+    effect(() => {
+      runs++;
+      void state.items.length;
+    });
+    runs = 0;
+    state.items.push('x');
+    flushPending();
+    expect(runs).toBeGreaterThan(0);
+    expect(state.items.length).toBe(1);
+  });
+
+  it('push notifies subscribers of the appended index', () => {
+    const state = store({ items: ['a'] as string[] });
+    let seen = '';
+    effect(() => {
+      seen = String(state.items[1]);
+    });
+    state.items.push('b');
+    flushPending();
+    expect(seen).toBe('b');
   });
 
   it('throws on non-object initial state', () => {

@@ -156,6 +156,14 @@ export function bindList<T>(
 ): void {
   // Map from key to DOM node
   const nodeMap = new Map<string | number, ChildNode>();
+  // DOM order tracking (parallel arrays) — enables O(delta) fast paths.
+  let keysInOrder: (string | number)[] = [];
+  let nodesInOrder: ChildNode[] = [];
+
+  const toChildNode = (rendered: HTMLElement | DocumentFragment): ChildNode | undefined =>
+    rendered instanceof DocumentFragment
+      ? ((rendered.firstChild ?? rendered) as ChildNode)
+      : rendered;
 
   effect(() => {
     const nextItems = getter();
@@ -168,7 +176,80 @@ export function bindList<T>(
       nextKeys.set(key, item);
     }
 
-    // Remove nodes that are no longer in the list
+    const newLen = nextItems.length;
+    const oldLen = keysInOrder.length;
+
+    // Fast paths: same keys in the same order with only a length change
+    // (pure append / tail removal / head removal) — the common
+    // push/pop/shift/splice-at-head-or-tail cases. Without them, every list
+    // change re-inserts ALL nodes via textContent='' + fragment, costing
+    // O(n) DOM ops for an O(delta) change.
+    if (nextKeys.size === newLen) {
+      // No duplicate keys — safe to reason about order.
+
+      // Append / no-op: old keys are a prefix of the new keys.
+      if (newLen >= oldLen) {
+        let prefixMatch = true;
+        for (let i = 0; prefixMatch && i < oldLen; i++) {
+          const key = keyFn ? keyFn(nextItems[i]!, i) : i;
+          if (key !== keysInOrder[i]) prefixMatch = false;
+        }
+        if (prefixMatch) {
+          if (newLen === oldLen) return; // identical order — nothing to do
+          for (let i = oldLen; i < newLen; i++) {
+            const item = nextItems[i]!;
+            const key = keyFn ? keyFn(item, i) : i;
+            const node = toChildNode(render(item, i));
+            if (node) {
+              nodeMap.set(key, node);
+              el.appendChild(node);
+              nodesInOrder.push(node);
+              keysInOrder.push(key);
+            }
+          }
+          return;
+        }
+      } else {
+        const removed = oldLen - newLen;
+        // Tail removal: new keys are a prefix of the old keys.
+        let tailMatch = true;
+        for (let i = 0; tailMatch && i < newLen; i++) {
+          const key = keyFn ? keyFn(nextItems[i]!, i) : i;
+          if (key !== keysInOrder[i]) tailMatch = false;
+        }
+        if (tailMatch) {
+          for (let i = newLen; i < oldLen; i++) {
+            const key = keysInOrder[i]!;
+            const node = nodesInOrder[i]!;
+            node.remove();
+            nodeMap.delete(key);
+          }
+          keysInOrder.length = newLen;
+          nodesInOrder.length = newLen;
+          return;
+        }
+        // Head removal: old keys shifted by `removed` match the new keys.
+        let headMatch = true;
+        for (let i = 0; headMatch && i < newLen; i++) {
+          const key = keyFn ? keyFn(nextItems[i]!, i) : i;
+          if (key !== keysInOrder[i + removed]) headMatch = false;
+        }
+        if (headMatch) {
+          for (let i = 0; i < removed; i++) {
+            const key = keysInOrder[i]!;
+            const node = nodesInOrder[i]!;
+            node.remove();
+            nodeMap.delete(key);
+          }
+          keysInOrder = keysInOrder.slice(removed);
+          nodesInOrder = nodesInOrder.slice(removed);
+          return;
+        }
+      }
+    }
+
+    // General path: remove missing nodes, then rebuild child order in one
+    // fragment (single DOM operation). Reorder/rekey cases land here.
     for (const [key, node] of nodeMap) {
       if (!nextKeys.has(key)) {
         node.remove();
@@ -176,8 +257,9 @@ export function bindList<T>(
       }
     }
 
-    // Build the new child list in order
     const fragment = document.createDocumentFragment();
+    keysInOrder = [];
+    nodesInOrder = [];
     for (let i = 0; i < nextItems.length; i++) {
       const item = nextItems[i]!;
       const key = keyFn ? keyFn(item, i) : i;
@@ -185,10 +267,7 @@ export function bindList<T>(
 
       if (!node) {
         // New item — render and store
-        const rendered = render(item, i);
-        node = rendered instanceof DocumentFragment
-          ? (rendered.firstChild ?? rendered) as ChildNode
-          : rendered;
+        node = toChildNode(render(item, i));
         if (node) {
           nodeMap.set(key, node);
         }
@@ -196,6 +275,8 @@ export function bindList<T>(
 
       if (node) {
         fragment.appendChild(node);
+        keysInOrder.push(key);
+        nodesInOrder.push(node);
       }
     }
 

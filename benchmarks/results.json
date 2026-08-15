@@ -1,0 +1,98 @@
+{
+  "meta": {
+    "generatedAt": "2026-08-15T20:25:57.750Z",
+    "source": "Canonical snapshot — average of 2 production runs (medians). Copied into /docs/comparison#benchmarks; re-running the benchmark is optional.",
+    "node": "v22.21.1",
+    "platform": "darwin arm64",
+    "cpu": "Apple M4 Pro",
+    "environment": "jsdom (no layout / no paint) — measures framework JS cost",
+    "productionBuilds": true,
+    "averagedRuns": 2,
+    "rowCount": 10000,
+    "updateIndex": 5000
+  },
+  "frameworks": [
+    {
+      "name": "AstraJS",
+      "version": "0.1.0"
+    },
+    {
+      "name": "React",
+      "version": "19.2.8"
+    },
+    {
+      "name": "Vue",
+      "version": "3.5.41"
+    },
+    {
+      "name": "Solid",
+      "version": "1.9.14"
+    },
+    {
+      "name": "Angular",
+      "version": "19.2.25"
+    }
+  ],
+  "ops": [
+    {
+      "id": "render10k",
+      "label": "Render 10,000 rows",
+      "unit": "ms",
+      "values": {
+        "AstraJS": 325.56,
+        "React": 555.63,
+        "Vue": 359.92,
+        "Solid": 504.96,
+        "Angular": 2279.3
+      }
+    },
+    {
+      "id": "updateRow",
+      "label": "Update 1 row (of 10,000)",
+      "unit": "ms",
+      "values": {
+        "AstraJS": 0.09,
+        "React": 20.94,
+        "Vue": 24.08,
+        "Solid": 1.61,
+        "Angular": 4.77
+      }
+    },
+    {
+      "id": "append1k",
+      "label": "Append 1,000 rows",
+      "unit": "ms",
+      "values": {
+        "AstraJS": 41.01,
+        "React": 56.25,
+        "Vue": 65.96,
+        "Solid": 43.62,
+        "Angular": 557.21
+      }
+    },
+    {
+      "id": "remove1k",
+      "label": "Remove 1,000 rows",
+      "unit": "ms",
+      "values": {
+        "AstraJS": 48.64,
+        "React": 47.88,
+        "Vue": 65.5,
+        "Solid": 491.68,
+        "Angular": 51.15
+      }
+    },
+    {
+      "id": "replaceAll",
+      "label": "Replace all 10,000 rows",
+      "unit": "ms",
+      "values": {
+        "AstraJS": 548.19,
+        "React": 798.16,
+        "Vue": 594.73,
+        "Solid": 71.32,
+        "Angular": 2842.9
+      }
+    }
+  ]
+}

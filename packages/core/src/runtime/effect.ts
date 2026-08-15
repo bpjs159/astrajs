@@ -25,9 +25,6 @@ import { getCurrentTracker, setCurrentTracker, _beginBatch, _endBatch } from './
 
 // ─── Effect ──────────────────────────────────────────────────────────────────
 
-/** Tracks active effects for potential manual disposal. */
-const effectStack: Array<{ fn: () => void | (() => void); cleanup: (() => void) | null }> = [];
-
 /**
  * Creates a reactive effect that automatically re-runs when any store property
  * accessed during execution is mutated.
@@ -68,7 +65,6 @@ export function effect(fn: () => void | (() => void)): void {
   };
 
   entry.fn = run;
-  effectStack.push(entry);
 
   // Execute immediately to collect dependencies
   run();

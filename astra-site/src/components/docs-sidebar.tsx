@@ -72,6 +72,7 @@ const docSections: DocSection[] = [
     title: 'Comparativa',
     titleK: 'sb.compare',
     items: [
+      { label: '', k: 'sb.benchmarks', href: '/docs/comparison#benchmarks' },
       { label: 'React vs AstraJS', href: '/docs/comparison#react-vs' },
       { label: 'Vue.js vs AstraJS', href: '/docs/comparison#vue-vs' },
       { label: 'Angular vs AstraJS', href: '/docs/comparison#angular-vs' },
