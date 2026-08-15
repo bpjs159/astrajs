@@ -140,7 +140,7 @@ export const DocsExamples = component(() => {
                         </div>
                         <div class="ex-viewer-code">
                           <div class="ex-viewer-code-label">{i18n.t('ex.code')}</div>
-                          <CodeBlock code={ex.code} />
+                          <CodeBlock code={ex.code} commentsKey={ex.commentsKey} />
                         </div>
                         <div class="ex-viewer-preview">
                           <div class="ex-viewer-preview-label">{i18n.t('ex.live')}</div>

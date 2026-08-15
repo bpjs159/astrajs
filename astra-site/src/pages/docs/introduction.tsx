@@ -138,7 +138,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   plugins: [astra()],
-});`} />
+});`} commentsKey="introduction.vite" />
         <p>{i18n.t('d2.tsconfig')}</p>
         <CodeBlock code={`{
   "compilerOptions": {

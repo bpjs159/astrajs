@@ -1,5 +1,6 @@
 import { component, store } from '@astrajs/core';
 import { i18n } from '../i18n.js';
+import { localizedCode } from '../snippets.js';
 
 /**
  * CodeBlock — code snippet with syntax highlighting in the site palette
@@ -7,6 +8,7 @@ import { i18n } from '../i18n.js';
  *
  * Usage:
  *   <CodeBlock code={`const x = store({ n: 0 });`} lang="TS" />
+ *   <CodeBlock code={`...`} commentsKey="router.patterns" />  // localized comments
  *   <CodeBlock code={tabCode[state.tab]} bare />   // no frame, plain <pre>
  */
 
@@ -108,6 +110,12 @@ const style = `
 export interface CodeBlockProps {
   /** Source code to highlight. */
   code: string;
+  /**
+   * Snippet key in the comment catalog (`snippets.ts`). When set, the
+   * // and /* *\/ comments are translated to the active locale and the
+   * block re-renders reactively when the user switches language.
+   */
+  commentsKey?: string;
   /** Label shown on the top-right corner (e.g. "TS"). */
   lang?: string;
   /** Bare mode: no frame/background, just a plain <pre> (for embeds). */
@@ -115,10 +123,15 @@ export interface CodeBlockProps {
 }
 
 export const CodeBlock = component((props: CodeBlockProps) => {
+  const resolve = () =>
+    props.commentsKey
+      ? localizedCode(props.code ?? '', props.commentsKey)
+      : (props.code ?? '');
+
   const tokens = tokenize(props.code ?? '');
   const state = store({ copied: false });
   const copy = () => {
-    const text = props.code ?? '';
+    const text = resolve();
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
       navigator.clipboard.writeText(text).catch(() => {});
     }
@@ -131,7 +144,9 @@ export const CodeBlock = component((props: CodeBlockProps) => {
       {props.lang ? <span class="cb-lang">{props.lang}</span> : null}
       <pre class="cb-pre">
         <code class="cb-code">
-          {tokens.map((t) => <span class={t.cls}>{t.text}</span>)}
+          {props.commentsKey
+            ? tokenize(resolve()).map((t) => <span class={t.cls}>{t.text}</span>)
+            : tokens.map((t) => <span class={t.cls}>{t.text}</span>)}
         </code>
       </pre>
       <button

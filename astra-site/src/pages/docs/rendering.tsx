@@ -46,8 +46,8 @@ export const DocsRendering = component(() => (
           <li>{i18n.t('rr.ol5')}</li>
         </ol>
 
-        <CodeBlock code={`// SSR se activa por defecto en el servidor
-// No necesitas configuracion especial
+        <CodeBlock code={`// SSR is enabled by default on the server
+// No special configuration needed
 
 export default function ProductPage() {
   const product = await getProduct(params.id); // server()
@@ -58,41 +58,41 @@ export default function ProductPage() {
       <span>\${product.price}</span>
     </article>
   );
-}`} />
+}`} commentsKey="rendering.ssr" />
 
         <h2 id="ssg">SSG (Static Site Generation)</h2>
         <p>{i18n.t('rr.ssg.a')}<strong>{i18n.t('rr.ssg.b')}</strong>{i18n.t('rr.ssg.c')}<strong>{i18n.t('rr.ssg.d')}</strong>{i18n.t('rr.ssg.e')}</p>
 
-        <CodeBlock code={`// Las paginas SSG usan server({ type: 'pre-build' })
-// El resultado se incrusta en el HTML durante el build
+        <CodeBlock code={`// SSG pages use server({ type: 'pre-build' })
+// The result is embedded in the HTML during the build
 
 const posts = server(
   { type: 'pre-build', tags: ['blog-posts'] },
   () => db.post.findMany({ where: { published: true } })
 );
 
-// En build time: db.post.findMany() se ejecuta
-// El HTML generado incluye los posts serializados
-// En produccion: se sirve HTML estatico, sin consultas a BD`} />
+// At build time: db.post.findMany() runs
+// The generated HTML includes the serialized posts
+// In production: static HTML is served, no DB queries`} commentsKey="rendering.ssg" />
 
         <h2 id="isr">ISR (Incremental Static Regeneration)</h2>
         <p>{i18n.t('rr.isr.a')}<strong>{i18n.t('rr.isr.b')}</strong>{i18n.t('rr.isr.c')}</p>
 
-        <CodeBlock code={`// ISR: maxAge controla cada cuanto se re-genera
+        <CodeBlock code={`// ISR: maxAge controls how often it re-generates
 const featuredProducts = server(
   { 
-    type: 'pre-build',   // generado en build
-    tags: ['featured'],   // invalidable
-    maxAge: 3600,         // re-generar cada hora (ISR)
+    type: 'pre-build',   // generated at build
+    tags: ['featured'],   // invalidatable
+    maxAge: 3600,         // re-generate every hour (ISR)
   },
   () => db.product.findMany({ where: { featured: true } })
 );
 
-// Flujo ISR:
-// t=0: Build → HTML con datos incluidos
-// t=30min: Usuario visita → recibe HTML cacheado (rapido)
-// t=61min: Cache expiro → se sirve stale + re-generacion en bg
-// t=62min: Siguiente visita → HTML fresco con nuevos datos`} />
+// ISR flow:
+// t=0: Build → HTML with embedded data
+// t=30min: User visits → gets cached HTML (fast)
+// t=61min: Cache expired → stale is served + background re-generation
+// t=62min: Next visit → fresh HTML with new data`} commentsKey="rendering.isr" />
 
         <h2>{i18n.t('rr.comp.title')}</h2>
         <table>
@@ -112,21 +112,21 @@ const featuredProducts = server(
           <li><strong>{i18n.t('rr.vs2.name')}:</strong> {i18n.t('rr.vs2')}</li>
         </ul>
 
-        <CodeBlock code={`// El HTML generado por el servidor incluye:
+        <CodeBlock code={`// The server-generated HTML includes:
 //   <div id="app">
 //     <span data-astra-store="counter" data-astra-value="42">
-//       Contador: 42
+//       Counter: 42
 //     </span>
 //     <button data-astra-handler="increment">
 //       +
 //     </button>
 //   </div>
 
-// Cuando el cliente "resume":
-//   1. Lee data-astra-store → inicializa el store con valor 42
-//   2. Lee data-astra-handler → sabe que hay un onclick pendiente
-//   3. No ejecuta componentes, no hace diffing
-//   4. El JS del handler se carga solo cuando haces clic en "+"`} />
+// When the client "resumes":
+//   1. Reads data-astra-store → initializes the store with value 42
+//   2. Reads data-astra-handler → knows there is a pending onclick
+//   3. Runs no components, does no diffing
+//   4. The handler JS loads only when you click "+"`} commentsKey="rendering.resume" />
       </div>
     </main>
     <DocRightToc items={[

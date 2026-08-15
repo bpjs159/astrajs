@@ -38,10 +38,10 @@ export const DocsServerData = component(() => (
         <h3>{i18n.t('sd.basic.title')}</h3>
         <CodeBlock code={`import { server } from '@astrajs/server';
 
-// Defines la funcion UNA VEZ
+// Define the function ONCE
 export const getUsers = server({
   tags: ['users'],
-  maxAge: 300, // cache TTL en segundos
+  maxAge: 300, // cache TTL in seconds
 }, async (role?: string) => {
   const users = await db.user.findMany({
     where: role ? { role } : undefined,
@@ -49,10 +49,10 @@ export const getUsers = server({
   return users;
 });
 
-// En el CLIENTE — se ve como una llamada async normal
+// On the CLIENT — it looks like a normal async call
 const admins = await getUsers('admin');
-// ↑ Esto es un fetch a /api/astra/getUsers?args=["admin"]
-// Los tipos se infieren automaticamente — admins es User[]`} />
+// ↑ This is a fetch to /api/astra/getUsers?args=["admin"]
+// Types are inferred automatically — admins is User[]`} commentsKey="sd.basic" />
 
         <h3>{i18n.t('sd.compiler.title')}</h3>
         <ol>
@@ -63,39 +63,39 @@ const admins = await getUsers('admin');
 
         <h3>{i18n.t('sd.config.title')}</h3>
         <CodeBlock code={`interface ServerConfig {
-  // Tipo de ejecucion
+  // Execution type
   type?: 'pre-build' | 'dynamic';  // default: 'dynamic'
   
   // Cache
-  tags?: string[];      // Etiquetas para invalidacion quirurgica
-  maxAge?: number;      // TTL en segundos (0 = sin cache)
+  tags?: string[];      // Tags for surgical invalidation
+  maxAge?: number;      // TTL in seconds (0 = no cache)
   
-  // Sincronizacion en tiempo real
-  autoSync?: boolean;           // Polling con ETags
-  autoSyncInterval?: number;    // Intervalo en ms (default: 3000)
+  // Real-time sync
+  autoSync?: boolean;           // Polling with ETags
+  autoSyncInterval?: number;    // Interval in ms (default: 3000)
   
-  // Transformacion
-  transform?: (data: T) => U;   // Transforma datos antes de enviar al cliente
-}`} />
+  // Transformation
+  transform?: (data: T) => U;   // Transforms data before sending to the client
+}`} commentsKey="sd.config" />
 
         <h2 id="tipos-server">{i18n.t('sb.serverTypes')}</h2>
         <p>{i18n.t('sd.when.a')}<strong>{i18n.t('sd.when.b')}</strong>{i18n.t('sd.when.c')}</p>
 
         <h3>pre-build</h3>
         <p>{i18n.t('sd.pre.a')}<strong>{i18n.t('sd.pre.b')}</strong>{i18n.t('sd.pre.c')}</p>
-        <CodeBlock code={`// Ideal para: menus, configuraciones, contenido estatico
+        <CodeBlock code={`// Great for: menus, settings, static content
 const siteNav = server(
   { type: 'pre-build', tags: ['navigation'] },
   () => db.menu.findMany({ orderBy: { position: 'asc' } })
 );
 
-// En build time: db.menu.findMany() → resultado serializado en HTML
-// En el cliente: siteNav() → datos ya disponibles, sin fetch
-// Se re-genera en cada build o con ISR`} />
+// At build time: db.menu.findMany() → result serialized into HTML
+// On the client: siteNav() → data already available, no fetch
+// Regenerated on each build or via ISR`} commentsKey="sd.prebuild" />
 
         <h3>dynamic</h3>
         <p>{i18n.t('sd.dyn.a')}<strong>{i18n.t('sd.dyn.b')}</strong>{i18n.t('sd.dyn.c')}</p>
-        <CodeBlock code={`// Ideal para: sesiones, datos de usuario, busquedas
+        <CodeBlock code={`// Great for: sessions, user data, searches
 const userDashboard = server(
   { type: 'dynamic', maxAge: 60 },
   async (userId: string) => {
@@ -105,13 +105,13 @@ const userDashboard = server(
     ]);
     return { stats, notifications };
   }
-);`} />
+);`} commentsKey="sd.dynamic" />
 
         <h2 id="caching">{i18n.t('sb.caching')}</h2>
         <p>{i18n.t('sd.cache.a')}<strong>{i18n.t('sd.cache.b')}</strong>{i18n.t('sd.cache.c')}</p>
 
         <h3>{i18n.t('sd.cache.tags.title')}</h3>
-        <CodeBlock code={`// Servicios con tags
+        <CodeBlock code={`// Services with tags
 const getProducts = server(
   { tags: ['products'], maxAge: 3600 },
   () => db.product.findMany()
@@ -125,24 +125,24 @@ const getProductById = server(
 const getCategories = server(
   { tags: ['categories'], maxAge: 86400 },
   () => db.category.findMany()
-);`} />
+);`} commentsKey="sd.tags" />
 
         <h3>{i18n.t('sd.inv.title')}</h3>
         <CodeBlock code={`import { revalidate } from '@astrajs/server';
 
-// Despues de crear un producto:
+// After creating a product:
 await db.product.create({ data: newProduct });
 
-// Solo se revalidan las queries con estos tags
+// Only queries with these tags revalidate
 await revalidate(['products']);
-// ↑ getProducts se revalida (tiene tag 'products')
-// ↑ getProductById se revalida (tiene tag 'products')
-// getCategories NO se revalida (no tiene 'products')
+// ↑ getProducts revalidates (has the 'products' tag)
+// ↑ getProductById revalidates (has the 'products' tag)
+// getCategories does NOT revalidate (no 'products' tag)
 
-// Despues de actualizar una categoria:
+// After updating a category:
 await db.category.update({ where: { id }, data: update });
 await revalidate(['categories']);
-// ↑ Solo getCategories se revalida`} />
+// ↑ Only getCategories revalidates`} commentsKey="sd.revalidate" />
 
         <div class="note">
           <strong>{i18n.t('lbl.best')}:</strong> {i18n.t('sd.note.a')}<code>'products'</code>{i18n.t('sd.note.b')}<code>'users'</code>{i18n.t('sd.note.c')}<code>'product-detail'</code>{i18n.t('sd.note.d')}<code>'user-profile'</code>{i18n.t('sd.note.e')}
@@ -160,7 +160,7 @@ await revalidate(['categories']);
           <li>{i18n.t('sd.auto.ol5')}</li>
         </ol>
 
-        <CodeBlock code={`// Datos que se auto-sincronizan cada 3 segundos
+        <CodeBlock code={`// Data that auto-syncs every 3 seconds
 const liveStats = server(
   { 
     autoSync: true, 
@@ -170,13 +170,13 @@ const liveStats = server(
   () => db.dashboard.liveStats()
 );
 
-// En el componente:
+// In the component:
 <div>
   <h3>Real-time sales</h3>
   <p>\${liveStats.totalSales}</p>
-  {/* ↑ Se actualiza solo cuando el servidor devuelve datos nuevos */}
-  {/* Sin polling manual, sin useEffect, sin suscripciones */}
-</div>`} />
+  {/* ↑ Updates only when the server returns new data */}
+  {/* No manual polling, no useEffect, no subscriptions */}
+</div>`} commentsKey="sd.autosync" />
 
         <h3>{i18n.t('sd.auto.vs')}</h3>
         <ul>
@@ -187,20 +187,20 @@ const liveStats = server(
         <h2>{i18n.t('sd.mut.title')}</h2>
         <p>{i18n.t('sd.mut.a')}<code>server()</code>{i18n.t('sd.mut.b')}</p>
         <CodeBlock code={`const createProduct = server(
-  { tags: ['products'] }, // tags a revalidar tras la mutacion
+  { tags: ['products'] }, // tags to revalidate after the mutation
   async (data: CreateProductInput) => {
     const product = await db.product.create({ data });
     return product;
   }
 );
 
-// En el componente:
+// In the component:
 async function handleCreate(formData: CreateProductInput) {
   const newProduct = await createProduct(formData);
-  // ↑ La mutacion se ejecuta en el servidor
-  // ↑ Los tags ['products'] se revalidan automaticamente tras la mutacion
-  // ↑ La UI se actualiza sin codigo adicional
-}`} />
+  // ↑ The mutation runs on the server
+  // ↑ The ['products'] tags revalidate automatically after the mutation
+  // ↑ The UI updates with no extra code
+}`} commentsKey="sd.mutation" />
       </div>
     </main>
     <DocRightToc items={[

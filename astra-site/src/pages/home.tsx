@@ -78,7 +78,11 @@ export const HomePage = component(() => {
 const state = store({
     products: [] as Product[],
     total: 0
-}, { key: 'cart', swr: true });`,
+});
+
+// Mutating is reactive — the DOM updates itself.
+state.products.push({ id: 1, name: 'Astra' });
+state.total += 1;`,
     server: `import { server } from '@astrajs/server';
 
 export const loadProducts = server(() => ({
@@ -105,15 +109,26 @@ const cardStyle = css\`
 \`;`,
     router: `import { route, Link, Outlet } from '@astrajs/router';
 
-// routes.ts
-export const routes = {
-    get dashboard() {
-        return route('/', { exact: true });
-    },
-    get products() {
-        return route('/products');
-    },
-};`,
+// app.tsx — route() is reactive: active route ⇒ component.
+// No routes file, no config, no switch.
+function App() {
+    return (
+        <main>
+            {route('/', { exact: true }) && <Dashboard />}
+            {route('/products') && <Products />}
+            {route('/admin') && <Admin />}
+
+            <Link href="/admin">Go to Admin</Link>
+        </main>
+    );
+}`,
+  };
+
+  const tabComments: Record<string, string | undefined> = {
+    store: 'home.store',
+    server: undefined,
+    css: undefined,
+    router: 'home.router',
   };
 
   const style = `
@@ -508,7 +523,7 @@ export const routes = {
               ))}
             </div>
             <div class="tab-content">
-              {(() => <CodeBlock bare code={tabCode[tabsState.activeTab]} />)()}
+              {(() => <CodeBlock bare code={tabCode[tabsState.activeTab]} commentsKey={tabComments[tabsState.activeTab]} />)()}
             </div>
           </div>
         </div>

@@ -57,18 +57,18 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   plugins: [
-    astra(),          // compilador JSX → DOM
+    astra(),          // JSX → DOM compiler
     tailwindcss(),    // Tailwind v4
   ],
-});`} />
+});`} commentsKey="integrations.tailwind-vite" />
         <CodeBlock code={`/* src/main.css */
 @import "tailwindcss";
 
-/* en tu entry: */
-import './main.css';`} />
+/* in your entry: */
+import './main.css';`} commentsKey="integrations.tailwind-css" />
 
         <h3>{i18n.t('ig.tw3.title')}</h3>
-        <CodeBlock code={`// tailwind.config.js — escanea también tus .tsx
+        <CodeBlock code={`// tailwind.config.js — also scans your .tsx
 export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: { extend: {} },
@@ -78,7 +78,7 @@ export default {
 // postcss.config.js
 export default {
   plugins: { tailwindcss: {}, autoprefixer: {} },
-};`} />
+};`} commentsKey="integrations.tailwind-config" />
 
         <h3>{i18n.t('ig.use.title')}</h3>
         <CodeBlock code={`export const Card = component(() => (
@@ -130,14 +130,14 @@ export const Form = component(() => (
       <md-outlined-button>Cancel</md-outlined-button>
     </div>
   </div>
-));`} />
+));`} commentsKey="integrations.material-web" />
 
         <h3>{i18n.t('ig.wc.title')}</h3>
         <p>{i18n.t('ig.wc.a')}<strong>Shoelace</strong>{i18n.t('ig.wc.b')}<strong>Carbon Web Components</strong>{i18n.t('ig.wc.c')}<strong>Spectrum</strong>{i18n.t('ig.wc.d')}<strong>Fluent</strong>{i18n.t('ig.wc.e')}</p>
         <CodeBlock code={`// Shoelace
 import '@shoelace-style/shoelace/dist/components/button/button.js';
 
-<sl-button variant="primary" onclick={save}>Save</sl-button>`} />
+<sl-button variant="primary" onclick={save}>Save</sl-button>`} commentsKey="integrations.shoelace" />
 
         <div class="note">
           <strong>{i18n.t('lbl.note')}:</strong> {i18n.t('ig.wcn.a')}<code>mounted()</code>{i18n.t('ig.wcn.b')}
@@ -158,12 +158,12 @@ export const SalesChart = component(() => {
       },
     });
 
-    // cleanup automático al desmontar el componente
+    // automatic cleanup when the component unmounts
     return () => chart.destroy();
   });
 
   return <canvas id="sales-chart" />;
-});`} />
+});`} commentsKey="integrations.charts" />
 
         <h2 id="utilidades">{i18n.t('sb.intUtils')}</h2>
         <p>{i18n.t('ig.utils.p')}</p>

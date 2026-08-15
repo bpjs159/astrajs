@@ -38,31 +38,31 @@ export const DocsAdvanced = component(() => (
 
         <h3>{i18n.t('av.p1.title')}</h3>
         <p>{i18n.t('av.p1.a')}<code>document.createElement</code>{i18n.t('av.p1.b')}<code>{'{store.value}'}</code>{i18n.t('av.p1.c')}<code>effect(() =&gt; {'{'} textNode.nodeValue = store.value {'}'})</code>{i18n.t('av.p1.d')}</p>
-        <CodeBlock code={`// Entrada (JSX):
+        <CodeBlock code={`// Input (JSX):
 <span class="greeting">Hola {name}</span>
 
-// Salida del compilador (aproximado):
+// Compiler output (approximate):
 const span = document.createElement('span');
 span.className = 'greeting';
 const t1 = document.createTextNode('Hola ');
 const t2 = document.createTextNode('');
 span.append(t1, t2);
-effect(() => { t2.nodeValue = String(name); });`} />
+effect(() => { t2.nodeValue = String(name); });`} commentsKey="advanced.jsx-out" />
 
         <h3>{i18n.t('av.p2.title')}</h3>
         <p>{i18n.t('av.p2.a')}<code>css</code>{i18n.t('av.p2.b')}</p>
-        <CodeBlock code={`// Entrada:
+        <CodeBlock code={`// Input:
 const styles = css\`.card { padding: 16px; }\`;
 
-// Salida:
-// 1. Se extrae el CSS a un archivo: assets/card-a1b2c3.css
-// 2. Se reemplaza el template por una referencia:
+// Output:
+// 1. The CSS is extracted to a file: assets/card-a1b2c3.css
+// 2. The template is replaced with a reference:
 const styles = 'card_a1b2c3';
-// 3. En el HTML: <link rel="stylesheet" href="/assets/card-a1b2c3.css">`} />
+// 3. In the HTML: <link rel="stylesheet" href="/assets/card-a1b2c3.css">`} commentsKey="advanced.css-out" />
 
         <h3>{i18n.t('av.p3.title')}</h3>
         <p>{i18n.t('av.p3.a')}<code>server()</code>{i18n.t('av.p3.b')}</p>
-        <CodeBlock code={`// Entrada:
+        <CodeBlock code={`// Input:
 export const getUsers = server(
   { tags: ['users'] },
   async (role?: string) => {
@@ -70,17 +70,17 @@ export const getUsers = server(
   }
 );
 
-// Salida — Cliente (incluido en el bundle):
+// Output — Client (included in the bundle):
 export const getUsers = (role?: string) =>
   fetch('/api/astra/getUsers', {
     method: 'POST',
     body: JSON.stringify([role]),
   }).then(r => r.json());
 
-// Salida — Servidor (registrado en el middleware):
+// Output — Server (registered in the middleware):
 registerHandler('getUsers', async ([role]) => {
   return db.user.findMany({ where: { role } });
-});`} />
+});`} commentsKey="advanced.server-out" />
 
         <h3>{i18n.t('av.modes.title')}</h3>
         <p>{i18n.t('av.modes.a')}<code>transformMode</code>{i18n.t('av.modes.b')}</p>
@@ -94,11 +94,11 @@ import astra from '@astrajs/compiler';
 export default defineConfig({
   plugins: [
     astra({
-      transformMode: 'dynamic', // o 'vanilla'
-      apiPrefix: '/api/astra',  // prefijo para endpoints RPC
+      transformMode: 'dynamic', // or 'vanilla'
+      apiPrefix: '/api/astra',  // prefix for RPC endpoints
     }),
   ],
-});`} />
+});`} commentsKey="advanced.config" />
 
         <h2 id="inferencia">{i18n.t('sb.advInference')}</h2>
         <p>{i18n.t('av.inf.a')}<strong>{i18n.t('av.inf.b')}</strong>{i18n.t('av.inf.c')}</p>
@@ -114,25 +114,25 @@ export default defineConfig({
   tags: ['ts', 'oss'], // → string[]
 });
 
-// user.name es string (inferido, no anotado)
-// user.profile.bio es string (inferido en profundidad)
-// user.tags es string[] (inferido del array inicial)`} />
+// user.name is string (inferred, not annotated)
+// user.profile.bio is string (deeply inferred)
+// user.tags is string[] (inferred from the initial array)`} commentsKey="advanced.inference-store" />
 
         <h3>{i18n.t('av.inf2.title')}</h3>
         <CodeBlock code={`const getProduct = server(
   { tags: ['products'] },
   async (id: string) => {
-    // db.product.findUnique retorna Product | null
+    // db.product.findUnique returns Product | null
     return db.product.findUnique({ where: { id } });
   }
 );
 
-// El tipo de retorno se infiere y se propaga al cliente:
+// The return type is inferred and propagates to the client:
 // const getProduct: (id: string) => Promise<Product | null>
-// Sin anotaciones manuales, sin duplicacion`} />
+// No manual annotations, no duplication`} commentsKey="advanced.inference-server" />
 
         <h3>{i18n.t('av.inf3.title')}</h3>
-        <CodeBlock code={`// types/products.ts (compartido)
+        <CodeBlock code={`// types/products.ts (shared)
 export interface Product {
   id: string;
   name: string;
@@ -148,10 +148,10 @@ export const listProducts = server(
   }
 );
 
-// pages/products.tsx (cliente)
+// pages/products.tsx (client)
 const products = await listProducts();
-// ↑ products es Product[] — el tipo viaja del servidor al cliente
-// automaticamente, sin codegen, sin duplicar definiciones`} />
+// ↑ products is Product[] — the type travels from server to client
+// automatically, no codegen, no duplicated definitions`} commentsKey="advanced.inference-e2e" />
 
         <h2 id="vite">{i18n.t('sb.advVite')}</h2>
         <p>{i18n.t('av.vite.p')}</p>
@@ -165,17 +165,17 @@ import path from 'path';
 export default defineConfig({
   plugins: [
     astra({
-      apiPrefix: '/api/astra',    // prefijo RPC
-      transformMode: 'dynamic',   // modo del compilador
+      apiPrefix: '/api/astra',    // RPC prefix
+      transformMode: 'dynamic',   // compiler mode
     }),
   ],
   resolve: {
     alias: {
-      // Solo necesario en monorepo/dev
+      // Only needed in monorepo/dev
       '@astrajs/core': path.resolve(__dirname, '../packages/core/src'),
     },
   },
-});`} />
+});`} commentsKey="advanced.vite-config" />
 
         <h3>{i18n.t('av.hmr.title')}</h3>
         <p>{i18n.t('av.hmr.p')}</p>

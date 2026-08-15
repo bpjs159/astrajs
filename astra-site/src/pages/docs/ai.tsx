@@ -55,7 +55,7 @@ export const chat = aiStream(
 
 // src/app.tsx — client: typed calls
 const result = await summarize(longText);        // { text: string }
-chat('hello', (chunk) => { answer += chunk; });  // tokens arrive live`} />
+chat('hello', (chunk) => { answer += chunk; });  // tokens arrive live`} commentsKey="ai.endpoints" />
 
         <h2 id="streaming">{i18n.t('sb.aiStreaming')}</h2>
         <p>{i18n.t('ai.stream.p')}</p>
@@ -64,7 +64,7 @@ chat('hello', (chunk) => { answer += chunk; });  // tokens arrive live`} />
 
 chat(question, (chunk) => {
   state.answer += chunk;   // one TextNode mutation per token
-});`} />
+});`} commentsKey="ai.streaming" />
 
         <h2 id="build-time">{i18n.t('sb.aiBuildTime')}</h2>
         <p><code>ai({'{ type: \'pre-build\' }'})</code>{i18n.t('ai.build.p')}</p>
@@ -73,7 +73,7 @@ chat(question, (chunk) => {
   return 'Generate 3 FAQs about AstraJS. Respond ONLY as a JSON array of {"q": "...", "a": "..."} objects.';
 });
 
-// The client receives: const faq = [{"q":"...","a":"..."}];`} />
+// The client receives: const faq = [{"q":"...","a":"..."}];`} commentsKey="ai.build" />
 
         <h2 id="caching">{i18n.t('sb.aiCaching')}</h2>
         <p>{i18n.t('ai.cache.p')}</p>

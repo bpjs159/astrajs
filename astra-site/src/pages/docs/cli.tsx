@@ -154,7 +154,7 @@ import { getPosts } from '../server/posts.server.js';
 
 mounted(() => {
   getPosts().then(posts => { state.posts = posts; });
-});`} />
+});`} commentsKey="cli.server-split" />
 
         <h2>{i18n.t('cl.pm.title')}</h2>
         <p>{i18n.t('cl.pm.a')}<code>npm_config_user_agent</code>{i18n.t('cl.pm.b')}<code>pnpm dlx astra</code>{i18n.t('cl.pm.c')}<code>npx astra</code>{i18n.t('cl.pm.d')}</p>

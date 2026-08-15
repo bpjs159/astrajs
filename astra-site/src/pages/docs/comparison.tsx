@@ -71,11 +71,11 @@ export const DocsComparison = component(() => (
 
         <h3>{i18n.t('cp.react.vdom.title')}</h3>
         <p>{i18n.t('cp.react.vdom.p')}</p>
-        <CodeBlock code={`// React: re-ejecucion del componente ENTERO
+        <CodeBlock code={`// React: the ENTIRE component re-executes
 function Counter() {
   const [count, setCount] = useState(0);
-  // TODO este cuerpo se ejecuta en cada render
-  console.log('re-render'); // ← se imprime en cada click
+  // This whole body runs on every render
+  console.log('re-render'); // ← prints on every click
   
   return (
     <button onClick={() => setCount(count + 1)}>
@@ -84,27 +84,27 @@ function Counter() {
   );
 }
 
-// AstraJS: el componente se ejecuta UNA VEZ
+// AstraJS: the component runs ONCE
 const Counter = component(() => {
   const state = store({ count: 0 });
-  // Este codigo SOLO se ejecuta al montar
-  console.log('mount'); // ← se imprime UNA vez
+  // This code runs ONLY on mount
+  console.log('mount'); // ← prints ONCE
   
   return (
     <button onclick={() => state.count++}>
       Count: {state.count}
     </button>
-    // Solo el TextNode de state.count se actualiza
+    // Only the state.count TextNode updates
   );
-});`} />
+});`} commentsKey="comparison.react-rerender" />
 
         <h3>{i18n.t('cp.react.hooks.title')}</h3>
         <p>{i18n.t('cp.hooks.a')}<code>useCallback</code>{i18n.t('cp.hooks.b')}<code>useMemo</code>{i18n.t('cp.hooks.c')}<code>store()</code>{i18n.t('cp.hooks.d')}</p>
-        <CodeBlock code={`// React: reglas de hooks, memoizacion manual
+        <CodeBlock code={`// React: hook rules, manual memoization
 function SearchResults({ query }: { query: string }) {
-  // No podes llamar hooks dentro de condicionales
-  // Necesitas useCallback para referencias estables
-  // Necesitas useMemo para valores derivados
+  // You can't call hooks inside conditionals
+  // You need useCallback for stable references
+  // You need useMemo for derived values
   
   const results = useMemo(() => 
     searchData(query), [query]
@@ -116,16 +116,16 @@ function SearchResults({ query }: { query: string }) {
   return <ul>{results.map(r => <Item onClick={handleClick} />)}</ul>;
 }
 
-// AstraJS: sin reglas, sin memoizacion manual
+// AstraJS: no rules, no manual memoization
 function SearchResults({ query }: { query: string }) {
-  // store() funciona en cualquier lado
-  // El compilador memoiza automaticamente
-  // Sin useCallback, sin useMemo
+  // store() works anywhere
+  // The compiler memoizes automatically
+  // No useCallback, no useMemo
   
   const results = memo(() => searchData(query));
   
   return <ul>{results().map(r => <Item />)}</ul>;
-}`} />
+}`} commentsKey="comparison.react-hooks" />
 
         <h3>{i18n.t('cp.react.next.title')}</h3>
         <p>{i18n.t('cp.react.next.p')}</p>
@@ -154,7 +154,7 @@ button { background: #818cf8; }
 
 // --- vs ---
 
-// AstraJS TSX (mismo archivo)
+// AstraJS TSX (same file)
 import { component, store, css } from '@astrajs/core';
 
 const btnStyle = css\`
@@ -168,7 +168,7 @@ export const Counter = component(() => {
       Count: {state.count}
     </button>
   );
-});`} />
+});`} commentsKey="comparison.vue" />
 
         <h3>{i18n.t('cp.vue.react.title')}</h3>
         <p>{i18n.t('cp.vr.a')}<code>.value</code>{i18n.t('cp.vr.b')}<code>.value</code>{i18n.t('cp.vr.c')}</p>
@@ -178,8 +178,8 @@ export const Counter = component(() => {
 
         <h3>{i18n.t('cp.angular.cd.title')}</h3>
         <p>{i18n.t('cp.angular.cd.p')}</p>
-        <CodeBlock code={`// Angular: Zone.js intercepta setTimeout, HTTP, eventos...
-// y dispara change detection en todo el arbol
+        <CodeBlock code={`// Angular: Zone.js intercepts setTimeout, HTTP, events...
+// and triggers change detection across the whole tree
 @Component({
   template: \`<button (click)="increment()">
     Count: {{ count }}
@@ -188,19 +188,19 @@ export const Counter = component(() => {
 export class CounterComponent {
   count = 0;
   increment() { this.count++; }
-  // Angular re-evalua TODOS los bindings del componente
+  // Angular re-evaluates ALL bindings in the component
 }
 
-// AstraJS: Proxy notifica solo al suscriptor exacto
+// AstraJS: the Proxy notifies only the exact subscriber
 const Counter = component(() => {
   const state = store({ count: 0 });
   return (
     <button onclick={() => state.count++}>
       Count: {state.count}
     </button>
-    // Solo este TextNode se actualiza. Nada mas.
+    // Only this TextNode updates. Nothing else.
   );
-});`} />
+});`} commentsKey="comparison.angular-cd" />
 
         <h3>{i18n.t('cp.angular.ts.title')}</h3>
         <p>{i18n.t('cp.angular.ts.p')}<code>server()</code>{i18n.t('cp.angular.ts.p2')}</p>

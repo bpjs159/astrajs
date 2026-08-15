@@ -45,7 +45,7 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
   },
-});`} />
+});`} commentsKey="testing.vitest" />
 
         <h3>{i18n.t('t.store.title')}</h3>
         <p>{i18n.t('t.store.p1')}<code>effect()</code>{i18n.t('t.store.p2')}</p>
@@ -58,27 +58,27 @@ describe('store', () => {
   it('fires surgical effects on mutation', () => {
     let runs = 0;
     effect(() => {
-      void cart.items.length; // suscripcion a la propiedad 'items'
+      void cart.items.length; // subscription to the 'items' property
       runs++;
     });
 
-    expect(runs).toBe(1); // el efecto corre al suscribirse
+    expect(runs).toBe(1); // the effect runs on subscription
 
     cart.items = ['t-shirt', 'cap'];
-    expect(runs).toBe(2); // re-corre solo por 'items'
+    expect(runs).toBe(2); // re-runs only for 'items'
 
     cart.items.push('mug');
     expect(runs).toBe(3);
     expect(cart.items).toHaveLength(3);
   });
-});`} />
+});`} commentsKey="testing.store" />
 
         <h3>{i18n.t('t.comp.title')}</h3>
         <p>{i18n.t('t.comp.p')}</p>
         <CodeBlock code={`import { describe, it, expect } from 'vitest';
 import { Counter } from '../main.js';
 
-// Los efectos de AstraJS se ejecutan en microtareas
+// AstraJS effects run on microtasks
 const flush = () => new Promise((r) => setTimeout(r, 0));
 
 describe('Counter', () => {
@@ -98,7 +98,7 @@ describe('Counter', () => {
 
     expect(el.querySelector('strong')?.textContent).toBe('1');
   });
-});`} />
+});`} commentsKey="testing.flush" />
 
         <div class="note">
           <strong>{i18n.t('lbl.tip')}:</strong> {i18n.t('t.note1')}<code>examples/frontend-only/</code>{i18n.t('t.note2')}<code>examples/fullstack/</code>{i18n.t('t.note3')}<code>src/__tests__/</code>{i18n.t('t.note4')}
@@ -114,7 +114,7 @@ module.exports = {
       tsconfig: { jsx: 'react-jsx', jsxImportSource: '@astrajs/core' },
     }],
   },
-};`} />
+};`} commentsKey="testing.jest" />
         <CodeBlock code={`// __tests__/counter.test.tsx
 import { Counter } from '../src/main';
 
@@ -126,7 +126,7 @@ test('the counter increments from 0 to 1', () => {
   inc.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
   expect(el.querySelector('strong')?.textContent).toBe('1');
-});`} />
+});`} commentsKey="testing.jest-test" />
 
         <h2 id="e2e-playwright">{i18n.t('sb.testPlaywright')}</h2>
         <p>{i18n.t('t.pw.p1')}<code>webServer</code>{i18n.t('t.pw.p2')}</p>
@@ -154,7 +154,7 @@ test('the cart persists across routes', async ({ page }) => {
   await page.getByRole('button', { name: 'Add to cart' }).first().click();
   await page.getByRole('link', { name: 'Cart' }).click();
   await expect(page.locator('.cart-line')).toHaveCount(1);
-});`} />
+});`} commentsKey="testing.playwright" />
 
         <h2 id="e2e-cypress">{i18n.t('sb.testCypress')}</h2>
         <p>{i18n.t('t.cy.p1')}<code>shadow-dom</code>{i18n.t('t.cy.p2')}</p>
@@ -172,7 +172,7 @@ describe('Counter', () => {
     cy.contains('button', '+ 1').click();
     cy.get('.count strong').should('have.text', '1');
   });
-});`} />
+});`} commentsKey="testing.cypress" />
 
         <h2 id="server">server() RPC</h2>
         <p>{i18n.t('t.rpc.p1')}<code>server()</code>{i18n.t('t.rpc.p2')}<code>fetch</code>{i18n.t('t.rpc.p3')}</p>

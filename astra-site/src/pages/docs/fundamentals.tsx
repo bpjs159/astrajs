@@ -37,23 +37,23 @@ export const DocsFundamentals = component(() => (
 
         <h3>{i18n.t('f.st.title')}</h3>
         <p>{i18n.t('f.st.p1')}<code>component()</code>{i18n.t('f.st.p2')}</p>
-        <CodeBlock code={`// Funcion pura — sin estado, sin wrapping
+        <CodeBlock code={`// Pure function — no state, no wrapping
 function Greeting({ name }: { name: string }) {
   return <h2>Hello, {name}!</h2>;
 }
 
-// Uso directo:
-document.body.appendChild(<Greeting name="Ada" /> as any);`} />
+// Direct usage:
+document.body.appendChild(<Greeting name="Ada" /> as any);`} commentsKey="fund.pure" />
 
         <h3>{i18n.t('f.sf.title')}</h3>
         <p>{i18n.t('f.sf.a')}<code>component()</code>{i18n.t('f.sf.mid')}<strong>{i18n.t('f.sf.b')}</strong>{i18n.t('f.sf.c')}</p>
         <CodeBlock code={`import { component, store } from '@astrajs/core';
 
 export const Counter = component(() => {
-  // store() crea un Proxy reactivo
+  // store() creates a reactive Proxy
   const state = store({ count: 0 });
 
-  // Esta funcion se ejecuta UNA SOLA VEZ
+  // This function runs ONCE
   return (
     <div>
       <h2>Counter: {state.count}</h2>
@@ -62,10 +62,10 @@ export const Counter = component(() => {
       </button>
     </div>
   );
-  // El compilador transforma {state.count}
-  // en: effect(() => { textNode.nodeValue = state.count; })
-  // Solo ese TextNode se actualiza cuando count cambia.
-});`} />
+  // The compiler transforms {state.count}
+  // into: effect(() => { textNode.nodeValue = state.count; })
+  // Only that TextNode updates when count changes.
+});`} commentsKey="fund.counter" />
         <div class="note">
           <strong>{i18n.t('lbl.important')}:</strong> <code>component()</code> {i18n.t('f.note.a')}<code>&lt;span style="display:contents"&gt;</code>{i18n.t('f.note.b')}<code>mounted()</code>{i18n.t('f.note.c')}
         </div>
@@ -85,21 +85,21 @@ const user = store({
   }
 });
 
-// LECTURA → el Proxy registra que estas leyendo "name"
-// Si esto ocurre dentro de un effect(), se crea una suscripcion
+// READ → the Proxy registers that you are reading "name"
+// If this happens inside an effect(), a subscription is created
 console.log(user.name); // 'Ada'
 
-// ESCRITURA → el Proxy notifica SOLO a los suscriptores de "name"
+// WRITE → the Proxy notifies ONLY the "name" subscribers
 user.name = 'Grace';
-// Internamente:
-//   1. Se actualiza el valor
-//   2. Se notifica a cada effect suscrito a "name"
-//   3. Los effects ejecutan sus callbacks
-//   4. Solo los TextNodes de "name" se actualizan en el DOM
+// Internally:
+//   1. The value is updated
+//   2. Every effect subscribed to "name" is notified
+//   3. The effects run their callbacks
+//   4. Only the "name" TextNodes update in the DOM
 
-// Objetos anidados tambien son reactivos (lazy proxy)
+// Nested objects are reactive too (lazy proxy)
 user.profile.bio = 'Senior Developer';
-// → solo se actualizan los suscriptores de "profile.bio"`} />
+// → only "profile.bio" subscribers update`} commentsKey="fund.proxy" />
 
         <h3>{i18n.t('f.arrays.title')}</h3>
         <p>{i18n.t('f.arr.a')}<code>push</code>{i18n.t('f.arr.b')}<code>splice</code>{i18n.t('f.arr.c')}</p>
@@ -108,26 +108,26 @@ user.profile.bio = 'Senior Developer';
   selected: null as string | null
 });
 
-// Mutaciones de array → reactivas
-app.items.push('D');       // notifica a suscriptores de "items" y "items.length"
-app.items[0] = 'Z';       // notifica a suscriptores de "items[0]"
-app.items = [...app.items]; // reemplazo completo → notifica a suscriptores de "items"`} />
+// Array mutations → reactive
+app.items.push('D');       // notifies "items" and "items.length" subscribers
+app.items[0] = 'Z';       // notifies "items[0]" subscribers
+app.items = [...app.items]; // full replacement → notifies "items" subscribers`} commentsKey="fund.arrays" />
 
         <h3>{i18n.t('f.batch.title')}</h3>
         <p>{i18n.t('f.bat.a')}<code>queueMicrotask()</code>{i18n.t('f.bat.b')}<code>batch()</code>{i18n.t('f.bat.c')}</p>
-        <CodeBlock code={`// Estas 3 mutaciones → 1 solo ciclo de DOM update
+        <CodeBlock code={`// These 3 mutations → a single DOM update cycle
 user.name = 'Grace';
 user.age = 29;
 user.profile.bio = 'Senior';
 
-// Los efectos se ejecutan una vez, no tres.
-// Los nodos del DOM se actualizan en un solo microtask.`} />
+// Effects run once, not three times.
+// The DOM nodes update in a single microtask.`} commentsKey="fund.batch" />
 
         <h2 id="jsx-sin-vdom">{i18n.t('sb.jsx')}</h2>
         <p>{i18n.t('f.jsx.a')}<code>createElement</code>{i18n.t('f.jsx.b')}</p>
 
         <h3>{i18n.t('f.trans.title')}</h3>
-        <CodeBlock code={`// === TU CODIGO (JSX) ===
+        <CodeBlock code={`// === YOUR CODE (JSX) ===
 function Greeting({ name }: { name: string }) {
   return (
     <div class="greeting">
@@ -137,7 +137,7 @@ function Greeting({ name }: { name: string }) {
   );
 }
 
-// === LO QUE GENERA EL COMPILADOR (aproximado) ===
+// === WHAT THE COMPILER GENERATES (approximate) ===
 function Greeting({ name }: { name: string }) {
   const div = document.createElement('div');
   div.className = 'greeting';
@@ -151,39 +151,39 @@ function Greeting({ name }: { name: string }) {
   strong.appendChild(text);
   div.appendChild(strong);
   
-  // Binding reactivo de grano fino
+  // Fine-grained reactive binding
   effect(() => {
     text.nodeValue = String(name);
   });
   
   return div;
-}`} />
+}`} commentsKey="fund.jsx" />
 
         <h3>{i18n.t('f.cond.title')}</h3>
         <p>{i18n.t('f.cond.a')}<code>bindConditional</code>{i18n.t('f.cond.b')}</p>
-        <CodeBlock code={`// Escribes:
+        <CodeBlock code={`// You write:
 <div>{show && <span>Visible!</span>}</div>
 
-// El compilador genera:
+// The compiler generates:
 const marker = document.createComment('~');
 bindConditional(marker, () => show, 
   () => <span>Visible!</span>
 );
-// Cuando show cambia, el <span> se inserta/remueve del DOM
-// sin re-crear el <div> padre.`} />
+// When show changes, the <span> is inserted/removed from the DOM
+// without re-creating the parent <div>.`} commentsKey="fund.cond" />
 
         <h3>{i18n.t('f.list.title')}</h3>
         <p>{i18n.t('f.list.a')}<code>array.map()</code>{i18n.t('f.list.b')}<code>bindList</code>{i18n.t('f.list.c')}</p>
-        <CodeBlock code={`// Escribes:
+        <CodeBlock code={`// You write:
 <ul>
   {items.map(item => <li key={item.id}>{item.name}</li>)}
 </ul>
 
-// El compilador genera bindList con key-based diffing:
-// - Items nuevos → se crean
-// - Items removidos → se eliminan
-// - Items reordenados → se mueven (sin re-crear)
-// - Items con misma key → se preservan`} />
+// The compiler generates bindList with key-based diffing:
+// - New items → created
+// - Removed items → deleted
+// - Reordered items → moved (without re-creating)
+// - Items with the same key → preserved`} commentsKey="fund.list" />
 
         <h2 id="estilos">{i18n.t('sb.css')}</h2>
         <p>{i18n.t('f.css.a')}<code>css</code>{i18n.t('f.css.b')}</p>
@@ -237,7 +237,7 @@ function Card({ title, featured }: { title: string; featured?: boolean }) {
 // Eventos resumibles — el JS se carga JIT
 <button astra-on:click={heavyHandler}>
   Complex action (code loaded on-demand)
-</button>`} />
+</button>`} commentsKey="fund.events" />
         <div class="note">
           <strong>{i18n.t('lbl.keydiff')}:</strong> <code>onclick</code> {i18n.t('f.ev.n1')}<code>astra-on:click</code>{i18n.t('f.ev.n2')}
         </div>

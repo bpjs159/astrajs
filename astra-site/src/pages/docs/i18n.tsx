@@ -182,29 +182,29 @@ export const DocsI18n = component(() => (
 "dependencies": { "@astrajs/i18n": "0.1.0" }
 
 // vite.config.ts
-resolve: { alias: { '@astrajs/i18n': '@astrajs/i18n/src' } } // solo monorepo`} />
+resolve: { alias: { '@astrajs/i18n': '@astrajs/i18n/src' } } // monorepo only`} commentsKey="i18n.install" />
 
         <h2 id="setup">{siteI18n.t('sb.i18nSetup')}</h2>
         <CodeBlock code={`import { createI18n } from '@astrajs/i18n';
 
 export const i18n = createI18n({
-  locale: 'es',            // idioma inicial
-  fallbackLocale: 'en',    // respaldo cuando falta una clave
+  locale: 'es',            // initial language
+  fallbackLocale: 'en',    // fallback when a key is missing
   messages: {
     en: { 'hero.title': 'Ship zero JavaScript' },
     es: { 'hero.title': 'Cero JavaScript enviado' },
   },
-});`} />
+});`} commentsKey="i18n.setup" />
 
         <h2 id="reactividad">{siteI18n.t('id.react.title')}</h2>
         <p>{siteI18n.t('id.react.a')}<code>t()</code>{siteI18n.t('id.react.b')}<code>dynamic()</code>{siteI18n.t('id.react.c')}</p>
-        <CodeBlock code={`<h1>{i18n.t('hero.title')}</h1>           // ← solo este nodo cambia
-<button onClick={() => i18n.setLocale('en')}>EN</button>`} />
+        <CodeBlock code={`<h1>{i18n.t('hero.title')}</h1>           // ← only this node changes
+<button onClick={() => i18n.setLocale('en')}>EN</button>`} commentsKey="i18n.react" />
 
         <h2 id="interpolacion">{siteI18n.t('sb.i18nInterp')}</h2>
         <CodeBlock code={`messages: { es: { greeting: '¡Hola, {name}!' } }
 
-i18n.t('greeting', { name: 'Ada' });  // → "¡Hola, Ada!"`} />
+i18n.t('greeting', { name: 'Ada' });  // → "¡Hola, Ada!"`} commentsKey="i18n.interp" />
 
         <h2 id="pluralizacion">{siteI18n.t('sb.i18nPlural')}</h2>
         <p>{siteI18n.t('id.plural.a')}<code>{'{count}'}</code>{siteI18n.t('id.plural.b')}<code>t()</code>{siteI18n.t('id.plural.c')}<code>Intl.PluralRules</code>{siteI18n.t('id.plural.d')}<code>key.one</code>{siteI18n.t('id.plural.e')}<code>key.other</code>{siteI18n.t('id.plural.f')}<code>key.few</code>{siteI18n.t('id.plural.g')}<code>key.many</code>{siteI18n.t('id.plural.h')}<code>other</code>{siteI18n.t('id.plural.i')}</p>
@@ -219,9 +219,9 @@ i18n.t('items', { count: 5 });`} />
         <h2 id="formato">{siteI18n.t('sb.i18nFormat')}</h2>
         <p>{siteI18n.t('id.format.p')}</p>
         <CodeBlock code={`i18n.n(1234567.89);   // es → "1.234.567,89" · en → "1,234,567.89"
-i18n.d(new Date());    // fecha con formato local
-i18n.l(['TS', 'JSX']); // listas con conjunciones locales
-i18n.dir();            // 'rtl' para ar/he/fa/ur, 'ltr' en el resto`} />
+i18n.d(new Date());    // locale-formatted date
+i18n.l(['TS', 'JSX']); // lists with locale conjunctions
+i18n.dir();            // 'rtl' for ar/he/fa/ur, 'ltr' elsewhere`} commentsKey="i18n.format" />
 
         <h2 id="idiomas">{siteI18n.t('sb.i18nLangs')}</h2>
         <p>{siteI18n.t('id.langs.a')}<code>Intl</code>{siteI18n.t('id.langs.b')}<code>WORLD_LOCALES</code>{siteI18n.t('id.langs.c')}</p>

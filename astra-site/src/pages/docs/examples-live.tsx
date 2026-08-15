@@ -14,6 +14,8 @@ export interface LiveExample {
   description: string;
   concepts: string[];
   code: string;
+  /** Snippet key for localized comments (optional). */
+  commentsKey?: string;
   docsHref: string;
   render: () => JSX.Element;
 }
@@ -428,11 +430,11 @@ const ex16 = component(() => {
   const toggle = (id: number) => {
     const item = todos.items.find((t) => t.id === id)!;
     const prev = item.done;
-    item.done = !prev; // optimista
+    item.done = !prev; // optimistic
     setTimeout(() => {
-      // servidor responde ok — sin cambios
+      // server responds ok — no changes
       if (Math.random() < 0.2) {
-        item.done = prev; // rollback simulado
+        item.done = prev; // simulated rollback
       }
     }, 500);
   };
@@ -585,16 +587,17 @@ export const Counter = component(() => (
   </div>
 ));` },
   { num: '02', title: 'ex2.title', description: 'ex2.desc', concepts: ['store compartido'], docsHref: '/docs/fundamentals#reactividad', render: ex02,
-    code: `// store.ts — módulo compartido
+    code: `// store.ts — shared module
 export const cart = store({ items: 0 });
 
-// Componente A
+// Component A
 <button onclick={() => cart.items++}>
   Add ({cart.items})
 </button>
 
-// Componente B — se actualiza solo
-<p>{cart.items} items</p>` },
+// Component B — updates itself
+<p>{cart.items} items</p>`,
+    commentsKey: 'ex02' },
   { num: '03', title: 'ex3.title', description: 'ex3.desc', concepts: ['bindValue', 'onInput'], docsHref: '/docs/fundamentals#eventos', render: ex03,
     code: `const form = store({ name: '', email: '' });
 
@@ -665,7 +668,9 @@ mounted(() => {
   });
 
   return <p>{state.time}</p>;
-});` },
+});`,
+    commentsKey: 'ex08',
+    },
   { num: '09', title: 'ex9.title', description: 'ex9.desc', concepts: ['props', 'children'], docsHref: '/docs/fundamentals#componentes', render: ex09,
     code: `function Layout({ title, children }: {
   title: string;
@@ -689,8 +694,9 @@ mounted(() => {
   <button disabled={!ui.active}>Send</button>
 </div>
 
-// Solo cambia el class/disabled
-// del nodo afectado. Nada más.` },
+// Only the class/disabled changes
+// on the affected node. Nothing else.`,
+    commentsKey: 'ex10' },
 ];
 
 export const fullstackExamples: LiveExample[] = [
@@ -702,18 +708,20 @@ export const fullstackExamples: LiveExample[] = [
   }
 );
 
-// Cliente — RPC tipado:
+// Client — typed RPC:
 const users = await getUsers();
-// users: User[] — tipos e2e automáticos` },
+// users: User[] — automatic e2e types`,
+    commentsKey: 'ex11' },
   { num: '02', title: 'ex12.title', description: 'ex12.desc', concepts: ['swr', 'maxAge'], docsHref: '/docs/server-data#caching', render: ex12,
     code: `export const getProducts = server(
   { tags: ['products'], maxAge: 300 },
   async () => db.product.findMany()
 );
 
-// 1er fetch → red + caché
-// Siguientes → caché instantáneo (SWR)
-// Expira → stale + revalidación bg` },
+// 1st fetch → network + cache
+// Subsequent → instant cache (SWR)
+// Expired → stale + background revalidation`,
+    commentsKey: 'ex12' },
   { num: '03', title: 'ex13.title', description: 'ex13.desc', concepts: ['server()', 'mutations'], docsHref: '/docs/server-data#server', render: ex13,
     code: `const createPost = server(
   { tags: ['posts'] },
@@ -723,7 +731,8 @@ const users = await getUsers();
 );
 
 await createPost({ title, body });
-// Tags ['posts'] revalidados automáticamente` },
+// ['posts'] tags revalidated automatically`,
+    commentsKey: 'ex13' },
   { num: '04', title: 'ex14.title', description: 'ex14.desc', concepts: ['params', 'server()'], docsHref: '/docs/router#rutas', render: ex14,
     code: `export const routes = {
   get product() { return route('/products/:id'); },
@@ -744,24 +753,27 @@ const p = await getProduct(params.id);` },
   age: { type: 'number', min: 18 },
 });
 
-// Cliente:
+// Client:
 const result = UserSchema.validate(formData);
 
-// Servidor:
+// Server:
 const valid = UserSchema.validate(data);
-if (!valid.ok) return { errors: valid.errors };` },
+if (!valid.ok) return { errors: valid.errors };`,
+    commentsKey: 'ex15' },
   { num: '06', title: 'ex16.title', description: 'ex16.desc', concepts: ['optimistic', 'rollback'], docsHref: '/docs/server-data#caching', render: ex16,
     code: `async function handleToggle(id: string) {
   const item = todos.find(t => t.id === id)!;
   const prev = item.done;
-  item.done = !prev; // optimista
+  item.done = !prev; // optimistic
 
   try {
-    await toggleTodo(id); // servidor
+    await toggleTodo(id); // server
   } catch {
     item.done = prev; // rollback
   }
-}` },
+}`,
+    commentsKey: 'ex16',
+    },
   { num: '07', title: 'ex17.title', description: 'ex17.desc', concepts: ['upload', 'FormData'], docsHref: '/docs/server-data#server', render: ex17,
     code: `const uploadFile = server(
   { tags: ['files'] },
@@ -782,27 +794,30 @@ if (!valid.ok) return { errors: valid.errors };` },
   async () => db.stats.latest()
 );
 
-// El DOM se actualiza solo cuando el
-// servidor devuelve datos nuevos.
-// Sin WebSockets, sin suscripciones.` },
+// The DOM updates only when the
+// server returns new data.
+// No WebSockets, no subscriptions.`,
+    commentsKey: 'ex18' },
   { num: '09', title: 'ex19.title', description: 'ex19.desc', concepts: ['resume()', 'SSR'], docsHref: '/docs/rendering#resumibilidad', render: ex19,
-    code: `// HTML del servidor:
+    code: `// Server HTML:
 <div data-astra-store="cart"
      data-astra-value='{"items":3,"total":42}'>
   3 items · $42
 </div>
 
-// Cliente: resume()
-// 1. Lee el estado del HTML
-// 2. Store inicializado sin re-ejecutar
-// 3. Handlers se cargan on-demand` },
+// Client: resume()
+// 1. Reads the state from the HTML
+// 2. Store initialized without re-running
+// 3. Handlers load on-demand`,
+    commentsKey: 'ex19' },
   { num: '10', title: 'ex20.title', description: 'ex20.desc', concepts: ['SSG', 'pre-build'], docsHref: '/docs/rendering#ssg', render: ex20,
     code: `export const getPosts = server(
   { type: 'pre-build', tags: ['posts'] },
   async () => db.post.findMany()
 );
 
-// Build time: consulta ejecutada
-// HTML: datos incrustados (astra-data)
-// Cliente: 0 fetch, 0 KB de JS` },
+// Build time: query executed
+// HTML: embedded data (astra-data)
+// Client: 0 fetch, 0 KB of JS`,
+    commentsKey: 'ex20' },
 ];

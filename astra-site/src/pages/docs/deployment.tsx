@@ -42,7 +42,7 @@ export const DocsDeployment = component(() => (
 {
   "adapter": "node",   // node | vercel | cloudflare | static
   "apiPrefix": "/api/astra"
-}`} />
+}`} commentsKey="deployment.config" />
         <p>{i18n.t('dp.build.p')}</p>
 
         <h2 id="build">{i18n.t('sb.deployBuild')}</h2>
