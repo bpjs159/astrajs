@@ -7,7 +7,7 @@ import { CodeBlock } from '../../components/code-block.js';
 
 const docLayoutStyle = `
   .docs-layout{display:flex;min-height:100vh}
-  .docs-main{flex:1;margin-left:260px;padding:48px 56px;max-width:860px}
+  .docs-main{flex:1;min-width:0;margin-left:260px;padding:48px 56px;max-width:860px}
   @media(max-width:960px){.docs-main{margin-left:0;padding:32px 24px}}
   .docs-content h1{font-size:2rem;font-weight:800;color:#f7f7ff;margin-bottom:12px;letter-spacing:-.02em}
   .docs-content h2{font-size:1.3rem;font-weight:700;color:#f7f7ff;margin:40px 0 14px;padding-top:20px;border-top:1px solid rgba(255,255,255,.06);letter-spacing:-.01em}

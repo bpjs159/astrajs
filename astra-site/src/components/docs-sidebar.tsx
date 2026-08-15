@@ -187,6 +187,40 @@ if (typeof window !== 'undefined') {
   window.addEventListener('hashchange', syncNavHref);
 }
 
+// ── Drawer móvil (≤960px) ──────────────────────────────────────────────
+// En escritorio el sidebar queda fijo a la izquierda; en móvil se esconde
+// fuera de pantalla y se abre como drawer: botón flotante, backdrop, botón
+// de cierre y tecla Escape. Al navegar se cierra solo.
+const sbOpen = store({ open: false });
+
+/** Abre/cierra el drawer y bloquea el scroll del fondo en móvil. */
+const setSbOpen = (open: boolean) => {
+  sbOpen.open = open;
+  if (typeof document !== 'undefined') {
+    document.body.classList.toggle('sb-open', open);
+  }
+};
+
+if (typeof window !== 'undefined') {
+  const w = window as unknown as {
+    __sbKey?: (e: KeyboardEvent) => void;
+    __sbMq?: MediaQueryList;
+    __sbMqFn?: (e: MediaQueryListEvent) => void;
+  };
+  // Cierra el drawer al navegar (el sidebar se re-monta en cada página).
+  onRouteChange(() => setSbOpen(false));
+  // Dedupe para que HMR no acumule listeners duplicados.
+  if (w.__sbKey) window.removeEventListener('keydown', w.__sbKey);
+  w.__sbKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setSbOpen(false); };
+  window.addEventListener('keydown', w.__sbKey);
+  if (w.__sbMq && w.__sbMqFn) w.__sbMq.removeEventListener('change', w.__sbMqFn);
+  const mq = window.matchMedia('(min-width: 961px)');
+  const onMq = (e: MediaQueryListEvent) => { if (e.matches) setSbOpen(false); };
+  w.__sbMq = mq;
+  w.__sbMqFn = onMq;
+  mq.addEventListener('change', onMq);
+}
+
 if (typeof window !== 'undefined') {
   // ── Scroll-spy ──────────────────────────────────────────────────────────
   // Al hacer scroll en el contenido, el item activo sigue la sección que está
@@ -254,8 +288,19 @@ export const DocSidebar = component(() => {
     .docs-sidebar-footer a{display:flex;align-items:center;gap:8px;font-size:.78rem;color:#64748b;font-weight:500;transition:color .15s}
     .docs-sidebar-footer a:hover{color:#e2e8f0}
     [id]{scroll-margin-top:84px}
+    /* === DRAWER MÓVIL (≤960px) === */
+    .docs-sb-root{display:contents}
+    .docs-sb-toggle{display:none;position:fixed;bottom:20px;left:14px;z-index:40;width:44px;height:44px;align-items:center;justify-content:center;background:rgba(6,11,20,.92);border:1px solid rgba(255,255,255,.12);border-radius:12px;color:#e2e8f0;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+    .docs-sb-close{display:none;position:absolute;top:12px;right:12px;z-index:2;width:32px;height:32px;align-items:center;justify-content:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:#94a3b8;cursor:pointer}
+    .docs-sb-backdrop{display:none}
+    body.sb-open{overflow:hidden}
     @media(max-width:960px){
-      .docs-sidebar{display:none}
+      .docs-sidebar{transform:translateX(-105%);visibility:hidden;pointer-events:none;transition:transform .25s ease,visibility 0s linear .25s}
+      .docs-sidebar.open{transform:translateX(0);visibility:visible;pointer-events:auto;transition:transform .25s ease;box-shadow:0 0 80px rgba(0,0,0,.55)}
+      .docs-sb-toggle{display:flex}
+      .docs-sb-close{display:flex}
+      .docs-sb-backdrop{display:block;position:fixed;inset:0;z-index:45;background:rgba(2,4,9,.55);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);opacity:0;pointer-events:none;transition:opacity .25s ease}
+      .docs-sb-backdrop.open{opacity:1;pointer-events:auto}
     }
   `;
 
@@ -288,9 +333,21 @@ export const DocSidebar = component(() => {
   }
 
   return (
-    <aside class="docs-sidebar">
+    <div class="docs-sb-root">
       <style>{style}</style>
-      <nav>
+      <button class="docs-sb-toggle" onclick={() => setSbOpen(true)} aria-label="Docs index">
+        <Icon name="arrow-right" size={18} />
+      </button>
+      <div
+        class={dynamic(() => `docs-sb-backdrop${sbOpen.open ? ' open' : ''}`)}
+        onclick={() => setSbOpen(false)}
+        aria-hidden="true"
+      />
+      <aside class={dynamic(() => `docs-sidebar${sbOpen.open ? ' open' : ''}`)}>
+        <button class="docs-sb-close" onclick={() => setSbOpen(false)} aria-label="Close">
+          <Icon name="x" size={16} />
+        </button>
+        <nav>
         {docSections.map(section => (
           <div class="docs-sidebar-section">
             <div class={dynamic(() => `docs-sidebar-title${isSectionActive(navHref.href, section) ? ' active' : ''}`)}>
@@ -302,6 +359,8 @@ export const DocSidebar = component(() => {
                 class={dynamic(() => `docs-sidebar-item${isItemActive(navHref.href, item.href, idx) ? ' active' : ''}`)}
                 onclick={(e: Event) => {
                   e.preventDefault();
+                  // En móvil, elegir un item desde el drawer debe cerrarlo.
+                  setSbOpen(false);
                   const parts = item.href.split('#');
                   navigate(parts[0]);
                   if (parts[1]) {
@@ -352,6 +411,7 @@ export const DocSidebar = component(() => {
           <Icon name="star" size={13} /> 0.0 GitHub
         </a>
       </div>
-    </aside>
+      </aside>
+    </div>
   );
 });

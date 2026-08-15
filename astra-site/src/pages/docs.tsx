@@ -10,7 +10,7 @@ export const DocsPage = component(() => {
   const br = (key: string) => i18n.t(key).split('<br/>');
   const style = `
     .docs-layout{display:flex;min-height:100vh}
-    .docs-main{flex:1;margin-left:260px;padding:48px 56px;max-width:900px}
+    .docs-main{flex:1;min-width:0;margin-left:260px;padding:48px 56px;max-width:900px}
     .docs-right{position:fixed;top:64px;right:0;width:280px;padding:48px 36px;display:none}
     @media(min-width:1280px){.docs-right{display:block}}
     @media(max-width:960px){.docs-main{margin-left:0;padding:32px 24px}}

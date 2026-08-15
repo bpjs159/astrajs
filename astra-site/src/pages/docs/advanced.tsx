@@ -7,7 +7,7 @@ import { CodeBlock } from '../../components/code-block.js';
 
 const s = `
   .docs-layout{display:flex;min-height:100vh}
-  .docs-main{flex:1;margin-left:260px;padding:48px 56px;max-width:860px}
+  .docs-main{flex:1;min-width:0;margin-left:260px;padding:48px 56px;max-width:860px}
   @media(max-width:960px){.docs-main{margin-left:0;padding:32px 24px}}
   .docs-content h1{font-size:2rem;font-weight:800;color:#f7f7ff;margin-bottom:12px;letter-spacing:-.02em}
   .docs-content h2{font-size:1.3rem;font-weight:700;color:#f7f7ff;margin:40px 0 14px;padding-top:20px;border-top:1px solid rgba(255,255,255,.06);letter-spacing:-.01em}
@@ -22,6 +22,8 @@ const s = `
   .docs-content ul,.docs-content ol{padding-left:24px;margin-bottom:16px}
   .docs-content li{font-size:.88rem;color:#94a3b8;line-height:1.75;margin-bottom:6px}
   .docs-content .note{padding:14px 18px;background:rgba(139,77,255,.06);border-left:3px solid rgba(139,77,255,.3);border-radius:0 8px 8px 0;margin-bottom:20px;font-size:.84rem;color:#c4a0ff}
+  .docs-content table{width:100%;border-collapse:collapse;margin-bottom:24px;font-size:.82rem}
+  @media(max-width:960px){.docs-content table{display:block;overflow-x:auto;max-width:100%}}
 `;
 
 export const DocsAdvanced = component(() => (
