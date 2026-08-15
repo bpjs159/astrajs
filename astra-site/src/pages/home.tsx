@@ -85,16 +85,13 @@ state.products.push({ id: 1, name: 'Astra' });
 state.total += 1;`,
     server: `import { server } from '@astrajs/server';
 
-export const loadProducts = server(() => ({
-    type: 'pre-build',
-    tags: ['products'],
-    maxAge: 3600
-}), async () => {
-    const res = await fetch(
-        'https://api.example.com/products'
-    );
-    return res.json();
-});`,
+export const loadProducts = server(async () => {
+    return db.product.findMany();
+});
+
+// Usage — call it anywhere in the client:
+const products = await loadProducts();
+// products is Product[] — the type is inferred from the server`,
     css: `import { css } from '@astrajs/core';
 
 const cardStyle = css\`
@@ -126,7 +123,7 @@ function App() {
 
   const tabComments: Record<string, string | undefined> = {
     store: 'home.store',
-    server: undefined,
+    server: 'home.server',
     css: undefined,
     router: 'home.router',
   };

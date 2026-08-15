@@ -12,6 +12,12 @@ export const SNIPPET_COMMENTS_ROMANCE: Record<string, Record<string, string[]>> 
     fr: ['// Muter est réactif — le DOM se met à jour tout seul.'],
     it: ['// Mutare è reattivo — il DOM si aggiorna da solo.'],
   },
+  'home.server': {
+    es: ['// Uso: llámalo donde sea en el cliente:', '// products es Product[] — el tipo se infiere desde el servidor'],
+    pt: ['// Uso: chame em qualquer lugar do cliente:', '// products é Product[] — o tipo é inferido do servidor'],
+    fr: ['// Utilisation : appelez-le n\u2019importe où côté client :', '// products est Product[] — le type est inféré depuis le serveur'],
+    it: ['// Uso: chiamalo ovunque nel client:', '// products è Product[] — il tipo è inferito dal server'],
+  },
   'home.router': {
     es: ['// app.tsx — route() es reactivo: ruta activa ⇒ componente.', '// Sin archivo de rutas, sin config, sin switch.'],
     pt: ['// app.tsx — route() é reativo: rota ativa ⇒ componente.', '// Sem arquivo de rotas, sem config, sem switch.'],

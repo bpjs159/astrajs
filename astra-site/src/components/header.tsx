@@ -39,7 +39,7 @@ export const Header = component(() => {
     .lang-select option{background:#060b14;color:#e2e8f0}
     .header-nav > a{font-size:.82rem;font-weight:500;color:#94a3b8;padding:6px 14px;border-radius:8px;transition:color .15s,background .15s;letter-spacing:.01em;text-decoration:none}
     .header-nav > a:hover{color:#e2e8f0;background:rgba(255,255,255,.04)}
-    .header-nav .header-cta{display:inline-flex;align-items:center;gap:8px;font-size:.82rem;font-weight:600;color:#fff;background:linear-gradient(135deg,#8d4dff,#4d7cff);padding:6px 22px;border-radius:10px;transition:opacity .15s,transform .15s,box-shadow .15s;letter-spacing:.01em;cursor:pointer;border:none;text-decoration:none;height:32px;box-sizing:border-box}
+    .header-nav .header-cta{display:inline-flex;align-items:center;gap:8px;font-size:.82rem;font-weight:600;color:#fff;background:linear-gradient(135deg,#8d4dff,#4d7cff);padding:6px 22px;border-radius:10px;transition:opacity .15s,transform .15s,box-shadow .15s;letter-spacing:.01em;cursor:pointer;border:none;text-decoration:none;height:32px;box-sizing:border-box;white-space:nowrap;width:auto;flex-shrink:0}
     .header-nav .header-cta:hover{opacity:.92;transform:translateY(-2px);box-shadow:0 8px 30px rgba(139,77,255,.35);color:#fff;background:linear-gradient(135deg,#8d4dff,#4d7cff)}
     .header-mobile-btn{display:none;background:none;border:none;color:#e2e8f0;font-size:1.5rem;cursor:pointer;padding:4px}
     .header-mobile-menu{display:none;flex-direction:column;padding:12px 24px 24px;background:rgba(4,6,13,.95);border-bottom:1px solid rgba(255,255,255,.06)}

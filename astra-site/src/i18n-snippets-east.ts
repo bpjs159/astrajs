@@ -6,6 +6,10 @@ export const SNIPPET_COMMENTS_EAST: Record<string, Record<string, string[]>> = {
     ja: ['// ミューテーションはリアクティブ — DOM が自動更新されます。'],
     'zh-CN': ['// 变更即响应 — DOM 自行更新。'],
   },
+  'home.server': {
+    ja: ['// 使い方: クライアントのどこでも呼べる:', '// products は Product[] — 型はサーバーから推論される'],
+    'zh-CN': ['// 用法: 在客户端任意位置调用:', '// products 是 Product[] — 类型由服务端推断'],
+  },
   'home.router': {
     ja: ['// app.tsx — route() はリアクティブ：アクティブなルート ⇒ コンポーネント。', '// ルートファイル不要、設定不要、switch 不要。'],
     'zh-CN': ['// app.tsx — route() 是响应式的：激活路由 ⇒ 组件。', '// 无需路由文件、无需配置、无需 switch。'],

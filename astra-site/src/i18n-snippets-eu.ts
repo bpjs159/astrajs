@@ -6,6 +6,10 @@ export const SNIPPET_COMMENTS_EU: Record<string, Record<string, string[]>> = {
     de: ['// Mutieren ist reaktiv — das DOM aktualisiert sich selbst.'],
     ru: ['// Мутация реактивна — DOM обновляется сам.'],
   },
+  'home.server': {
+    de: ['// Verwendung: überall im Client aufrufbar:', '// products ist Product[] — der Typ wird vom Server inferiert'],
+    ru: ['// Использование: вызывайте где угодно в клиенте:', '// products — это Product[] — тип выводится с сервера'],
+  },
   'home.router': {
     de: ['// app.tsx — route() ist reaktiv: aktive Route ⇒ Komponente.', '// Keine Routendatei, keine Config, kein Switch.'],
     ru: ['// app.tsx — route() реактивен: активный маршрут ⇒ компонент.', '// Ни файла маршрутов, ни конфига, ни switch.'],
