@@ -51,22 +51,59 @@ Todos los frameworks corren en **build de producción**: `NODE_ENV=production`
 | `suites/react.mjs` | React | `createRoot` + `flushSync` + lista keyed |
 | `suites/vue.mjs` | Vue | `createApp` + array `reactive` + `v-for` keyed (render fn) |
 | `suites/solid.mjs` | Solid | `render` + `<Index>` (ver nota) |
-| `suites/angular.mjs` | Angular | `NgModule` + `*ngFor` + `ApplicationRef.tick()` |
+| `suites/angular.mjs` | Angular | `NgModule` + `@for track` + `ApplicationRef.tick()` |
 
 ## Resultados
 
 > Snapshot canónico — promedio de **2 corridas de producción** (medianas) ·
 > Node 22 + jsdom · Apple M4 Pro. Copiados en `/docs/comparison#benchmarks`;
 > **no hace falta re-correr el benchmark** para verlos (guarda también en
-> `results.json` / `results.md`).
+> `results.json` / `results.md`; bundles en `bundle-results.json`).
+
+### Tabla (10.000 filas)
 
 | Benchmark | AstraJS | React | Vue | Solid | Angular |
 |---|---|---|---|---|---|
-| Render 10.000 filas | **325.56 ms** | 555.63 ms | 359.92 ms | 504.96 ms | 2279.30 ms |
-| Actualizar 1 fila | **0.09 ms** | 20.94 ms | 24.08 ms | 1.61 ms | 4.77 ms |
-| Añadir 1.000 filas | **41.01 ms** | 56.25 ms | 65.96 ms | 43.62 ms | 557.21 ms |
-| Eliminar 1.000 filas | **48.64 ms** | 47.88 ms | 65.50 ms | 491.68 ms | 51.15 ms |
-| Reemplazar todo | **548.19 ms** | 798.16 ms | 594.73 ms | 71.32 ms | 2842.90 ms |
+| Render 10.000 filas | **247.36 ms** | 223.30 ms | 222.58 ms | 322.00 ms | 1602.20 ms |
+| Actualizar 1 fila | **0.08 ms** | 20.91 ms | 19.08 ms | 1.41 ms | 1.50 ms |
+| Actualizar las 10.000 filas | **27.86 ms** | 42.07 ms | 102.32 ms | 31.66 ms | 20.51 ms |
+| Añadir 1.000 filas | **31.15 ms** | 53.10 ms | 55.54 ms | 32.67 ms | 355.20 ms |
+| Eliminar 1.000 filas | **37.16 ms** | 40.88 ms | 45.82 ms | 306.19 ms | 40.23 ms |
+| Reemplazar todo | 401.23 ms | 557.89 ms | 447.72 ms | **54.50 ms** | 8632.82 ms |
+
+### Arranque y escalado
+
+| Benchmark | AstraJS | React | Vue | Solid | Angular |
+|---|---|---|---|---|---|
+| Bootstrap (app vacía) | **0.26 ms** | 9.29 ms | 8.19 ms | 6.59 ms | 27.17 ms |
+| Montar 1.000 componentes | 24.72 ms | 24.63 ms | **21.01 ms** | 20.31 ms | 34.28 ms |
+| Desmontar 10.000 filas | 149.01 ms | 160.12 ms | **137.03 ms** | 148.30 ms | 1462.28 ms |
+
+### Latencia de interacción
+
+| Benchmark | AstraJS | React | Vue | Solid | Angular |
+|---|---|---|---|---|---|
+| Click → DOM (fila 5.000) | **2.42 ms** | 61.32 ms | 60.58 ms | 43.79 ms | 40.40 ms |
+| Tecla → DOM | **0.15 ms** | 0.59 ms | 0.50 ms | 0.23 ms | 0.34 ms |
+| Toggle condicional (1.000 filas) | **1.44 ms** | 1.89 ms | 1.59 ms | 1.68 ms | 1.64 ms |
+
+### Memoria (proceso aislado, --expose-gc)
+
+| Benchmark | AstraJS | React | Vue | Solid | Angular |
+|---|---|---|---|---|---|
+| Delta de heap (render 10.000 filas) | 175.76 MB | 173.22 MB | 178.85 MB | 181.17 MB | **162.16 MB** |
+
+### Bundle (misma app de 10.000 filas, min + gzip)
+
+| Framework | min | gzip |
+|---|---|---|
+| AstraJS | **4.3 kB** | **1.9 kB** |
+| React | 189.1 kB | 59.0 kB |
+| Vue | 61.9 kB | 24.6 kB |
+| Solid | 11.9 kB | 4.7 kB |
+
+> Angular omitido en bundle: en producción se compila AOT con el Angular CLI
+> (su bundle JIT embebe el compilador y no es comparable).
 
 ## Notas de equidad
 
@@ -74,11 +111,21 @@ Todos los frameworks corren en **build de producción**: `NODE_ENV=production`
   10k filas y miden "tiempo hasta que el DOM cambia", no trabajo interno.
 - React usa `flushSync` para forzar el commit síncrono (sin `useTransition`),
   que es el camino más rápido y determinista para medir.
-- Angular usa el bootstrap clásico `NgModule` + plantilla `*ngFor`. Como las
+- Angular usa el bootstrap clásico `NgModule` + plantilla `@for track`. Como las
   operaciones del benchmark corren FUERA de `NgZone`, cada op llama
   `ApplicationRef.tick()` — el mismo ciclo de change detection completo que
   Zone.js programaría tras cada evento asíncrono en una app real. El bootstrap
   se hace por iteración (fuera de la medición) y el host es `<app-root>`.
+  **zone.js se importa dinámicamente dentro del factory**: sus parches
+  globales (timers/eventos) no contaminan a los demás suites.
+- Latencia (`click` / `input` / `toggle`): cada suite dispara el evento DOM
+  real (`.click()` o `dispatchEvent('input')`) y se mide hasta que el DOM lo
+  refleja (MutationObserver) — incluye handler + scheduler + commit.
+- Heap: se mide en un **proceso hijo fresco por framework** (`heap-probe.mjs`)
+  — un solo render por proceso, para que la retención de suscripciones de
+  iteraciones previas no contamine la línea base.
+- Bundle: `bundle.mjs` usa esbuild (minify, `NODE_ENV=production`) sobre la
+  misma app de 10.000 filas; reporta min + gzip. Angular se omite (AOT).
 - Solid usa `<Index>` (filas referencialmente estables) construidas con
   `document.createElement` + `insert(el, () => expr)` — exactamente lo que
   emite el compilador de plantillas de Solid. Es el patrón que la propia

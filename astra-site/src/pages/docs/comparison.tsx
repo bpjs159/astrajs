@@ -11,13 +11,92 @@ interface BenchOp {
   key: string;
   ms: Record<BenchFramework, number>;
 }
+
+// 10,000-row table operations.
 const BENCH_RESULTS: BenchOp[] = [
-  { key: 'cp.bm.op.render', ms: { AstraJS: 325.56, React: 555.63, Vue: 359.92, Angular: 2279.3, Solid: 504.96 } },
-  { key: 'cp.bm.op.update', ms: { AstraJS: 0.09, React: 20.94, Vue: 24.08, Angular: 4.77, Solid: 1.61 } },
-  { key: 'cp.bm.op.append', ms: { AstraJS: 41.01, React: 56.25, Vue: 65.96, Angular: 557.21, Solid: 43.62 } },
-  { key: 'cp.bm.op.remove', ms: { AstraJS: 48.64, React: 47.88, Vue: 65.5, Angular: 51.15, Solid: 491.68 } },
-  { key: 'cp.bm.op.replace', ms: { AstraJS: 548.19, React: 798.16, Vue: 594.73, Angular: 2842.9, Solid: 71.32 } },
+  { key: 'cp.bm.op.render', ms: { AstraJS: 247.36, React: 223.3, Vue: 222.58, Angular: 1602.2, Solid: 322.0 } },
+  { key: 'cp.bm.op.update', ms: { AstraJS: 0.08, React: 20.91, Vue: 19.08, Angular: 1.5, Solid: 1.41 } },
+  { key: 'cp.bm.op.updateAll', ms: { AstraJS: 27.86, React: 42.07, Vue: 102.32, Angular: 20.51, Solid: 31.66 } },
+  { key: 'cp.bm.op.append', ms: { AstraJS: 31.15, React: 53.1, Vue: 55.54, Angular: 355.2, Solid: 32.67 } },
+  { key: 'cp.bm.op.remove', ms: { AstraJS: 37.16, React: 40.88, Vue: 45.82, Angular: 40.23, Solid: 306.19 } },
+  { key: 'cp.bm.op.replace', ms: { AstraJS: 401.23, React: 557.89, Vue: 447.72, Angular: 8632.82, Solid: 54.5 } },
 ];
+
+// Startup & scale.
+const EXTRA_RESULTS: BenchOp[] = [
+  { key: 'cp.bm.op.bootstrap', ms: { AstraJS: 0.26, React: 9.29, Vue: 8.19, Angular: 27.17, Solid: 6.59 } },
+  { key: 'cp.bm.op.mount', ms: { AstraJS: 24.72, React: 24.63, Vue: 21.01, Angular: 34.28, Solid: 20.31 } },
+  { key: 'cp.bm.op.unmount', ms: { AstraJS: 149.01, React: 160.12, Vue: 137.03, Angular: 1462.28, Solid: 148.3 } },
+];
+
+// Interaction latency (event → DOM reflected).
+const LATENCY_RESULTS: BenchOp[] = [
+  { key: 'cp.bm.op.click', ms: { AstraJS: 2.42, React: 61.32, Vue: 60.58, Angular: 40.4, Solid: 43.79 } },
+  { key: 'cp.bm.op.input', ms: { AstraJS: 0.15, React: 0.59, Vue: 0.5, Angular: 0.34, Solid: 0.23 } },
+  { key: 'cp.bm.op.toggle', ms: { AstraJS: 1.44, React: 1.89, Vue: 1.59, Angular: 1.64, Solid: 1.68 } },
+];
+
+// Memory (isolated process, --expose-gc).
+const HEAP_RESULTS: { ms: Record<BenchFramework, number> } = {
+  ms: { AstraJS: 175.76, React: 173.22, Vue: 178.85, Angular: 162.16, Solid: 181.17 },
+};
+
+// Bundle size — same 10,000-row table app, min + gzip. Angular omitted (AOT).
+const BUNDLE_RESULTS = [
+  { framework: 'AstraJS', min: 4.3, gzip: 1.9 },
+  { framework: 'React', min: 189.1, gzip: 59.0 },
+  { framework: 'Vue', min: 61.9, gzip: 24.6 },
+  { framework: 'Solid', min: 11.9, gzip: 4.7 },
+] as const;
+
+// Composite score: per benchmark, best = 100 and the rest scale down; the
+// score is the average across all ms benchmarks.
+const ALL_MS_BENCHES = [...BENCH_RESULTS, ...EXTRA_RESULTS, ...LATENCY_RESULTS];
+function scoreOf(f: BenchFramework): number {
+  let sum = 0;
+  for (const b of ALL_MS_BENCHES) {
+    const best = Math.min(...BENCH_FRAMEWORKS.map((x) => b.ms[x]));
+    sum += best / b.ms[f];
+  }
+  return (sum / ALL_MS_BENCHES.length) * 100;
+}
+
+// Shared renderers (called directly, not as JSX components).
+const BenchTable = (rows: BenchOp[], unit = 'ms') => (
+  <table>
+    <tr><th>{i18n.t('cp.bm.op')}</th>{BENCH_FRAMEWORKS.map((f) => <th>{f === 'AstraJS' ? <strong>AstraJS</strong> : f}</th>)}</tr>
+    {rows.map((b) => (
+      <tr>
+        <td><strong>{i18n.t(b.key)}</strong></td>
+        {BENCH_FRAMEWORKS.map((f) => (
+          <td>{f === 'AstraJS' ? <span class="win">{b.ms[f].toFixed(2)} {unit}</span> : `${b.ms[f].toFixed(2)} ${unit}`}</td>
+        ))}
+      </tr>
+    ))}
+  </table>
+);
+
+const BenchChart = (rows: BenchOp[], unit = 'ms') => (
+  <div class="bench-chart">
+    {rows.map((b) => {
+      const max = Math.max(...BENCH_FRAMEWORKS.map((f) => b.ms[f]));
+      return (
+        <div class="bench-row">
+          <div class="bench-op-label">{i18n.t(b.key)}<span class="bench-unit">{unit === 'MB' ? 'MB' : i18n.t('cp.bm.ms')}</span></div>
+          {BENCH_FRAMEWORKS.map((f) => (
+            <div class="bench-line">
+              <span class="bench-name">{f}</span>
+              <div class="bench-track">
+                <div class={`bench-bar${f === 'AstraJS' ? ' astra' : ''}`} style={{ width: `${Math.max(1.2, (b.ms[f] / max) * 100)}%` }}></div>
+              </div>
+              <span class="bench-val">{b.ms[f].toFixed(2)} {unit}</span>
+            </div>
+          ))}
+        </div>
+      );
+    })}
+  </div>
+);
 
 const s = `
   .docs-layout{display:flex;min-height:100vh}
@@ -70,38 +149,67 @@ export const DocsComparison = component(() => (
         <p>{i18n.t('cp.bm.intro')}</p>
 
         <h3>{i18n.t('cp.bm.table.title')}</h3>
+        {BenchTable(BENCH_RESULTS)}
+        {BenchChart(BENCH_RESULTS)}
+
+        <h3>{i18n.t('cp.bm.sec.extra')}</h3>
+        {BenchTable(EXTRA_RESULTS)}
+        {BenchChart(EXTRA_RESULTS)}
+
+        <h3>{i18n.t('cp.bm.sec.latency')}</h3>
+        {BenchTable(LATENCY_RESULTS)}
+        {BenchChart(LATENCY_RESULTS)}
+
+        <h3>{i18n.t('cp.bm.sec.heap')}</h3>
         <table>
-          <tr><th>{i18n.t('cp.bm.op')}</th><th><strong>AstraJS</strong></th><th>React</th><th>Vue</th><th>Angular</th><th>Solid</th></tr>
-          {BENCH_RESULTS.map((b) => (
+          <tr><th>{i18n.t('cp.bm.op')}</th>{BENCH_FRAMEWORKS.map((f) => <th>{f === 'AstraJS' ? <strong>AstraJS</strong> : f}</th>)}</tr>
+          <tr>
+            <td><strong>{i18n.t('cp.bm.op.heap')}</strong></td>
+            {BENCH_FRAMEWORKS.map((f) => (
+              <td>{f === 'AstraJS' ? <span class="win">{HEAP_RESULTS.ms[f].toFixed(0)} MB</span> : `${HEAP_RESULTS.ms[f].toFixed(0)} MB`}</td>
+            ))}
+          </tr>
+        </table>
+        <p>{i18n.t('cp.bm.heap.note')}</p>
+
+        <h3>{i18n.t('cp.bm.sec.bundle')}</h3>
+        <table>
+          <tr><th>Framework</th><th>min</th><th>gzip</th></tr>
+          {BUNDLE_RESULTS.map((b) => (
             <tr>
-              <td><strong>{i18n.t(b.key)}</strong></td>
-              <td><span class="win">{b.ms.AstraJS.toFixed(2)} ms</span></td>
-              <td>{b.ms.React.toFixed(2)} ms</td>
-              <td>{b.ms.Vue.toFixed(2)} ms</td>
-              <td>{b.ms.Angular.toFixed(2)} ms</td>
-              <td>{b.ms.Solid.toFixed(2)} ms</td>
+              <td><strong>{b.framework}</strong></td>
+              <td>{b.min} kB</td>
+              <td>{b.gzip} kB</td>
             </tr>
           ))}
         </table>
-
         <div class="bench-chart">
-          {BENCH_RESULTS.map((b) => {
-            const max = Math.max(...BENCH_FRAMEWORKS.map((f) => b.ms[f]));
+          {BUNDLE_RESULTS.map((b) => {
+            const max = Math.max(...BUNDLE_RESULTS.map((x) => x.gzip));
             return (
-              <div class="bench-row">
-                <div class="bench-op-label">{i18n.t(b.key)}<span class="bench-unit">{i18n.t('cp.bm.ms')}</span></div>
-                {BENCH_FRAMEWORKS.map((f) => (
-                  <div class="bench-line">
-                    <span class="bench-name">{f}</span>
-                    <div class="bench-track">
-                      <div class={`bench-bar${f === 'AstraJS' ? ' astra' : ''}`} style={{ width: `${Math.max(1.2, (b.ms[f] / max) * 100)}%` }}></div>
-                    </div>
-                    <span class="bench-val">{b.ms[f].toFixed(2)} ms</span>
-                  </div>
-                ))}
+              <div class="bench-line">
+                <span class="bench-name">{b.framework}</span>
+                <div class="bench-track">
+                  <div class={`bench-bar${b.framework === 'AstraJS' ? ' astra' : ''}`} style={{ width: `${Math.max(1.2, (b.gzip / max) * 100)}%` }}></div>
+                </div>
+                <span class="bench-val">{b.gzip} kB gzip</span>
               </div>
             );
           })}
+        </div>
+        <p>{i18n.t('cp.bm.bundle.note')}</p>
+
+        <h3>{i18n.t('cp.bm.sec.score')}</h3>
+        <div class="bench-chart">
+          {BENCH_FRAMEWORKS.map((f) => (
+            <div class="bench-line">
+              <span class="bench-name">{f}</span>
+              <div class="bench-track">
+                <div class={`bench-bar${f === 'AstraJS' ? ' astra' : ''}`} style={{ width: `${Math.min(100, scoreOf(f))}%` }}></div>
+              </div>
+              <span class="bench-val">{scoreOf(f).toFixed(0)}%</span>
+            </div>
+          ))}
         </div>
 
         <h3>{i18n.t('cp.bm.key.title')}</h3>

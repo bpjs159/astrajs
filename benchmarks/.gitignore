@@ -1,5 +1,7 @@
 node_modules/
 .npm-cache/
 run.log
+run1.log
+run2.log
 results.latest.json
 results.latest.md

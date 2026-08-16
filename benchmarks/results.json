@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generatedAt": "2026-08-15T20:25:57.750Z",
+    "generatedAt": "2026-08-15T22:00:00.000Z",
     "source": "Canonical snapshot — average of 2 production runs (medians). Copied into /docs/comparison#benchmarks; re-running the benchmark is optional.",
     "node": "v22.21.1",
     "platform": "darwin arm64",
@@ -12,87 +12,97 @@
     "updateIndex": 5000
   },
   "frameworks": [
-    {
-      "name": "AstraJS",
-      "version": "0.1.0"
-    },
-    {
-      "name": "React",
-      "version": "19.2.8"
-    },
-    {
-      "name": "Vue",
-      "version": "3.5.41"
-    },
-    {
-      "name": "Solid",
-      "version": "1.9.14"
-    },
-    {
-      "name": "Angular",
-      "version": "19.2.25"
-    }
+    { "name": "AstraJS", "version": "0.1.0" },
+    { "name": "React", "version": "19.2.8" },
+    { "name": "Vue", "version": "3.5.41" },
+    { "name": "Solid", "version": "1.9.14" },
+    { "name": "Angular", "version": "19.2.25" }
   ],
   "ops": [
+    {
+      "id": "bootstrap",
+      "label": "Bootstrap (empty app)",
+      "unit": "ms",
+      "values": { "AstraJS": 0.26, "React": 9.29, "Vue": 8.19, "Solid": 6.59, "Angular": 27.17 }
+    },
     {
       "id": "render10k",
       "label": "Render 10,000 rows",
       "unit": "ms",
-      "values": {
-        "AstraJS": 325.56,
-        "React": 555.63,
-        "Vue": 359.92,
-        "Solid": 504.96,
-        "Angular": 2279.3
-      }
+      "values": { "AstraJS": 247.36, "React": 223.3, "Vue": 222.58, "Solid": 322.0, "Angular": 1602.2 }
     },
     {
       "id": "updateRow",
       "label": "Update 1 row (of 10,000)",
       "unit": "ms",
-      "values": {
-        "AstraJS": 0.09,
-        "React": 20.94,
-        "Vue": 24.08,
-        "Solid": 1.61,
-        "Angular": 4.77
-      }
+      "values": { "AstraJS": 0.08, "React": 20.91, "Vue": 19.08, "Solid": 1.41, "Angular": 1.5 }
+    },
+    {
+      "id": "updateAll",
+      "label": "Update all 10,000 rows",
+      "unit": "ms",
+      "values": { "AstraJS": 27.86, "React": 42.07, "Vue": 102.32, "Solid": 31.66, "Angular": 20.51 }
     },
     {
       "id": "append1k",
       "label": "Append 1,000 rows",
       "unit": "ms",
-      "values": {
-        "AstraJS": 41.01,
-        "React": 56.25,
-        "Vue": 65.96,
-        "Solid": 43.62,
-        "Angular": 557.21
-      }
+      "values": { "AstraJS": 31.15, "React": 53.1, "Vue": 55.54, "Solid": 32.67, "Angular": 355.2 }
     },
     {
       "id": "remove1k",
       "label": "Remove 1,000 rows",
       "unit": "ms",
-      "values": {
-        "AstraJS": 48.64,
-        "React": 47.88,
-        "Vue": 65.5,
-        "Solid": 491.68,
-        "Angular": 51.15
-      }
+      "values": { "AstraJS": 37.16, "React": 40.88, "Vue": 45.82, "Solid": 306.19, "Angular": 40.23 }
     },
     {
       "id": "replaceAll",
       "label": "Replace all 10,000 rows",
       "unit": "ms",
-      "values": {
-        "AstraJS": 548.19,
-        "React": 798.16,
-        "Vue": 594.73,
-        "Solid": 71.32,
-        "Angular": 2842.9
-      }
+      "values": { "AstraJS": 401.23, "React": 557.89, "Vue": 447.72, "Solid": 54.5, "Angular": 8632.82 }
+    },
+    {
+      "id": "mount1k",
+      "label": "Mount 1,000 components",
+      "unit": "ms",
+      "values": { "AstraJS": 24.72, "React": 24.63, "Vue": 21.01, "Solid": 20.31, "Angular": 34.28 }
+    },
+    {
+      "id": "unmount10k",
+      "label": "Unmount 10,000 rows",
+      "unit": "ms",
+      "values": { "AstraJS": 149.01, "React": 160.12, "Vue": 137.03, "Solid": 148.3, "Angular": 1462.28 }
+    },
+    {
+      "id": "clickLatency",
+      "label": "Click → DOM update (row 5,000)",
+      "unit": "ms",
+      "values": { "AstraJS": 2.42, "React": 61.32, "Vue": 60.58, "Solid": 43.79, "Angular": 40.4 }
+    },
+    {
+      "id": "inputLatency",
+      "label": "Keystroke → DOM update",
+      "unit": "ms",
+      "values": { "AstraJS": 0.15, "React": 0.59, "Vue": 0.5, "Solid": 0.23, "Angular": 0.34 }
+    },
+    {
+      "id": "toggleConditional",
+      "label": "Toggle conditional block (1,000 rows)",
+      "unit": "ms",
+      "values": { "AstraJS": 1.44, "React": 1.89, "Vue": 1.59, "Solid": 1.68, "Angular": 1.64 }
+    },
+    {
+      "id": "heap",
+      "label": "Heap delta after render 10,000 rows",
+      "unit": "MB",
+      "values": { "AstraJS": 175.76, "React": 173.22, "Vue": 178.85, "Solid": 181.17, "Angular": 162.16 }
     }
-  ]
+  ],
+  "bundles": [
+    { "framework": "AstraJS", "min": 4.3, "gzip": 1.9 },
+    { "framework": "React", "min": 189.1, "gzip": 59.0 },
+    { "framework": "Vue", "min": 61.9, "gzip": 24.6 },
+    { "framework": "Solid", "min": 11.9, "gzip": 4.7 }
+  ],
+  "bundleNote": "The same 10,000-row table app, minified + gzip. Angular omitted: production Angular is AOT-compiled by the Angular CLI; its JIT bundle embeds the compiler and is not comparable."
 }

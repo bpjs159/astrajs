@@ -5,7 +5,8 @@
   "description": "AstraJS vs React vs Vue vs Solid — DOM benchmark PoC (jsdom, no paint). Used to feed the /docs/comparison benchmarks section.",
   "type": "module",
   "scripts": {
-    "start": "NODE_ENV=production node --import ./register-solid.mjs run.mjs"
+    "start": "NODE_ENV=production node --expose-gc --import ./register-solid.mjs run.mjs",
+    "bundle": "NODE_ENV=production node bundle.mjs"
   },
   "dependencies": {
     "@angular/common": "^19.2.25",
@@ -19,5 +20,8 @@
     "solid-js": "^1.9.14",
     "vue": "^3.5.41",
     "zone.js": "^0.15.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
   }
 }

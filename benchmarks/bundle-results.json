@@ -1,0 +1,28 @@
+{
+  "meta": {
+    "generatedAt": "2026-08-15T21:12:42.231Z",
+    "note": "Minified + gzip (level 9) bundles for the same 10,000-row table app. Angular omitted: production Angular is AOT-compiled by the Angular CLI; its JIT bundle embeds the compiler and is not comparable."
+  },
+  "bundles": [
+    {
+      "framework": "AstraJS",
+      "min": 4399,
+      "gzip": 1951
+    },
+    {
+      "framework": "React",
+      "min": 193629,
+      "gzip": 60376
+    },
+    {
+      "framework": "Vue",
+      "min": 63386,
+      "gzip": 25224
+    },
+    {
+      "framework": "Solid",
+      "min": 12231,
+      "gzip": 4823
+    }
+  ]
+}
