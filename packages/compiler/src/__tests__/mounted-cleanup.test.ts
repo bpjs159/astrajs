@@ -1,5 +1,5 @@
 /**
- * @astrajs/compiler — mounted() Cleanup Auto-Wiring Tests
+ * @bpjs159/compiler — mounted() Cleanup Auto-Wiring Tests
  */
 import { describe, it, expect } from 'vitest';
 import { autoWrapMountedCleanup } from '../transformers/mounted-cleanup.js';

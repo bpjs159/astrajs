@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Promotes the @astrajs packages from one dist-tag to another WITHOUT
+ * Promotes the @astra packages from one dist-tag to another WITHOUT
  * re-uploading (npm does not allow publishing the same version twice).
  *
  * Usage:

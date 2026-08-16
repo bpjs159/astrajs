@@ -3,7 +3,7 @@
  *
  * `faq` is a folded constant: no fetch, no async, no runtime model call.
  */
-import { component } from '@astrajs/core';
+import { component } from '@bpjs159/core';
 import { faq } from './server.js';
 
 interface FaqItem {

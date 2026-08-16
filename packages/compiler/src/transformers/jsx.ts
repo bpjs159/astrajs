@@ -1,5 +1,5 @@
 /**
- * @astrajs/compiler — JSX → Vanilla DOM Transformer
+ * @bpjs159/compiler — JSX → Vanilla DOM Transformer
  *
  * ## Transformation Pipeline
  *
@@ -21,7 +21,7 @@
  *
  * **Output (Vanilla JS + Bindings):**
  * ```js
- * import { bindText } from '@astrajs/core';
+ * import { bindText } from '@bpjs159/core';
  *
  * const App = () => {
  *   const _el0 = document.createElement('div');
@@ -157,7 +157,7 @@ const ROUTER_REACTIVE_IDS = new Set(['route', 'fallbackRoute', 'params']);
  *
  * **3. Optimisation:**
  *    - Expressions already wrapped in `dynamic(...)` are skipped
- *    - `dynamic` is auto-imported from `@astrajs/core` when needed
+ *    - `dynamic` is auto-imported from `@bpjs159/core` when needed
  *
  * @param source  — The full source code of a .tsx/.jsx file.
  * @param reactiveVars — Set of variable names from `store()` declarations.
@@ -442,7 +442,7 @@ export function autoWrapDynamic(
  *
  * **Output (AST-injected):**
  * ```ts
- * import { memo } from '@astrajs/core';
+ * import { memo } from '@bpjs159/core';
  * const total = memo(() => ui.x + ui.y);
  * ```
  *
@@ -810,7 +810,7 @@ export function transformJSX(
   if (needsBindList) imports.push('bindList');
 
   if (imports.length > 0) {
-    result = ensureImport(result, '@astrajs/core', imports);
+    result = ensureImport(result, '@bpjs159/core', imports);
   }
 
   return { code: result, needsDynamic, needsBindText, needsBindAttr, needsBindValue, needsBindList };

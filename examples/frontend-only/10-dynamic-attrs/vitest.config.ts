@@ -8,10 +8,10 @@ export default defineConfig({
   resolve: {
     conditions: ['development'],
     alias: [
-      { find: '@astrajs/core/jsx-dev-runtime', replacement: path.resolve(root, 'packages/core/src/jsx-dev-runtime.ts') },
-      { find: '@astrajs/core/jsx-runtime', replacement: path.resolve(root, 'packages/core/src/jsx-runtime.ts') },
-      { find: '@astrajs/core', replacement: path.resolve(root, 'packages/core/src/index.ts') },
-      { find: '@astrajs/compiler/css', replacement: path.resolve(root, 'packages/compiler/src/css.ts') },
+      { find: '@bpjs159/core/jsx-dev-runtime', replacement: path.resolve(root, 'packages/core/src/jsx-dev-runtime.ts') },
+      { find: '@bpjs159/core/jsx-runtime', replacement: path.resolve(root, 'packages/core/src/jsx-runtime.ts') },
+      { find: '@bpjs159/core', replacement: path.resolve(root, 'packages/core/src/index.ts') },
+      { find: '@bpjs159/compiler/css', replacement: path.resolve(root, 'packages/compiler/src/css.ts') },
     ],
   },
 });

@@ -1,6 +1,10 @@
 {
-  "name": "@astrajs/ssr",
+  "name": "@bpjs159/ssr",
   "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bpjs159/astrajs.git"
+  },
   "description": "AstraJS SSR — Server-side renderer, SSG crawler, HTML stringifier, ISR",
   "type": "module",
   "exports": {
@@ -25,9 +29,9 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@astrajs/core": "0.1.0",
-    "@astrajs/router": "0.1.0",
-    "@astrajs/server": "0.1.0"
+    "@bpjs159/core": "0.1.0",
+    "@bpjs159/router": "0.1.0",
+    "@bpjs159/server": "0.1.0"
   },
   "devDependencies": {
     "typescript": "^5.5.0",

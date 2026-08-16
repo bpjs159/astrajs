@@ -1,4 +1,4 @@
-import { component } from '@astrajs/core';
+import { component } from '@bpjs159/core';
 
 /**
  * Icon — vector icons in the "flow" style of the original sprite:

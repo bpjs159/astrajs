@@ -23,7 +23,7 @@
 
     /* JSX */
     "jsx": "preserve",
-    "jsxImportSource": "@astrajs/core",
+    "jsxImportSource": "@bpjs159/core",
 
     /* Emit */
     "declaration": true,

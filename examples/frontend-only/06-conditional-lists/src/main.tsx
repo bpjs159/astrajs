@@ -16,7 +16,7 @@
  * Zero-VDOM: `dynamic()` re-evaluates the expression when tracked
  * stores change, surgically updating only the affected DOM node.
  */
-import { component, store } from '@astrajs/core';
+import { component, store } from '@bpjs159/core';
 import { styles } from './styles.js';
 
 interface Task {

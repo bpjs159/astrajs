@@ -1,5 +1,5 @@
 /**
- * @astrajs/server — RPC Runtime
+ * @bpjs159/server — RPC Runtime
  *
  * Client-side fetch wrapper and server-side handler registry for
  * the `server()` macro. The compiler transforms `server()` calls
@@ -11,14 +11,14 @@
  * ### Client Side
  * ```ts
  * // Transformed from: const getData = server(async (id: string) => db.find(id));
- * import { rpcClient } from '@astrajs/server';
+ * import { rpcClient } from '@bpjs159/server';
  * const getData = rpcClient('/api/astra/getData');
  * // → getData('42') → fetch('/api/astra/getData', { method:'POST', body:'["42"]' })
  * ```
  *
  * ### Server Side
  * ```ts
- * import { rpcHandler } from '@astrajs/server';
+ * import { rpcHandler } from '@bpjs159/server';
  * rpcHandler('getData', async (args) => {
  *   const [id] = args;
  *   return db.find(id);

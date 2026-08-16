@@ -9,8 +9,8 @@
  * Si el post existe pero es de otro autor → 404 contextual ("orphan")
  * con enlace al autor correcto.
  */
-import { component } from '@astrajs/core';
-import { params, Link } from '@astrajs/router';
+import { component } from '@bpjs159/core';
+import { params, Link } from '@bpjs159/router';
 import { db } from '../db.js';
 import { BreadcrumbsMarkup } from '../components/site-chrome.js';
 import { PostCardMarkup } from '../components/post-card.js';

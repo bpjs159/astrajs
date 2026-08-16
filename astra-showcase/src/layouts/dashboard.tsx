@@ -1,4 +1,4 @@
-import { component } from '@astrajs/core';
+import { component } from '@bpjs159/core';
 import { Sidebar } from '../components/sidebar.js';
 import { DashboardPage } from '../pages/dashboard.js';
 import { ProductsPage } from '../pages/products.js';

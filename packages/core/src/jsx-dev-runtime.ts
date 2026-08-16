@@ -1,5 +1,5 @@
 /**
- * @astrajs/core — JSX Dev Runtime
+ * @bpjs159/core — JSX Dev Runtime
  */
 
 export {

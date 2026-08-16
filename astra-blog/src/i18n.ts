@@ -2,11 +2,11 @@
  * astra-blog — i18n
  *
  * Internacionalización del chrome del blog (nav, hero, secciones,
- * footer, filtros) con el módulo built-in @astrajs/i18n.
+ * footer, filtros) con el módulo built-in @bpjs159/i18n.
  * El contenido de los artículos viene de la base de datos pre-construida
  * y se mantiene en español — el chrome de la UI se traduce en vivo.
  */
-import { createI18n } from '@astrajs/i18n';
+import { createI18n } from '@bpjs159/i18n';
 import { db } from './db.js';
 
 export const i18n = createI18n({

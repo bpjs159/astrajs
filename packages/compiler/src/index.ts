@@ -1,5 +1,5 @@
 /**
- * @astrajs/compiler — Public API Entry Point
+ * @bpjs159/compiler — Public API Entry Point
  *
  * The compiler is a Vite plugin that operates in three phases:
  * 1. **JSX → Vanilla DOM** — Transforms JSX expressions into
@@ -13,7 +13,7 @@
  * ```ts
  * // vite.config.ts
  * import { defineConfig } from 'vite';
- * import astra from '@astrajs/core/vite';
+ * import astra from '@bpjs159/core/vite';
  *
  * export default defineConfig({
  *   plugins: [astra({ cssPrefix: 'app-' })]

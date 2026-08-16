@@ -1,10 +1,10 @@
 /**
- * @astrajs/router — Reactive path state
+ * @bpjs159/router — Reactive path state
  *
  * Shared reactive store so route() calls inside component()
  * re-evaluate when navigate() changes the path.
  */
-import { store } from '@astrajs/core';
+import { store } from '@bpjs159/core';
 
 export const _pathState = store({ path: '/' });
 

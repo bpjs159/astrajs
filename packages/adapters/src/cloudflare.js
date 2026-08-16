@@ -38,11 +38,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createCloudflareHandler = createCloudflareHandler;
 /**
- * @astrajs/adapters — Cloudflare (edge) handler
+ * @bpjs159/adapters — Cloudflare (edge) handler
  *
  * Produces the default export for a Cloudflare Worker / Pages Function:
  *
- *   import { createCloudflareHandler } from '@astrajs/adapters/edge';
+ *   import { createCloudflareHandler } from '@bpjs159/adapters/edge';
  *   export default createCloudflareHandler({ apiPrefix: '/api/astra' });
  *
  * Static assets are served by Cloudflare's own static pipeline (Pages

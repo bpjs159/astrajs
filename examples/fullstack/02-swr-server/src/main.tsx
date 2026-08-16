@@ -1,7 +1,7 @@
 // 02 — SWR + Server · Stale-While-Revalidate with server functions
-import { component, swr } from '@astrajs/core';
-import type { SWRState } from '@astrajs/core';
-import { server } from '@astrajs/server';
+import { component, swr } from '@bpjs159/core';
+import type { SWRState } from '@bpjs159/core';
+import { server } from '@bpjs159/server';
 
 interface DashboardStats {
   totalUsers: number;

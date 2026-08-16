@@ -1,6 +1,10 @@
 {
-  "name": "@astrajs/schema",
+  "name": "@bpjs159/schema",
   "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bpjs159/astrajs.git"
+  },
   "description": "AstraJS Schema — Declarative validation with inferred types",
   "type": "module",
   "exports": {
@@ -24,7 +28,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@astrajs/core": "0.1.0"
+    "@bpjs159/core": "0.1.0"
   },
   "license": "MIT",
   "publishConfig": {

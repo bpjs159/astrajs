@@ -1,4 +1,4 @@
-import { component, dynamic } from '@astrajs/core';
+import { component, dynamic } from '@bpjs159/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
 import { DocRightToc } from '../../components/doc-right-toc.js';
 import { i18n } from '../../i18n.js';
@@ -43,7 +43,7 @@ export const DocsCli = component(() => (
         <h2 id="crear-proyecto">{i18n.t('sb.cliCreate')}</h2>
         <p>{i18n.t('cl.create.p')}</p>
         <CodeBlock code={`astra my-app
-npx @astrajs/cli@latest my-app
+npx @bpjs159/cli@latest my-app
 pnpm create astrajs my-app`} />
 
         <h3>{i18n.t('cl.run.title')}</h3>
@@ -59,7 +59,7 @@ astra test       # vitest run`} />
 
 ◇ Project name: my-app
 ◇ Select a template:
-   1. minimal    — Just the essentials — @astrajs/core + @astrajs/compiler
+   1. minimal    — Just the essentials — @bpjs159/core + @bpjs159/compiler
    2. frontend   — SPA building blocks — router, form, schema, validation
    3. fullstack  — Everything — server() RPC, SSR/SSG/ISR
    Enter a number (1-3): 3
@@ -77,17 +77,17 @@ Happy building!`} />
           <tr><th>Template</th><th>Packages</th><th>{i18n.t('rr.th4')}</th></tr>
           <tr>
             <td><strong>minimal</strong></td>
-            <td><code>@astrajs/core</code> + <code>@astrajs/compiler</code></td>
+            <td><code>@bpjs159/core</code> + <code>@bpjs159/compiler</code></td>
             <td>{i18n.t('cl.cell.minimal')}</td>
           </tr>
           <tr>
             <td><strong>frontend</strong></td>
-            <td>+ <code>@astrajs/router</code>, <code>@astrajs/form</code>, <code>@astrajs/schema</code>, <code>@astrajs/validation</code></td>
+            <td>+ <code>@bpjs159/router</code>, <code>@bpjs159/form</code>, <code>@bpjs159/schema</code>, <code>@bpjs159/validation</code></td>
             <td>{i18n.t('cl.cell.frontend')}</td>
           </tr>
           <tr>
             <td><strong>fullstack</strong></td>
-            <td>+ <code>@astrajs/server</code>, <code>@astrajs/ssr</code></td>
+            <td>+ <code>@bpjs159/server</code>, <code>@bpjs159/ssr</code></td>
             <td>{i18n.t('cl.cell.fullstack')}</td>
           </tr>
         </table>
@@ -120,8 +120,8 @@ astra my-app --dry-run`} />
         <p>{i18n.t('cl.structure.p.a')}<code>--template fullstack</code>{i18n.t('cl.structure.p.b')}</p>
         <CodeBlock code={`my-app/
 ├── index.html          → points to /src/app.tsx
-├── package.json        → @astrajs/* deps + dev/build scripts
-├── tsconfig.json       → jsx: react-jsx, jsxImportSource: @astrajs/core
+├── package.json        → @bpjs159/* deps + dev/build scripts
+├── tsconfig.json       → jsx: react-jsx, jsxImportSource: @bpjs159/core
 ├── vite.config.ts      → astra({ apiPrefix: '/api/astra' })
 ├── .gitignore
 ├── README.md           → getting-started guide for this project
@@ -135,12 +135,12 @@ astra my-app --dry-run`} />
         └── posts.server.ts → typed RPC with cache tags`} />
 
         <h3>{i18n.t('cl.mono.title')}</h3>
-        <p>{i18n.t('cl.mono.a')}<code>packages/</code>{i18n.t('cl.mono.b')}<code>@astrajs/*</code>{i18n.t('cl.mono.c')}</p>
+        <p>{i18n.t('cl.mono.a')}<code>packages/</code>{i18n.t('cl.mono.b')}<code>@bpjs159/*</code>{i18n.t('cl.mono.c')}</p>
 
         <h2>{i18n.t('cl.gen.title')}</h2>
         <p>{i18n.t('cl.gen.a')}<code>server()</code>{i18n.t('cl.gen.b')}</p>
         <CodeBlock code={`// src/server/posts.server.ts — ONE function, split by the compiler
-import { server } from '@astrajs/server';
+import { server } from '@bpjs159/server';
 
 export const getPosts = server(
   { tags: ['posts'], maxAge: 60 },

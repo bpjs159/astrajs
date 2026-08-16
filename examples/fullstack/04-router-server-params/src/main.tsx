@@ -1,7 +1,7 @@
 // 04 — Router + Server · Server data loading driven by route params
-import { component, store, mounted } from '@astrajs/core';
-import { route, fallbackRoute, params, navigate, Link, onRouteChange } from '@astrajs/router';
-import { server } from '@astrajs/server';
+import { component, store, mounted } from '@bpjs159/core';
+import { route, fallbackRoute, params, navigate, Link, onRouteChange } from '@bpjs159/router';
+import { server } from '@bpjs159/server';
 
 interface Product { id: string; name: string; price: number; stock: number; }
 

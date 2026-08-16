@@ -1,13 +1,13 @@
 /**
- * @astrajs/core/validation — Re-export of @astrajs/validation
+ * @bpjs159/core/validation — Re-export of @bpjs159/validation
  *
  * Convenience re-export so developers can import validators
- * directly from `@astrajs/core` without installing a separate package.
+ * directly from `@bpjs159/core` without installing a separate package.
  *
  * ```ts
- * import { isEmail, isRequired, all } from '@astrajs/core/validation';
+ * import { isEmail, isRequired, all } from '@bpjs159/core/validation';
  * // or
- * import { isEmail, isRequired, all } from '@astrajs/validation';
+ * import { isEmail, isRequired, all } from '@bpjs159/validation';
  * ```
  */
 
@@ -24,6 +24,6 @@ export {
   oneOf,
   all,
   any,
-} from '@astrajs/validation';
+} from '@bpjs159/validation';
 
-export type { Validator, AsyncValidator } from '@astrajs/validation';
+export type { Validator, AsyncValidator } from '@bpjs159/validation';

@@ -1,5 +1,5 @@
 /**
- * @astrajs/router — lazy()
+ * @bpjs159/router — lazy()
  *
  * Creates a lazy-loaded component wrapper. The module is only fetched
  * when the component is first rendered. On subsequent renders, the
@@ -14,7 +14,7 @@
  * ```
  */
 
-import { store } from '@astrajs/core';
+import { store } from '@bpjs159/core';
 
 type ComponentModule = { [key: string]: (props?: Record<string, unknown>) => JSX.Element };
 

@@ -1,8 +1,8 @@
 /**
- * @astrajs/schema — Public API
+ * @bpjs159/schema — Public API
  *
  * ```ts
- * import { schema } from '@astrajs/schema';
+ * import { schema } from '@bpjs159/schema';
  *
  * const User = schema.object({
  *   name: schema.string().min(2),

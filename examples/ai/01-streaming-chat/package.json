@@ -9,13 +9,13 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@astrajs/core": "0.1.0",
-    "@astrajs/server": "0.1.0",
-    "@astrajs/ai": "0.1.0",
-    "@astrajs/adapters": "0.1.0"
+    "@bpjs159/core": "0.1.0",
+    "@bpjs159/server": "0.1.0",
+    "@bpjs159/ai": "0.1.0",
+    "@bpjs159/adapters": "0.1.0"
   },
   "devDependencies": {
-    "@astrajs/cli": "0.1.0",
+    "@bpjs159/cli": "0.1.0",
     "vite": "^5.4.0",
     "typescript": "^5.5.0"
   }

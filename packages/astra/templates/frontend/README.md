@@ -15,7 +15,7 @@ Scaffolded with **astra** (frontend template).
 - `src/routes.ts` — declarative boolean route guards
 - `src/pages/` — Home and About pages
 - `src/components/` — a reactive Counter component
-- `@astrajs/router` — isomorphic routing, no wrapper components
+- `astrajsx/router` — isomorphic routing, no wrapper components
 
 ## Docs
 

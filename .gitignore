@@ -25,3 +25,6 @@ examples/*/dist/
 
 # Local AI agent config (not for publication)
 .github/
+
+# AstraJS umbrella vendored build output
+packages/astra-js/vendor/

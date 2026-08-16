@@ -1,5 +1,5 @@
 /**
- * @astrajs/core — Reactive Store (Proxy-based Fine-Grained Reactivity)
+ * @bpjs159/core — Reactive Store (Proxy-based Fine-Grained Reactivity)
  *
  * ## Architecture
  *

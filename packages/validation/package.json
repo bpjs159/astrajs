@@ -1,6 +1,10 @@
 {
-  "name": "@astrajs/validation",
+  "name": "@bpjs159/validation",
   "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bpjs159/astrajs.git"
+  },
   "description": "AstraJS Validation — Standalone validator functions for forms and schemas",
   "type": "module",
   "exports": {

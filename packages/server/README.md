@@ -1,4 +1,4 @@
-# @astrajs/server
+# @bpjs159/server
 
 > **Server RPC, SWR, and cache management for AstraJS.**
 
@@ -13,7 +13,7 @@
 ## Usage
 
 ```ts
-import { server, revalidate, ServerConfig } from '@astrajs/server';
+import { server, revalidate, ServerConfig } from '@bpjs159/server';
 
 // Pre-built query (SSG — 0 KB JS on client)
 const getProducts = server(
@@ -32,7 +32,7 @@ const addToCart = server(async (productId: string, qty: number) => {
 });
 
 // SWR store (show stale data while revalidating)
-import { store } from '@astrajs/core';
+import { store } from '@bpjs159/core';
 const products = store(getProducts('hats'), { swr: true });
 ```
 

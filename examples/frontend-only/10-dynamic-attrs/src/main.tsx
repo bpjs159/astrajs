@@ -15,7 +15,7 @@
  *
  * Everything is plain JS/TS expressions. The compiler handles the rest.
  */
-import { component, store } from '@astrajs/core';
+import { component, store } from '@bpjs159/core';
 import { styles } from './styles.js';
 
 // ─── Section Label Component ──────────────────────────────────────────────

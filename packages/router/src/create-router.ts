@@ -1,12 +1,12 @@
 /**
- * @astrajs/router — createRouter()
+ * @bpjs159/router — createRouter()
  *
  * Initializes the router with application route definitions.
  * Sets up browser history listeners and provides the route
  * tree for SSG crawling and `<Outlet />` resolution.
  *
  * ```ts
- * import { createRouter } from '@astrajs/router';
+ * import { createRouter } from '@bpjs159/router';
  *
  * const router = createRouter([
  *   { path: '/', component: () => import('./pages/home.js') },

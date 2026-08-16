@@ -8,6 +8,7 @@
  *   node scripts/publish.mjs --tag latest     # publish as latest
  *   node scripts/publish.mjs --dry-run        # build + npm pack check, no publish
  *   node scripts/publish.mjs --skip-build     # skip the workspace build
+ *   node scripts/publish.mjs --npm11          # publish via npm@11 (fixes npm 10.9.x auth bug)
  *   node scripts/publish.mjs --otp=123456     # single command, one OTP for 2FA
  *
  * npm / pnpm / yarn / bun are all CLIENTS of the same npm registry:
@@ -31,8 +32,12 @@ const tag = val('--tag') ?? 'beta';
 const dryRun = has('--dry-run');
 const skipBuild = has('--skip-build');
 const otp = val('--otp');
+// npm 10.9.x sends publish PUTs WITHOUT Authorization (registry masks it as 404).
+// --npm11 forces the publish steps through npm@11 (via npx) which attaches auth correctly.
+const useNpm11 = has('--npm11');
+const NPM_BIN = useNpm11 ? ['npx', '-y', 'npm@11.16.0'] : ['npm'];
 
-// ── Publish order: dependencies first (from the internal @astrajs graph) ──
+// ── Publish order: dependencies first (from the internal @astra graph) ──
 const ORDER = [
   'validation',
   'ai',
@@ -46,13 +51,15 @@ const ORDER = [
   'ssr',
   'adapters',
   'astra',
+  'astra-js',
 ];
 
 function run(cmd, cmdArgs, { fatal = true } = {}) {
-  console.log(`\n$ ${cmd} ${cmdArgs.join(' ')}`);
-  const r = spawnSync(cmd, cmdArgs, { cwd: root, stdio: 'inherit' });
+  const [base, ...preArgs] = Array.isArray(cmd) ? cmd : [cmd];
+  console.log(`\n$ ${base} ${[...preArgs, ...cmdArgs].join(' ')}`);
+  const r = spawnSync(base, [...preArgs, ...cmdArgs], { cwd: root, stdio: 'inherit' });
   if (r.status !== 0 && fatal) {
-    console.error(`✗ "${cmd} ${cmdArgs.join(' ')}" failed with exit code ${r.status}`);
+    console.error(`✗ "${base} ${[...preArgs, ...cmdArgs].join(' ')}" failed with exit code ${r.status}`);
     process.exit(r.status ?? 1);
   }
   return r.status ?? 0;
@@ -62,7 +69,7 @@ function run(cmd, cmdArgs, { fatal = true } = {}) {
 console.log(`\nAstraJS publisher — tag "${tag}"${dryRun ? ' (DRY RUN)' : ''}\n`);
 
 if (!dryRun) {
-  const who = run('npm', ['whoami'], { fatal: false });
+  const who = run(NPM_BIN, ['whoami'], { fatal: false });
   if (who !== 0) {
     console.error('✗ Not authenticated with the npm registry. Run `npm login` first.');
     process.exit(1);
@@ -71,7 +78,7 @@ if (!dryRun) {
 
 if (!skipBuild) {
   console.log('\n── Building all workspaces ──');
-  run('npm', ['run', 'build', '--workspaces', '--if-present']);
+  run(NPM_BIN, ['run', 'build', '--workspaces', '--if-present']);
 }
 
 // ── Publish (or dry-run) ───────────────────────────────────────────────────
@@ -89,7 +96,7 @@ if (dryRun) pkgArgs.push('--dry-run');
 if (otp) pkgArgs.push(`--otp=${otp}`);
 
 console.log(`\n── Publishing all workspaces (tag "${tag}") ──`);
-run('npm', pkgArgs);
+run(NPM_BIN, pkgArgs);
 
 console.log('\n── Summary ──');
 for (const dir of ORDER) {

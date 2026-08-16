@@ -1,4 +1,4 @@
-import { component, dynamic } from '@astrajs/core';
+import { component, dynamic } from '@bpjs159/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
 import { DocRightToc } from '../../components/doc-right-toc.js';
 import { i18n } from '../../i18n.js';
@@ -51,7 +51,7 @@ export default defineConfig({
         <h3>{i18n.t('t.store.title')}</h3>
         <p>{i18n.t('t.store.p1')}<code>effect()</code>{i18n.t('t.store.p2')}</p>
         <CodeBlock code={`import { describe, it, expect } from 'vitest';
-import { store, effect } from '@astrajs/core';
+import { store, effect } from '@bpjs159/core';
 
 const cart = store({ items: [] as string[] });
 
@@ -112,7 +112,7 @@ module.exports = {
   testEnvironment: 'jsdom',
   transform: {
     '^.+\\\\.tsx?$': ['ts-jest', {
-      tsconfig: { jsx: 'react-jsx', jsxImportSource: '@astrajs/core' },
+      tsconfig: { jsx: 'react-jsx', jsxImportSource: '@bpjs159/core' },
     }],
   },
 };`} commentsKey="testing.jest" />

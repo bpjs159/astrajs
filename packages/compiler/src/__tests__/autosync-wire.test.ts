@@ -1,5 +1,5 @@
 /**
- * @astrajs/compiler — AutoSync Polling Auto-Wiring Tests
+ * @bpjs159/compiler — AutoSync Polling Auto-Wiring Tests
  */
 import { describe, it, expect } from 'vitest';
 import { autoWireAutoSyncCalls, type AutoSyncCallInfo } from '../transformers/autosync-wire.js';

@@ -1,6 +1,10 @@
 {
-  "name": "@astrajs/server",
+  "name": "@bpjs159/server",
   "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bpjs159/astrajs.git"
+  },
   "description": "AstraJS Server — server$ RPC macro, SWR, cache tags, autoSync",
   "type": "module",
   "exports": {
@@ -25,7 +29,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@astrajs/core": "0.1.0"
+    "@bpjs159/core": "0.1.0"
   },
   "devDependencies": {
     "typescript": "^5.5.0",

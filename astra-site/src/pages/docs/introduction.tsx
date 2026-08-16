@@ -1,5 +1,5 @@
-import { component, dynamic } from '@astrajs/core';
-import { navigate } from '@astrajs/router';
+import { component, dynamic } from '@bpjs159/core';
+import { navigate } from '@bpjs159/router';
 import { DocSidebar } from '../../components/docs-sidebar.js';
 import { Icon } from '../../components/icon.js';
 import { i18n } from '../../i18n.js';
@@ -58,7 +58,7 @@ const docLayoutStyle = `
   .toc-item.active{color:#b84cff;border-left-color:#b84cff}
 `;
 
-const demoCode = `import { store } from '@astrajs/core';
+const demoCode = `import { store } from '@bpjs159/core';
 
 const state = store({ count: 0 });
 
@@ -119,21 +119,21 @@ export const DocsIntroduction = component(() => (
         <h2>{i18n.t('d2.arch.title')}</h2>
         <p>{i18n.t('d2.arch.p')}</p>
         <ul>
-          <li><strong>@astrajs/core</strong> (~3KB) — {i18n.t('d2.pkg.core')}</li>
-          <li><strong>@astrajs/compiler</strong> — {i18n.t('d2.pkg.compiler')}</li>
-          <li><strong>@astrajs/server</strong> — {i18n.t('d2.pkg.server')}</li>
-          <li><strong>@astrajs/router</strong> — {i18n.t('d2.pkg.router')}</li>
-          <li><strong>@astrajs/ssr</strong> — {i18n.t('d2.pkg.ssr')}</li>
-          <li><strong>@astrajs/form</strong> — {i18n.t('d2.pkg.form')}</li>
+          <li><strong>@bpjs159/core</strong> (~3KB) — {i18n.t('d2.pkg.core')}</li>
+          <li><strong>@bpjs159/compiler</strong> — {i18n.t('d2.pkg.compiler')}</li>
+          <li><strong>@bpjs159/server</strong> — {i18n.t('d2.pkg.server')}</li>
+          <li><strong>@bpjs159/router</strong> — {i18n.t('d2.pkg.router')}</li>
+          <li><strong>@bpjs159/ssr</strong> — {i18n.t('d2.pkg.ssr')}</li>
+          <li><strong>@bpjs159/form</strong> — {i18n.t('d2.pkg.form')}</li>
         </ul>
         <h2 id="instalacion">{i18n.t('sb.install')}</h2>
         <p>{i18n.t('d2.install1')}</p>
-        <CodeBlock code={`npx @astrajs/cli@latest`} />
+        <CodeBlock code={`npx @bpjs159/cli@latest`} />
         <p>{i18n.t('d2.install2')}</p>
-        <CodeBlock code={`pnpm add @astrajs/core @astrajs/compiler
+        <CodeBlock code={`pnpm add @bpjs159/core @bpjs159/compiler
 
 // vite.config.ts
-import astra from '@astrajs/compiler';
+import astra from '@bpjs159/compiler';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
@@ -143,12 +143,12 @@ export default defineConfig({
         <CodeBlock code={`{
   "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "@astrajs/core"
+    "jsxImportSource": "@bpjs159/core"
   }
 }`} />
         <h2 id="primeros-pasos">{i18n.t('sb.gettingStarted')}</h2>
         <p>{i18n.t('d2.getting')}</p>
-        <CodeBlock code={`import { component, store } from '@astrajs/core';
+        <CodeBlock code={`import { component, store } from '@bpjs159/core';
 
 export const Hello = component(() => {
   const name = store({ value: 'AstraJS' });

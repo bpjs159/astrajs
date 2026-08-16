@@ -1,4 +1,4 @@
-import { component, store } from '@astrajs/core';
+import { component, store } from '@bpjs159/core';
 import { i18n } from '../i18n.js';
 import { localizedCode } from '../snippets.js';
 

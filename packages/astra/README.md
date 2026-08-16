@@ -1,16 +1,16 @@
-# @astrajs/cli
+# @bpjs159/cli
 
 The [AstraJS](https://astrajs.dev) CLI — scaffold new projects and run them.
 Zero config, zero VDOM, zero dependencies, full-stack TypeScript.
 
-Package name: `@astrajs/cli` · binary name: `astra` (also exposed as `create-astrajs`).
+Package name: `@bpjs159/cli` · binary name: `astra` (also exposed as `create-astrajs`).
 
 ## Usage
 
 ```bash
 # scaffold a new project
 astra my-app
-npx @astrajs/cli@latest my-app
+npx @bpjs159/cli@latest my-app
 pnpm create astrajs my-app
 
 # run an existing project

@@ -106,7 +106,7 @@ export function median(xs) {
   return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
 }
 
-const EMAILS = ['@correo.dev', '@astrajs.dev', '@correo.io'];
+const EMAILS = ['@correo.dev', '@astra.dev', '@correo.io'];
 export function makeRows(count, offset = 0) {
   const rows = new Array(count);
   for (let i = 0; i < count; i++) {

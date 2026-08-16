@@ -1,4 +1,4 @@
-# @astrajs/core
+# @bpjs159/core
 
 > **Proxy-based fine-grained reactivity runtime for AstraJS.**
 
@@ -15,7 +15,7 @@
 ## Usage
 
 ```ts
-import { store, effect, memo, batch, Component } from '@astrajs/core';
+import { store, effect, memo, batch, Component } from '@bpjs159/core';
 
 // Create reactive state
 const counter = store({ count: 0 });
@@ -47,7 +47,7 @@ Configure `tsconfig.json`:
 {
   "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "@astrajs/core"
+    "jsxImportSource": "@bpjs159/core"
   }
 }
 ```

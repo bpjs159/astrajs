@@ -1,5 +1,5 @@
 /**
- * @astrajs/ai — Runtime configuration
+ * @bpjs159/ai — Runtime configuration
  *
  * The provider, endpoint and credentials are resolved ONCE at startup from
  * environment variables — never compiled into client bundles (the `ai()`

@@ -1,5 +1,5 @@
 /**
- * @astrajs/ssr — State Serialization (Resumability)
+ * @bpjs159/ssr — State Serialization (Resumability)
  *
  * AstraJS achieves resumability by serializing reactive state into
  * HTML attributes (`astra-data`) and event handlers into delegated
@@ -23,16 +23,16 @@
  * 5. The app is interactive — no component re-execution needed.
  */
 
-import { store, toRaw } from '@astrajs/core';
-import { getHandlerRegistry } from '@astrajs/core';
-import type { StoreOptions } from '@astrajs/core';
+import { store, toRaw } from '@bpjs159/core';
+import { getHandlerRegistry } from '@bpjs159/core';
+import type { StoreOptions } from '@bpjs159/core';
 
 // ─── Forward declarations for form resumability ──────────────────────────────
 // These are lazily imported to avoid circular dependencies.
 let _formResume: ((root: ParentNode) => void) | null = null;
 
 /**
- * Registers a form resume handler. Called by @astrajs/form to enable
+ * Registers a form resume handler. Called by @bpjs159/form to enable
  * SSR-resumable forms without creating a circular dependency.
  *
  * @internal
@@ -160,7 +160,7 @@ export function astraDataAttr(state: object): string {
  *
  * @example
  * ```ts
- * import { resume } from '@astrajs/ssr';
+ * import { resume } from '@bpjs159/ssr';
  *
  * // Client entry point
  * const stores = resume();
@@ -224,7 +224,7 @@ export function resume(root: ParentNode = document): Map<Element, object> {
  *
  * @example
  * ```ts
- * import { bootstrap } from '@astrajs/ssr';
+ * import { bootstrap } from '@bpjs159/ssr';
  * import { App } from './app';
  *
  * // Single call — handles both SSR resume and CSR mount transparently

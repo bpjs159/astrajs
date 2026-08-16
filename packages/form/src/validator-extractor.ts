@@ -1,5 +1,5 @@
 /**
- * @astrajs/form — Validator Extractor
+ * @bpjs159/form — Validator Extractor
  *
  * Extracts validation rules attached to form inputs (via the `validate` prop)
  * and serializes them so the same rules can be re-executed on the server.
@@ -22,7 +22,7 @@
  * - Merge server results back into the form controller via `setServerErrors()`
  */
 
-import type { Validator, AsyncValidator } from '@astrajs/validation';
+import type { Validator, AsyncValidator } from '@bpjs159/validation';
 import { resolveBuiltinValidator } from './builtin-validators.js';
 import type { ServerValidator } from './builtin-validators.js';
 
@@ -215,7 +215,7 @@ export function deserializeValidators(encoded: string): ValidatorMeta[] {
  * form data, re-runs every validation rule and returns a map of
  * `{ fieldName: errorMessage }` for any failing fields.
  *
- * **Auto-resolution**: Standard @astrajs/validation validators are resolved
+ * **Auto-resolution**: Standard @bpjs159/validation validators are resolved
  * automatically from the built-in registry. No manual `createValidatorMap()`
  * needed. Custom validators can be provided via `customValidators`.
  *
@@ -257,7 +257,7 @@ export async function runValidators(
     // ── Resolution order ──────────────────────────────────────────
     // 1. Direct function reference (captured from DOM on client)
     // 2. Custom validators map (provided by developer for non-standard)
-    // 3. Built-in registry (@astrajs/validation standard validators)
+    // 3. Built-in registry (@bpjs159/validation standard validators)
     let validatorFn: ServerValidator | undefined;
 
     if (directFn) {

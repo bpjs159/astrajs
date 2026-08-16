@@ -1,5 +1,5 @@
 /**
- * @astrajs/adapters — Vercel adapter (Node serverless function)
+ * @bpjs159/adapters — Vercel adapter (Node serverless function)
  *
  * One catch-all function (`api/astra.mjs`) handles every RPC endpoint.
  * Static assets are served by Vercel's own static pipeline; the function
@@ -23,7 +23,7 @@ export interface VercelAdapterOptions extends AstraHandlerOptions {}
  *
  * Generated entry:
  * ```ts
- * import { createVercelHandler } from '@astrajs/adapters';
+ * import { createVercelHandler } from '@bpjs159/adapters';
  * export default createVercelHandler({ apiPrefix: '/api/astra' });
  * ```
  */

@@ -5,7 +5,7 @@
  * When any component mutates the store, all components that
  * read from it update automatically via `component()`.
  */
-import { store } from '@astrajs/core';
+import { store } from '@bpjs159/core';
 
 export const appStore = store({
   likes: 0,

@@ -1,4 +1,4 @@
-import { css } from '@astrajs/compiler/css';
+import { css } from '@bpjs159/compiler/css';
 
 export const styles = css`
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }

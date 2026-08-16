@@ -1,5 +1,5 @@
 /**
- * @astrajs/router — useLocation() hook + RouteDefinition type
+ * @bpjs159/router — useLocation() hook + RouteDefinition type
  *
  * Reactive path accessor and route configuration types.
  */

@@ -1,6 +1,10 @@
 {
-  "name": "@astrajs/ai",
+  "name": "@bpjs159/ai",
   "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bpjs159/astrajs.git"
+  },
   "description": "AstraJS AI — typed AI endpoints, streaming, tools and RAG. Edge-safe, provider-agnostic.",
   "type": "module",
   "exports": {

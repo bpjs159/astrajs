@@ -7,10 +7,10 @@
 // - Server: Same validators re-executed against submitted data
 // - SSR Resumable: Form state survives server → client transition
 //
-import { component, store } from '@astrajs/core';
-import { form, serverForm } from '@astrajs/form';
-import * as validation from '@astrajs/validation';
-import { server } from '@astrajs/server';
+import { component, store } from '@bpjs159/core';
+import { form, serverForm } from '@bpjs159/form';
+import * as validation from '@bpjs159/validation';
+import { server } from '@bpjs159/server';
 
 // ─── Shared Types ────────────────────────────────────────────────────────────
 

@@ -1,6 +1,6 @@
 // 08 — AutoSync · ETag polling keeps a store fresh without full reloads
-import { component, store, mounted } from '@astrajs/core';
-import { server, autoSync } from '@astrajs/server';
+import { component, store, mounted } from '@bpjs159/core';
+import { server, autoSync } from '@bpjs159/server';
 
 // Shared "server" state — mutated independently of this tab (another
 // customer, another process, whatever). This is what autoSync discovers.

@@ -1,5 +1,5 @@
 /**
- * @astrajs/router — <Link> component
+ * @bpjs159/router — <Link> component
  *
  * A client-side navigation link that uses `navigate()` instead of
  * full-page reloads. Falls back gracefully to standard `<a>` behavior
@@ -12,7 +12,7 @@
  */
 
 import { navigate } from './navigate.js';
-import { bindAttr } from '@astrajs/core';
+import { bindAttr } from '@bpjs159/core';
 
 export interface LinkProps {
   href: string;

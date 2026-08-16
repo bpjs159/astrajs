@@ -47,7 +47,7 @@ Todos los frameworks corren en **build de producción**: `NODE_ENV=production`
 
 | Archivo | Framework | Patrón usado |
 |---|---|---|
-| `suites/astra.mjs` | AstraJS `@astrajs/core` | `store()` + `bindList()` (keyed) + `bindText()` por fila |
+| `suites/astra.mjs` | AstraJS `@bpjs159/core` | `store()` + `bindList()` (keyed) + `bindText()` por fila |
 | `suites/react.mjs` | React | `createRoot` + `flushSync` + lista keyed |
 | `suites/vue.mjs` | Vue | `createApp` + array `reactive` + `v-for` keyed (render fn) |
 | `suites/solid.mjs` | Solid | `render` + `<Index>` (ver nota) |

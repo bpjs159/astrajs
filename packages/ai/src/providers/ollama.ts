@@ -1,5 +1,5 @@
 /**
- * @astrajs/ai — Ollama provider
+ * @bpjs159/ai — Ollama provider
  *
  * Talks to a local or remote Ollama server (`/api/chat`, `/api/embed`).
  * Streaming uses Ollama's NDJSON protocol. When the API key contains `:`

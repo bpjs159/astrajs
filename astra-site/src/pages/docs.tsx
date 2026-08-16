@@ -1,5 +1,5 @@
-import { component, dynamic } from '@astrajs/core';
-import { Link } from '@astrajs/router';
+import { component, dynamic } from '@bpjs159/core';
+import { Link } from '@bpjs159/router';
 import { DocSidebar } from '../components/docs-sidebar.js';
 import { Icon } from '../components/icon.js';
 import { i18n } from '../i18n.js';
@@ -82,7 +82,7 @@ export const DocsPage = component(() => {
     .toc-item.active{color:#b84cff;border-left-color:#b84cff}
   `;
 
-  const demoCode = `import { store } from '@astrajs/core';
+  const demoCode = `import { store } from '@bpjs159/core';
 
 const state = store({ count: 0 });
 
@@ -243,11 +243,11 @@ export default function Counter() {
           {/* Placeholder sections for sidebar nav */}
           <h2 id="instalacion">{i18n.t('sb.install')}</h2>
           <p>{i18n.t('d.install1')}</p>
-          <CodeBlock code={`npx @astrajs/cli@latest`} />
+          <CodeBlock code={`npx @bpjs159/cli@latest`} />
           <p>{i18n.t('d.install2')}</p>
-          <CodeBlock code={`pnpm add @astrajs/core @astrajs/compiler
+          <CodeBlock code={`pnpm add @bpjs159/core @bpjs159/compiler
 // vite.config.ts
-import astra from '@astrajs/compiler';
+import astra from '@bpjs159/compiler';
 
 export default {
   plugins: [astra()],
@@ -255,7 +255,7 @@ export default {
 
           <h2 id="primeros-pasos">{i18n.t('sb.gettingStarted')}</h2>
           <p>{i18n.t('d.getting')}</p>
-          <CodeBlock code={`import { component, store } from '@astrajs/core';
+          <CodeBlock code={`import { component, store } from '@bpjs159/core';
 
 export const Hello = component(() => {
   const name = store({ value: 'AstraJS' });
@@ -332,7 +332,7 @@ effect(() => { text2.nodeValue = String(name); });`} />
 
           <h2 id="server">server</h2>
           <p>{i18n.t('d.server.p')}</p>
-          <CodeBlock code={`import { server } from '@astrajs/server';
+          <CodeBlock code={`import { server } from '@bpjs159/server';
 
 export const getUsers = server({
   tags: ['users'],
@@ -354,7 +354,7 @@ const admins = await getUsers('admin');
 
           <h2 id="estilos">{i18n.t('sb.css')}</h2>
           <p>{i18n.t('d.css.p')}</p>
-          <CodeBlock code={`import { css } from '@astrajs/core';
+          <CodeBlock code={`import { css } from '@bpjs159/core';
 
 const card = css\`
   background: #0f172a;
@@ -388,7 +388,7 @@ const session = server({ type: 'dynamic' }, (req) => getSession(req));`} />
 const products = server({ tags: ['products'] }, () => db.product.findMany());
 
 // Invalidar quirúrgicamente
-import { revalidate } from '@astrajs/server';
+import { revalidate } from '@bpjs159/server';
 await revalidate(['products']);`} />
 
           <h2 id="autosync">{i18n.t('sb.autosync')}</h2>
@@ -400,7 +400,7 @@ await revalidate(['products']);`} />
 
           <h2 id="rutas">{i18n.t('sb.routes')}</h2>
           <p>{i18n.t('d.routes.p')}</p>
-          <CodeBlock code={`import { route, Outlet } from '@astrajs/router';
+          <CodeBlock code={`import { route, Outlet } from '@bpjs159/router';
 
 function Layout() {
   return (
@@ -416,7 +416,7 @@ function Layout() {
 
           <h2 id="navegacion">{i18n.t('sb.navigation')}</h2>
           <p>{i18n.t('d.nav.p')}</p>
-          <CodeBlock code={`import { Link, navigate } from '@astrajs/router';
+          <CodeBlock code={`import { Link, navigate } from '@bpjs159/router';
 
 <Link href="/products">Products</Link>
 <button onclick={() => navigate('/cart')}>Cart</button>`} />
@@ -447,7 +447,7 @@ function Layout() {
           <h2 id="vite">{i18n.t('sb.advVite')}</h2>
           <p>{i18n.t('d.vite.p')}</p>
           <CodeBlock code={`// vite.config.ts
-import astra from '@astrajs/compiler';
+import astra from '@bpjs159/compiler';
 
 export default defineConfig({
   plugins: [astra()],

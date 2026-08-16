@@ -1,5 +1,5 @@
 /**
- * @astrajs/server — AutoSync (ETag Polling + DOM Mutation)
+ * @bpjs159/server — AutoSync (ETag Polling + DOM Mutation)
  *
  * AutoSync keeps client-side data in sync with the server without
  * full page reloads. It works by:
@@ -50,8 +50,8 @@ const subscriptions = new Map<string, AutoSyncSubscription>();
  *
  * @example
  * ```ts
- * import { store } from '@astrajs/core';
- * import { autoSync } from '@astrajs/server';
+ * import { store } from '@bpjs159/core';
+ * import { autoSync } from '@bpjs159/server';
  *
  * const products = store<Product[]>([]);
  *

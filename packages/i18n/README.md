@@ -1,4 +1,4 @@
-# @astrajs/i18n
+# @bpjs159/i18n
 
 > Built-in internationalization for AstraJS — fine-grained reactive translations, zero dependencies.
 
@@ -11,7 +11,7 @@ The active locale lives in a reactive `store()`. Any JSX expression that calls
 ## Usage
 
 ```ts
-import { createI18n } from '@astrajs/i18n';
+import { createI18n } from '@bpjs159/i18n';
 
 const i18n = createI18n({
   locale: 'es',

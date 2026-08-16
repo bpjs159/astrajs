@@ -1,5 +1,5 @@
 /**
- * @astrajs/core — DOM Binding Utilities
+ * @bpjs159/core — DOM Binding Utilities
  *
  * These functions bridge the reactive system with the real DOM.
  * When the Vite compiler transforms JSX, it emits calls to these

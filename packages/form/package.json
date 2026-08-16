@@ -1,6 +1,10 @@
 {
-  "name": "@astrajs/form",
+  "name": "@bpjs159/form",
   "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bpjs159/astrajs.git"
+  },
   "description": "AstraJS Form — Reactive metadata controller, delegates validation to HTML5 Constraint Validation API",
   "type": "module",
   "exports": {
@@ -24,7 +28,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@astrajs/core": "0.1.0"
+    "@bpjs159/core": "0.1.0"
   },
   "devDependencies": {
     "typescript": "^5.5.0"

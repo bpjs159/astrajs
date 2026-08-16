@@ -1,4 +1,4 @@
-import { Link, navigate } from '@astrajs/router';
+import { Link, navigate } from '@bpjs159/router';
 import { i18n } from '../i18n.js';
 import { BrandLogo } from './brand-logo.js';
 

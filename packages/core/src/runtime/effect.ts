@@ -1,5 +1,5 @@
 /**
- * @astrajs/core — Effect & Memo System
+ * @bpjs159/core — Effect & Memo System
  *
  * ## How Tracking Works
  *

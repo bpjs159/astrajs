@@ -7,7 +7,7 @@
  * parent's reactive store from these callbacks — that causes cascading
  * re-renders because AstraJS recreates children on every parent render.
  */
-import { component, store, mounted } from '@astrajs/core';
+import { component, store, mounted } from '@bpjs159/core';
 
 export interface TimerEvents {
   /** Non-reactive side effect: fires when the Timer enters the DOM. */

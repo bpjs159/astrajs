@@ -1,4 +1,4 @@
-import { component, dynamic } from '@astrajs/core';
+import { component, dynamic } from '@bpjs159/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
 import { DocRightToc } from '../../components/doc-right-toc.js';
 import { i18n } from '../../i18n.js';
@@ -34,7 +34,7 @@ export const DocsRouter = component(() => (
 
         <h2 id="rutas">{i18n.t('sb.routes')}</h2>
         <p><code>route()</code> {i18n.t('rt.a1')}<code>window.location</code>{i18n.t('rt.a2')}<code>true</code>{i18n.t('rt.a3')}<code>store()</code>{i18n.t('rt.a4')}</p>
-        <CodeBlock code={`import { route, fallbackRoute } from '@astrajs/router';
+        <CodeBlock code={`import { route, fallbackRoute } from '@bpjs159/router';
 
 // routes.ts — an object with reactive getters
 export const routes = {
@@ -74,7 +74,7 @@ route('/products/:id', { exact: true })  // only "/products/42"`} commentsKey="r
 
         <h2>params</h2>
         <p>{i18n.t('rt.p.a')}<code>:id</code>{i18n.t('rt.p.b')}<code>:slug</code>{i18n.t('rt.p.c')}<code>params</code>{i18n.t('rt.p.d')}</p>
-        <CodeBlock code={`import { route, params } from '@astrajs/router';
+        <CodeBlock code={`import { route, params } from '@bpjs159/router';
 
 // Ruta: /products/:id
 export const routes = {
@@ -95,7 +95,7 @@ function ProductPage() {
         <p>{i18n.t('rt.nav.a')}<code>&lt;Link&gt;</code>{i18n.t('rt.nav.b')}<code>navigate()</code>{i18n.t('rt.nav.c')}</p>
 
         <h3>{i18n.t('rt.link.title')}</h3>
-        <CodeBlock code={`import { Link } from '@astrajs/router';
+        <CodeBlock code={`import { Link } from '@bpjs159/router';
 
 // Basic navigation
 <Link href="/products">Products</Link>
@@ -110,7 +110,7 @@ function ProductPage() {
 </Link>`} commentsKey="router.link" />
 
         <h3>{i18n.t('rt.navigate.title')}</h3>
-        <CodeBlock code={`import { navigate } from '@astrajs/router';
+        <CodeBlock code={`import { navigate } from '@bpjs159/router';
 
 // After an action
 async function handleCreate() {
@@ -130,7 +130,7 @@ async function handleCreate() {
 
         <h2 id="layouts">{i18n.t('sb.layouts')}</h2>
         <p><code>&lt;Outlet /&gt;</code> {i18n.t('rt.l.a')}</p>
-        <CodeBlock code={`import { Outlet } from '@astrajs/router';
+        <CodeBlock code={`import { Outlet } from '@bpjs159/router';
 
 function DashboardLayout() {
   return (
@@ -168,7 +168,7 @@ function DashboardLayout() {
 
         <h2>onRouteChange</h2>
         <p>{i18n.t('rt.onroute.p')}</p>
-        <CodeBlock code={`import { onRouteChange } from '@astrajs/router';
+        <CodeBlock code={`import { onRouteChange } from '@bpjs159/router';
 
 onRouteChange((path) => {
   // Analytics

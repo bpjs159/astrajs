@@ -4,7 +4,7 @@
  * and an endpoint handler (server). This module has NO DOM code, so the
  * production server entry can import it safely.
  */
-import { server } from '@astrajs/server';
+import { server } from '@bpjs159/server';
 
 export interface Quote {
   id: number;

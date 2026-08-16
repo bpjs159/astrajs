@@ -4,8 +4,8 @@
  * Página fija con mucha información, 100% resuelta con datos
  * pre-construidos: featured, recientes, categorías, autores y stats.
  */
-import { component } from '@astrajs/core';
-import { Link, navigate } from '@astrajs/router';
+import { component } from '@bpjs159/core';
+import { Link, navigate } from '@bpjs159/router';
 import { db } from '../db.js';
 import { i18n } from '../i18n.js';
 import { PostCardMarkup } from '../components/post-card.js';

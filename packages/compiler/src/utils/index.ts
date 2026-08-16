@@ -1,4 +1,4 @@
 /**
- * @astrajs/compiler — Utility Barrel
+ * @bpjs159/compiler — Utility Barrel
  */
 export * from './ast.js';

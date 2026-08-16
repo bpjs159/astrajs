@@ -1,5 +1,5 @@
 /**
- * @astrajs/server — Stale-While-Revalidate (SWR)
+ * @bpjs159/server — Stale-While-Revalidate (SWR)
  *
  * Enhances reactive stores with SWR semantics. When a store is
  * initialized with a Promise (e.g., from a `server()` call), SWR:
@@ -11,7 +11,7 @@
  * This is the client-side counterpart to server-side ISR `maxAge`.
  */
 
-import type { StoreOptions } from '@astrajs/core';
+import type { StoreOptions } from '@bpjs159/core';
 
 /**
  * Extended store options for SWR.
@@ -83,8 +83,8 @@ const swrCache = new Map<string, SWRCacheEntry<unknown>>();
  *
  * @example
  * ```ts
- * import { store } from '@astrajs/core';
- * import { swr } from '@astrajs/server';
+ * import { store } from '@bpjs159/core';
+ * import { swr } from '@bpjs159/server';
  *
  * const products = store(
  *   swr('products:hats', () => getProducts('hats'), {

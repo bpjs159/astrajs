@@ -1,4 +1,4 @@
-import { component, dynamic } from '@astrajs/core';
+import { component, dynamic } from '@bpjs159/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
 import { i18n } from '../../i18n.js';
 import { CodeBlock } from '../../components/code-block.js';
@@ -341,7 +341,7 @@ button { background: #818cf8; }
 // --- vs ---
 
 // AstraJS TSX (same file)
-import { component, store, css } from '@astrajs/core';
+import { component, store, css } from '@bpjs159/core';
 
 const btnStyle = css\`
   button { background: #818cf8; }

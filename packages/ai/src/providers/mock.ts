@@ -1,5 +1,5 @@
 /**
- * @astrajs/ai — Mock provider (deterministic, offline)
+ * @bpjs159/ai — Mock provider (deterministic, offline)
  *
  * Used by tests and `ASTRA_AI_PROVIDER=mock` runs: no network, predictable
  * output. Chat echoes the last user message; streaming yields it in chunks;

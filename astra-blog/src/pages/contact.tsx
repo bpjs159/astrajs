@@ -4,7 +4,7 @@
  * Página fija resuelta por la pre-built request getStaticPages()
  * → pages.contact.
  */
-import { component } from '@astrajs/core';
+import { component } from '@bpjs159/core';
 import { db } from '../db.js';
 
 export const ContactPage = component(() => {

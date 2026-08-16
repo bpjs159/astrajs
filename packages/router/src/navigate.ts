@@ -1,5 +1,5 @@
 /**
- * @astrajs/router — navigate() + history management
+ * @bpjs159/router — navigate() + history management
  */
 import { _onNavigation } from './listener.js';
 import { _pathState } from './path-state.js';

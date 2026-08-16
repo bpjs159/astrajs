@@ -1,4 +1,4 @@
-import { css } from '@astrajs/compiler/css';
+import { css } from '@bpjs159/compiler/css';
 
 export const styles = css`
   .card {

@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.emitStaticAdapter = exports.emitCloudflareAdapter = exports.emitVercelAdapter = exports.emitNodeAdapter = exports.createVercelHandler = exports.startAstraServer = exports.createNodeHandler = exports.createAstraHandler = void 0;
 /**
- * @astrajs/adapters — Public API Entry Point
+ * @bpjs159/adapters — Public API Entry Point
  *
  * Deployment adapters for AstraJS:
  *
@@ -10,10 +10,10 @@ exports.emitStaticAdapter = exports.emitCloudflareAdapter = exports.emitVercelAd
  *   - `createNodeHandler`    Node `(req, res)` handler + static files
  *   - `startAstraServer`     standalone `node:http` server (Fly/Railway/Docker)
  *   - `createVercelHandler`  Vercel serverless function (Node runtime)
- *   - `createCloudflareHandler` (via `@astrajs/adapters/edge`)
+ *   - `createCloudflareHandler` (via `@bpjs159/adapters/edge`)
  *   - `emit*Adapter`         build-time emitters used by `astra build`
  *
- * Import from `@astrajs/adapters/edge` when bundling for edge runtimes —
+ * Import from `@bpjs159/adapters/edge` when bundling for edge runtimes —
  * that entry never pulls in Node.js built-ins.
  */
 var core_js_1 = require("./core.js");

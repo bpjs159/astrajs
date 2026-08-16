@@ -1,6 +1,6 @@
 // 05 — Schema Validation · One schema, validated on client AND server
-import { component, store } from '@astrajs/core';
-import { server } from '@astrajs/server';
+import { component, store } from '@bpjs159/core';
+import { server } from '@bpjs159/server';
 import { NewUserSchema } from './user-schema.js';
 
 type FieldErrors = Partial<Record<'name' | 'email', string>>;

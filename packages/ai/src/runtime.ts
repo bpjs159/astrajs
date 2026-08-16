@@ -1,8 +1,8 @@
 /**
- * @astrajs/ai — Runtime primitives + `ai()` / `aiStream()` macros
+ * @bpjs159/ai — Runtime primitives + `ai()` / `aiStream()` macros
  *
  * `ai(cfg, fn)` / `aiStream(cfg, fn)` are COMPILE-TIME macros (processed by
- * @astrajs/compiler exactly like `server()`):
+ * @bpjs159/compiler exactly like `server()`):
  *
  *  - Client bundle: replaced by a typed fetch wrapper to `/api/astra/:id`
  *    (the model is called on the server — API keys never reach the browser).
@@ -95,7 +95,7 @@ export function ai<Args extends unknown[]>(
   }
   throw new Error(
     '[AstraJS] ai() macro was not transformed by the compiler. ' +
-      'Make sure the @astrajs/compiler vite plugin is active.'
+      'Make sure the @bpjs159/compiler vite plugin is active.'
   );
 }
 
@@ -137,6 +137,6 @@ export function aiStream<Args extends unknown[]>(
   }
   throw new Error(
     '[AstraJS] aiStream() macro was not transformed by the compiler. ' +
-      'Make sure the @astrajs/compiler vite plugin is active.'
+      'Make sure the @bpjs159/compiler vite plugin is active.'
   );
 }

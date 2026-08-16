@@ -1,5 +1,5 @@
 /**
- * @astrajs/router — onRouteChange() global listener
+ * @bpjs159/router — onRouteChange() global listener
  *
  * Registers callbacks that fire on every navigation.
  * Used at top-level (outside any component) for analytics,

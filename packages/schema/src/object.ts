@@ -1,5 +1,5 @@
 /**
- * @astrajs/schema — ObjectSchema
+ * @bpjs159/schema — ObjectSchema
  *
  * Composes multiple field schemas into one structured validator.
  * The phantom `_type` enables full type inference from the shape.

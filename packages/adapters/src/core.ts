@@ -1,16 +1,16 @@
 /**
- * @astrajs/adapters — platform-neutral request handler
+ * @bpjs159/adapters — platform-neutral request handler
  *
  * `createAstraHandler()` produces a `(request: Request) => Promise<Response>`
  * function that:
  *  1. Routes `/api/astra/:id` (configurable prefix) to `handleRPCRequest()`
- *     from `@astrajs/server` — the same dispatch the Vite dev middleware uses.
+ *     from `@bpjs159/server` — the same dispatch the Vite dev middleware uses.
  *  2. Falls back to an optional `render` hook (SSR-on-demand) and finally 404.
  *
  * This module is **edge-safe** (Web APIs only): Node, Vercel and Cloudflare
  * adapters are all thin shells around this core.
  */
-import { handleRPCRequest } from '@astrajs/server';
+import { handleRPCRequest } from '@bpjs159/server';
 
 /**
  * Configuration for the platform-neutral Astra handler.

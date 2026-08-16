@@ -1,4 +1,4 @@
-# @astrajs/schema
+# @bpjs159/schema
 
 Declarative, type-safe validation schemas for AstraJS. Types are inferred
 from the schema — no codegen.
@@ -6,13 +6,13 @@ from the schema — no codegen.
 ## Install
 
 ```bash
-npm install @astrajs/schema
+npm install @bpjs159/schema
 ```
 
 ## Usage
 
 ```ts
-import { schema } from '@astrajs/schema';
+import { schema } from '@bpjs159/schema';
 
 const User = schema.object({
   name: schema.string().min(2),

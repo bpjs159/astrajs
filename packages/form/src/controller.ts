@@ -1,18 +1,18 @@
 /**
- * @astrajs/form — Form Controller
+ * @bpjs159/form — Form Controller
  *
  * `form()` returns a reactive proxy that manages form metadata:
  * errors, touched, isDirty, isValid, isSubmitting, isValidating, submitCount.
  *
  * ## Architecture
  *
- * - **Data** lives in `@astrajs/core` stores (the developer's responsibility).
+ * - **Data** lives in `@bpjs159/core` stores (the developer's responsibility).
  * - **Metadata** lives in this controller (auto-managed via native DOM events).
  * - **Validation** is delegated 100% to the browser's Constraint Validation API.
  * - **No manual validation loops** — we read `ValidityState` from the DOM.
  */
 
-import { store, mounted } from '@astrajs/core';
+import { store, mounted } from '@bpjs159/core';
 import { getFormErrors } from './validity-map.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────

@@ -1,6 +1,10 @@
 {
-  "name": "@astrajs/compiler",
+  "name": "@bpjs159/compiler",
   "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bpjs159/astrajs.git"
+  },
   "description": "AstraJS Compiler — Vite plugin, AST transformer, CSS extractor",
   "type": "module",
   "exports": {
@@ -30,9 +34,9 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@astrajs/ai": "0.1.0",
-    "@astrajs/core": "0.1.0",
-    "@astrajs/server": "0.1.0"
+    "@bpjs159/ai": "0.1.0",
+    "@bpjs159/core": "0.1.0",
+    "@bpjs159/server": "0.1.0"
   },
   "devDependencies": {
     "@types/node": "^26.1.2",

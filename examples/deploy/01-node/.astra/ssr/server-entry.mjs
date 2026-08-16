@@ -156,7 +156,7 @@ function server(configOrFn, fn) {
     return fn;
   }
   throw new Error(
-    "[AstraJS] server() macro was not transformed by the compiler. Make sure @astrajs/core/vite is in your vite.config.ts plugins."
+    "[AstraJS] server() macro was not transformed by the compiler. Make sure @bpjs159/core/vite is in your vite.config.ts plugins."
   );
 }
 function createAstraHandler(options = {}) {

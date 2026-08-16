@@ -1,5 +1,5 @@
 /**
- * @astrajs/compiler — Transformers Barrel
+ * @bpjs159/compiler — Transformers Barrel
  */
 export { transformJSX, autoWrapDynamic, autoMemoDerivedFunctions } from './jsx.js';
 export type { JSXTransformResult } from './jsx.js';

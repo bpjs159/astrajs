@@ -4,7 +4,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
-    "jsxImportSource": "@astrajs/core",
+    "jsxImportSource": "@bpjs159/core",
     "strict": true,
     "noEmit": true,
     "skipLibCheck": true,
@@ -14,12 +14,12 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "paths": {
-      "@astrajs/core": ["./../../../packages/core/src"],
-      "@astrajs/core/jsx-runtime": ["./../../../packages/core/src/jsx-runtime"],
-      "@astrajs/core/jsx-dev-runtime": ["./../../../packages/core/src/jsx-dev-runtime"],
-      "@astrajs/ssr": ["./../../../packages/ssr/src"],
-      "@astrajs/compiler": ["./../../../packages/compiler/src"],
-      "@astrajs/compiler/css": ["./../../../packages/compiler/src/css"]
+      "@bpjs159/core": ["./../../../packages/core/src"],
+      "@bpjs159/core/jsx-runtime": ["./../../../packages/core/src/jsx-runtime"],
+      "@bpjs159/core/jsx-dev-runtime": ["./../../../packages/core/src/jsx-dev-runtime"],
+      "@bpjs159/ssr": ["./../../../packages/ssr/src"],
+      "@bpjs159/compiler": ["./../../../packages/compiler/src"],
+      "@bpjs159/compiler/css": ["./../../../packages/compiler/src/css"]
     }
   },
   "include": ["src"]

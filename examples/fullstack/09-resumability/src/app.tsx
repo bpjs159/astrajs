@@ -11,7 +11,7 @@
  * The developer never writes astra-on:click or astra-data manually.
  */
 
-import { store } from '@astrajs/core';
+import { store } from '@bpjs159/core';
 
 // ─── Reactive state ──────────────────────────────────────────────────────────
 

@@ -1,5 +1,5 @@
 /**
- * @astrajs/core — SWR (Stale-While-Revalidate)
+ * @bpjs159/core — SWR (Stale-While-Revalidate)
  *
  * `swr(fetcher)` wraps any async function with automatic caching and
  * reactive state management. One import, zero boilerplate.
@@ -18,7 +18,7 @@
  * ## Usage
  *
  * ```ts
- * import { swr } from '@astrajs/core';
+ * import { swr } from '@bpjs159/core';
  *
  * const users = swr(() => fetch('/api/users').then(r => r.json()));
  *

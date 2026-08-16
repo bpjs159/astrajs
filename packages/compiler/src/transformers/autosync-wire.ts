@@ -1,5 +1,5 @@
 /**
- * @astrajs/compiler — AutoSync Polling Auto-Wiring Transformer
+ * @bpjs159/compiler — AutoSync Polling Auto-Wiring Transformer
  *
  * When a `server({ autoSync: true, autoSyncInterval })` function is called
  * inside `mounted(() => { ... })`, this transformer auto-appends a real

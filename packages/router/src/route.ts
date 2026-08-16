@@ -1,5 +1,5 @@
 /**
- * @astrajs/router — route() + fallbackRoute()
+ * @bpjs159/router — route() + fallbackRoute()
  *
  * Declarative routing primitives. No wrapper components needed.
  *
@@ -13,7 +13,7 @@
 
 import { params } from './params.js';
 import { getCurrentPath } from './navigate.js';
-import { setBindingUpdate } from '@astrajs/core';
+import { setBindingUpdate } from '@bpjs159/core';
 
 // ─── Route matching state ────────────────────────────────────────────────────
 

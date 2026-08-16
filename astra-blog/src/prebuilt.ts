@@ -22,7 +22,7 @@
  * sus parámetros contra estas constantes pre-construidas vía la capa
  * de consultas de `db-core.ts`.
  */
-import { server } from '@astrajs/server';
+import { server } from '@bpjs159/server';
 
 // ─── Config del sitio ────────────────────────────────────────────────────────
 export const getSiteConfig = server({ type: 'pre-build', tags: ['site'] }, async () => {
@@ -690,7 +690,7 @@ export const getStaticPages = server({ type: 'pre-build', tags: ['pages'] }, asy
         { day: 'Domingos', hours: 'Cerrado (las flores descansan)' },
       ],
       socials: [
-        { label: 'GitHub', href: 'https://github.com', handle: '@astrajs' },
+        { label: 'GitHub', href: 'https://github.com', handle: '@astra' },
         { label: 'Discord', href: 'https://discord.com', handle: 'discord.gg/astrajs' },
         { label: 'X', href: 'https://x.com', handle: '@floresdelmundo' },
       ],

@@ -6,8 +6,8 @@
  * for the data query — the client receives a static JSON constant.
  */
 
-import { component } from '@astrajs/core';
-import { server } from '@astrajs/server';
+import { component } from '@bpjs159/core';
+import { server } from '@bpjs159/server';
 
 // ─── Pre-Build Server Call ───────────────────────────────────────────────────
 //

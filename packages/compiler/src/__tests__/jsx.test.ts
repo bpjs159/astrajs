@@ -1,5 +1,5 @@
 /**
- * @astrajs/compiler — JSX → DOM Transform Tests
+ * @bpjs159/compiler — JSX → DOM Transform Tests
  *
  * Tests that the AST compiler transforms JSX into correct DOM code.
  */
@@ -22,7 +22,7 @@ describe('JSX → DOM Transform', () => {
 
   it('detects reactive store and adds bindText', () => {
     const source = `
-      import { store } from '@astrajs/core';
+      import { store } from '@bpjs159/core';
       const ui = store({ value: 0 });
       const el = <h1>{ui.value}</h1>;
     `;
@@ -66,7 +66,7 @@ describe('JSX → DOM Transform', () => {
 
   it('handles Counter component (01-simple-state pattern)', () => {
     const source = `
-      import { component, store } from '@astrajs/core';
+      import { component, store } from '@bpjs159/core';
       const Counter = component(() => {
         const ui = store({ value: 0 });
         return (
@@ -101,7 +101,7 @@ describe('JSX → DOM Transform', () => {
 
   it('handles bindValue for input value={store.prop}', () => {
     const source = `
-      import { store } from '@astrajs/core';
+      import { store } from '@bpjs159/core';
       const ui = store({ name: '' });
       const el = <input value={ui.name} />;
     `;
@@ -111,7 +111,7 @@ describe('JSX → DOM Transform', () => {
 
   it('no bindValue when onInput is also present', () => {
     const source = `
-      import { store } from '@astrajs/core';
+      import { store } from '@bpjs159/core';
       const ui = store({ name: '' });
       const el = <input value={ui.name} onInput={(e) => ui.name = e.target.value} />;
     `;

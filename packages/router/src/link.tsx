@@ -1,5 +1,5 @@
 /**
- * @astrajs/router — <Link> component
+ * @bpjs159/router — <Link> component
  *
  * A client-side navigation link that uses `navigate()` instead of
  * full-page reloads. Falls back gracefully to standard `<a>` behavior

@@ -5,7 +5,7 @@
  * Principio general: como AstraJS compila JSX a DOM REAL (sin runtime
  * propietario), cualquier librería que hable DOM funciona directamente.
  */
-import { component, dynamic } from '@astrajs/core';
+import { component, dynamic } from '@bpjs159/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
 import { DocRightToc } from '../../components/doc-right-toc.js';
 import { Icon } from '../../components/icon.js';
@@ -53,7 +53,7 @@ export const DocsIntegrations = component(() => (
         <p>{i18n.t('ig.tw4.p')}</p>
         <CodeBlock code={`// vite.config.ts
 import { defineConfig } from 'vite';
-import astra from '@astrajs/compiler';
+import astra from '@bpjs159/compiler';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
@@ -91,7 +91,7 @@ export default {
 
         <h3>{i18n.t('ig.dyn.title')}</h3>
         <p>{i18n.t('ig.dyn.a')}<code>class</code>{i18n.t('ig.dyn.b')}</p>
-        <CodeBlock code={`import { component, store, classes } from '@astrajs/core';
+        <CodeBlock code={`import { component, store, classes } from '@bpjs159/core';
 
 const state = store({ active: false });
 
@@ -192,7 +192,7 @@ mounted(() => {
           <tr><td><strong>Chart.js / ECharts / D3</strong></td><td>{i18n.t('ig.cell.canvas')}</td><td class="ok"><Icon name="check" size={12} /> {i18n.t('ig.ok')}</td><td>{i18n.t('ig.n4.a')}<code>mounted()</code>{i18n.t('ig.n4.b')}</td></tr>
           <tr><td><strong>date-fns / dayjs / zod</strong></td><td>{i18n.t('ig.cell.pure')}</td><td class="ok"><Icon name="check" size={12} /> {i18n.t('ig.ok')}</td><td>{i18n.t('ig.n5')}</td></tr>
           <tr><td><strong>Motion One / anime.js</strong></td><td>{i18n.t('ig.cell.anim')}</td><td class="ok"><Icon name="check" size={12} /> {i18n.t('ig.ok')}</td><td>{i18n.t('ig.n6')}</td></tr>
-          <tr><td><strong>i18next / formatjs</strong></td><td>{i18n.t('ig.cell.i18n')}</td><td class="ok"><Icon name="layers" size={12} /> {i18n.t('ig.bridge')}</td><td>{i18n.t('ig.n7.a')}<code>@astrajs/i18n</code></td></tr>
+          <tr><td><strong>i18next / formatjs</strong></td><td>{i18n.t('ig.cell.i18n')}</td><td class="ok"><Icon name="layers" size={12} /> {i18n.t('ig.bridge')}</td><td>{i18n.t('ig.n7.a')}<code>@bpjs159/i18n</code></td></tr>
         </table>
 
         <h2 id="regla">{i18n.t('ig.rule.title')}</h2>

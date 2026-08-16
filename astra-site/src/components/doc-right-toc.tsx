@@ -1,4 +1,4 @@
-import { component } from '@astrajs/core';
+import { component } from '@bpjs159/core';
 import { i18n } from '../i18n.js';
 
 /**

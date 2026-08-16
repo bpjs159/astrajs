@@ -1,6 +1,6 @@
 // 06 — Optimistic Mutations · Update the UI before the server confirms
-import { component, store } from '@astrajs/core';
-import { server } from '@astrajs/server';
+import { component, store } from '@bpjs159/core';
+import { server } from '@bpjs159/server';
 
 interface Post { id: string; title: string; likes: number; }
 

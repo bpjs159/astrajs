@@ -2,7 +2,7 @@
  * UserProfile — layout for /users
  * Uses sub-routing: route(':id') matches /users/40, /users/42, etc.
  */
-import { route, navigate } from '@astrajs/router';
+import { route, navigate } from '@bpjs159/router';
 import { UserID } from './UserID.js';
 
 export const UserProfile = () => (

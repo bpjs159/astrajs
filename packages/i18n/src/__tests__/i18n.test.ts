@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { effect, flushPending } from '@astrajs/core';
+import { effect, flushPending } from '@bpjs159/core';
 import { createI18n } from '../i18n.js';
 
 function makeI18n() {

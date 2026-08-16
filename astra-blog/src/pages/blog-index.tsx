@@ -5,7 +5,7 @@
  * búsqueda de texto + filtro por categoría. Cada tecla re-filtra el
  * índice ya inlinado — sin fetch, sin debounce contra una API.
  */
-import { component, store } from '@astrajs/core';
+import { component, store } from '@bpjs159/core';
 import { db } from '../db.js';
 import { i18n } from '../i18n.js';
 import { PostCardMarkup } from '../components/post-card.js';

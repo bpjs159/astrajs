@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createCloudflareHandler = exports.createAstraHandler = void 0;
 /**
- * @astrajs/adapters/edge — edge-safe public API (Cloudflare Workers)
+ * @bpjs159/adapters/edge — edge-safe public API (Cloudflare Workers)
  *
  * Importing from this entry guarantees the module graph contains NO
  * Node.js built-ins — safe to bundle for edge runtimes.

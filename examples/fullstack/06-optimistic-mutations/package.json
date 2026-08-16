@@ -1,1 +1,1 @@
-{"name":"06-optimistic-mutations","private":true,"type":"module","scripts":{"dev":"vite","dev:server":"vite --host","build":"vite build"},"dependencies":{"@astrajs/core":"0.1.0","@astrajs/server":"0.1.0"},"devDependencies":{"vite":"^5.4.0","typescript":"^5.5.0"}}
+{"name":"06-optimistic-mutations","private":true,"type":"module","scripts":{"dev":"vite","dev:server":"vite --host","build":"vite build"},"dependencies":{"@bpjs159/core":"0.1.0","@bpjs159/server":"0.1.0"},"devDependencies":{"vite":"^5.4.0","typescript":"^5.5.0"}}

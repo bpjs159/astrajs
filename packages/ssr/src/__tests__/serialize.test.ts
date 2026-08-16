@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { store } from '@astrajs/core';
+import { store } from '@bpjs159/core';
 import { serializeState, deserializeState } from '../serialize.js';
 
 describe('serializeState()', () => {

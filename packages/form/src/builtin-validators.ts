@@ -1,7 +1,7 @@
 /**
- * @astrajs/form — Built-in Validator Registry
+ * @bpjs159/form — Built-in Validator Registry
  *
- * Ships with the standard @astrajs/validation validators pre-registered.
+ * Ships with the standard @bpjs159/validation validators pre-registered.
  * When `serverForm()` runs validators server-side, it resolves validator
  * names against this registry automatically — the developer does NOT
  * need to provide a manual `createValidatorMap()`.
@@ -30,8 +30,8 @@ import {
   oneOf,
   all,
   any,
-} from '@astrajs/validation';
-import type { Validator, AsyncValidator } from '@astrajs/validation';
+} from '@bpjs159/validation';
+import type { Validator, AsyncValidator } from '@bpjs159/validation';
 
 // ─── Registry Type ───────────────────────────────────────────────────────────
 
@@ -42,7 +42,7 @@ export type ServerValidator = ((...args: any[]) => any) | Validator | AsyncValid
  * Built-in validator registry.
  *
  * Maps validator function names → implementations. All standard
- * @astrajs/validation validators are pre-registered, so `serverForm()`
+ * @bpjs159/validation validators are pre-registered, so `serverForm()`
  * can auto-resolve them without a manual map.
  *
  * Custom validators can extend this via the `serverValidators` option

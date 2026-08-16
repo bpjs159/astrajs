@@ -1,5 +1,5 @@
 /**
- * @astrajs/i18n — Built-in internationalization for AstraJS.
+ * @bpjs159/i18n — Built-in internationalization for AstraJS.
  *
  * Zero dependencies. The current locale lives in a reactive `store()`, so
  * any JSX expression that calls `t()` inside a `dynamic()` block re-runs
@@ -25,7 +25,7 @@
  *   - Number / date / list formatting with Intl (native, locale-aware)
  *   - RTL detection for right-to-left languages (ar, he, fa, ur)
  */
-import { store } from '@astrajs/core';
+import { store } from '@bpjs159/core';
 
 // ─── Public types ─────────────────────────────────────────────────────────────
 

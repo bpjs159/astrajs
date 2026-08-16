@@ -1,5 +1,5 @@
-import { component, store, dynamic } from '@astrajs/core';
-import { navigate, onRouteChange } from '@astrajs/router';
+import { component, store, dynamic } from '@bpjs159/core';
+import { navigate, onRouteChange } from '@bpjs159/router';
 import { i18n } from '../i18n.js';
 import { Icon } from './icon.js';
 

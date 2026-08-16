@@ -1,5 +1,5 @@
 /**
- * @astrajs/compiler — AI RPC Transformer
+ * @bpjs159/compiler — AI RPC Transformer
  *
  * Transforms `ai()` and `aiStream()` calls exactly like `server()`:
  *
@@ -9,7 +9,7 @@
  * 2. **SSR graph / production bundle**: the macro stays intact (runtime
  *    passthrough returns the real function) and the compiler appends an
  *    `rpcHandler` registration that wraps the function with `complete()`
- *    (JSON `{ text }`) or `stream()` (text chunks) from `@astrajs/ai`.
+ *    (JSON `{ text }`) or `stream()` (text chunks) from `@bpjs159/ai`.
  * 3. **Pre-build** (`{ type: 'pre-build' }`): the prompt is executed at
  *    BUILD time by the plugin (see `executeAiPreBuild`), the result is
  *    folded into the bundle, and the call ships zero runtime data code.
@@ -33,7 +33,7 @@
  */
 
 import type { AstraViteConfig } from '../index.js';
-import type { AiCallConfig } from '@astrajs/ai';
+import type { AiCallConfig } from '@bpjs159/ai';
 import { hashContent } from '../utils/ast.js';
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -290,7 +290,7 @@ function registrationOptions(call: AiCallInfo): string {
 /**
  * Server-side registration appended to the SSR graph (and production
  * bundle). Wraps the real prompt function with `complete()` / `stream()`
- * from `@astrajs/ai` and registers it through `rpcHandler`.
+ * from `@bpjs159/ai` and registers it through `rpcHandler`.
  */
 export function generateAiServerRegistration(call: AiCallInfo): string {
   const { id, varName, paramNames } = call;
@@ -356,7 +356,7 @@ export function transformAiRPC(
     if (call.isPreBuild) {
       const text = preBuildResults.get(call.id);
       if (text === undefined) {
-        replacement = `${call.varName ? `const ${call.varName} = ` : ''}/* @astrajs ai pre-build — execution failed */ undefined;`;
+        replacement = `${call.varName ? `const ${call.varName} = ` : ''}/* @astra ai pre-build — execution failed */ undefined;`;
       } else {
         // If the model answered with pure JSON, fold the parsed value;
         // otherwise fold the text contract ({ text }) used by the wrappers.
@@ -440,7 +440,7 @@ export async function executeAiPreBuildCall(
   }
 
   try {
-    const { executePrompt } = await import('@astrajs/ai');
+    const { executePrompt } = await import('@bpjs159/ai');
     // Run the prompt body in isolation → the prompt string.
     const promptFn = new Function(
       `return (async function() { ${call.functionBody} })();`

@@ -5,7 +5,7 @@
  * Función pura: se invoca dentro de listas dinámicas y re-evalúa
  * con cada cambio de ruta o filtro.
  */
-import { Link } from '@astrajs/router';
+import { Link } from '@bpjs159/router';
 import { db } from '../db.js';
 import type { PostMeta } from '../db-core.js';
 

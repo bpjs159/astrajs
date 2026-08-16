@@ -7,11 +7,11 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@astrajs/core': path.resolve(__dirname, 'src'),
-      '@astrajs/router': path.resolve(__dirname, '../router/src'),
-      '@astrajs/server': path.resolve(__dirname, '../server/src'),
-      '@astrajs/ssr': path.resolve(__dirname, '../ssr/src'),
-      '@astrajs/compiler': path.resolve(__dirname, '../compiler/src'),
+      '@bpjs159/core': path.resolve(__dirname, 'src'),
+      '@bpjs159/router': path.resolve(__dirname, '../router/src'),
+      '@bpjs159/server': path.resolve(__dirname, '../server/src'),
+      '@bpjs159/ssr': path.resolve(__dirname, '../ssr/src'),
+      '@bpjs159/compiler': path.resolve(__dirname, '../compiler/src'),
     },
   },
 });

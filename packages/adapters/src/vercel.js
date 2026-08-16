@@ -44,7 +44,7 @@ var node_bridge_js_1 = require("./node-bridge.js");
  *
  * Generated entry:
  * ```ts
- * import { createVercelHandler } from '@astrajs/adapters';
+ * import { createVercelHandler } from '@bpjs159/adapters';
  * export default createVercelHandler({ apiPrefix: '/api/astra' });
  * ```
  */

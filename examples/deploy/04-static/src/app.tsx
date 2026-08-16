@@ -4,7 +4,7 @@
  * Every value on this page was computed at BUILD TIME.
  * The shipped JS contains zero fetch() calls and zero async data code.
  */
-import { component } from '@astrajs/core';
+import { component } from '@bpjs159/core';
 import { getProducts, type Product } from './server.js';
 
 const css = `

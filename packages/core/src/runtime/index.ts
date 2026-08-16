@@ -1,5 +1,5 @@
 /**
- * @astrajs/core — Runtime Barrel Export
+ * @bpjs159/core — Runtime Barrel Export
  *
  * Re-exports all public runtime APIs from a single entry point.
  */

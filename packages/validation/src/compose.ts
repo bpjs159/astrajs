@@ -1,5 +1,5 @@
 /**
- * @astrajs/validation — Composition Helpers
+ * @bpjs159/validation — Composition Helpers
  *
  * Compose multiple validators together:
  * - `all([...])` — every validator must pass (AND semantics).

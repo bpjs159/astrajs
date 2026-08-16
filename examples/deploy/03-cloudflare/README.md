@@ -2,7 +2,7 @@
 
 `server()` handlers inside ONE Worker (`dist/_worker.js`), static assets
 served by the Cloudflare Pages pipeline. The handler graph is edge-safe:
-`@astrajs/adapters/edge` never pulls in Node built-ins.
+`@bpjs159/adapters/edge` never pulls in Node built-ins.
 
 ## Build
 

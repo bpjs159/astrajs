@@ -1,5 +1,5 @@
 /**
- * @astrajs/form — Server Form Validation Bridge
+ * @bpjs159/form — Server Form Validation Bridge
  *
  * `serverForm()` integrates the form controller with server-side validation.
  * The developer writes validation rules ONCE on the inputs, and AstraJS
@@ -7,7 +7,7 @@
  *
  * ## Zero-Config Auto-Resolution
  *
- * Standard `@astrajs/validation` validators (`isEmail`, `isRequired`,
+ * Standard `@bpjs159/validation` validators (`isEmail`, `isRequired`,
  * `minLength`, etc.) are resolved automatically from the built-in registry.
  * **No manual `createValidatorMap()` needed.** Just write `validate={fn}`
  * on your inputs and AstraJS handles the rest.
@@ -36,10 +36,10 @@
  * ## Usage
  *
  * ```tsx
- * import { component, store } from '@astrajs/core';
- * import { form, serverForm } from '@astrajs/form';
- * import { isEmail, isRequired, minLength, all } from '@astrajs/validation';
- * import { server } from '@astrajs/server';
+ * import { component, store } from '@bpjs159/core';
+ * import { form, serverForm } from '@bpjs159/form';
+ * import { isEmail, isRequired, minLength, all } from '@bpjs159/validation';
+ * import { server } from '@bpjs159/server';
  *
  * export const RegisterPage = component(() => {
  *   const formData = store({ name: '', email: '', password: '' });
@@ -71,7 +71,7 @@
  * ```
  */
 
-import { store } from '@astrajs/core';
+import { store } from '@bpjs159/core';
 import type { FormController } from './controller.js';
 import { extractValidators, runValidators } from './validator-extractor.js';
 import type { ServerValidator } from './builtin-validators.js';
@@ -103,7 +103,7 @@ export interface ServerFormConfig<T extends Record<string, unknown>> {
    *
    * @example
    * ```ts
-   * import * as v from '@astrajs/validation';
+   * import * as v from '@bpjs159/validation';
    * const customValidators = {
    *   isEmail: v.isEmail,
    *   isRequired: v.isRequired,

@@ -5,7 +5,7 @@
  * appends to a store property and the compiler-patched bindText mutates
  * exactly one TextNode — no re-render, no diffing.
  */
-import { component, store } from '@astrajs/core';
+import { component, store } from '@bpjs159/core';
 import { chat, summarize } from './ai.js';
 
 const css = `

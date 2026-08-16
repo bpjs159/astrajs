@@ -11,7 +11,7 @@
  * - Form controller: Browser Constraint Validation API + server error merging
  * - serverForm(): Bridges client validators → server re-execution
  */
-import { resume } from '@astrajs/ssr';
+import { resume } from '@bpjs159/ssr';
 import { FormServerDemo } from './main.js';
 
 // ─── SSR Resumability Bootstrap ──────────────────────────────────────────────

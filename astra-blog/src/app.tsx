@@ -5,8 +5,8 @@
  * Todas las rutas (fijas y dinámicas anidadas) se resuelven contra
  * las constantes que el compilador inlinó en build time.
  */
-import { component } from '@astrajs/core';
-import { route, fallbackRoute } from '@astrajs/router';
+import { component } from '@bpjs159/core';
+import { route, fallbackRoute } from '@bpjs159/router';
 import { SiteHeaderMarkup, SiteFooterMarkup } from './components/site-chrome.js';
 import { HomePage } from './pages/home.js';
 import { BlogIndexPage } from './pages/blog-index.js';

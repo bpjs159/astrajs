@@ -13,7 +13,7 @@
  * 4. **Composition** — `UserProfile` = `Card` + `Badge` + `Avatar`
  * 5. **Primitives** — small reusable building blocks
  */
-import { component, store } from '@astrajs/core';
+import { component, store } from '@bpjs159/core';
 import { styles } from './styles.js';
 
 // ─── Primitive: Badge ────────────────────────────────────────────────────

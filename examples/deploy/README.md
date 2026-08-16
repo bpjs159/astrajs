@@ -32,6 +32,6 @@ at build time — its output runs without any server.
 1. **Client build** — Vite compiles JSX to physical DOM mutations; `server()` calls become typed `fetch()` wrappers.
 2. **Server manifest** — the compiler emits the list of RPC endpoints (`dist/astra-server-modules.json`).
 3. **SSR bundle** — the CLI builds a server entry that imports your real server modules, so handlers keep their module-scope closures.
-4. **Adapter emission** — `@astrajs/adapters` writes the platform files for the configured adapter.
+4. **Adapter emission** — `@bpjs159/adapters` writes the platform files for the configured adapter.
 
 Full docs: `/docs/deployment` on the official site.

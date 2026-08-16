@@ -1,5 +1,5 @@
 /**
- * @astrajs/ai — runtime tests
+ * @bpjs159/ai — runtime tests
  *
  * Imports the BUILT dist (vitest can't remap `.js` → `.ts` inside sibling
  * package sources under native Node). Run `npm run build` first.

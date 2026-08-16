@@ -1,4 +1,4 @@
-import { component, store } from '@astrajs/core';
+import { component, store } from 'astrajsx/core';
 
 /**
  * Reactive counter — the classic AstraJS example.

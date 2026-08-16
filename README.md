@@ -20,26 +20,38 @@ no re-renders: components run **once**, the AST compiler wires surgical
 
 ## Packages
 
-| Package | Description |
-|---------|-------------|
-| [`@astrajs/core`](packages/core) | Proxy-based reactivity runtime, JSX runtime & types, DOM bindings (~3 KB) |
-| [`@astrajs/compiler`](packages/compiler) | Vite plugin: AST transformers, `server()` RPC, CSS macro, auto-memo |
-| [`@astrajs/server`](packages/server) | `server()` RPC macro, SWR, cache tags, autoSync |
-| [`@astrajs/ssr`](packages/ssr) | Server renderer, SSG crawler, HTML stringifier, ISR, resumability |
-| [`@astrajs/router`](packages/router) | Isomorphic router with `<Outlet />` and View Transitions |
-| [`@astrajs/adapters`](packages/adapters) | Deployment adapters: Node, Vercel, Cloudflare, static |
-| [`@astrajs/ai`](packages/ai) | Typed AI endpoints, streaming, tool agents, in-memory RAG |
-| [`@astrajs/form`](packages/form) | Reactive form controller (HTML5 Constraint Validation API) |
-| [`@astrajs/schema`](packages/schema) | Declarative validation schemas with inferred types |
-| [`@astrajs/validation`](packages/validation) | Standalone validator functions and compositors |
-| [`@astrajs/i18n`](packages/i18n) | Built-in i18n: reactive translations, pluralization, Intl formats |
-| [`@astrajs/cli`](packages/astra) | Scaffold and run AstraJS projects (`astra my-app`, `astra dev`) |
+One install, dynamic subpath imports — only the entry you import is loaded:
+
+```bash
+npm install astrajsx
+```
+
+```ts
+import { store } from 'astrajsx/core';
+import astra from 'astrajsx/compiler';
+import { server } from 'astrajsx/server';
+```
+
+| Subpath | Description | Repo dir |
+|---------|-------------|----------|
+| `astrajsx/core` | Proxy-based reactivity runtime, JSX runtime & types, DOM bindings (~3 KB) | [`packages/core`](packages/core) |
+| `astrajsx/compiler` | Vite plugin: AST transformers, `server()` RPC, CSS macro, auto-memo | [`packages/compiler`](packages/compiler) |
+| `astrajsx/server` | `server()` RPC macro, SWR, cache tags, autoSync | [`packages/server`](packages/server) |
+| `astrajsx/ssr` | Server renderer, SSG crawler, HTML stringifier, ISR, resumability | [`packages/ssr`](packages/ssr) |
+| `astrajsx/router` | Isomorphic router with `<Outlet />` and View Transitions | [`packages/router`](packages/router) |
+| `astrajsx/adapters` | Deployment adapters: Node, Vercel, Cloudflare, static | [`packages/adapters`](packages/adapters) |
+| `astrajsx/ai` | Typed AI endpoints, streaming, tool agents, in-memory RAG | [`packages/ai`](packages/ai) |
+| `astrajsx/form` | Reactive form controller (HTML5 Constraint Validation API) | [`packages/form`](packages/form) |
+| `astrajsx/schema` | Declarative validation schemas with inferred types | [`packages/schema`](packages/schema) |
+| `astrajsx/validation` | Standalone validator functions and compositors | [`packages/validation`](packages/validation) |
+| `astrajsx/i18n` | Built-in i18n: reactive translations, pluralization, Intl formats | [`packages/i18n`](packages/i18n) |
+| `astrajsx` (bin `astra`) | Scaffold and run AstraJS projects (`astra my-app`, `astra dev`) | [`packages/astra`](packages/astra) |
 
 ## Quick Start
 
 ```bash
 # Scaffold a new project
-npx @astrajs/cli@latest my-app     # or: pnpm create astrajs my-app
+npx astrajsx@latest my-app
 
 # Develop / build from the repo
 pnpm install
@@ -78,6 +90,8 @@ pnpm build          # build every package
 pnpm test           # run all test suites
 pnpm publish:beta   # publish all packages with the `beta` tag
 pnpm publish:dry    # dry-run the publish flow
+# publishing requires npm >= 11 (npm 10.9.x sends PUTs without auth):
+node scripts/publish.mjs --npm11 --tag beta
 ```
 
 ## Docs

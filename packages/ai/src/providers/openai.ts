@@ -1,5 +1,5 @@
 /**
- * @astrajs/ai — OpenAI-compatible provider
+ * @bpjs159/ai — OpenAI-compatible provider
  *
  * Works with OpenAI and any OpenAI-compatible endpoint (together.ai, Groq,
  * vLLM, LM Studio, …). Streaming uses Server-Sent Events.

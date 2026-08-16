@@ -1,6 +1,6 @@
 # AI 04 — RAG
 
-Retrieval-Augmented Generation with `@astrajs/ai/rag`: embed a knowledge
+Retrieval-Augmented Generation with `@bpjs159/ai/rag`: embed a knowledge
 base, retrieve the top-k chunks by cosine similarity, and ground the answer
 on them. The index builds lazily inside the server handler — never in the
 client bundle.

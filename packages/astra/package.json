@@ -1,6 +1,10 @@
 {
-  "name": "@astrajs/cli",
+  "name": "@bpjs159/cli",
   "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bpjs159/astrajs.git"
+  },
   "description": "The AstraJS CLI — scaffold new projects and run them (astra dev|build|preview|test). Zero dependencies.",
   "type": "module",
   "bin": {

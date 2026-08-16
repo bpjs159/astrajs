@@ -1,5 +1,5 @@
 /**
- * @astrajs/ssr — Constant Folding (Pre-Build Execution)
+ * @bpjs159/ssr — Constant Folding (Pre-Build Execution)
  *
  * When `server()` is called with `{ type: 'pre-build' }`, the function
  * is executed at build time (during SSG) and its result is inlined into
@@ -130,13 +130,13 @@ export async function executePreBuild(
  * JSON constants. The client code is just:
  *
  * ```ts
- * const getProducts = /* @astrajs pre-build * / Object.freeze({...});
+ * const getProducts = /* @astra pre-build * / Object.freeze({...});
  * ```
  *
  * Or, when used with `store()`:
  *
  * ```ts
- * const products = store(/* @astrajs pre-build * / {...});
+ * const products = store(/* @astra pre-build * / {...});
  * ```
  *
  * @param data — The serialized JSON result.
@@ -147,7 +147,7 @@ export function generatePreBuildCode(
   data: string,
   varName: string
 ): string {
-  return `/* @astrajs pre-build — resolved at build time */\nconst ${varName} = ${data};`;
+  return `/* @astra pre-build — resolved at build time */\nconst ${varName} = ${data};`;
 }
 
 /**

@@ -1,4 +1,4 @@
-import { component, store, dynamic } from '@astrajs/core';
+import { component, store, dynamic } from '@bpjs159/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
 import { DocRightToc } from '../../components/doc-right-toc.js';
 import { Icon } from '../../components/icon.js';

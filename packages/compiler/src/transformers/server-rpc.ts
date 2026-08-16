@@ -1,5 +1,5 @@
 /**
- * @astrajs/compiler — server RPC Transformer
+ * @bpjs159/compiler — server RPC Transformer
  *
  * Transforms `server()` calls into:
  * 1. **Server side**: An API endpoint handler.
@@ -47,7 +47,7 @@
  */
 
 import type { AstraViteConfig } from '../index.js';
-import type { ServerConfig } from '@astrajs/server';
+import type { ServerConfig } from '@bpjs159/server';
 import { hashContent } from '../utils/ast.js';
 
 // ─── server Call Parser ─────────────────────────────────────────────────────
@@ -518,7 +518,7 @@ export function generatePreBuildInline(call: ServerCallInfo): string {
       `(function may depend on module-scope variables):`,
       e instanceof Error ? e.message : e
     );
-    return `${stub}/* @astrajs pre-build — execution failed */ undefined;`;
+    return `${stub}/* @astra pre-build — execution failed */ undefined;`;
   }
 }
 

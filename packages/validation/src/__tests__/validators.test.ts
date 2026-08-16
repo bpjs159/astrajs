@@ -1,5 +1,5 @@
 /**
- * @astrajs/validation — Tests
+ * @bpjs159/validation — Tests
  */
 import { describe, it, expect } from 'vitest';
 import {

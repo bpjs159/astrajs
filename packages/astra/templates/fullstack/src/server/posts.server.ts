@@ -8,7 +8,7 @@
  *
  * Types are inferred end-to-end. No codegen, no duplication.
  */
-import { server } from '@astrajs/server';
+import { server } from 'astrajsx/server';
 
 export interface Post {
   id: number;

@@ -1,5 +1,5 @@
 /**
- * @astrajs/compiler — Vite Plugin
+ * @bpjs159/compiler — Vite Plugin
  *
  * ## Architecture
  *
@@ -142,7 +142,7 @@ function readConfigFile(root: string): Partial<AstraViteConfig> {
  * ```ts
  * // vite.config.ts
  * import { defineConfig } from 'vite';
- * import astra from '@astrajs/core/vite';
+ * import astra from '@bpjs159/core/vite';
  *
  * export default defineConfig({
  *   plugins: [astra({ cssPrefix: 'app-', apiPrefix: '/api/rpc' })]
@@ -206,7 +206,7 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
       // and build share one provider configuration (apiKey read from env).
       if (config.ai) {
         const ai = config.ai;
-        import('@astrajs/ai')
+        import('@bpjs159/ai')
           .then(({ configureAi }) => {
             configureAi({
               ...(ai.provider ? { provider: ai.provider } : {}),
@@ -220,7 +220,7 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
           })
           .catch(() => {
             console.warn(
-              '[AstraJS] @astrajs/ai not found — install it to use ai() endpoints.'
+              '[AstraJS] @bpjs159/ai not found — install it to use ai() endpoints.'
             );
           });
       }
@@ -230,13 +230,13 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
 
     async configureServer(server) {
       // Server-side handler state must live in the SAME module instance as the
-      // SSR-loaded app modules that register handlers. Resolving @astrajs/server
+      // SSR-loaded app modules that register handlers. Resolving @bpjs159/server
       // through Vite's SSR graph (not a plain `import()`) guarantees the RPC
       // middleware and the app modules share one handler registry.
       let rpcSsrPromise: Promise<any> | null = null;
       const getRpcSsr = (): Promise<any> => {
         if (!rpcSsrPromise) {
-          rpcSsrPromise = server.ssrLoadModule('@astrajs/server');
+          rpcSsrPromise = server.ssrLoadModule('@bpjs159/server');
         }
         return rpcSsrPromise;
       };
@@ -358,9 +358,9 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
           });
 
         if (regs.length > 0) {
-          transformed = ensureImport(transformed, '@astrajs/server', ['rpcHandler']);
+          transformed = ensureImport(transformed, '@bpjs159/server', ['rpcHandler']);
           transformed +=
-            '\n\n// @astrajs dev: register server() handlers (SSR graph)\n' +
+            '\n\n// @astra dev: register server() handlers (SSR graph)\n' +
             regs.join('\n') +
             '\n';
           hasChanges = true;
@@ -382,14 +382,14 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
 
         if (aiRegs.length > 0) {
           if (aiCalls.some((c) => !c.isPreBuild && !c.isStream && c.varName)) {
-            transformed = ensureImport(transformed, '@astrajs/ai', ['complete']);
+            transformed = ensureImport(transformed, '@bpjs159/ai', ['complete']);
           }
           if (aiCalls.some((c) => !c.isPreBuild && c.isStream && c.varName)) {
-            transformed = ensureImport(transformed, '@astrajs/ai', ['stream']);
+            transformed = ensureImport(transformed, '@bpjs159/ai', ['stream']);
           }
-          transformed = ensureImport(transformed, '@astrajs/server', ['rpcHandler']);
+          transformed = ensureImport(transformed, '@bpjs159/server', ['rpcHandler']);
           transformed +=
-            '\n\n// @astrajs dev: register ai()/aiStream() handlers (SSR graph)\n' +
+            '\n\n// @astra dev: register ai()/aiStream() handlers (SSR graph)\n' +
             aiRegs.join('\n') +
             '\n';
           hasChanges = true;
@@ -516,7 +516,7 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
         // called there — no manual autoSync() call needed from the developer.
         const wiredResult = autoWireAutoSyncCalls(transformed, autoSyncCalls);
         if (wiredResult.changed) {
-          transformed = ensureImport(wiredResult.code, '@astrajs/server', ['autoSync']);
+          transformed = ensureImport(wiredResult.code, '@bpjs159/server', ['autoSync']);
           hasChanges = true;
         }
 
@@ -533,7 +533,7 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
         // Runs for BOTH dynamic and vanilla modes. Transparent to developer.
         const memoResult = autoMemoDerivedFunctions(transformed, reactiveVars);
         if (memoResult.needsMemo) {
-          transformed = ensureImport(memoResult.code, '@astrajs/core', ['memo']);
+          transformed = ensureImport(memoResult.code, '@bpjs159/core', ['memo']);
           hasChanges = true;
         } else if (memoResult.code !== transformed) {
           transformed = memoResult.code;
@@ -544,7 +544,7 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
           // ── Dynamic mode: auto-wrap ALL JSX child expressions with dynamic() ──
           const wrapped = autoWrapDynamic(transformed, reactiveVars);
           if (wrapped.needsDynamic) {
-            transformed = ensureImport(wrapped.code, '@astrajs/core', ['dynamic']);
+            transformed = ensureImport(wrapped.code, '@bpjs159/core', ['dynamic']);
             hasChanges = true;
           } else if (wrapped.code !== transformed) {
             transformed = wrapped.code;
@@ -658,6 +658,6 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
 }
 
 /**
- * Default export for `import astra from '@astrajs/core/vite'`.
+ * Default export for `import astra from '@bpjs159/core/vite'`.
  */
 export default astraVitePlugin;

@@ -1,5 +1,5 @@
 /**
- * @astrajs/core — CSS Class Name Composer
+ * @bpjs159/core — CSS Class Name Composer
  *
  * `classes()` composes CSS class names from strings, objects, and arrays.
  * Falsy values (`false`, `null`, `undefined`, `0`, `''`) are silently

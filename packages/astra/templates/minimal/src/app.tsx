@@ -5,7 +5,7 @@
  * Proxy reactivity. The component runs ONCE — the compiler turns
  * {counter.value} into an O(1) effect that updates only that TextNode.
  */
-import { component, store } from '@astrajs/core';
+import { component, store } from 'astrajsx/core';
 
 const style = document.createElement('style');
 style.textContent = `

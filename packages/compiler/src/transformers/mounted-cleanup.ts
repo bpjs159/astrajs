@@ -1,8 +1,8 @@
 /**
- * @astrajs/compiler — mounted() Cleanup Auto-Wiring Transformer
+ * @bpjs159/compiler — mounted() Cleanup Auto-Wiring Transformer
  *
  * `autoSync()` and `watchTags()` are framework-internal APIs (from
- * `@astrajs/server`) that already return a disposer function. When one is
+ * `@bpjs159/server`) that already return a disposer function. When one is
  * called directly inside `mounted(() => { ... })` without an explicit
  * `return`, this transformer auto-appends the matching `return` so the
  * disposer is wired into `mounted()`'s existing unmount-cleanup mechanism —

@@ -1,7 +1,7 @@
 /**
  * Deploy 01 — Node · App component
  */
-import { component, store } from '@astrajs/core';
+import { component, store } from '@bpjs159/core';
 import { getQuote, getStats, addVisit, type Quote } from './server.js';
 
 const style = `

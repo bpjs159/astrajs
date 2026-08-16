@@ -2,7 +2,7 @@
  * AstraJS — Official Site
  * Zero-VDOM, AST-compiled, full-stack TypeScript framework.
  */
-import { component } from '@astrajs/core';
+import { component } from '@bpjs159/core';
 import { Header } from './components/header.js';
 import { Footer } from './components/footer.js';
 import { HomePage } from './pages/home.js';

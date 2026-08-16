@@ -1,6 +1,10 @@
 {
-  "name": "@astrajs/adapters",
+  "name": "@bpjs159/adapters",
   "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bpjs159/astrajs.git"
+  },
   "description": "AstraJS deployment adapters — Node, Vercel, Cloudflare, static",
   "type": "module",
   "exports": {
@@ -31,7 +35,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@astrajs/server": "0.1.0"
+    "@bpjs159/server": "0.1.0"
   },
   "devDependencies": {
     "typescript": "^5.5.0",

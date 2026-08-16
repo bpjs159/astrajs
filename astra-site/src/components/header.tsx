@@ -1,7 +1,7 @@
-import { component, store, dynamic } from '@astrajs/core';
-import { navigate } from '@astrajs/router';
+import { component, store, dynamic } from '@bpjs159/core';
+import { navigate } from '@bpjs159/router';
 import { i18n } from '../i18n.js';
-import { WORLD_LOCALES } from '@astrajs/i18n';
+import { WORLD_LOCALES } from '@bpjs159/i18n';
 import { Icon } from './icon.js';
 import { BrandLogo } from './brand-logo.js';
 

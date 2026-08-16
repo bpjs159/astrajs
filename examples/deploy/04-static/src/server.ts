@@ -13,7 +13,7 @@
  * other module-scope bindings. After folding, `getProducts` becomes a
  * plain array constant (no async, no fetch).
  */
-import { server } from '@astrajs/server';
+import { server } from '@bpjs159/server';
 
 // Executed at build time — the client receives the result as a JSON constant.
 export const getProducts = server({ type: 'pre-build' }, async () => {

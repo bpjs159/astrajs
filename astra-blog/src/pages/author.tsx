@@ -3,8 +3,8 @@
  *
  * RUTA DINÁMICA: /authors/:authorSlug
  */
-import { component } from '@astrajs/core';
-import { params, Link } from '@astrajs/router';
+import { component } from '@bpjs159/core';
+import { params, Link } from '@bpjs159/router';
 import { db } from '../db.js';
 import { BreadcrumbsMarkup } from '../components/site-chrome.js';
 import { PostCardMarkup } from '../components/post-card.js';
