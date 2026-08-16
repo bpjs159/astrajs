@@ -1,4 +1,4 @@
-import { component, store, mounted } from 'astrajsx/core';
+import { component, store, mounted } from 'astrajs.dev/core';
 import { getPosts, type Post } from '../server/posts.server.js';
 
 export const PostsPage = component(() => {

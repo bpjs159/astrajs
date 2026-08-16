@@ -1,4 +1,4 @@
-import { Link } from 'astrajsx/router';
+import { Link } from 'astrajs.dev/router';
 
 export function HomePage(): JSX.Element {
   return (

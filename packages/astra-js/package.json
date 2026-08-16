@@ -1,7 +1,7 @@
 {
-  "name": "astrajsx",
-  "version": "0.1.3",
-  "description": "AstraJS — Full-Stack TypeScript Framework. One install, dynamic subpath imports: astrajsx/core, astrajsx/compiler, astrajsx/server…",
+  "name": "astrajs.dev",
+  "version": "0.1.4",
+  "description": "AstraJS — Full-Stack TypeScript Framework. One install, dynamic subpath imports: astrajs.dev/core, astrajs.dev/compiler, astrajs.dev/server…",
   "type": "module",
   "repository": {
     "type": "git",

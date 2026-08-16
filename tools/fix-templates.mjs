@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * One-shot repair of packages/astra/templates after the scope rename:
- * rewrites imports to astrajsx subpaths, collapses package.json deps,
+ * rewrites imports to astrajs.dev subpaths, collapses package.json deps,
  * fixes tsconfig jsxImportSource and README prose.
  */
 import { readdirSync, statSync, readFileSync, writeFileSync } from 'node:fs';
@@ -19,22 +19,22 @@ const files = [];
 })(templatesDir);
 
 const importRules = [
-  [/import astra from 'astrajsx';/g, "import astra from 'astrajsx/compiler';"],
-  [/import \{ route, fallbackRoute \} from 'astrajsx';/g, "import { route, fallbackRoute } from 'astrajsx/router';"],
-  [/import \{ route \} from 'astrajsx';/g, "import { route } from 'astrajsx/router';"],
-  [/import \{ component, store, mounted \} from 'astrajsx';/g, "import { component, store, mounted } from 'astrajsx/core';"],
-  [/import \{ component, store \} from 'astrajsx';/g, "import { component, store } from 'astrajsx/core';"],
-  [/import \{ component \} from 'astrajsx';/g, "import { component } from 'astrajsx/core';"],
-  [/import \{ store \} from 'astrajsx';/g, "import { store } from 'astrajsx/core';"],
-  [/import \{ server \} from 'astrajsx';/g, "import { server } from 'astrajsx/server';"],
-  [/import \{ Link \} from 'astrajsx';/g, "import { Link } from 'astrajsx/router';"],
-  [/from 'astrajsx';/g, "from 'astrajsx/core';"],
+  [/import astra from 'astrajs.dev';/g, "import astra from 'astrajs.dev/compiler';"],
+  [/import \{ route, fallbackRoute \} from 'astrajs.dev';/g, "import { route, fallbackRoute } from 'astrajs.dev/router';"],
+  [/import \{ route \} from 'astrajs.dev';/g, "import { route } from 'astrajs.dev/router';"],
+  [/import \{ component, store, mounted \} from 'astrajs.dev';/g, "import { component, store, mounted } from 'astrajs.dev/core';"],
+  [/import \{ component, store \} from 'astrajs.dev';/g, "import { component, store } from 'astrajs.dev/core';"],
+  [/import \{ component \} from 'astrajs.dev';/g, "import { component } from 'astrajs.dev/core';"],
+  [/import \{ store \} from 'astrajs.dev';/g, "import { store } from 'astrajs.dev/core';"],
+  [/import \{ server \} from 'astrajs.dev';/g, "import { server } from 'astrajs.dev/server';"],
+  [/import \{ Link \} from 'astrajs.dev';/g, "import { Link } from 'astrajs.dev/router';"],
+  [/from 'astrajs.dev';/g, "from 'astrajs.dev/core';"],
 ];
 
 const proseRules = [
-  [/<strong>astrajsx<\/strong> for isomorphic navigation/g, '<strong>astrajsx/router</strong> for isomorphic navigation'],
-  [/<strong> astrajsx<\/strong> for reactive forms/g, '<strong> astrajsx/form</strong> for reactive forms'],
-  [/<strong> astrajsx<\/strong> for declarative validation/g, '<strong> astrajsx/schema</strong> for declarative validation'],
+  [/<strong>astrajs.dev<\/strong> for isomorphic navigation/g, '<strong>astrajs.dev/router</strong> for isomorphic navigation'],
+  [/<strong> astrajs.dev<\/strong> for reactive forms/g, '<strong> astrajs.dev/form</strong> for reactive forms'],
+  [/<strong> astrajs.dev<\/strong> for declarative validation/g, '<strong> astrajs.dev/schema</strong> for declarative validation'],
 ];
 
 let changed = 0;
@@ -51,8 +51,8 @@ for (const f of files) {
   if (f.endsWith('package.json')) {
     try {
       const j = JSON.parse(t);
-      j.dependencies = { astrajsx: '^0.1.0' };
-      if (j.devDependencies) delete j.devDependencies.astrajsx;
+      j.dependencies = { astrajs.dev: '^0.1.0' };
+      if (j.devDependencies) delete j.devDependencies.astrajs.dev;
       t = JSON.stringify(j, null, 2) + '\n';
     } catch {
       console.warn(`⚠ JSON inválido, saltando: ${f}`);
@@ -60,13 +60,13 @@ for (const f of files) {
   }
 
   if (f.endsWith('tsconfig.json')) {
-    t = t.replace(/"jsxImportSource": "astrajsx"/, '"jsxImportSource": "astrajsx/core"');
+    t = t.replace(/"jsxImportSource": "astrajs.dev"/, '"jsxImportSource": "astrajs.dev/core"');
   }
 
   if (f.endsWith('.md')) {
-    t = t.replace('`astrajsx` — isomorphic routing', '`astrajsx/router` — isomorphic routing');
-    t = t.replace('`jsxImportSource: astrajsx`', '`jsxImportSource: astrajsx/core`');
-    t = t.replace('@astrajs', 'astrajsx');
+    t = t.replace('`astrajs.dev` — isomorphic routing', '`astrajs.dev/router` — isomorphic routing');
+    t = t.replace('`jsxImportSource: astrajs.dev`', '`jsxImportSource: astrajs.dev/core`');
+    t = t.replace('@astrajs', 'astrajs.dev');
   }
 
   if (t !== before) {

@@ -27,7 +27,7 @@ export function printHelp() {
 
   ${colors.bold}Scaffold a new project:${colors.reset}
     astra [project-name] [options]
-    npx astrajsx@latest [project-name] [options]
+    npx astrajs.dev@latest [project-name] [options]
     pnpm create astrajs [project-name] [options]
 
   ${colors.bold}Scaffold options:${colors.reset}
@@ -39,7 +39,7 @@ export function printHelp() {
     -v, --version           Print the CLI version
 
   ${colors.bold}Templates:${colors.reset}
-    minimal    Just the essentials — astrajsx/core + astrajsx/compiler
+    minimal    Just the essentials — astrajs.dev/core + astrajs.dev/compiler
     frontend   SPA building blocks — router, form, schema, validation
     fullstack  Everything — server() RPC, SSR/SSG/ISR
 

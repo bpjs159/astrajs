@@ -14,8 +14,8 @@ Scaffolded with **astra** (fullstack template).
 - `src/app.tsx` — entry with routing
 - `src/server/posts.server.ts` — typed RPC with `server()`: caching, tags, revalidation
 - `src/pages/posts.tsx` — client page consuming the server function
-- `astrajsx` — the compiler splits `server()` into a client fetch stub + server handler
-- `astrajsx` — SSR / SSG / ISR and resumability
+- `astrajs.dev` — the compiler splits `server()` into a client fetch stub + server handler
+- `astrajs.dev` — SSR / SSG / ISR and resumability
 
 ## Docs
 

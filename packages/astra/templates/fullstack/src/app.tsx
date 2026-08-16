@@ -1,5 +1,5 @@
-import { component } from 'astrajsx/core';
-import { Link } from 'astrajsx/router';
+import { component } from 'astrajs.dev/core';
+import { Link } from 'astrajs.dev/router';
 import { routes } from './routes.js';
 import { HomePage } from './pages/home.js';
 import { PostsPage } from './pages/posts.js';

@@ -6,9 +6,9 @@ export function AboutPage(): JSX.Element {
         Generated with <code>astra --template frontend</code>.
       </p>
       <p>
-        It includes <strong>astrajsx/router</strong> for isomorphic navigation,
-        <strong> astrajsx/form</strong> for reactive forms, and
-        <strong> astrajsx/schema</strong> for declarative validation.
+        It includes <strong>astrajs.dev/router</strong> for isomorphic navigation,
+        <strong> astrajs.dev/form</strong> for reactive forms, and
+        <strong> astrajs.dev/schema</strong> for declarative validation.
       </p>
     </div>
   );

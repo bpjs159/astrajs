@@ -13,7 +13,7 @@ Scaffolded with **astra** — the full-stack framework that ships zero JavaScrip
 
 - `src/app.tsx` — app entry with a reactive `store()` counter
 - `vite.config.ts` — AstraJS compiler plugin (JSX → native DOM at build time)
-- `tsconfig.json` — `jsxImportSource: astrajsx/core`
+- `tsconfig.json` — `jsxImportSource: astrajs.dev/core`
 
 ## Docs
 

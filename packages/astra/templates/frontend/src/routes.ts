@@ -1,4 +1,4 @@
-import { route, fallbackRoute } from 'astrajsx/router';
+import { route, fallbackRoute } from 'astrajs.dev/router';
 
 /**
  * Declarative routing — plain boolean guards.

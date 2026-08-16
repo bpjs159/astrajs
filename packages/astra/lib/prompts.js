@@ -28,7 +28,7 @@ export async function promptProjectName() {
 export const TEMPLATES = {
   minimal: {
     label: 'minimal',
-    description: 'Just the essentials — astrajsx/core + astrajsx/compiler',
+    description: 'Just the essentials — astrajs.dev/core + astrajs.dev/compiler',
   },
   frontend: {
     label: 'frontend',

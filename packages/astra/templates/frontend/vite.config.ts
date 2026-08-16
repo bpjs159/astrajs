@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-import astra from 'astrajsx/compiler';
+import astra from 'astrajs.dev/compiler';
 import path from 'path';
 
 export default defineConfig({

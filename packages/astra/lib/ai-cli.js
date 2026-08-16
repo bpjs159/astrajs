@@ -30,7 +30,7 @@ async function loadAi() {
     return await import('@bpjs159/ai');
   } catch {
     throw new Error(
-      'astrajsx/ai is not installed. Run: npm install astrajsx'
+      'astrajs.dev/ai is not installed. Run: npm install astrajs.dev'
     );
   }
 }

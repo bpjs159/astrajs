@@ -248,12 +248,12 @@ ${lines.join('\n')}
   });
 
   // ── 5. Emit platform files ────────────────────────────────────────────
-  const adaptersEntry = resolveProjectPackage(root, 'astrajsx/adapters');
+  const adaptersEntry = resolveProjectPackage(root, 'astrajs.dev/adapters');
   if (!adaptersEntry) {
     console.error(
-      `${paint('✖', colors.red)} Adapter ${paint(adapter, colors.bold)} requires ${paint('astrajsx/adapters', colors.bold)} as a project dependency.`
+      `${paint('✖', colors.red)} Adapter ${paint(adapter, colors.bold)} requires ${paint('astrajs.dev/adapters', colors.bold)} as a project dependency.`
     );
-    console.error('   Install it with: npm install astrajsx');
+    console.error('   Install it with: npm install astrajs.dev');
     process.exitCode = 1;
     return;
   }
@@ -268,7 +268,7 @@ ${lines.join('\n')}
 
   const emit = adapters[`emit${adapter[0].toUpperCase()}${adapter.slice(1)}Adapter`];
   if (typeof emit !== 'function') {
-    console.error(`${paint('✖', colors.red)} astrajsx/adapters does not export an emitter for ${adapter}.`);
+    console.error(`${paint('✖', colors.red)} astrajs.dev/adapters does not export an emitter for ${adapter}.`);
     process.exitCode = 1;
     return;
   }

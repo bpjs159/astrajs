@@ -23,35 +23,35 @@ no re-renders: components run **once**, the AST compiler wires surgical
 One install, dynamic subpath imports — only the entry you import is loaded:
 
 ```bash
-npm install astrajsx
+npm install astrajs.dev
 ```
 
 ```ts
-import { store } from 'astrajsx/core';
-import astra from 'astrajsx/compiler';
-import { server } from 'astrajsx/server';
+import { store } from 'astrajs.dev/core';
+import astra from 'astrajs.dev/compiler';
+import { server } from 'astrajs.dev/server';
 ```
 
 | Subpath | Description | Repo dir |
 |---------|-------------|----------|
-| `astrajsx/core` | Proxy-based reactivity runtime, JSX runtime & types, DOM bindings (~3 KB) | [`packages/core`](packages/core) |
-| `astrajsx/compiler` | Vite plugin: AST transformers, `server()` RPC, CSS macro, auto-memo | [`packages/compiler`](packages/compiler) |
-| `astrajsx/server` | `server()` RPC macro, SWR, cache tags, autoSync | [`packages/server`](packages/server) |
-| `astrajsx/ssr` | Server renderer, SSG crawler, HTML stringifier, ISR, resumability | [`packages/ssr`](packages/ssr) |
-| `astrajsx/router` | Isomorphic router with `<Outlet />` and View Transitions | [`packages/router`](packages/router) |
-| `astrajsx/adapters` | Deployment adapters: Node, Vercel, Cloudflare, static | [`packages/adapters`](packages/adapters) |
-| `astrajsx/ai` | Typed AI endpoints, streaming, tool agents, in-memory RAG | [`packages/ai`](packages/ai) |
-| `astrajsx/form` | Reactive form controller (HTML5 Constraint Validation API) | [`packages/form`](packages/form) |
-| `astrajsx/schema` | Declarative validation schemas with inferred types | [`packages/schema`](packages/schema) |
-| `astrajsx/validation` | Standalone validator functions and compositors | [`packages/validation`](packages/validation) |
-| `astrajsx/i18n` | Built-in i18n: reactive translations, pluralization, Intl formats | [`packages/i18n`](packages/i18n) |
-| `astrajsx` (bin `astra`) | Scaffold and run AstraJS projects (`astra my-app`, `astra dev`) | [`packages/astra`](packages/astra) |
+| `astrajs.dev/core` | Proxy-based reactivity runtime, JSX runtime & types, DOM bindings (~3 KB) | [`packages/core`](packages/core) |
+| `astrajs.dev/compiler` | Vite plugin: AST transformers, `server()` RPC, CSS macro, auto-memo | [`packages/compiler`](packages/compiler) |
+| `astrajs.dev/server` | `server()` RPC macro, SWR, cache tags, autoSync | [`packages/server`](packages/server) |
+| `astrajs.dev/ssr` | Server renderer, SSG crawler, HTML stringifier, ISR, resumability | [`packages/ssr`](packages/ssr) |
+| `astrajs.dev/router` | Isomorphic router with `<Outlet />` and View Transitions | [`packages/router`](packages/router) |
+| `astrajs.dev/adapters` | Deployment adapters: Node, Vercel, Cloudflare, static | [`packages/adapters`](packages/adapters) |
+| `astrajs.dev/ai` | Typed AI endpoints, streaming, tool agents, in-memory RAG | [`packages/ai`](packages/ai) |
+| `astrajs.dev/form` | Reactive form controller (HTML5 Constraint Validation API) | [`packages/form`](packages/form) |
+| `astrajs.dev/schema` | Declarative validation schemas with inferred types | [`packages/schema`](packages/schema) |
+| `astrajs.dev/validation` | Standalone validator functions and compositors | [`packages/validation`](packages/validation) |
+| `astrajs.dev/i18n` | Built-in i18n: reactive translations, pluralization, Intl formats | [`packages/i18n`](packages/i18n) |
+| `astrajs.dev` (bin `astra`) | Scaffold and run AstraJS projects (`astra my-app`, `astra dev`) | [`packages/astra`](packages/astra) |
 
 ## Quick Start
 
 ```bash
 # Scaffold a new project
-npx astrajsx@latest my-app
+npx astrajs.dev@latest my-app
 
 # Develop / build from the repo
 pnpm install
