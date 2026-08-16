@@ -51,6 +51,8 @@ import { server } from 'astrajs.dev/server';
 
 ```bash
 # Scaffold a new project
+npm create astrajs.dev@latest my-app -- --template minimal
+# or
 npx astrajs.dev@latest my-app
 
 # Develop / build from the repo

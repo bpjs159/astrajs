@@ -1,0 +1,33 @@
+{
+  "name": "create-astrajs.dev",
+  "version": "0.1.0",
+  "description": "Scaffold a new AstraJS project — `npm create astrajs.dev`. Delegates to the astrajs.dev CLI.",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bpjs159/astrajs.git"
+  },
+  "bin": {
+    "create-astrajs.dev": "./bin/create.js"
+  },
+  "files": [
+    "bin"
+  ],
+  "dependencies": {
+    "astrajs.dev": "^0.1.6"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [
+    "astrajs",
+    "scaffold",
+    "cli",
+    "typescript",
+    "vite"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
+}
