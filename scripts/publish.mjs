@@ -37,22 +37,9 @@ const otp = val('--otp');
 const useNpm11 = has('--npm11');
 const NPM_BIN = useNpm11 ? ['npx', '-y', 'npm@11.16.0'] : ['npm'];
 
-// ── Publish order: dependencies first (from the internal @astra graph) ──
-const ORDER = [
-  'validation',
-  'ai',
-  'core',
-  'form',
-  'i18n',
-  'router',
-  'schema',
-  'server',
-  'compiler',
-  'ssr',
-  'adapters',
-  'astra',
-  'astra-js',
-];
+// ── Publish order: only the self-contained umbrella ships to npm ──
+// (astrajs.dev vendors all internal packages, so @bpjs159/* stays off the registry)
+const ORDER = ['astra-js'];
 
 function run(cmd, cmdArgs, { fatal = true } = {}) {
   const [base, ...preArgs] = Array.isArray(cmd) ? cmd : [cmd];
@@ -86,7 +73,8 @@ if (!skipBuild) {
 // prompts for the 2FA code exactly ONCE (interactive terminals).
 const pkgArgs = [
   'publish',
-  '--workspaces',
+  '-w',
+  'packages/astra-js',
   '--access',
   'public',
   '--tag',
