@@ -1,0 +1,586 @@
+#!/usr/bin/env node
+/**
+ * deploy-build.mjs — builds every deployable AstraJS app + example into a
+ * single staging directory ready for rsync to the production server.
+ *
+ * Staging layout (mirrors /var/www/astrajs on the server):
+ *   site/               astra-site static build
+ *   blog/               astra-blog static build
+ *   showcase/           astra-showcase build (client + dist/server/server.mjs)
+ *   examples/<cat>/<name>/   one dir per example (client + server bundle)
+ *   examples/index.html      hub page linking every example
+ *   runners/                 node shims for the vercel/cloudflare examples
+ *   config/                  nginx vhosts + pm2 ecosystem file
+ *
+ * Usage: node tools/deploy-build.mjs [--stage /path]
+ */
+import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const STAGE = process.env.ASTRA_STAGE_DIR ?? path.join(process.env.TMPDIR ?? '/tmp', 'astrajs-deploy');
+const VITE_BIN = path.join(ROOT, 'node_modules', '.bin', 'vite');
+
+const failures = [];
+
+function run(cmd, args, cwd, env = {}) {
+  const label = `${path.relative(ROOT, cwd)}: ${cmd} ${args.join(' ')}`;
+  process.stdout.write(`\n── ${label}\n`);
+  try {
+    execFileSync(cmd, args, { cwd, stdio: 'inherit', env: { ...process.env, ...env } });
+  } catch (e) {
+    failures.push(`${label}\n    ${String(e.stderr ?? e).slice(0, 2000)}`);
+  }
+}
+
+function copyDir(src, dest) {
+  fs.mkdirSync(path.dirname(dest), { recursive: true });
+  fs.cpSync(src, dest, { recursive: true });
+}
+
+/** Temporarily replace/restore astra.config.json in an example dir. */
+function withConfig(exampleRel, writeConfig, fn) {
+  const dir = path.join(ROOT, 'examples', exampleRel);
+  const file = path.join(dir, 'astra.config.json');
+  const hadFile = fs.existsSync(file);
+  const original = hadFile ? fs.readFileSync(file, 'utf-8') : null;
+  try {
+    if (writeConfig !== undefined) {
+      fs.writeFileSync(file, JSON.stringify(writeConfig, null, 2) + '\n');
+    }
+    fn();
+  } finally {
+    if (hadFile) fs.writeFileSync(file, original);
+    else fs.rmSync(file, { force: true });
+  }
+}
+
+/** Prefixes each example's RPC api under its own deployment path. */
+const prefixFor = (exampleRel) => `/examples/${exampleRel}/api/astra`;
+const baseFor = (exampleRel) => `/examples/${exampleRel}/`;
+const astraBin = (exampleRel) => path.join(ROOT, exampleRel, 'node_modules', '.bin', 'astra');
+
+function checkServerManifest(exampleRel) {
+  const manifestPath = path.join(ROOT, 'examples', exampleRel, 'dist', 'astra-server-modules.json');
+  if (!fs.existsSync(manifestPath)) {
+    console.warn(`⚠️  ${exampleRel}: no astra-server-modules.json — no dynamic handlers.`);
+    return;
+  }
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+  const count = Object.keys(manifest.modules ?? {}).length;
+  console.log(`✓ ${exampleRel}: ${count} server module(s)`);
+  if (count === 0) console.warn(`⚠️  ${exampleRel}: server modules EMPTY — will be static-only.`);
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// 1. Top-level apps
+// ────────────────────────────────────────────────────────────────────────────
+console.log('== astra-site (static) ==');
+run(VITE_BIN, ['build'], path.join(ROOT, 'astra-site'));
+copyDir(path.join(ROOT, 'astra-site', 'dist'), path.join(STAGE, 'site'));
+
+console.log('== astra-blog (static, pre-built) ==');
+run(astraBin('astra-blog'), ['build'], path.join(ROOT, 'astra-blog'));
+copyDir(path.join(ROOT, 'astra-blog', 'dist'), path.join(STAGE, 'blog'));
+
+// Showcase's server() arrows carry return-type annotations, which the
+// compiler cannot parse yet — they fall back to client-side execution with
+// mock data, so the showcase is fully functional as a static site.
+console.log('== astra-showcase (static) ==');
+run(VITE_BIN, ['build'], path.join(ROOT, 'astra-showcase'));
+copyDir(path.join(ROOT, 'astra-showcase', 'dist'), path.join(STAGE, 'showcase'));
+
+// ────────────────────────────────────────────────────────────────────────────
+// 2. Examples — static (plain vite build)
+// ────────────────────────────────────────────────────────────────────────────
+const STATIC_VITE = [
+  'frontend-only/01-simple-state',
+  'frontend-only/02-global-state',
+  'frontend-only/03-forms',
+  'frontend-only/04-routing',
+  'frontend-only/05-css-macro',
+  'frontend-only/06-conditional-lists',
+  'frontend-only/07-async-data',
+  'frontend-only/08-lifecycle',
+  'frontend-only/09-composition',
+  'frontend-only/10-dynamic-attrs',
+  'fullstack/10-ssg-prebuilt',
+];
+
+for (const ex of STATIC_VITE) {
+  console.log(`== ${ex} (static vite) ==`);
+  run(VITE_BIN, ['build', `--base=${baseFor(ex)}`], path.join(ROOT, 'examples', ex));
+  copyDir(path.join(ROOT, 'examples', ex, 'dist'), path.join(STAGE, 'examples', ex));
+}
+
+const STATIC_ASTRA = ['ai/03-build-time', 'deploy/04-static'];
+for (const ex of STATIC_ASTRA) {
+  console.log(`== ${ex} (static astra) ==`);
+  run(astraBin(`examples/${ex}`), ['build', `--base=${baseFor(ex)}`], path.join(ROOT, 'examples', ex), {
+    ...(ex === 'ai/03-build-time' ? { ASTRA_AI_PROVIDER: 'mock' } : {}),
+  });
+  copyDir(path.join(ROOT, 'examples', ex, 'dist'), path.join(STAGE, 'examples', ex));
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// 3. Examples — server-backed (unique RPC prefix + adapter)
+// ────────────────────────────────────────────────────────────────────────────
+const SERVER_NODE = [
+  'fullstack/01-server-dynamic',
+  'fullstack/02-swr-server',
+  'fullstack/03-form-server',
+  'fullstack/04-router-server-params',
+  'fullstack/05-schema-validation',
+  'fullstack/06-optimistic-mutations',
+  'fullstack/07-file-upload',
+  'fullstack/08-autosync',
+  'fullstack/09-resumability',
+];
+
+for (const ex of SERVER_NODE) {
+  console.log(`== ${ex} (node adapter) ==`);
+  const prefix = prefixFor(ex);
+  const baseCfg = ex.includes('09-resumability') ? { resumability: true } : {};
+  withConfig(ex, { ...baseCfg, adapter: 'node', apiPrefix: prefix }, () => {
+    run(astraBin(`examples/${ex}`), ['build', `--base=${baseFor(ex)}`], path.join(ROOT, 'examples', ex), {
+      ASTRA_API_PREFIX: prefix,
+    });
+  });
+  checkServerManifest(ex);
+  copyDir(path.join(ROOT, 'examples', ex, 'dist'), path.join(STAGE, 'examples', ex));
+}
+
+for (const ex of ['ai/01-streaming-chat', 'ai/02-tools', 'ai/04-rag']) {
+  console.log(`== ${ex} (node adapter + AI) ==`);
+  const prefix = prefixFor(ex);
+  withConfig(ex, { adapter: 'node', apiPrefix: prefix }, () => {
+    run(astraBin(`examples/${ex}`), ['build', `--base=${baseFor(ex)}`], path.join(ROOT, 'examples', ex), {
+      ASTRA_API_PREFIX: prefix,
+    });
+  });
+  checkServerManifest(ex);
+  copyDir(path.join(ROOT, 'examples', ex, 'dist'), path.join(STAGE, 'examples', ex));
+}
+
+for (const ex of ['deploy/01-node']) {
+  console.log(`== ${ex} (node adapter) ==`);
+  const prefix = prefixFor(ex);
+  withConfig(ex, { adapter: 'node', apiPrefix: prefix }, () => {
+    run(astraBin(`examples/${ex}`), ['build', `--base=${baseFor(ex)}`], path.join(ROOT, 'examples', ex), {
+      ASTRA_API_PREFIX: prefix,
+    });
+  });
+  checkServerManifest(ex);
+  copyDir(path.join(ROOT, 'examples', ex, 'dist'), path.join(STAGE, 'examples', ex));
+}
+
+// Vercel + Cloudflare targets: built with their own adapters, then run on the
+// box with tiny Node shims (runners/) so the demos actually work behind nginx.
+for (const [ex, adapter] of [
+  ['deploy/02-vercel', 'vercel'],
+  ['deploy/03-cloudflare', 'cloudflare'],
+]) {
+  console.log(`== ${ex} (${adapter} adapter) ==`);
+  const prefix = prefixFor(ex);
+  withConfig(ex, { adapter, apiPrefix: prefix }, () => {
+    run(astraBin(`examples/${ex}`), ['build', `--base=${baseFor(ex)}`], path.join(ROOT, 'examples', ex), {
+      ASTRA_API_PREFIX: prefix,
+    });
+  });
+  copyDir(path.join(ROOT, 'examples', ex, 'dist'), path.join(STAGE, 'examples', ex));
+  if (adapter === 'vercel' && fs.existsSync(path.join(ROOT, 'examples', ex, 'api'))) {
+    copyDir(path.join(ROOT, 'examples', ex, 'api'), path.join(STAGE, 'examples', ex, 'api'));
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// 4. Runners (vercel/cloudflare shims)
+// ────────────────────────────────────────────────────────────────────────────
+fs.mkdirSync(path.join(STAGE, 'runners'), { recursive: true });
+
+fs.writeFileSync(
+  path.join(STAGE, 'runners', 'run-vercel.mjs'),
+  `// Serves a Vercel-emitted api/astra.mjs handler as a plain Node HTTP server.
+import { createServer } from 'node:http';
+import { pathToFileURL } from 'node:url';
+
+const handlerPath = process.env.HANDLER;
+const port = Number(process.env.PORT ?? 3000);
+if (!handlerPath) {
+  console.error('HANDLER env is required (path to api/astra.mjs)');
+  process.exit(1);
+}
+const { default: handler } = await import(pathToFileURL(handlerPath).href);
+createServer((req, res) => handler(req, res)).listen(port, '127.0.0.1', () => {
+  console.log('[vercel-shim] listening on 127.0.0.1:' + port);
+});
+`
+);
+
+fs.writeFileSync(
+  path.join(STAGE, 'runners', 'run-cloudflare.mjs'),
+  `// Serves a Cloudflare-emitted _worker.js as a plain Node HTTP server.
+import { createServer } from 'node:http';
+import { pathToFileURL } from 'node:url';
+
+const workerPath = process.env.WORKER;
+const port = Number(process.env.PORT ?? 3000);
+if (!workerPath) {
+  console.error('WORKER env is required (path to dist/_worker.js)');
+  process.exit(1);
+}
+const worker = (await import(pathToFileURL(workerPath).href)).default;
+
+createServer(async (req, res) => {
+  try {
+    const url = new URL(req.url, 'http://127.0.0.1');
+    let body = null;
+    if (req.method !== 'GET' && req.method !== 'HEAD') {
+      const chunks = [];
+      for await (const c of req) chunks.push(c);
+      body = Buffer.concat(chunks);
+    }
+    const request = new Request(url, {
+      method: req.method,
+      headers: req.headers,
+      body,
+      duplex: body ? 'half' : undefined,
+    });
+    const response = await worker.fetch(request, {});
+    res.statusCode = response.status;
+    for (const [k, v] of response.headers) res.setHeader(k, v);
+    if (response.body) {
+      const reader = response.body.getReader();
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        res.write(Buffer.from(value));
+      }
+    }
+    res.end();
+  } catch (e) {
+    res.statusCode = 500;
+    res.end(String(e?.stack ?? e));
+  }
+}).listen(port, '127.0.0.1', () => {
+  console.log('[cloudflare-shim] listening on 127.0.0.1:' + port);
+});
+`
+);
+
+// ────────────────────────────────────────────────────────────────────────────
+// 5. Examples hub index.html
+// ────────────────────────────────────────────────────────────────────────────
+const GROUPS = [
+  ['Frontend-only', STATIC_VITE.filter((e) => e.startsWith('frontend-only'))],
+  ['Fullstack', ['fullstack/01-server-dynamic', 'fullstack/02-swr-server', 'fullstack/03-form-server', 'fullstack/04-router-server-params', 'fullstack/05-schema-validation', 'fullstack/06-optimistic-mutations', 'fullstack/07-file-upload', 'fullstack/08-autosync', 'fullstack/09-resumability', 'fullstack/10-ssg-prebuilt']],
+  ['AI', ['ai/01-streaming-chat', 'ai/02-tools', 'ai/03-build-time', 'ai/04-rag']],
+  ['Deploy targets', ['deploy/01-node', 'deploy/02-vercel', 'deploy/03-cloudflare', 'deploy/04-static']],
+];
+
+const humanize = (name) =>
+  name
+    .replace(/^\d+-/, '')
+    .split('-')
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+
+const cards = GROUPS.map(
+  ([group, items]) => `
+    <section class="group">
+      <h2>${group}</h2>
+      <div class="grid">
+        ${items
+          .map(
+            (ex) => `
+        <a class="card" href="/examples/${ex}/">
+          <span class="card-num">${ex.split('/')[1]}</span>
+          <span class="card-title">${humanize(ex.split('/')[1])}</span>
+        </a>`
+          )
+          .join('')}
+      </div>
+    </section>`
+).join('');
+
+fs.writeFileSync(
+  path.join(STAGE, 'examples', 'index.html'),
+  `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AstraJS Examples — Live demos</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; color: #e6e6f0;
+    background: radial-gradient(1200px 600px at 20% -10%, #1b2340 0%, #0a0d18 55%, #07080f 100%);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  header { padding: 56px 24px 8px; max-width: 1060px; margin: 0 auto; }
+  h1 {
+    margin: 0; font-size: 34px; letter-spacing: -0.5px;
+    background: linear-gradient(90deg, #b7c4ff, #8b5cf6 55%, #22d3ee);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  header p { color: #9aa1c0; margin: 10px 0 0; max-width: 640px; line-height: 1.55; }
+  main { max-width: 1060px; margin: 28px auto 80px; padding: 0 24px; }
+  .group h2 {
+    font-size: 13px; text-transform: uppercase; letter-spacing: 2.5px;
+    color: #6f77a8; margin: 38px 0 14px; font-weight: 600;
+  }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+  .card {
+    display: flex; flex-direction: column; gap: 10px; text-decoration: none;
+    padding: 18px; border-radius: 14px; border: 1px solid #222a4d;
+    background: linear-gradient(180deg, #12172c, #0d1122);
+    transition: transform .15s ease, border-color .15s ease;
+  }
+  .card:hover { transform: translateY(-2px); border-color: #4f5ba8; }
+  .card-num { font-size: 12px; color: #8b5cf6; font-variant-numeric: tabular-nums; letter-spacing: 1px; }
+  .card-title { color: #dde2ff; font-size: 16px; font-weight: 600; }
+  footer { color: #5c6388; text-align: center; padding: 24px; font-size: 13px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>AstraJS Examples</h1>
+  <p>Every example from the repository, built for production and served behind
+  nginx. Server-backed demos run real RPC handlers in Node — try the forms,
+  uploads, AI streaming chat and the deploy-target adapters.</p>
+</header>
+<main>${cards}</main>
+<footer>examples.astrajs.dev · AstraJS — Zero-VDOM, AST-compiled, Proxy-reactive</footer>
+</body>
+</html>
+`
+);
+
+// ────────────────────────────────────────────────────────────────────────────
+// 6. pm2 ecosystem + nginx vhosts
+// ────────────────────────────────────────────────────────────────────────────
+fs.mkdirSync(path.join(STAGE, 'config'), { recursive: true });
+
+const SERVER_PORT = {
+  'fullstack/01-server-dynamic': 5001,
+  'fullstack/02-swr-server': 5002,
+  'fullstack/03-form-server': 5003,
+  'fullstack/04-router-server-params': 5004,
+  'fullstack/05-schema-validation': 5005,
+  'fullstack/06-optimistic-mutations': 5006,
+  'fullstack/07-file-upload': 5007,
+  'fullstack/08-autosync': 5008,
+  'fullstack/09-resumability': 5009,
+  'ai/01-streaming-chat': 5101,
+  'ai/02-tools': 5102,
+  'ai/04-rag': 5104,
+  'deploy/01-node': 5201,
+  'deploy/02-vercel': 5202,
+  'deploy/03-cloudflare': 5203,
+};
+
+const WWW = '/var/www/astrajs';
+const apps = [];
+
+// Only register processes for examples whose server bundle was actually
+// emitted (examples with unparseable server() calls fall back to
+// client-side execution and are deployed as pure static sites).
+const hasBundle = (ex) =>
+  fs.existsSync(path.join(STAGE, 'examples', ex, 'server', 'server.mjs'));
+
+for (const [ex, port] of Object.entries(SERVER_PORT)) {
+  if (ex === 'deploy/02-vercel') {
+    if (!fs.existsSync(path.join(STAGE, 'examples', ex, 'api', 'astra.mjs'))) {
+      console.warn(`⚠️  ${ex}: no vercel handler emitted — deploying static.`);
+      continue;
+    }
+    apps.push({
+      name: 'deploy-02-vercel',
+      cwd: `${WWW}/examples/deploy/02-vercel`,
+      script: `${WWW}/runners/run-vercel.mjs`,
+      env: { PORT: port, HANDLER: `${WWW}/examples/deploy/02-vercel/api/astra.mjs` },
+    });
+    continue;
+  }
+  if (ex === 'deploy/03-cloudflare') {
+    if (!fs.existsSync(path.join(STAGE, 'examples', ex, '_worker.js'))) {
+      console.warn(`⚠️  ${ex}: no worker emitted — deploying static.`);
+      continue;
+    }
+    apps.push({
+      name: 'deploy-03-cloudflare',
+      cwd: `${WWW}/examples/deploy/03-cloudflare`,
+      script: `${WWW}/runners/run-cloudflare.mjs`,
+      env: { PORT: port, WORKER: `${WWW}/examples/deploy/03-cloudflare/_worker.js` },
+    });
+    continue;
+  }
+  if (!hasBundle(ex)) {
+    console.warn(`⚠️  ${ex}: no server bundle emitted — deploying static (client-side fallback).`);
+    continue;
+  }
+  const isAi = ex.startsWith('ai/');
+  apps.push({
+    name: ex.replace(/[^a-z0-9]+/g, '-').replace(/^0+/, ''),
+    cwd: `${WWW}/examples/${ex}`,
+    script: 'server/server.mjs',
+    env: { PORT: port, ...(isAi ? { ASTRA_AI_PROVIDER: 'mock' } : {}) },
+  });
+}
+
+fs.writeFileSync(
+  path.join(STAGE, 'config', 'ecosystem.config.cjs'),
+  `// AUTO-GENERATED by tools/deploy-build.mjs — do not edit.
+module.exports = {
+  apps: ${JSON.stringify(
+    apps.map((a) => ({ ...a, autorestart: true, max_memory_restart: '300M' })),
+    null,
+    2
+  )},
+};
+`
+);
+
+const apiLocations = Object.entries(SERVER_PORT)
+  .filter(([ex]) => {
+    if (ex === 'deploy/02-vercel') return fs.existsSync(path.join(STAGE, 'examples', ex, 'api', 'astra.mjs'));
+    if (ex === 'deploy/03-cloudflare') return fs.existsSync(path.join(STAGE, 'examples', ex, '_worker.js'));
+    return hasBundle(ex);
+  })
+  .map(
+    ([ex, port]) => `
+    # ${ex}
+    location ^~ /examples/${ex}/api/astra/ {
+        proxy_pass http://127.0.0.1:${port};
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Connection "";
+        proxy_buffering off;
+        proxy_read_timeout 300s;
+    }`
+  )
+  .join('\n');
+
+fs.writeFileSync(
+  path.join(STAGE, 'config', 'nginx-examples.conf'),
+  `# AUTO-GENERATED by tools/deploy-build.mjs — examples.astrajs.dev
+server {
+    listen 80;
+    server_name examples.astrajs.dev;
+
+    root ${WWW};
+    index index.html;
+
+    # Hub lives at examples/index.html
+    location = / {
+        return 301 /examples/;
+    }
+
+    # Per-example RPC backends (longest-prefix match wins over static dirs)
+${apiLocations}
+
+    # Client-side routed examples need an index.html fallback
+    location /examples/frontend-only/04-routing/ {
+        try_files $uri $uri/ /examples/frontend-only/04-routing/index.html;
+    }
+    location /examples/fullstack/04-router-server-params/ {
+        try_files $uri $uri/ /examples/fullstack/04-router-server-params/index.html;
+    }
+
+    # Hashed build assets — immutable
+    location ~* \\.(?:js|mjs|css|png|jpe?g|webp|gif|svg|ico|woff2?|ttf)$ {
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+`
+);
+
+fs.writeFileSync(
+  path.join(STAGE, 'config', 'nginx-astrajs.conf'),
+  `# astrajs.dev — main documentation site
+server {
+    listen 80 default_server;
+    server_name astrajs.dev www.astrajs.dev;
+
+    root ${WWW}/site;
+    index index.html;
+
+    location /assets/ {
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+`
+);
+
+fs.writeFileSync(
+  path.join(STAGE, 'config', 'nginx-blog.conf'),
+  `# blog.astrajs.dev
+server {
+    listen 80;
+    server_name blog.astrajs.dev;
+
+    root ${WWW}/blog;
+    index index.html;
+
+    location /assets/ {
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+`
+);
+
+fs.writeFileSync(
+  path.join(STAGE, 'config', 'nginx-showcase.conf'),
+  `# showcase.astrajs.dev — static (server() calls fall back to client-side
+# execution with mock data; the compiler cannot parse annotated arrows yet)
+server {
+    listen 80;
+    server_name showcase.astrajs.dev;
+
+    root ${WWW}/showcase;
+    index index.html;
+
+    location /assets/ {
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+`
+);
+
+// ────────────────────────────────────────────────────────────────────────────
+// 7. Report
+// ────────────────────────────────────────────────────────────────────────────
+console.log('\n========================================');
+if (failures.length) {
+  console.log(`✖ ${failures.length} build(s) FAILED:`);
+  for (const f of failures) console.log('\n' + f);
+  process.exit(1);
+}
+console.log(`✓ Staging complete: ${STAGE}`);
+console.log('  Next: rsync to server → nginx vhosts → pm2 start');

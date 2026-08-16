@@ -1,8 +1,20 @@
-const handlerRegistry$1 = /* @__PURE__ */ new Map();
+const handlerRegistry = /* @__PURE__ */ new Map();
+function rpcHandler(id, fn, options = {}) {
+  handlerRegistry.set(id, {
+    fn,
+    tags: options.tags ?? [],
+    autoSync: options.autoSync ?? false,
+    maxAge: options.maxAge ?? 0,
+    stream: options.stream ?? false
+  });
+}
 async function handleRPCRequest(request, id) {
-  const handler = handlerRegistry$1.get(id);
-  if (!handler) {
-    return new Response(JSON.stringify({ error: `Unknown RPC handler: ${id}` }), { status: 404, headers: { "Content-Type": "application/json" } });
+  const handler2 = handlerRegistry.get(id);
+  if (!handler2) {
+    return new Response(
+      JSON.stringify({ error: `Unknown RPC handler: ${id}` }),
+      { status: 404, headers: { "Content-Type": "application/json" } }
+    );
   }
   try {
     let args;
@@ -11,8 +23,7 @@ async function handleRPCRequest(request, id) {
       args = [];
       for (let i = 0; ; i++) {
         const val = url.searchParams.get(`_${i}`);
-        if (val === null)
-          break;
+        if (val === null) break;
         args.push(JSON.parse(val));
       }
     } else {
@@ -22,8 +33,8 @@ async function handleRPCRequest(request, id) {
         args = [args];
       }
     }
-    const result = await handler.fn(...args);
-    if (handler.stream) {
+    const result = await handler2.fn(...args);
+    if (handler2.stream) {
       const encoder = new TextEncoder();
       const gen = result;
       const body = new ReadableStream({
@@ -48,11 +59,11 @@ async function handleRPCRequest(request, id) {
         "Cache-Control": "no-cache",
         "X-Astra-Stream": "1"
       };
-      if (handler.maxAge > 0) {
-        streamHeaders["Cache-Control"] = `public, max-age=${handler.maxAge}, stale-while-revalidate=${handler.maxAge * 2}`;
-        streamHeaders["CDN-Cache-Control"] = `max-age=${handler.maxAge}`;
-        if (handler.tags.length > 0) {
-          streamHeaders["Cache-Tag"] = handler.tags.join(",");
+      if (handler2.maxAge > 0) {
+        streamHeaders["Cache-Control"] = `public, max-age=${handler2.maxAge}, stale-while-revalidate=${handler2.maxAge * 2}`;
+        streamHeaders["CDN-Cache-Control"] = `max-age=${handler2.maxAge}`;
+        if (handler2.tags.length > 0) {
+          streamHeaders["Cache-Tag"] = handler2.tags.join(",");
         }
       }
       return new Response(body, { status: 200, headers: streamHeaders });
@@ -60,7 +71,7 @@ async function handleRPCRequest(request, id) {
     const headers = {
       "Content-Type": "application/json"
     };
-    if (handler.autoSync) {
+    if (handler2.autoSync) {
       const etag = `"${hashJSON(result)}"`;
       headers["ETag"] = etag;
       headers["Cache-Control"] = "no-cache";
@@ -68,11 +79,11 @@ async function handleRPCRequest(request, id) {
         return new Response(null, { status: 304, headers });
       }
     }
-    if (handler.maxAge > 0) {
-      headers["Cache-Control"] = `public, max-age=${handler.maxAge}, stale-while-revalidate=${handler.maxAge * 2}`;
-      headers["CDN-Cache-Control"] = `max-age=${handler.maxAge}`;
-      if (handler.tags.length > 0) {
-        headers["Cache-Tag"] = handler.tags.join(",");
+    if (handler2.maxAge > 0) {
+      headers["Cache-Control"] = `public, max-age=${handler2.maxAge}, stale-while-revalidate=${handler2.maxAge * 2}`;
+      headers["CDN-Cache-Control"] = `max-age=${handler2.maxAge}`;
+      if (handler2.tags.length > 0) {
+        headers["Cache-Tag"] = handler2.tags.join(",");
       }
     }
     return new Response(JSON.stringify(result), {
@@ -81,7 +92,10 @@ async function handleRPCRequest(request, id) {
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Internal RPC error";
-    return new Response(JSON.stringify({ error: message }), { status: 500, headers: { "Content-Type": "application/json" } });
+    return new Response(
+      JSON.stringify({ error: message }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   }
 }
 function hashJSON(value) {
@@ -92,131 +106,6 @@ function hashJSON(value) {
     hash = Math.imul(hash, 16777619);
   }
   return (hash >>> 0).toString(16).padStart(8, "0");
-}
-const swrCache$1 = /* @__PURE__ */ new Map();
-if (typeof window !== "undefined") {
-  window.addEventListener("focus", () => {
-    for (const [, entry] of swrCache$1) {
-      if (entry.options.revalidateOnFocus !== false && !entry.isValidating) {
-        const swrEntry = entry;
-        swrEntry.isValidating = true;
-        swrEntry.pendingPromise = swrEntry.fetcher();
-        swrEntry.pendingPromise.then((fresh) => {
-          swrEntry.data = fresh;
-          swrEntry.fetchedAt = Date.now();
-        }).catch(() => {
-        }).finally(() => {
-          swrEntry.isValidating = false;
-          swrEntry.pendingPromise = null;
-        });
-      }
-    }
-  });
-  window.addEventListener("online", () => {
-    for (const [, entry] of swrCache$1) {
-      if (!entry.isValidating) {
-        const swrEntry = entry;
-        swrEntry.isValidating = true;
-        swrEntry.pendingPromise = swrEntry.fetcher();
-        swrEntry.pendingPromise.then((fresh) => {
-          swrEntry.data = fresh;
-          swrEntry.fetchedAt = Date.now();
-        }).catch(() => {
-        }).finally(() => {
-          swrEntry.isValidating = false;
-          swrEntry.pendingPromise = null;
-        });
-      }
-    }
-  });
-}
-function createAstraHandler(options = {}) {
-  const apiPrefix = options.apiPrefix ?? "/api/astra";
-  return async (request) => {
-    const url = new URL(request.url);
-    if (url.pathname === apiPrefix || url.pathname.startsWith(`${apiPrefix}/`)) {
-      const id = url.pathname.slice(apiPrefix.length + 1).replace(/\/+$/, "");
-      return handleRPCRequest(request, id);
-    }
-    if (options.render) {
-      const rendered = await options.render(request, url);
-      if (rendered)
-        return rendered;
-    }
-    return new Response(JSON.stringify({ error: "Not found" }), {
-      status: 404,
-      headers: { "Content-Type": "application/json" }
-    });
-  };
-}
-async function readRequestBody(req) {
-  const chunks = [];
-  for await (const chunk of req) {
-    chunks.push(chunk);
-  }
-  return Buffer.concat(chunks).toString();
-}
-async function toWebRequest(req) {
-  const url = new URL(req.url ?? "/", `http://${req.headers.host ?? "localhost"}`);
-  const headers = {};
-  for (const [key, value] of Object.entries(req.headers)) {
-    if (value !== void 0)
-      headers[key] = String(value);
-  }
-  const body = await readRequestBody(req);
-  return new Request(url.toString(), {
-    method: req.method,
-    headers,
-    body: body || void 0
-  });
-}
-async function writeResponse(res, response) {
-  res.statusCode = response.status;
-  response.headers.forEach((value, key) => {
-    res.setHeader(key, value);
-  });
-  if (response.body) {
-    const reader = response.body.getReader();
-    for (; ; ) {
-      const { done, value } = await reader.read();
-      if (done)
-        break;
-      res.write(Buffer.from(value));
-    }
-  }
-  res.end();
-}
-function writeError(res, err) {
-  const message = err instanceof Error ? err.message : "Internal AstraJS server error";
-  if (!res.headersSent) {
-    res.statusCode = 500;
-    res.setHeader("Content-Type", "application/json");
-    res.end(JSON.stringify({ error: message }));
-  } else {
-    res.destroy();
-  }
-}
-function createVercelHandler(options = {}) {
-  const handle = createAstraHandler(options);
-  return async (req, res) => {
-    try {
-      const webRequest = await toWebRequest(req);
-      const response = await handle(webRequest);
-      await writeResponse(res, response);
-    } catch (err) {
-      writeError(res, err);
-    }
-  };
-}
-const handlerRegistry = /* @__PURE__ */ new Map();
-function rpcHandler(id, fn, options = {}) {
-  handlerRegistry.set(id, {
-    fn,
-    tags: options.tags ?? [],
-    autoSync: options.autoSync ?? false,
-    maxAge: options.maxAge ?? 0,
-    stream: options.stream ?? false
-  });
 }
 const swrCache = /* @__PURE__ */ new Map();
 if (typeof window !== "undefined") {
@@ -287,7 +176,49 @@ const addVisit = server(async (page) => {
 rpcHandler("getQuote", getQuote);
 rpcHandler("getStats", getStats, { "tags": ["stats"], "maxAge": 60 });
 rpcHandler("addVisit", addVisit);
-const serverEntry = createVercelHandler({ apiPrefix: "/api/astra" });
+const apiPrefix = "/examples/deploy/02-vercel/api/astra";
+async function handler(req, res) {
+  try {
+    const url = new URL(req.url ?? "/", `http://${req.headers.host ?? "localhost"}`);
+    if (url.pathname !== apiPrefix && !url.pathname.startsWith(apiPrefix + "/")) {
+      res.statusCode = 404;
+      res.setHeader("Content-Type", "application/json");
+      res.end(JSON.stringify({ error: "Not found" }));
+      return;
+    }
+    const handlerId = url.pathname.slice(apiPrefix.length + 1);
+    let body;
+    if (req.method !== "GET" && req.method !== "HEAD") {
+      const chunks = [];
+      for await (const c of req) chunks.push(c);
+      body = Buffer.concat(chunks).toString();
+    }
+    const webRequest = new Request(url.toString(), {
+      method: req.method,
+      headers: Object.entries(req.headers).reduce(
+        (acc, [k, v]) => ({
+          ...acc,
+          [k]: Array.isArray(v) ? v.join(", ") : String(v ?? "")
+        }),
+        {}
+      ),
+      body
+    });
+    const response = await handleRPCRequest(webRequest, handlerId);
+    res.statusCode = response.status;
+    response.headers.forEach((value, key) => res.setHeader(key, value));
+    if (response.headers.get("x-astra-stream") === "1" && response.body) {
+      for await (const chunk of response.body) res.write(Buffer.from(chunk));
+      res.end();
+    } else {
+      res.end(Buffer.from(await response.arrayBuffer()));
+    }
+  } catch (err) {
+    res.statusCode = 500;
+    res.setHeader("Content-Type", "application/json");
+    res.end(JSON.stringify({ error: err instanceof Error ? err.message : String(err) }));
+  }
+}
 export {
-  serverEntry as default
+  handler as default
 };

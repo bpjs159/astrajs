@@ -1,0 +1,5 @@
+# Only bump on new commits (not amends), as signalled by prepare-commit-msg.
+if [ -f .git/ASTRAJS_NEW_COMMIT ]; then
+  rm -f .git/ASTRAJS_NEW_COMMIT
+  node scripts/bump-version.cjs
+fi

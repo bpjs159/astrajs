@@ -1,6 +1,6 @@
 {
   "name": "@bpjs159/schema",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bpjs159/astrajs.git"

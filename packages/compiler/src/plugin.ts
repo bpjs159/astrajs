@@ -197,6 +197,14 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
         ...userConfig,     // inline in vite.config.ts (highest priority)
       } as AstraViteConfig;
 
+      // Deployment override: ASTRA_API_PREFIX lets a build target a sub-path
+      // (e.g. /examples/fullstack/01-server-dynamic/api/astra) without
+      // editing vite.config.ts — the client fetch wrappers, autoSync wiring,
+      // dev middleware and the server module manifest all read this config.
+      if (process.env.ASTRA_API_PREFIX) {
+        config.apiPrefix = process.env.ASTRA_API_PREFIX;
+      }
+
       // In dev mode, source maps are more useful
       if (resolvedConfig.command === 'serve') {
         config.sourceMaps = true;

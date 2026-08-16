@@ -104,3 +104,10 @@ locales): `pnpm --filter astra-site dev`.
 ## License
 
 MIT — all packages. Branding assets (logos, images) are © AstraJS.
+
+## 📋 Changelog
+
+- **0.1.1** (2026-08-16): First deployment
+
+
+- **0.1.0** (2026-08-15): Automatic version bump on commit via Husky (all package.json files)

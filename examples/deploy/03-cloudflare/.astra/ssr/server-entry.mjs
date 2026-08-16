@@ -1,8 +1,20 @@
-const handlerRegistry$1 = /* @__PURE__ */ new Map();
+const handlerRegistry = /* @__PURE__ */ new Map();
+function rpcHandler(id, fn, options = {}) {
+  handlerRegistry.set(id, {
+    fn,
+    tags: options.tags ?? [],
+    autoSync: options.autoSync ?? false,
+    maxAge: options.maxAge ?? 0,
+    stream: options.stream ?? false
+  });
+}
 async function handleRPCRequest(request, id) {
-  const handler = handlerRegistry$1.get(id);
+  const handler = handlerRegistry.get(id);
   if (!handler) {
-    return new Response(JSON.stringify({ error: `Unknown RPC handler: ${id}` }), { status: 404, headers: { "Content-Type": "application/json" } });
+    return new Response(
+      JSON.stringify({ error: `Unknown RPC handler: ${id}` }),
+      { status: 404, headers: { "Content-Type": "application/json" } }
+    );
   }
   try {
     let args;
@@ -11,8 +23,7 @@ async function handleRPCRequest(request, id) {
       args = [];
       for (let i = 0; ; i++) {
         const val = url.searchParams.get(`_${i}`);
-        if (val === null)
-          break;
+        if (val === null) break;
         args.push(JSON.parse(val));
       }
     } else {
@@ -81,7 +92,10 @@ async function handleRPCRequest(request, id) {
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Internal RPC error";
-    return new Response(JSON.stringify({ error: message }), { status: 500, headers: { "Content-Type": "application/json" } });
+    return new Response(
+      JSON.stringify({ error: message }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   }
 }
 function hashJSON(value) {
@@ -92,84 +106,6 @@ function hashJSON(value) {
     hash = Math.imul(hash, 16777619);
   }
   return (hash >>> 0).toString(16).padStart(8, "0");
-}
-const swrCache$1 = /* @__PURE__ */ new Map();
-if (typeof window !== "undefined") {
-  window.addEventListener("focus", () => {
-    for (const [, entry] of swrCache$1) {
-      if (entry.options.revalidateOnFocus !== false && !entry.isValidating) {
-        const swrEntry = entry;
-        swrEntry.isValidating = true;
-        swrEntry.pendingPromise = swrEntry.fetcher();
-        swrEntry.pendingPromise.then((fresh) => {
-          swrEntry.data = fresh;
-          swrEntry.fetchedAt = Date.now();
-        }).catch(() => {
-        }).finally(() => {
-          swrEntry.isValidating = false;
-          swrEntry.pendingPromise = null;
-        });
-      }
-    }
-  });
-  window.addEventListener("online", () => {
-    for (const [, entry] of swrCache$1) {
-      if (!entry.isValidating) {
-        const swrEntry = entry;
-        swrEntry.isValidating = true;
-        swrEntry.pendingPromise = swrEntry.fetcher();
-        swrEntry.pendingPromise.then((fresh) => {
-          swrEntry.data = fresh;
-          swrEntry.fetchedAt = Date.now();
-        }).catch(() => {
-        }).finally(() => {
-          swrEntry.isValidating = false;
-          swrEntry.pendingPromise = null;
-        });
-      }
-    }
-  });
-}
-function createAstraHandler(options = {}) {
-  const apiPrefix = options.apiPrefix ?? "/api/astra";
-  return async (request) => {
-    const url = new URL(request.url);
-    if (url.pathname === apiPrefix || url.pathname.startsWith(`${apiPrefix}/`)) {
-      const id = url.pathname.slice(apiPrefix.length + 1).replace(/\/+$/, "");
-      return handleRPCRequest(request, id);
-    }
-    if (options.render) {
-      const rendered = await options.render(request, url);
-      if (rendered)
-        return rendered;
-    }
-    return new Response(JSON.stringify({ error: "Not found" }), {
-      status: 404,
-      headers: { "Content-Type": "application/json" }
-    });
-  };
-}
-function createCloudflareHandler(options = {}) {
-  const handle = createAstraHandler(options);
-  return {
-    async fetch(request, env) {
-      const response = await handle(request);
-      if (response.status !== 404 || !env)
-        return response;
-      const assets = env.ASSETS;
-      return assets ? assets.fetch(request) : response;
-    }
-  };
-}
-const handlerRegistry = /* @__PURE__ */ new Map();
-function rpcHandler(id, fn, options = {}) {
-  handlerRegistry.set(id, {
-    fn,
-    tags: options.tags ?? [],
-    autoSync: options.autoSync ?? false,
-    maxAge: options.maxAge ?? 0,
-    stream: options.stream ?? false
-  });
 }
 const swrCache = /* @__PURE__ */ new Map();
 if (typeof window !== "undefined") {
@@ -240,7 +176,23 @@ const addVisit = server(async (page) => {
 rpcHandler("getQuote", getQuote);
 rpcHandler("getStats", getStats, { "tags": ["stats"], "maxAge": 60 });
 rpcHandler("addVisit", addVisit);
-const serverEntry = createCloudflareHandler({ apiPrefix: "/api/astra" });
+const apiPrefix = "/examples/deploy/03-cloudflare/api/astra";
+const serverEntry = {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+    if (url.pathname === apiPrefix || url.pathname.startsWith(apiPrefix + "/")) {
+      return handleRPCRequest(request, url.pathname.slice(apiPrefix.length + 1));
+    }
+    const notFound = new Response(JSON.stringify({ error: "Not found" }), {
+      status: 404,
+      headers: { "Content-Type": "application/json" }
+    });
+    if (env?.ASSETS) {
+      return env.ASSETS.fetch(request).catch(() => notFound);
+    }
+    return notFound;
+  }
+};
 export {
   serverEntry as default
 };

@@ -19,6 +19,7 @@ examples/*/dist/
 .env
 .env.*
 !.env.example
+/keys
 
 # Logs
 *.log

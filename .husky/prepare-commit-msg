@@ -1,0 +1,5 @@
+# Signal to post-commit that this is a new (non-amend) commit.
+# $2 is the source: "message" = new commit with -m, "commit" = amend.
+if [ "$2" = "message" ]; then
+  touch .git/ASTRAJS_NEW_COMMIT
+fi

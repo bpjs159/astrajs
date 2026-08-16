@@ -1067,6 +1067,15 @@ function _parseChildren(
       }
       // Extract expression with balanced braces
       const { expr, endPos } = _extractBracedExpr(remaining, pos);
+      const trimmedExpr = expr.trim();
+
+      // JSX comments ({/* ... */}) render nothing — drop them entirely.
+      // (Also keeps the "contains /*" transformed-JSX heuristic below from
+      // mistaking a comment for generated DOM code.)
+      if (trimmedExpr.startsWith('/*') && trimmedExpr.endsWith('*/')) {
+        pos = endPos;
+        continue;
+      }
 
       // If expression contains JSX, transform it inline
       if (expr.includes('<')) {
