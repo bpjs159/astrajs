@@ -3,9 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "astra dev",
-    "build": "astra build",
-    "preview": "astra preview"
+    "dev": "astrajs dev",
+    "build": "astrajs build",
+    "preview": "astrajs preview"
   },
   "dependencies": {
     "astrajs.dev": "^0.1.0"

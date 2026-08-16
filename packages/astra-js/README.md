@@ -20,9 +20,9 @@ import { route } from 'astrajs.dev/router';
 ## CLI
 
 ```bash
-npx astra my-app        # scaffold a new project
-npx astra dev           # dev server
-npx astra build         # production build (SSR/SSG adapters)
+npx astrajs my-app        # scaffold a new project
+npx astrajs dev           # dev server
+npx astrajs build         # production build (SSR/SSG adapters)
 ```
 
 ## Subpaths

@@ -10,23 +10,23 @@ export const VERSION = pkg.version;
 
 export function printHelp() {
   console.log(`
-  ${colors.bold}astra ${VERSION}${colors.reset} — the AstraJS CLI
+  ${colors.bold}astrajs ${VERSION}${colors.reset} — the AstraJS CLI
 
   ${colors.bold}Project runner${colors.reset} (inside an AstraJS project):
-    astra dev [args…]        Start the dev server (vite)
-    astra build [args…]      Production build + deploy adapter output
+    astrajs dev [args…]        Start the dev server (vite)
+    astrajs build [args…]      Production build + deploy adapter output
                              (--adapter static|node|vercel|cloudflare,
                               or "adapter" in astra.config.json)
-    astra preview [args…]    Preview the production build (vite preview)
-    astra test [args…]       Run tests (vitest run)
+    astrajs preview [args…]    Preview the production build (vite preview)
+    astrajs test [args…]       Run tests (vitest run)
 
   ${colors.bold}AI helpers${colors.reset}:
-    astra ai chat <prompt>                One-shot completion
-    astra ai translate <locale> <file>    Translate a JSON i18n catalog
-    astra ai --help                       AI usage
+    astrajs ai chat <prompt>                One-shot completion
+    astrajs ai translate <locale> <file>    Translate a JSON i18n catalog
+    astrajs ai --help                       AI usage
 
   ${colors.bold}Scaffold a new project:${colors.reset}
-    astra [project-name] [options]
+    astrajs [project-name] [options]
     npx astrajs.dev@latest [project-name] [options]
     pnpm create astrajs [project-name] [options]
 
@@ -44,16 +44,16 @@ export function printHelp() {
     fullstack  Everything — server() RPC, SSR/SSG/ISR
 
   ${colors.bold}Examples:${colors.reset}
-    astra dev
-    astra build
-    astra build --adapter vercel
-    astra build --adapter cloudflare
-    astra test --watch
-    astra ai chat "explain direct DOM mutations"
-    astra ai translate fr src/i18n-en.json
-    astra my-app
-    astra my-app --template frontend
-    astra my-app --yes
+    astrajs dev
+    astrajs build
+    astrajs build --adapter vercel
+    astrajs build --adapter cloudflare
+    astrajs test --watch
+    astrajs ai chat "explain direct DOM mutations"
+    astrajs ai translate fr src/i18n-en.json
+    astrajs my-app
+    astrajs my-app --template frontend
+    astrajs my-app --yes
 `);
 }
 

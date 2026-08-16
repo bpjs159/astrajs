@@ -45,7 +45,7 @@ import { server } from 'astrajs.dev/server';
 | `astrajs.dev/schema` | Declarative validation schemas with inferred types | [`packages/schema`](packages/schema) |
 | `astrajs.dev/validation` | Standalone validator functions and compositors | [`packages/validation`](packages/validation) |
 | `astrajs.dev/i18n` | Built-in i18n: reactive translations, pluralization, Intl formats | [`packages/i18n`](packages/i18n) |
-| `astrajs.dev` (bin `astra`) | Scaffold and run AstraJS projects (`astra my-app`, `astra dev`) | [`packages/astra`](packages/astra) |
+| `astrajs.dev` (bin `astrajs`)  | Scaffold and run AstraJS projects (`astrajs my-app`, `astrajs dev`) | [`packages/astra`](packages/astra) |
 
 ## Quick Start
 
