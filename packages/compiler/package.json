@@ -50,5 +50,8 @@
     "ast",
     "css-in-js"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }

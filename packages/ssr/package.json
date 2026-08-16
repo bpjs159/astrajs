@@ -6,13 +6,17 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "development": "./src/index.ts", "import": "./dist/index.js",
+      "development": "./src/index.ts",
+      "import": "./dist/index.js",
       "default": "./dist/index.js"
     }
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist", "src"],
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
@@ -29,6 +33,15 @@
     "typescript": "^5.5.0",
     "vitest": "^2.0.0"
   },
-  "keywords": ["astrajs", "ssr", "ssg", "isr", "resumability"],
-  "license": "MIT"
+  "keywords": [
+    "astrajs",
+    "ssr",
+    "ssg",
+    "isr",
+    "resumability"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }

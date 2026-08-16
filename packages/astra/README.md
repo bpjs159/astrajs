@@ -69,3 +69,7 @@ node bin/astra.js my-app --yes
 ```
 
 No dependencies — pure Node.js (≥20), zero install step.
+
+## License
+
+MIT

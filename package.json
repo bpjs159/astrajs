@@ -4,12 +4,16 @@
   "private": true,
   "description": "AstraJS — Full-Stack TypeScript Framework: Zero-VDOM, AST-compiled, Proxy-reactive",
   "scripts": {
-    "build": "npm run build --workspaces",
+    "build": "npm run build --workspaces --if-present",
     "dev": "npm run dev --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "clean": "npm run clean --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present"
+    "test": "npm run test --workspaces --if-present",
+    "publish:beta": "node scripts/publish.mjs --tag beta",
+    "publish:latest": "node scripts/publish.mjs --tag latest",
+    "publish:dry": "node scripts/publish.mjs --dry-run",
+    "publish:promote": "node scripts/promote.mjs"
   },
   "engines": {
     "node": ">=20.0.0"

@@ -22,3 +22,6 @@ examples/*/dist/
 
 # Logs
 *.log
+
+# Local AI agent config (not for publication)
+.github/

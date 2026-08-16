@@ -4,7 +4,8 @@ function rpcHandler(id, fn, options = {}) {
     fn,
     tags: options.tags ?? [],
     autoSync: options.autoSync ?? false,
-    maxAge: options.maxAge ?? 0
+    maxAge: options.maxAge ?? 0,
+    stream: options.stream ?? false
   });
 }
 async function handleRPCRequest(request, id) {
@@ -33,6 +34,40 @@ async function handleRPCRequest(request, id) {
       }
     }
     const result = await handler.fn(...args);
+    if (handler.stream) {
+      const encoder = new TextEncoder();
+      const gen = result;
+      const body = new ReadableStream({
+        async start(controller) {
+          try {
+            for await (const chunk of gen) {
+              if (typeof chunk === "string" && chunk.length > 0) {
+                controller.enqueue(encoder.encode(chunk));
+              }
+            }
+          } catch (err) {
+            const message = err instanceof Error ? err.message : "Internal stream error";
+            controller.enqueue(encoder.encode(`
+[AstraJS stream error] ${message}`));
+          } finally {
+            controller.close();
+          }
+        }
+      });
+      const streamHeaders = {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-cache",
+        "X-Astra-Stream": "1"
+      };
+      if (handler.maxAge > 0) {
+        streamHeaders["Cache-Control"] = `public, max-age=${handler.maxAge}, stale-while-revalidate=${handler.maxAge * 2}`;
+        streamHeaders["CDN-Cache-Control"] = `max-age=${handler.maxAge}`;
+        if (handler.tags.length > 0) {
+          streamHeaders["Cache-Tag"] = handler.tags.join(",");
+        }
+      }
+      return new Response(body, { status: 200, headers: streamHeaders });
+    }
     const headers = {
       "Content-Type": "application/json"
     };

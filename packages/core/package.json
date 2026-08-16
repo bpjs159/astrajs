@@ -35,9 +35,15 @@
   },
   "typesVersions": {
     "0.1.0": {
-      "0.1.0": ["./dist/index.d.ts"],
-      "validation": ["./dist/validation.d.ts"],
-      "vite": ["./dist/compiler/index.d.ts"]
+      "0.1.0": [
+        "./dist/index.d.ts"
+      ],
+      "validation": [
+        "./dist/validation.d.ts"
+      ],
+      "vite": [
+        "./dist/compiler/index.d.ts"
+      ]
     }
   },
   "main": "./dist/index.js",
@@ -61,6 +67,14 @@
     "vitest": "^2.0.0"
   },
   "peerDependencies": {},
-  "keywords": ["astrajs", "reactivity", "proxy", "zero-vdom"],
-  "license": "MIT"
+  "keywords": [
+    "astrajs",
+    "reactivity",
+    "proxy",
+    "zero-vdom"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }

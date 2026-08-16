@@ -19,7 +19,10 @@
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist", "src"],
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
@@ -31,6 +34,17 @@
     "typescript": "^5.5.0",
     "vitest": "^2.0.0"
   },
-  "keywords": ["astrajs", "ai", "llm", "ollama", "openai", "streaming", "rag"],
-  "license": "MIT"
+  "keywords": [
+    "astrajs",
+    "ai",
+    "llm",
+    "ollama",
+    "openai",
+    "streaming",
+    "rag"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }
