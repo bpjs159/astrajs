@@ -62,7 +62,7 @@ export const SIDEBAR_STRINGS: Record<string, Record<string, string>> = {
     'sb.rendering': 'Renderizado',
     'sb.examples': 'Ejemplos',
     'sb.compare': 'Comparativa',
-    'sb.benchmarks': 'Benchmarks',
+    'sb.benchmarks': 'Rendimiento',
     'sb.testing': 'Pruebas',
     'sb.integrations': 'Integraciones',
     'sb.advanced': 'Avanzado',
