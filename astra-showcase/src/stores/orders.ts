@@ -1,4 +1,4 @@
-import { store } from '@bpjs159/core';
+import { store } from 'astrajs.dev/core';
 
 export interface Order {
   id: string;

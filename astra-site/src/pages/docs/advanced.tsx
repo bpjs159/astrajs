@@ -1,4 +1,4 @@
-import { component, dynamic } from '@bpjs159/core';
+import { component, dynamic } from 'astrajs.dev/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
 import { DocRightToc } from '../../components/doc-right-toc.js';
 import { Icon } from '../../components/icon.js';
@@ -91,7 +91,7 @@ registerHandler('getUsers', async ([role]) => {
           <li><strong><code>'vanilla'</code></strong> — {i18n.t('av.m2.a')}<code>bindText</code>{i18n.t('av.m2.b')}<code>bindAttr</code>{i18n.t('av.m2.c')}</li>
         </ul>
         <CodeBlock code={`// vite.config.ts
-import astra from '@bpjs159/compiler';
+import astra from 'astrajs.dev/compiler';
 
 export default defineConfig({
   plugins: [
@@ -161,7 +161,7 @@ const products = await listProducts();
         <h3>{i18n.t('av.config.title')}</h3>
         <CodeBlock code={`// vite.config.ts
 import { defineConfig } from 'vite';
-import astra from '@bpjs159/compiler';
+import astra from 'astrajs.dev/compiler';
 import path from 'path';
 
 export default defineConfig({
@@ -174,7 +174,7 @@ export default defineConfig({
   resolve: {
     alias: {
       // Only needed in monorepo/dev
-      '@bpjs159/core': path.resolve(__dirname, '../packages/core/src'),
+      'astrajs.dev/core': path.resolve(__dirname, '../packages/core/src'),
     },
   },
 });`} commentsKey="advanced.vite-config" />

@@ -7,7 +7,7 @@
  *
  * This file handles DOM mounting and global styles.
  */
-import { component } from '@bpjs159/core';
+import { component } from 'astrajs.dev/core';
 import { LikesDislikes } from './likes.js';
 import { TotalBox } from './total.js';
 

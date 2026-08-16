@@ -1,4 +1,4 @@
-import { component, dynamic } from '@bpjs159/core';
+import { component, dynamic } from 'astrajs.dev/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
 import { DocRightToc } from '../../components/doc-right-toc.js';
 import { i18n } from '../../i18n.js';
@@ -47,7 +47,7 @@ document.body.appendChild(<Greeting name="Ada" /> as any);`} commentsKey="fund.p
 
         <h3>{i18n.t('f.sf.title')}</h3>
         <p>{i18n.t('f.sf.a')}<code>component()</code>{i18n.t('f.sf.mid')}<strong>{i18n.t('f.sf.b')}</strong>{i18n.t('f.sf.c')}</p>
-        <CodeBlock code={`import { component, store } from '@bpjs159/core';
+        <CodeBlock code={`import { component, store } from 'astrajs.dev/core';
 
 export const Counter = component(() => {
   // store() creates a reactive Proxy
@@ -74,7 +74,7 @@ export const Counter = component(() => {
         <p><code>store()</code> {i18n.t('f.react.a')}<strong>{i18n.t('f.react.b')}</strong>{i18n.t('f.react.c')}</p>
 
         <h3>{i18n.t('f.proxy.title')}</h3>
-        <CodeBlock code={`import { store } from '@bpjs159/core';
+        <CodeBlock code={`import { store } from 'astrajs.dev/core';
 
 const user = store({
   name: 'Ada',
@@ -187,7 +187,7 @@ bindConditional(marker, () => show,
 
         <h2 id="estilos">{i18n.t('sb.css')}</h2>
         <p>{i18n.t('f.css.a')}<code>css</code>{i18n.t('f.css.b')}</p>
-        <CodeBlock code={`import { css } from '@bpjs159/core';
+        <CodeBlock code={`import { css } from 'astrajs.dev/core';
 
 const cardStyle = css\`
   background: #0f172a;
@@ -221,7 +221,7 @@ function Card({ title, featured }: { title: string; featured?: boolean }) {
   );
 }`} />
         <p>{i18n.t('f.cls.a')}<code>classes()</code>{i18n.t('f.cls.b')}</p>
-        <CodeBlock code={`import { classes } from '@bpjs159/core';
+        <CodeBlock code={`import { classes } from 'astrajs.dev/core';
 
 <div class={classes(cardStyle, featured && 'featured', 'mb-4')}>
   ...

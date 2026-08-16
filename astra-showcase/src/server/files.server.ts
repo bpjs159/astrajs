@@ -1,4 +1,4 @@
-import { server } from '@bpjs159/server';
+import { server } from 'astrajs.dev/server';
 
 export const uploadFile = server(async (fileName: string, _fileData: string): Promise<{ ok: boolean; url: string }> => {
   return { ok: true, url: `/uploads/${fileName}` };

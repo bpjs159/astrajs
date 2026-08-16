@@ -6,11 +6,11 @@ export default defineConfig({
   plugins: [astra({ transformMode: 'dynamic' })],
   resolve: {
     alias: {
-      '@bpjs159/core': path.resolve(__dirname, '../../../packages/core/src'),
-      '@bpjs159/core/jsx-runtime': path.resolve(__dirname, '../../../packages/core/src/jsx-runtime'),
-      '@bpjs159/core/jsx-dev-runtime': path.resolve(__dirname, '../../../packages/core/src/jsx-dev-runtime'),
-      '@bpjs159/compiler/css': path.resolve(__dirname, '../../../packages/compiler/src/css'),
-      '@bpjs159/compiler': path.resolve(__dirname, '../../../packages/compiler/src'),
+      'astrajs.dev/core': path.resolve(__dirname, '../../../packages/core/src'),
+      'astrajs.dev/core/jsx-runtime': path.resolve(__dirname, '../../../packages/core/src/jsx-runtime'),
+      'astrajs.dev/core/jsx-dev-runtime': path.resolve(__dirname, '../../../packages/core/src/jsx-dev-runtime'),
+      'astrajs.dev/compiler/css': path.resolve(__dirname, '../../../packages/compiler/src/css'),
+      'astrajs.dev/compiler': path.resolve(__dirname, '../../../packages/compiler/src'),
     },
   },
 });

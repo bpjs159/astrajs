@@ -87,12 +87,20 @@ function readJson(file) {
 
 /** Resolves a package entry through node_modules, walking up from `root`. */
 function resolveProjectPackage(root, name) {
+  // Separate the bare package name from a subpath (e.g. 'astrajs.dev/adapters').
+  const base = name.startsWith('@')
+    ? name.split('/').slice(0, 2).join('/')
+    : name.split('/')[0];
   let dir = root;
   for (;;) {
-    const pkgPath = path.join(dir, 'node_modules', name, 'package.json');
+    const pkgPath = path.join(dir, 'node_modules', base, 'package.json');
     if (fs.existsSync(pkgPath)) {
       const require = createRequire(path.join(dir, 'package.json'));
-      return require.resolve(name);
+      try {
+        return require.resolve(name);
+      } catch {
+        return pkgPath;
+      }
     }
     const parent = path.dirname(dir);
     if (parent === dir) return null;

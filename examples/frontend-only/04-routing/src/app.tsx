@@ -1,5 +1,5 @@
 /**
- * 04 — Routing · Declarative Routing with @bpjs159/router
+ * 04 — Routing · Declarative Routing with astrajs.dev/router
  *
  * Demonstrates file-system–style routing with reactive guards:
  * `route(path)` returns a boolean, `params` is a reactive proxy,

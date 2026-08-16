@@ -1,7 +1,7 @@
 /**
  * 404 — fallbackRoute() triggers this
  */
-import { navigate } from '@bpjs159/router';
+import { navigate } from 'astrajs.dev/router';
 
 export const NotFound = () => (
   <div class="page">

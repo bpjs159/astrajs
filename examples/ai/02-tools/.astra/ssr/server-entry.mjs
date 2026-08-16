@@ -2,23 +2,11 @@ import { createServer } from "node:http";
 import { existsSync, statSync, readFileSync } from "node:fs";
 import { resolve, sep, extname } from "node:path";
 import { fileURLToPath } from "node:url";
-const handlerRegistry = /* @__PURE__ */ new Map();
-function rpcHandler(id, fn, options = {}) {
-  handlerRegistry.set(id, {
-    fn,
-    tags: options.tags ?? [],
-    autoSync: options.autoSync ?? false,
-    maxAge: options.maxAge ?? 0,
-    stream: options.stream ?? false
-  });
-}
+const handlerRegistry$1 = /* @__PURE__ */ new Map();
 async function handleRPCRequest(request, id) {
-  const handler = handlerRegistry.get(id);
+  const handler = handlerRegistry$1.get(id);
   if (!handler) {
-    return new Response(
-      JSON.stringify({ error: `Unknown RPC handler: ${id}` }),
-      { status: 404, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: `Unknown RPC handler: ${id}` }), { status: 404, headers: { "Content-Type": "application/json" } });
   }
   try {
     let args;
@@ -27,7 +15,8 @@ async function handleRPCRequest(request, id) {
       args = [];
       for (let i = 0; ; i++) {
         const val = url.searchParams.get(`_${i}`);
-        if (val === null) break;
+        if (val === null)
+          break;
         args.push(JSON.parse(val));
       }
     } else {
@@ -96,10 +85,7 @@ async function handleRPCRequest(request, id) {
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Internal RPC error";
-    return new Response(
-      JSON.stringify({ error: message }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ error: message }), { status: 500, headers: { "Content-Type": "application/json" } });
   }
 }
 function hashJSON(value) {
@@ -111,10 +97,10 @@ function hashJSON(value) {
   }
   return (hash >>> 0).toString(16).padStart(8, "0");
 }
-const swrCache = /* @__PURE__ */ new Map();
+const swrCache$1 = /* @__PURE__ */ new Map();
 if (typeof window !== "undefined") {
   window.addEventListener("focus", () => {
-    for (const [, entry] of swrCache) {
+    for (const [, entry] of swrCache$1) {
       if (entry.options.revalidateOnFocus !== false && !entry.isValidating) {
         const swrEntry = entry;
         swrEntry.isValidating = true;
@@ -131,7 +117,7 @@ if (typeof window !== "undefined") {
     }
   });
   window.addEventListener("online", () => {
-    for (const [, entry] of swrCache) {
+    for (const [, entry] of swrCache$1) {
       if (!entry.isValidating) {
         const swrEntry = entry;
         swrEntry.isValidating = true;
@@ -147,14 +133,6 @@ if (typeof window !== "undefined") {
       }
     }
   });
-}
-function server(configOrFn, fn) {
-  if (typeof configOrFn === "function") {
-    return configOrFn;
-  }
-  throw new Error(
-    "[AstraJS] server() macro was not transformed by the compiler. Make sure @bpjs159/core/vite is in your vite.config.ts plugins."
-  );
 }
 function createAstraHandler(options = {}) {
   const apiPrefix = options.apiPrefix ?? "/api/astra";
@@ -289,6 +267,61 @@ function startAstraServer(options) {
     console.log(`[AstraJS] RPC prefix: ${options.apiPrefix ?? "/api/astra"}${options.staticDir ? ` · static: ${resolve(options.staticDir)}` : ""}`);
   });
   return server2;
+}
+const handlerRegistry = /* @__PURE__ */ new Map();
+function rpcHandler(id, fn, options = {}) {
+  handlerRegistry.set(id, {
+    fn,
+    tags: options.tags ?? [],
+    autoSync: options.autoSync ?? false,
+    maxAge: options.maxAge ?? 0,
+    stream: options.stream ?? false
+  });
+}
+const swrCache = /* @__PURE__ */ new Map();
+if (typeof window !== "undefined") {
+  window.addEventListener("focus", () => {
+    for (const [, entry] of swrCache) {
+      if (entry.options.revalidateOnFocus !== false && !entry.isValidating) {
+        const swrEntry = entry;
+        swrEntry.isValidating = true;
+        swrEntry.pendingPromise = swrEntry.fetcher();
+        swrEntry.pendingPromise.then((fresh) => {
+          swrEntry.data = fresh;
+          swrEntry.fetchedAt = Date.now();
+        }).catch(() => {
+        }).finally(() => {
+          swrEntry.isValidating = false;
+          swrEntry.pendingPromise = null;
+        });
+      }
+    }
+  });
+  window.addEventListener("online", () => {
+    for (const [, entry] of swrCache) {
+      if (!entry.isValidating) {
+        const swrEntry = entry;
+        swrEntry.isValidating = true;
+        swrEntry.pendingPromise = swrEntry.fetcher();
+        swrEntry.pendingPromise.then((fresh) => {
+          swrEntry.data = fresh;
+          swrEntry.fetchedAt = Date.now();
+        }).catch(() => {
+        }).finally(() => {
+          swrEntry.isValidating = false;
+          swrEntry.pendingPromise = null;
+        });
+      }
+    }
+  });
+}
+function server(configOrFn, fn) {
+  if (typeof configOrFn === "function") {
+    return configOrFn;
+  }
+  throw new Error(
+    "[AstraJS] server() macro was not transformed by the compiler. Make sure @bpjs159/core/vite is in your vite.config.ts plugins."
+  );
 }
 function getAiRuntime() {
   const provider = process.env.ASTRA_AI_PROVIDER || "ollama";

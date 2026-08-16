@@ -5,8 +5,8 @@
  * (No son component(): se invocan dentro de expresiones reactivas de
  * las páginas, que ya re-evalúan cuando cambia la ruta.)
  */
-import { Link, navigate } from '@bpjs159/router';
-import { WORLD_LOCALES } from '@bpjs159/i18n';
+import { Link, navigate } from 'astrajs.dev/router';
+import { WORLD_LOCALES } from 'astrajs.dev/i18n';
 import { db } from '../db.js';
 import { i18n, navKey } from '../i18n.js';
 

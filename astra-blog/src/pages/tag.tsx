@@ -3,8 +3,8 @@
  *
  * RUTA DINÁMICA: /tags/:tagSlug
  */
-import { component } from '@bpjs159/core';
-import { params, Link } from '@bpjs159/router';
+import { component } from 'astrajs.dev/core';
+import { params, Link } from 'astrajs.dev/router';
 import { db } from '../db.js';
 import { BreadcrumbsMarkup } from '../components/site-chrome.js';
 import { PostCardMarkup } from '../components/post-card.js';

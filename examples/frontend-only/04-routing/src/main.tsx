@@ -1,13 +1,13 @@
 /**
- * 04 — Declarative Routing with @bpjs159/router
+ * 04 — Declarative Routing with astrajs.dev/router
  *
  * - route(path, { exact? })  → returns boolean
  * - fallbackRoute()           → 404 handler
  * - params                    → global reactive proxy
  * - navigate(path)            → programmatic navigation
  */
-import { component } from '@bpjs159/core';
-import { route, fallbackRoute, navigate } from '@bpjs159/router';
+import { component } from 'astrajs.dev/core';
+import { route, fallbackRoute, navigate } from 'astrajs.dev/router';
 import { Home } from './pages/Home.js';
 import { Products } from './pages/Products.js';
 import { About } from './pages/About.js';

@@ -810,7 +810,7 @@ export function transformJSX(
   if (needsBindList) imports.push('bindList');
 
   if (imports.length > 0) {
-    result = ensureImport(result, '@bpjs159/core', imports);
+    result = ensureImport(result, 'astrajs.dev/core', imports);
   }
 
   return { code: result, needsDynamic, needsBindText, needsBindAttr, needsBindValue, needsBindList };

@@ -10,7 +10,7 @@
  * compiler injects `dynamic(() => ...)` automatically. Each expression
  * gets its own micro-effect for O(1) surgical DOM updates.
  */
-import { component, store } from '@bpjs159/core';
+import { component, store } from 'astrajs.dev/core';
 import { Timer } from './timer.js';
 
 // ── Main component ──────────────────────────────────────────────────────────

@@ -1,6 +1,6 @@
 // 07 — File Upload · Client reads a file, server validates and stores it
-import { component, store } from '@bpjs159/core';
-import { server } from '@bpjs159/server';
+import { component, store } from 'astrajs.dev/core';
+import { server } from 'astrajs.dev/server';
 
 interface UploadedFile {
   id: string;

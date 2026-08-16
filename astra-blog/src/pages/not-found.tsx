@@ -3,8 +3,8 @@
  *
  * Se renderiza vía fallbackRoute() cuando ninguna guarda coincide.
  */
-import { component } from '@bpjs159/core';
-import { Link } from '@bpjs159/router';
+import { component } from 'astrajs.dev/core';
+import { Link } from 'astrajs.dev/router';
 import { db } from '../db.js';
 
 export const NotFoundPage = component(() => (

@@ -1,4 +1,4 @@
-import { component } from '@bpjs159/core';
+import { component } from 'astrajs.dev/core';
 
 /**
  * BrandLogo — wordmark "ASTRAJS" para cuando el logo se muestra SIN

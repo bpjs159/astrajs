@@ -4,8 +4,8 @@
  * Página fija con mucho contenido, resuelta por la pre-built request
  * getStaticPages() → pages.about.
  */
-import { component } from '@bpjs159/core';
-import { Link } from '@bpjs159/router';
+import { component } from 'astrajs.dev/core';
+import { Link } from 'astrajs.dev/router';
 import { db } from '../db.js';
 
 export const AboutPage = component(() => {

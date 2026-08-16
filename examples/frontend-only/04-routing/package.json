@@ -1,1 +1,16 @@
-{"name":"04-routing","private":true,"type":"module","scripts":{"dev":"vite","build":"vite build"},"dependencies":{"@bpjs159/core":"0.1.0","@bpjs159/router":"0.1.0"},"devDependencies":{"vite":"^5.4.0","typescript":"^5.5.0"}}
+{
+  "name": "04-routing",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "astrajs.dev": "0.1.4"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0",
+    "typescript": "^5.5.0"
+  }
+}

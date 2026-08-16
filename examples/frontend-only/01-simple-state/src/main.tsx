@@ -5,7 +5,7 @@
  * with dynamic() — you write plain JSX, the AST transform handles the rest.
  * Each reactive expression gets its own O(1) micro-effect.
  */
-import { component, store } from '@bpjs159/core';
+import { component, store } from 'astrajs.dev/core';
 import { styles } from './styles.js';
 
 export const Counter = component(() => {

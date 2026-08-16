@@ -8,9 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@bpjs159/core": "0.1.0",
-    "@bpjs159/i18n": "0.1.0",
-    "@bpjs159/router": "0.1.0"
+    "astrajs.dev": "0.1.4"
   },
   "devDependencies": {
     "vite": "^5.4.0",

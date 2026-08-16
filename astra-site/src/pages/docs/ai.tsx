@@ -1,4 +1,4 @@
-import { component } from '@bpjs159/core';
+import { component } from 'astrajs.dev/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
 import { DocRightToc } from '../../components/doc-right-toc.js';
 import { i18n } from '../../i18n.js';
@@ -42,7 +42,7 @@ export const DocsAi = component(() => (
         <p><code>ai()</code>{i18n.t('ai.endpoints.p1')}<code>aiStream()</code>{i18n.t('ai.endpoints.p2')}</p>
         <p>{i18n.t('ai.endpoints.p3')}</p>
         <CodeBlock code={`// src/ai.ts — runs on the server (keys never ship)
-import { ai, aiStream } from '@bpjs159/ai';
+import { ai, aiStream } from 'astrajs.dev/ai';
 
 export const summarize = ai(
   { model: 'qwen2.5-coder:7b', maxAge: 300, tags: ['summaries'] },
@@ -87,8 +87,8 @@ chat(question, (chunk) => {
         <h2 id="tools">{i18n.t('sb.aiTools')}</h2>
         <p>{i18n.t('ai.tools.p1')}<code>aiAgent()</code>{i18n.t('ai.tools.p2')}</p>
         <p>{i18n.t('ai.tools.p3')}</p>
-        <CodeBlock code={`import { server } from '@bpjs159/server';
-import { aiAgent } from '@bpjs159/ai';
+        <CodeBlock code={`import { server } from 'astrajs.dev/server';
+import { aiAgent } from 'astrajs.dev/ai';
 
 export const getProduct = server(async (id: string) => db.products.find(id));
 
@@ -110,8 +110,8 @@ const shop = aiAgent({
 export const askShop = server(async (question: string) => shop.run(question));`} />
 
         <h2 id="rag">{i18n.t('sb.aiRag')}</h2>
-        <p><code>@bpjs159/ai/rag</code>{i18n.t('ai.rag.p')}</p>
-        <CodeBlock code={`import { createRag } from '@bpjs159/ai/rag';
+        <p><code>astrajs.dev/ai/rag</code>{i18n.t('ai.rag.p')}</p>
+        <CodeBlock code={`import { createRag } from 'astrajs.dev/ai/rag';
 
 const rag = createRag();
 await rag.index('docs', [...chunks]);

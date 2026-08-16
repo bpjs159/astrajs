@@ -1,8 +1,18 @@
 {
   "name": "10-dynamic-attrs",
-  "private": true, "version": "0.1.0",
+  "private": true,
+  "version": "0.1.0",
   "type": "module",
-  "scripts": { "test": "vitest run --config vitest.config.ts", "dev": "vite", "build": "vite build" },
-  "dependencies": { "@bpjs159/core": "0.1.0" },
-  "devDependencies": { "vite": "^5.4.0", "typescript": "^5.5.0" }
+  "scripts": {
+    "test": "vitest run --config vitest.config.ts",
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "astrajs.dev": "0.1.4"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0",
+    "typescript": "^5.5.0"
+  }
 }

@@ -4,8 +4,8 @@
  * `swr(fetcher)` — one import, zero boilerplate.
  * Auto cache key · localStorage · stale-while-revalidate · reactive state.
  */
-import { component, swr } from '@bpjs159/core';
-import type { SWRState } from '@bpjs159/core';
+import { component, swr } from 'astrajs.dev/core';
+import type { SWRState } from 'astrajs.dev/core';
 import { styles } from './styles.js';
 
 type User = { id: number; name: string; email: string };

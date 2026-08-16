@@ -7,8 +7,8 @@
  * The index builds LAZILY inside the handler — it never runs in the
  * client bundle (the client only receives the askDocs fetch wrapper).
  */
-import { server } from '@bpjs159/server';
-import { createRag } from '@bpjs159/ai/rag';
+import { server } from 'astrajs.dev/server';
+import { createRag } from 'astrajs.dev/ai/rag';
 
 // The "knowledge base" — could be docs chunks, product manuals, posts…
 const DOCS = [

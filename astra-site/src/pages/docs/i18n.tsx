@@ -1,12 +1,12 @@
 /**
  * astra-site — Docs: i18n
  *
- * Página de documentación del módulo built-in @bpjs159/i18n, con
+ * Página de documentación del módulo built-in astrajs.dev/i18n, con
  * demos EN VIVO: switcher de idiomas reactivo, pluralización,
  * interpolación y formato Intl.
  */
-import { component, store, dynamic } from '@bpjs159/core';
-import { createI18n, WORLD_LOCALES } from '@bpjs159/i18n';
+import { component, store, dynamic } from 'astrajs.dev/core';
+import { createI18n, WORLD_LOCALES } from 'astrajs.dev/i18n';
 import { DocSidebar } from '../../components/docs-sidebar.js';
 import { DocRightToc } from '../../components/doc-right-toc.js';
 import { CodeBlock } from '../../components/code-block.js';
@@ -147,7 +147,7 @@ export const DocsI18n = component(() => (
     <main class="docs-main">
       <div class="docs-content">
         <h1>i18n</h1>
-        <p><code>@bpjs159/i18n</code> {siteI18n.t('id.p.a')}<code>store()</code>{siteI18n.t('id.p.b')}<code>t()</code>{siteI18n.t('id.p.c')}</p>
+        <p><code>astrajs.dev/i18n</code> {siteI18n.t('id.p.a')}<code>store()</code>{siteI18n.t('id.p.b')}<code>t()</code>{siteI18n.t('id.p.c')}</p>
 
         <h2 id="demo">{siteI18n.t('sb.i18nDemo')}</h2>
         <div class="i18n-demo">
@@ -180,13 +180,13 @@ export const DocsI18n = component(() => (
 
         <h2 id="instalacion">{siteI18n.t('sb.install')}</h2>
         <CodeBlock code={`// package.json
-"dependencies": { "@bpjs159/i18n": "0.1.0" }
+"dependencies": { "astrajs.dev/i18n": "0.1.0" }
 
 // vite.config.ts
-resolve: { alias: { '@bpjs159/i18n': '@bpjs159/i18n/src' } } // monorepo only`} commentsKey="i18n.install" />
+resolve: { alias: { 'astrajs.dev/i18n': 'astrajs.dev/i18n/src' } } // monorepo only`} commentsKey="i18n.install" />
 
         <h2 id="setup">{siteI18n.t('sb.i18nSetup')}</h2>
-        <CodeBlock code={`import { createI18n } from '@bpjs159/i18n';
+        <CodeBlock code={`import { createI18n } from 'astrajs.dev/i18n';
 
 export const i18n = createI18n({
   locale: 'es',            // initial language

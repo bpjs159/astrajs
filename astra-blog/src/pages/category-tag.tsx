@@ -7,8 +7,8 @@
  * Resuelve los posts que cumplen AMBAS condiciones (intersección de
  * dos dimensiones dinámicas) contra los datos pre-construidos.
  */
-import { component } from '@bpjs159/core';
-import { params, Link } from '@bpjs159/router';
+import { component } from 'astrajs.dev/core';
+import { params, Link } from 'astrajs.dev/router';
 import { db } from '../db.js';
 import { BreadcrumbsMarkup } from '../components/site-chrome.js';
 import { PostCardMarkup } from '../components/post-card.js';

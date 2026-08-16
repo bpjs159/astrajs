@@ -1,4 +1,4 @@
-import { server } from '@bpjs159/server';
+import { server } from 'astrajs.dev/server';
 
 export interface Product {
   id: string;

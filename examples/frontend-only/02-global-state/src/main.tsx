@@ -7,7 +7,7 @@
  * Compiler output (conceptual):
  *   {appStore.likes} ? bindText(tn, () => String(appStore.likes))
  */
-import { component } from '@bpjs159/core';
+import { component } from 'astrajs.dev/core';
 import { appStore, total } from './store.js';
 import { styles } from './styles.js';
 

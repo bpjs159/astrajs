@@ -1,5 +1,5 @@
-import { component, store, dynamic } from '@bpjs159/core';
-import { navigate } from '@bpjs159/router';
+import { component, store, dynamic } from 'astrajs.dev/core';
+import { navigate } from 'astrajs.dev/router';
 import { i18n } from '../i18n.js';
 import { Icon } from '../components/icon.js';
 import { CodeBlock } from '../components/code-block.js';
@@ -73,7 +73,7 @@ export const HomePage = component(() => {
   };
 
   const tabCode: Record<string, string> = {
-    store: `import { store } from '@bpjs159/core';
+    store: `import { store } from 'astrajs.dev/core';
 
 const state = store({
     products: [] as Product[],
@@ -83,7 +83,7 @@ const state = store({
 // Mutating is reactive — the DOM updates itself.
 state.products.push({ id: 1, name: 'Astra' });
 state.total += 1;`,
-    server: `import { server } from '@bpjs159/server';
+    server: `import { server } from 'astrajs.dev/server';
 
 export const loadProducts = server(async () => {
     return db.product.findMany();
@@ -92,7 +92,7 @@ export const loadProducts = server(async () => {
 // Usage — call it anywhere in the client:
 const products = await loadProducts();
 // products is Product[] — the type is inferred from the server`,
-    css: `import { css } from '@bpjs159/core';
+    css: `import { css } from 'astrajs.dev/core';
 
 const cardStyle = css\`
     background: #0f172a;
@@ -104,7 +104,7 @@ const cardStyle = css\`
         border-color: #818cf8;
     }
 \`;`,
-    router: `import { route, Link, Outlet } from '@bpjs159/router';
+    router: `import { route, Link, Outlet } from 'astrajs.dev/router';
 
 // app.tsx — route() is reactive: active route ⇒ component.
 // No routes file, no config, no switch.
@@ -713,7 +713,7 @@ function App() {
           <h2>{i18n.t('home.cta.title')}</h2>
           <p>{i18n.t('home.cta.sub')}</p>
           <div class="cta-code">
-            <span>npx @bpjs159/cli@latest</span>
+            <span>npx astrajs.dev/cli@latest</span>
           </div>
           <br/>
           <button class="btn-primary" onclick={() => navigate('/docs/introduction')} style="font-size:.92rem;padding:14px 36px">

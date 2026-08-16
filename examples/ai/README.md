@@ -7,7 +7,7 @@ The same `ai()` macros, four ways:
 | [01-streaming-chat](./01-streaming-chat) | `ai()` + `aiStream()` typed endpoints; token-by-token DOM mutations | Node server |
 | [02-tools](./02-tools) | `aiAgent` calling your `server()` functions | Node server |
 | [03-build-time](./03-build-time) | `ai({ type: 'pre-build' })` folded into the bundle at build time | Static files |
-| [04-rag](./04-rag) | `@bpjs159/ai/rag` grounded answers | Node server |
+| [04-rag](./04-rag) | `astrajs.dev/ai/rag` grounded answers | Node server |
 
 ## Quick start
 

@@ -4,8 +4,8 @@
  * simulate server behavior client-side (mock latency, ETags, etc.)
  * since the docs site is purely static.
  */
-import { component, store, mounted } from '@bpjs159/core';
-import { css } from '@bpjs159/compiler/css';
+import { component, store, mounted } from 'astrajs.dev/core';
+import { css } from 'astrajs.dev/compiler/css';
 import { Icon } from '../../components/icon.js';
 
 export interface LiveExample {

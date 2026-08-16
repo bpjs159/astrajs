@@ -2,7 +2,7 @@
  * UserID — sub-route inside UserProfile
  * Displays the ID from params.
  */
-import { navigate, params } from '@bpjs159/router';
+import { navigate, params } from 'astrajs.dev/router';
 
 export const UserID = () => (
     <div>

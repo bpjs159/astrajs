@@ -8,8 +8,7 @@
     "build": "vite build"
   },
   "dependencies": {
-    "@bpjs159/core": "0.1.0",
-    "@bpjs159/ssr": "0.1.0"
+    "astrajs.dev": "0.1.4"
   },
   "devDependencies": {
     "vite": "^5.4.0",

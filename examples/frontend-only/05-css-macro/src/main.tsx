@@ -15,7 +15,7 @@
  * - `data-theme` attribute + `@media (prefers-color-scheme)` = native dark mode
  * - Zero runtime CSS — the `css` import is stripped at compile time
  */
-import { component, store, classes } from '@bpjs159/core';
+import { component, store, classes } from 'astrajs.dev/core';
 import { styles } from './styles.js';
 
 type ThemeMode = 'system' | 'light' | 'dark';

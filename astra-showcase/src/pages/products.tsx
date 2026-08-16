@@ -1,4 +1,4 @@
-import { component, mounted } from '@bpjs159/core';
+import { component, mounted } from 'astrajs.dev/core';
 import { ProductCard } from '../components/product-card.js';
 import { productStore, loadProducts, setProductsLoading } from '../stores/products.js';
 import { addToCart } from '../stores/cart.js';

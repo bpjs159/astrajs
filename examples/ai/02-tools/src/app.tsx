@@ -1,7 +1,7 @@
 /**
  * AI 02 — Tool-calling UI.
  */
-import { component, store } from '@bpjs159/core';
+import { component, store } from 'astrajs.dev/core';
 import { askShop } from './server.js';
 
 const css = `

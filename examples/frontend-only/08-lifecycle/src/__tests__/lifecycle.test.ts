@@ -3,9 +3,9 @@
  * Tests the full Zero-VDOM flow: component → dynamic() → bindings → DOM updates.
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { component, store, mounted } from '@bpjs159/core';
-import { bindDynamicText, bindConditional, bindDynamicList } from '@bpjs159/core';
-import { dynamic } from '@bpjs159/core';
+import { component, store, mounted } from 'astrajs.dev/core';
+import { bindDynamicText, bindConditional, bindDynamicList } from 'astrajs.dev/core';
+import { dynamic } from 'astrajs.dev/core';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 

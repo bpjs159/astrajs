@@ -1,4 +1,4 @@
-import { component, dynamic } from '@bpjs159/core';
+import { component, dynamic } from 'astrajs.dev/core';
 import { DocSidebar } from '../../components/docs-sidebar.js';
 import { DocRightToc } from '../../components/doc-right-toc.js';
 import { i18n } from '../../i18n.js';
@@ -36,7 +36,7 @@ export const DocsServerData = component(() => (
         <p>{i18n.t('sd.a')}<strong>{i18n.t('sd.b')}</strong>{i18n.t('sd.c')}<code>fetch</code>{i18n.t('sd.d')}</p>
 
         <h3>{i18n.t('sd.basic.title')}</h3>
-        <CodeBlock code={`import { server } from '@bpjs159/server';
+        <CodeBlock code={`import { server } from 'astrajs.dev/server';
 
 // Define the function ONCE
 export const getUsers = server({
@@ -128,7 +128,7 @@ const getCategories = server(
 );`} commentsKey="sd.tags" />
 
         <h3>{i18n.t('sd.inv.title')}</h3>
-        <CodeBlock code={`import { revalidate } from '@bpjs159/server';
+        <CodeBlock code={`import { revalidate } from 'astrajs.dev/server';
 
 // After creating a product:
 await db.product.create({ data: newProduct });

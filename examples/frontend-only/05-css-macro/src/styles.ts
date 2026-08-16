@@ -8,7 +8,7 @@
  * The `system` mode uses `@media (prefers-color-scheme: dark)` so the
  * OS-level preference is respected without any JavaScript.
  */
-import { css } from '@bpjs159/compiler/css';
+import { css } from 'astrajs.dev/compiler/css';
 
 export const styles = css`
   /* ── Base card ────────────────────────────────────────────────── */

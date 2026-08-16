@@ -2,17 +2,17 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "@bpjs159/core",
+    "jsxImportSource": "astrajs.dev/core",
     "rootDir": "..",
     "paths": {
-      "@bpjs159/core": ["../packages/core/src"],
-      "@bpjs159/core/jsx-runtime": ["../packages/core/src/jsx-runtime"],
-      "@bpjs159/core/jsx-dev-runtime": ["../packages/core/src/jsx-dev-runtime"],
-      "@bpjs159/router": ["../packages/router/src"],
-      "@bpjs159/server": ["../packages/server/src"],
-      "@bpjs159/i18n": ["../packages/i18n/src"],
-      "@bpjs159/compiler/css": ["../packages/compiler/src/css"],
-      "@bpjs159/compiler": ["../packages/compiler/src"]
+      "astrajs.dev/core": ["../packages/core/src"],
+      "astrajs.dev/core/jsx-runtime": ["../packages/core/src/jsx-runtime"],
+      "astrajs.dev/core/jsx-dev-runtime": ["../packages/core/src/jsx-dev-runtime"],
+      "astrajs.dev/router": ["../packages/router/src"],
+      "astrajs.dev/server": ["../packages/server/src"],
+      "astrajs.dev/i18n": ["../packages/i18n/src"],
+      "astrajs.dev/compiler/css": ["../packages/compiler/src/css"],
+      "astrajs.dev/compiler": ["../packages/compiler/src"]
     }
   },
   "include": [

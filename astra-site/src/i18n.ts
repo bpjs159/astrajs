@@ -6,7 +6,7 @@
  * actualiza quirúrgicamente cada nodo traducido (nav, hero, stats,
  * footer) sin recargar la página.
  */
-import { createI18n } from '@bpjs159/i18n';
+import { createI18n } from 'astrajs.dev/i18n';
 import { SITE_STRINGS } from './i18n-site.js';
 import { SIDEBAR_STRINGS } from './i18n-sidebar.js';
 import { DOCS_STRINGS } from './i18n-docs.js';

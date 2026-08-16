@@ -1,4 +1,4 @@
-import { css } from '@bpjs159/compiler/css';
+import { css } from 'astrajs.dev/compiler/css';
 
 export const styles = css`
   .formCard { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 36px; width: 420px; }

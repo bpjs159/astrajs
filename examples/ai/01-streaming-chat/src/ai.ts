@@ -7,7 +7,7 @@
  * - `ai(...)`        → one-shot completion, returns { text }
  * - `aiStream(...)`  → token stream; onToken fires per chunk client-side
  */
-import { ai, aiStream } from '@bpjs159/ai';
+import { ai, aiStream } from 'astrajs.dev/ai';
 
 /** One-shot endpoint (ISR-cached for 5 minutes). */
 export const summarize = ai(

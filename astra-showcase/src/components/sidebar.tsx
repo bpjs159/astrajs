@@ -1,6 +1,6 @@
 import { routes } from '../routes.js';
 import { cartCount } from '../stores/cart.js';
-import { Link } from '@bpjs159/router';
+import { Link } from 'astrajs.dev/router';
 
 const navItems = [
   { label: 'Dashboard', path: '/', emoji: '📊' },

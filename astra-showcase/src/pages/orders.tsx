@@ -1,4 +1,4 @@
-import { component, mounted } from '@bpjs159/core';
+import { component, mounted } from 'astrajs.dev/core';
 import { orderStore } from '../stores/orders.js';
 import { getOrders, likeOrder } from '../server/orders.server.js';
 import type { Order } from '../stores/orders.js';

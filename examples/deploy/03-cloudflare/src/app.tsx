@@ -1,7 +1,7 @@
 /**
  * Deploy 03 — Cloudflare · App component
  */
-import { component, store } from '@bpjs159/core';
+import { component, store } from 'astrajs.dev/core';
 import { getQuote, getStats, addVisit, type Quote } from './server.js';
 
 const style = `

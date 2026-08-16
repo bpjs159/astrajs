@@ -4,7 +4,7 @@
  * Reads the shared `appStore` via the derived `total()` function.
  * Re-renders whenever likes, dislikes, or comments change.
  */
-import { component } from '@bpjs159/core';
+import { component } from 'astrajs.dev/core';
 import { total } from './store.js';
 import { styles } from './styles.js';
 

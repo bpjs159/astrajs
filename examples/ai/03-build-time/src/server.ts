@@ -12,7 +12,7 @@
  * If the model answers with pure JSON, the parsed value is folded;
  * otherwise the `{ text }` contract is used.
  */
-import { ai } from '@bpjs159/ai';
+import { ai } from 'astrajs.dev/ai';
 
 export const faq = ai(
   { type: 'pre-build', model: 'qwen2.5-coder:7b' },

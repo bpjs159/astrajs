@@ -4,7 +4,7 @@
  * Reads and mutates the shared `appStore`.
  * Uses `component()` for reactive re-renders.
  */
-import { component } from '@bpjs159/core';
+import { component } from 'astrajs.dev/core';
 import { appStore } from './store.js';
 import { styles } from './styles.js';
 

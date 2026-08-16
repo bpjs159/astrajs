@@ -1,4 +1,4 @@
-import { component, store, mounted } from '@bpjs159/core';
+import { component, store, mounted } from 'astrajs.dev/core';
 import { getUploads, uploadFile } from '../server/files.server.js';
 
 const uploadState = store({

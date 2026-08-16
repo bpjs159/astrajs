@@ -4,7 +4,7 @@
  * Defined with the `css` macro — the compiler extracts them
  * to static CSS at build time (zero-runtime).
  */
-import { css } from '@bpjs159/compiler/css';
+import { css } from 'astrajs.dev/compiler/css';
 
 export const styles = css`
   .box { padding: 1rem; text-align: center; font-family: sans-serif; }

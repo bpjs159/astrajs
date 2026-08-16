@@ -1,5 +1,5 @@
-import { component, store } from '@bpjs159/core';
-import { server } from '@bpjs159/server';
+import { component, store } from 'astrajs.dev/core';
+import { server } from 'astrajs.dev/server';
 import { styles as s } from './styles.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────

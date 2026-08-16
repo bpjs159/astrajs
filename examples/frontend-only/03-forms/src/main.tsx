@@ -1,19 +1,19 @@
 /**
- * 03 — @bpjs159/form Controller + @bpjs159/validation
+ * 03 — astrajs.dev/form Controller + astrajs.dev/validation
  *
- * Data layer:  @bpjs159/core store (formStore.email, formStore.password…)
- * Meta layer:  @bpjs159/form controller (errors, touched, isDirty…)
- * Validation:  @bpjs159/validation — same validators used client & server
+ * Data layer:  astrajs.dev/core store (formStore.email, formStore.password…)
+ * Meta layer:  astrajs.dev/form controller (errors, touched, isDirty…)
+ * Validation:  astrajs.dev/validation — same validators used client & server
  *
  * Standard validators (isEmail, minLength, isRequired) come from
- * @bpjs159/validation. Custom async/cross-field validators are
+ * astrajs.dev/validation. Custom async/cross-field validators are
  * inline — the form controller handles both transparently.
  *
  * Cero efectos. Cero reimplementación de validación.
  */
-import { component, store } from '@bpjs159/core';
-import { form } from '@bpjs159/form';
-import * as validation from '@bpjs159/validation';
+import { component, store } from 'astrajs.dev/core';
+import { form } from 'astrajs.dev/form';
+import * as validation from 'astrajs.dev/validation';
 
 const takenUsernames = new Set(['admin', 'root', 'test']);
 
@@ -51,8 +51,8 @@ export const Form = component(() => {
 
   return (
     <div class="form-card">
-      <h1>@bpjs159/form</h1>
-      <p class="subtitle">Data + Metadata + <code>@bpjs159/validation</code></p>
+      <h1>astrajs.dev/form</h1>
+      <p class="subtitle">Data + Metadata + <code>astrajs.dev/validation</code></p>
 
       <form controller={formController} onSubmit={handleSubmit}>
         {/* ── Error box — only shows touched fields ── */}
@@ -177,7 +177,7 @@ export const Form = component(() => {
 
       <div class="live-preview">
         <h3>How it works</h3>
-        <div class="preview-item"><span><code>validate={'{validation.isEmail}'}</code></span><span class="badge badge-builtin">@bpjs159/validation</span></div>
+        <div class="preview-item"><span><code>validate={'{validation.isEmail}'}</code></span><span class="badge badge-builtin">astrajs.dev/validation</span></div>
         <div class="preview-item"><span><code>validate={'{validation.all([...])}'}</code></span><span>Compose validators</span></div>
         <div class="preview-item"><span><code>validate={'{async (val) => ...}'}</code></span><span class="badge badge-async">Custom async</span></div>
         <div class="preview-item"><span><code>controller={'{formController}'}</code></span><span class="badge badge-auto">Auto-wired</span></div>

@@ -1,4 +1,4 @@
-import { route, fallbackRoute } from '@bpjs159/router';
+import { route, fallbackRoute } from 'astrajs.dev/router';
 
 export const routes = {
   get home() { return route('/', { exact: true }); },

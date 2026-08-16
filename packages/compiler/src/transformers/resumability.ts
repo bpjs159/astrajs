@@ -88,7 +88,7 @@ export function injectRegisterHandlers(
   const transformed = lines.join('\n');
 
   // Ensure the import exists
-  const withImport = ensureImport(transformed, '@bpjs159/core', ['registerHandler']);
+  const withImport = ensureImport(transformed, 'astrajs.dev/core', ['registerHandler']);
 
   return { code: withImport, changed: true };
 }

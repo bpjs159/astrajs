@@ -1,7 +1,7 @@
 /**
  * AI 04 — RAG UI: ask, and also see which chunks were retrieved.
  */
-import { component, store } from '@bpjs159/core';
+import { component, store } from 'astrajs.dev/core';
 import { askDocs, searchDocs } from './server.js';
 
 const css = `
@@ -47,7 +47,7 @@ export const RagApp = component(() => {
       <h1>AI 04 — RAG</h1>
       <p class="sub">
         Ask about <code>AstraJS</code> — the answer is grounded on an indexed knowledge base
-        (<code>@bpjs159/ai/rag</code>), and you can see which chunks were retrieved.
+        (<code>astrajs.dev/ai/rag</code>), and you can see which chunks were retrieved.
       </p>
 
       <div class="row">

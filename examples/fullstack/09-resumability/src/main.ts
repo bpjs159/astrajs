@@ -17,8 +17,8 @@
  *   1. Executes the component normally with addEventListener
  */
 
-import { bootstrap } from '@bpjs159/ssr';
-import { bindText, store } from '@bpjs159/core';
+import { bootstrap } from 'astrajs.dev/ssr';
+import { bindText, store } from 'astrajs.dev/core';
 import { Counter } from './app.js';
 
 // ─── Bootstrap ───────────────────────────────────────────────────────────────

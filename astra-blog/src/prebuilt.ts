@@ -22,7 +22,7 @@
  * sus parámetros contra estas constantes pre-construidas vía la capa
  * de consultas de `db-core.ts`.
  */
-import { server } from '@bpjs159/server';
+import { server } from 'astrajs.dev/server';
 
 // ─── Config del sitio ────────────────────────────────────────────────────────
 export const getSiteConfig = server({ type: 'pre-build', tags: ['site'] }, async () => {

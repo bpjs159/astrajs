@@ -1,4 +1,4 @@
-import { component } from '@bpjs159/core';
+import { component } from 'astrajs.dev/core';
 import { cartStore, removeFromCart, clearCart, cartTotal, cartCount } from '../stores/cart.js';
 
 type CartItem = { productId: string; name: string; price: number; quantity: number };

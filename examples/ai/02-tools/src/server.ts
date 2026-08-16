@@ -8,8 +8,8 @@
  * Roadmap: the compiler will derive these JSON Schemas from the TypeScript
  * signatures of your `server()` functions (zero-config tools).
  */
-import { server } from '@bpjs159/server';
-import { aiAgent } from '@bpjs159/ai';
+import { server } from 'astrajs.dev/server';
+import { aiAgent } from 'astrajs.dev/ai';
 
 interface Product {
   id: string;
