@@ -28,3 +28,7 @@ examples/*/dist/
 
 # AstraJS umbrella vendored build output
 packages/astra-js/vendor/
+
+# Ghost shims (stale VS Code TS projects) — remove after reload
+packages/cli/
+packages/create-astra/
