@@ -350,6 +350,9 @@ export function findMatchingParen(source: string, openIdx: number): number {
  * 1. `server(async (params) => { body })`
  * 2. `server({ config }, async (params) => { body })`
  *
+ * Arrow functions with an explicit return-type annotation are supported too:
+ * `server({ config }, async (id: string): Promise<User | null> => { ... })`.
+ *
  * @param callText — The text between the outer parentheses of server(...).
  * @returns Parsed config, params, and body, or null if parsing fails.
  */
@@ -360,35 +363,120 @@ function parseServerCallArgs(
   paramNames: string[];
   functionBody: string;
 } | null {
+  let i = 0;
+  while (i < callText.length && /\s/.test(callText[i]!)) i++;
+
   // Try with-config form first: { config }, async (params) => <body>
-  const withConfigPrefix = callText.match(
-    /^\s*\{([^}]*(?:\{[^}]*\}[^}]*)*)\}\s*,\s*(async\s+)?\(([^)]*)\)\s*=>\s*/
-  );
-  if (withConfigPrefix) {
-    const configSource = `{${withConfigPrefix[1]}}`;
-    const config = parseServerConfig(configSource);
-    const paramNames = withConfigPrefix[3]!
-      .split(',')
-      .map((p) => stripTypeAnnotation(p.trim()))
-      .filter(Boolean);
-    const functionBody = extractArrowFunctionBody(callText.slice(withConfigPrefix[0].length));
-    if (functionBody === null) return null;
-    return { config, paramNames, functionBody };
+  if (callText[i] === '{') {
+    const closeBrace = findMatchingParen(callText, i);
+    if (closeBrace !== -1) {
+      let j = closeBrace + 1;
+      while (j < callText.length && /\s/.test(callText[j]!)) j++;
+      if (callText[j] === ',') {
+        const arrow = matchArrowPrefix(callText, j + 1);
+        if (arrow) {
+          const config = parseServerConfig(callText.slice(i, closeBrace + 1));
+          const paramNames = arrow.paramsText
+            .split(',')
+            .map((p) => stripTypeAnnotation(p.trim()))
+            .filter(Boolean);
+          const functionBody = extractArrowFunctionBody(
+            callText.slice(arrow.matchLength)
+          );
+          if (functionBody !== null) {
+            return { config, paramNames, functionBody };
+          }
+        }
+      }
+    }
   }
 
   // Try without-config form: async (params) => <body>
-  const withoutConfigPrefix = callText.match(/^\s*(async\s+)?\(([^)]*)\)\s*=>\s*/);
-  if (withoutConfigPrefix) {
-    const paramNames = withoutConfigPrefix[2]!
+  const arrow = matchArrowPrefix(callText, 0);
+  if (arrow) {
+    const paramNames = arrow.paramsText
       .split(',')
       .map((p) => stripTypeAnnotation(p.trim()))
       .filter(Boolean);
-    const functionBody = extractArrowFunctionBody(callText.slice(withoutConfigPrefix[0].length));
-    if (functionBody === null) return null;
-    return { config: {}, paramNames, functionBody };
+    const functionBody = extractArrowFunctionBody(callText.slice(arrow.matchLength));
+    if (functionBody !== null) {
+      return { config: {}, paramNames, functionBody };
+    }
   }
 
   return null;
+}
+
+/**
+ * Matches an arrow-function prefix — `[async] (params) [: ReturnType] =>` —
+ * starting at `startIdx`. The return-type annotation is skipped with bracket
+ * counting, so types containing their own `=>` (e.g. `Promise<() => void>`,
+ * `(x: number) => void`) do not confuse the scan: only a TOP-LEVEL `=>`
+ * terminates the annotation.
+ *
+ * @returns The matched prefix length and the raw parameter text, or null.
+ */
+function matchArrowPrefix(
+  text: string,
+  startIdx: number
+): { matchLength: number; paramsText: string } | null {
+  let i = startIdx;
+
+  // Skip leading whitespace
+  while (i < text.length && /\s/.test(text[i]!)) i++;
+
+  // Optional `async` keyword (word-boundary checked)
+  if (
+    text.startsWith('async', i) &&
+    (i + 5 >= text.length || !/[\w$]/.test(text[i + 5]!))
+  ) {
+    i += 5;
+    while (i < text.length && /\s/.test(text[i]!)) i++;
+  }
+
+  // Parameter list — balanced parentheses (defaults may nest parens/brackets)
+  if (text[i] !== '(') return null;
+  const closeParen = findMatchingParen(text, i);
+  if (closeParen === -1) return null;
+  const paramsText = text.slice(i + 1, closeParen);
+
+  let j = closeParen + 1;
+  while (j < text.length && /\s/.test(text[j]!)) j++;
+
+  // Optional return-type annotation: `: Type =>` — skip until a top-level '=>'
+  if (text[j] === ':') {
+    j++;
+    let depth = 0;
+    while (j < text.length) {
+      const ch = text[j]!;
+      // Treat '=>' as an ATOMIC token: its '>' is an operator char, NOT a
+      // bracket close. Counting it as one would desync the depth for types
+      // like `() => Promise<void>` and make the scan swallow the body.
+      if (ch === '=' && text[j + 1] === '>') {
+        if (depth === 0) {
+          j += 2;
+          break;
+        }
+        j += 2;
+        continue;
+      }
+      if (ch === '<' || ch === '(' || ch === '{' || ch === '[') {
+        depth++;
+      } else if (ch === '>' || ch === ')' || ch === '}' || ch === ']') {
+        depth--;
+      }
+      j++;
+    }
+    if (!(text[j - 2] === '=' && text[j - 1] === '>')) return null;
+  } else if (text[j] === '=' && text[j + 1] === '>') {
+    j += 2;
+  } else {
+    return null;
+  }
+
+  // Skip whitespace after '=>' so matchLength lands on the body start
+  while (j < text.length && /\s/.test(text[j]!)) j++;
+  return { matchLength: j, paramsText };
 }
 
 /**

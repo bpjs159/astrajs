@@ -9,8 +9,10 @@
  *   showcase/           astra-showcase build (client + dist/server/server.mjs)
  *   examples/<cat>/<name>/   one dir per example (client + server bundle)
  *   examples/index.html      hub page linking every example
- *   runners/                 node shims for the vercel/cloudflare examples
- *   config/                  nginx vhosts + pm2 ecosystem file
+ *   runners/                 run-vercel.mjs (Node (req,res) demo of the real
+ *                            emitted Vercel handler; cloudflare runs the REAL
+ *                            workerd runtime via wrangler dev instead)
+ *   config/                  nginx vhosts + pm2 ecosystem + wrangler reference
  *
  * Usage: node tools/deploy-build.mjs [--stage /path]
  */
@@ -22,6 +24,11 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const STAGE = process.env.ASTRA_STAGE_DIR ?? path.join(process.env.TMPDIR ?? '/tmp', 'astrajs-deploy');
 const VITE_BIN = path.join(ROOT, 'node_modules', '.bin', 'vite');
+
+// Wipe the stage first: artifacts removed from this script (e.g. old runner
+// shims) must not linger and get rsynced to the server.
+fs.rmSync(STAGE, { recursive: true, force: true });
+fs.mkdirSync(STAGE, { recursive: true });
 
 const failures = [];
 
@@ -40,9 +47,9 @@ function copyDir(src, dest) {
   fs.cpSync(src, dest, { recursive: true });
 }
 
-/** Temporarily replace/restore astra.config.json in an example dir. */
-function withConfig(exampleRel, writeConfig, fn) {
-  const dir = path.join(ROOT, 'examples', exampleRel);
+/** Temporarily replace/restore astra.config.json in a root-relative dir. */
+function withConfig(relDir, writeConfig, fn) {
+  const dir = path.join(ROOT, relDir);
   const file = path.join(dir, 'astra.config.json');
   const hadFile = fs.existsSync(file);
   const original = hadFile ? fs.readFileSync(file, 'utf-8') : null;
@@ -62,16 +69,16 @@ const prefixFor = (exampleRel) => `/examples/${exampleRel}/api/astra`;
 const baseFor = (exampleRel) => `/examples/${exampleRel}/`;
 const astraBin = (exampleRel) => path.join(ROOT, exampleRel, 'node_modules', '.bin', 'astra');
 
-function checkServerManifest(exampleRel) {
-  const manifestPath = path.join(ROOT, 'examples', exampleRel, 'dist', 'astra-server-modules.json');
+function checkServerManifest(relDir) {
+  const manifestPath = path.join(ROOT, relDir, 'dist', 'astra-server-modules.json');
   if (!fs.existsSync(manifestPath)) {
-    console.warn(`⚠️  ${exampleRel}: no astra-server-modules.json — no dynamic handlers.`);
+    console.warn(`⚠️  ${relDir}: no astra-server-modules.json — no dynamic handlers.`);
     return;
   }
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
   const count = Object.keys(manifest.modules ?? {}).length;
-  console.log(`✓ ${exampleRel}: ${count} server module(s)`);
-  if (count === 0) console.warn(`⚠️  ${exampleRel}: server modules EMPTY — will be static-only.`);
+  console.log(`✓ ${relDir}: ${count} server module(s)`);
+  if (count === 0) console.warn(`⚠️  ${relDir}: server modules EMPTY — will be static-only.`);
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -85,11 +92,16 @@ console.log('== astra-blog (static, pre-built) ==');
 run(astraBin('astra-blog'), ['build'], path.join(ROOT, 'astra-blog'));
 copyDir(path.join(ROOT, 'astra-blog', 'dist'), path.join(STAGE, 'blog'));
 
-// Showcase's server() arrows carry return-type annotations, which the
-// compiler cannot parse yet — they fall back to client-side execution with
-// mock data, so the showcase is fully functional as a static site.
-console.log('== astra-showcase (static) ==');
-run(VITE_BIN, ['build'], path.join(ROOT, 'astra-showcase'));
+// Showcase ships REAL RPC handlers now: the compiler parses return-type
+// annotations on server() arrows, so the node adapter emits a full server
+// bundle (dist/server/server.mjs) that runs under pm2 on port 5301.
+console.log('== astra-showcase (node adapter) ==');
+withConfig('astra-showcase', { adapter: 'node', apiPrefix: '/api/astra' }, () => {
+  run(astraBin('astra-showcase'), ['build'], path.join(ROOT, 'astra-showcase'), {
+    ASTRA_API_PREFIX: '/api/astra',
+  });
+});
+checkServerManifest('astra-showcase');
 copyDir(path.join(ROOT, 'astra-showcase', 'dist'), path.join(STAGE, 'showcase'));
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -143,36 +155,36 @@ for (const ex of SERVER_NODE) {
   console.log(`== ${ex} (node adapter) ==`);
   const prefix = prefixFor(ex);
   const baseCfg = ex.includes('09-resumability') ? { resumability: true } : {};
-  withConfig(ex, { ...baseCfg, adapter: 'node', apiPrefix: prefix }, () => {
+  withConfig(`examples/${ex}`, { ...baseCfg, adapter: 'node', apiPrefix: prefix }, () => {
     run(astraBin(`examples/${ex}`), ['build', `--base=${baseFor(ex)}`], path.join(ROOT, 'examples', ex), {
       ASTRA_API_PREFIX: prefix,
     });
   });
-  checkServerManifest(ex);
+  checkServerManifest(`examples/${ex}`);
   copyDir(path.join(ROOT, 'examples', ex, 'dist'), path.join(STAGE, 'examples', ex));
 }
 
 for (const ex of ['ai/01-streaming-chat', 'ai/02-tools', 'ai/04-rag']) {
   console.log(`== ${ex} (node adapter + AI) ==`);
   const prefix = prefixFor(ex);
-  withConfig(ex, { adapter: 'node', apiPrefix: prefix }, () => {
+  withConfig(`examples/${ex}`, { adapter: 'node', apiPrefix: prefix }, () => {
     run(astraBin(`examples/${ex}`), ['build', `--base=${baseFor(ex)}`], path.join(ROOT, 'examples', ex), {
       ASTRA_API_PREFIX: prefix,
     });
   });
-  checkServerManifest(ex);
+  checkServerManifest(`examples/${ex}`);
   copyDir(path.join(ROOT, 'examples', ex, 'dist'), path.join(STAGE, 'examples', ex));
 }
 
 for (const ex of ['deploy/01-node']) {
   console.log(`== ${ex} (node adapter) ==`);
   const prefix = prefixFor(ex);
-  withConfig(ex, { adapter: 'node', apiPrefix: prefix }, () => {
+  withConfig(`examples/${ex}`, { adapter: 'node', apiPrefix: prefix }, () => {
     run(astraBin(`examples/${ex}`), ['build', `--base=${baseFor(ex)}`], path.join(ROOT, 'examples', ex), {
       ASTRA_API_PREFIX: prefix,
     });
   });
-  checkServerManifest(ex);
+  checkServerManifest(`examples/${ex}`);
   copyDir(path.join(ROOT, 'examples', ex, 'dist'), path.join(STAGE, 'examples', ex));
 }
 
@@ -184,7 +196,7 @@ for (const [ex, adapter] of [
 ]) {
   console.log(`== ${ex} (${adapter} adapter) ==`);
   const prefix = prefixFor(ex);
-  withConfig(ex, { adapter, apiPrefix: prefix }, () => {
+  withConfig(`examples/${ex}`, { adapter, apiPrefix: prefix }, () => {
     run(astraBin(`examples/${ex}`), ['build', `--base=${baseFor(ex)}`], path.join(ROOT, 'examples', ex), {
       ASTRA_API_PREFIX: prefix,
     });
@@ -196,7 +208,7 @@ for (const [ex, adapter] of [
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// 4. Runners (vercel/cloudflare shims)
+// 4. Runners (vercel Node shim) + wrangler dev config reference
 // ────────────────────────────────────────────────────────────────────────────
 fs.mkdirSync(path.join(STAGE, 'runners'), { recursive: true });
 
@@ -219,54 +231,21 @@ createServer((req, res) => handler(req, res)).listen(port, '127.0.0.1', () => {
 `
 );
 
+// Reference copy of the wrangler dev config used on the server. The LIVE copy
+// lives at /home/admin/astrajs-cloudflare/wrangler.toml (outside the webroot).
+fs.mkdirSync(path.join(STAGE, 'config'), { recursive: true });
 fs.writeFileSync(
-  path.join(STAGE, 'runners', 'run-cloudflare.mjs'),
-  `// Serves a Cloudflare-emitted _worker.js as a plain Node HTTP server.
-import { createServer } from 'node:http';
-import { pathToFileURL } from 'node:url';
+  path.join(STAGE, 'config', 'wrangler-cloudflare.toml'),
+  `# wrangler dev config for the deployed 03-cloudflare worker (real workerd
+# runtime). Live copy: /home/admin/astrajs-cloudflare/wrangler.toml
+name = "astra-app"
+compatibility_date = "2025-01-01"
+main = "/var/www/astrajs/examples/deploy/03-cloudflare/_worker.js"
 
-const workerPath = process.env.WORKER;
-const port = Number(process.env.PORT ?? 3000);
-if (!workerPath) {
-  console.error('WORKER env is required (path to dist/_worker.js)');
-  process.exit(1);
-}
-const worker = (await import(pathToFileURL(workerPath).href)).default;
-
-createServer(async (req, res) => {
-  try {
-    const url = new URL(req.url, 'http://127.0.0.1');
-    let body = null;
-    if (req.method !== 'GET' && req.method !== 'HEAD') {
-      const chunks = [];
-      for await (const c of req) chunks.push(c);
-      body = Buffer.concat(chunks);
-    }
-    const request = new Request(url, {
-      method: req.method,
-      headers: req.headers,
-      body,
-      duplex: body ? 'half' : undefined,
-    });
-    const response = await worker.fetch(request, {});
-    res.statusCode = response.status;
-    for (const [k, v] of response.headers) res.setHeader(k, v);
-    if (response.body) {
-      const reader = response.body.getReader();
-      for (;;) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        res.write(Buffer.from(value));
-      }
-    }
-    res.end();
-  } catch (e) {
-    res.statusCode = 500;
-    res.end(String(e?.stack ?? e));
-  }
-}).listen(port, '127.0.0.1', () => {
-  console.log('[cloudflare-shim] listening on 127.0.0.1:' + port);
-});
+[assets]
+directory = "/var/www/astrajs/examples/deploy/03-cloudflare"
+binding = "ASSETS"
+not_found_handling = "none"
 `
 );
 
@@ -411,11 +390,17 @@ for (const [ex, port] of Object.entries(SERVER_PORT)) {
       console.warn(`⚠️  ${ex}: no worker emitted — deploying static.`);
       continue;
     }
+    // REAL Cloudflare runtime: wrangler dev runs the emitted _worker.js inside
+    // workerd (not a Node shim). The dev config lives OUTSIDE the webroot at
+    // /home/admin/astrajs-cloudflare/wrangler.toml (rsync --delete would wipe
+    // anything under /var/www/astrajs). A reference copy ships in
+    // config/wrangler-cloudflare.toml.
     apps.push({
       name: 'deploy-03-cloudflare',
-      cwd: `${WWW}/examples/deploy/03-cloudflare`,
-      script: `${WWW}/runners/run-cloudflare.mjs`,
-      env: { PORT: port, WORKER: `${WWW}/examples/deploy/03-cloudflare/_worker.js` },
+      cwd: '/home/admin/astrajs-cloudflare',
+      script: '/home/admin/node_modules/.bin/wrangler',
+      args: 'dev --port 5203 --ip 127.0.0.1 --log-level warn',
+      env: {},
     });
     continue;
   }
@@ -430,6 +415,18 @@ for (const [ex, port] of Object.entries(SERVER_PORT)) {
     script: 'server/server.mjs',
     env: { PORT: port, ...(isAi ? { ASTRA_AI_PROVIDER: 'mock' } : {}) },
   });
+}
+
+// astra-showcase — real RPC backend on its own port (showcase.astrajs.dev)
+if (fs.existsSync(path.join(STAGE, 'showcase', 'server', 'server.mjs'))) {
+  apps.push({
+    name: 'showcase',
+    cwd: `${WWW}/showcase`,
+    script: 'server/server.mjs',
+    env: { PORT: 5301 },
+  });
+} else {
+  console.warn('⚠️  astra-showcase: no server bundle emitted — deploying static (client-side fallback).');
 }
 
 fs.writeFileSync(
@@ -552,14 +549,24 @@ server {
 
 fs.writeFileSync(
   path.join(STAGE, 'config', 'nginx-showcase.conf'),
-  `# showcase.astrajs.dev — static (server() calls fall back to client-side
-# execution with mock data; the compiler cannot parse annotated arrows yet)
+  `# showcase.astrajs.dev — real RPC backend on 127.0.0.1:5301 (pm2 app 'showcase')
 server {
     listen 80;
     server_name showcase.astrajs.dev;
 
     root ${WWW}/showcase;
     index index.html;
+
+    # server() RPC endpoints → node adapter backend
+    location ^~ /api/astra/ {
+        proxy_pass http://127.0.0.1:5301;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Connection "";
+        proxy_buffering off;
+        proxy_read_timeout 300s;
+    }
 
     location /assets/ {
         expires 30d;

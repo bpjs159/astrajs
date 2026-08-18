@@ -63,4 +63,46 @@ describe('findServerCalls', () => {
     // The old raw-HTTP message is now only a fallback, not the default.
     expect(result.clientCode).toContain('[AstraJS RPC]');
   });
+
+  it('parses arrows with return-type annotations (with config)', () => {
+    const src = `const getProduct = server({ tags: ['products'] }, async (id: string): Promise<Product | null> => { return db.find(id); });`;
+    const calls = findServerCalls(src);
+    expect(calls).toHaveLength(1);
+    expect(calls[0]!.id).toBe('getProduct');
+    expect(calls[0]!.config).toEqual({ tags: ['products'] });
+    expect(calls[0]!.paramNames).toEqual(['id']);
+    expect(calls[0]!.functionBody.trim()).toBe('return db.find(id);');
+  });
+
+  it('parses arrows with return-type annotations (without config)', () => {
+    const src = `const getProducts = server(async (): Promise<Product[]> => { return PRODUCTS; });`;
+    const calls = findServerCalls(src);
+    expect(calls).toHaveLength(1);
+    expect(calls[0]!.id).toBe('getProducts');
+    expect(calls[0]!.paramNames).toEqual([]);
+    expect(calls[0]!.functionBody.trim()).toBe('return PRODUCTS;');
+  });
+
+  it('parses concise-body arrows with return-type annotations', () => {
+    const src = `const getLevel = server(async (): Promise<number> => stockLevel);`;
+    const calls = findServerCalls(src);
+    expect(calls).toHaveLength(1);
+    expect(calls[0]!.functionBody).toBe('return (stockLevel);');
+  });
+
+  it('handles nested arrows inside the return-type annotation', () => {
+    const src = `const load = server({ maxAge: 60 }, async (cb: () => void): Promise<{ run: () => Promise<void> }> => { return { run: async () => {} }; });`;
+    const calls = findServerCalls(src);
+    expect(calls).toHaveLength(1);
+    expect(calls[0]!.paramNames).toEqual(['cb']);
+    expect(calls[0]!.functionBody.trim()).toBe('return { run: async () => {} };');
+  });
+
+  it('transforms annotated-arrow calls into client wrappers', () => {
+    const src = `const getProduct = server({ tags: ['products'] }, async (id: string): Promise<Product | null> => { return db.find(id); });`;
+    const result = transformServerRPC(src, 'test.tsx', { apiPrefix: '/api/astra' });
+    expect(result.calls).toHaveLength(1);
+    expect(result.clientCode).not.toContain('server({');
+    expect(result.clientCode).toContain('/api/astra/getProduct');
+  });
 });
