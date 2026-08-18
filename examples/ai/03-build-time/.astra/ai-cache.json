@@ -1,3 +1,0 @@
-{
-  "e2de9cd8": "mock[qwen2.5-coder:7b]: Generate 3 FAQs about a framework called AstraJS (Zero Virtual DOM, TypeScript compiled to direct DOM mutations, resumability, server() RPC). Respond ONLY as a JSON array of {\"q\": \"...\", \"a\": \"...\"} objects."
-}
