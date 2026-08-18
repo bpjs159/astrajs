@@ -78,5 +78,9 @@ export const BUILTIN_VALIDATORS: Record<string, ServerValidator> = {
  * @returns The validator implementation, or undefined.
  */
 export function resolveBuiltinValidator(name: string): ServerValidator | undefined {
-  return BUILTIN_VALIDATORS[name];
+  // SECURITY: own-property check — a name like "constructor" or
+  // "__proto__" must not resolve inherited Object properties.
+  return Object.prototype.hasOwnProperty.call(BUILTIN_VALIDATORS, name)
+    ? BUILTIN_VALIDATORS[name]
+    : undefined;
 }

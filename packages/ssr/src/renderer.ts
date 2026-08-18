@@ -42,6 +42,19 @@ import { setSSRResumable } from 'astrajs.dev/core';
  * @param options — Serialization options.
  * @returns An HTML string.
  */
+
+/**
+ * Escapes text for HTML element content.
+ *
+ * @internal
+ */
+export function escapeHtmlText(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 export function nodeToHTML(
   node: Node,
   options: {
@@ -54,8 +67,10 @@ export function nodeToHTML(
   const { minify = false, indent = 0 } = options;
 
   if (node.nodeType === 3) {
-    // Text node
-    const text = node.textContent ?? '';
+    // Text node — SECURITY: escape it. Attributes are escaped below,
+    // text nodes must be too, or any user data rendered through SSR/SSG
+    // becomes raw HTML (stored/reflected XSS).
+    const text = escapeHtmlText(node.textContent ?? '');
     return minify ? text.trim() : text;
   }
 

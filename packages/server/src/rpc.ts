@@ -223,6 +223,48 @@ export function getHandlerRegistry(): ReadonlyMap<string, RegisteredHandler> {
 // ─── Server Request Handler (for Node.js/Edge runtimes) ──────────────────────
 
 /**
+ * Security configuration for the RPC request handler.
+ */
+export interface RPCSecurityConfig {
+  /**
+   * Optional authentication hook, runs before ANY handler executes.
+   * - Return `true` to allow the request.
+   * - Return `false` to reject with `401 { error: 'Unauthorized' }`.
+   * - Return a `Response` to short-circuit with a custom response.
+   */
+  auth?: (request: Request, id: string) => boolean | Response | Promise<boolean | Response>;
+  /** Maximum accepted request body size in bytes (default 1 MiB). */
+  maxBodyBytes?: number;
+  /**
+   * When false, internal error messages are NOT sent to clients — a
+   * generic `{ error: 'Internal RPC error' }` is returned instead and
+   * the real message is logged server-side. Default `true` (demo friendly).
+   */
+  exposeErrors?: boolean;
+}
+
+let rpcSecurity: RPCSecurityConfig = {
+  auth: undefined,
+  maxBodyBytes: 1024 * 1024,
+  exposeErrors: true,
+};
+
+/**
+ * Configures RPC security globally (auth hook, body size cap, error
+ * disclosure). Call once at server startup, before traffic arrives.
+ */
+export function configureRPC(options: RPCSecurityConfig): void {
+  rpcSecurity = { ...rpcSecurity, ...options };
+}
+
+function payloadTooLarge(): Response {
+  return new Response(
+    JSON.stringify({ error: 'Request body too large' }),
+    { status: 413, headers: { 'Content-Type': 'application/json' } }
+  );
+}
+
+/**
  * Handles an incoming RPC request on the server.
  *
  * This is the function that should be wired into your server framework
@@ -260,6 +302,18 @@ export async function handleRPCRequest(
     );
   }
 
+  // Authentication hook (see configureRPC).
+  if (rpcSecurity.auth) {
+    const allowed = await rpcSecurity.auth(request, id);
+    if (allowed === false) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+    if (allowed instanceof Response) return allowed;
+  }
+
   try {
     let args: unknown[];
 
@@ -273,8 +327,15 @@ export async function handleRPCRequest(
         args.push(JSON.parse(val));
       }
     } else {
-      // Parse args from JSON body
+      // Parse args from JSON body — size-capped against abuse.
+      const declared = Number(request.headers.get('content-length') ?? 0);
+      if (Number.isFinite(declared) && declared > (rpcSecurity.maxBodyBytes ?? 1024 * 1024)) {
+        return payloadTooLarge();
+      }
       const body = await request.text();
+      if (body.length > (rpcSecurity.maxBodyBytes ?? 1024 * 1024)) {
+        return payloadTooLarge();
+      }
       args = JSON.parse(body);
       if (!Array.isArray(args)) {
         args = [args];
@@ -356,8 +417,13 @@ export async function handleRPCRequest(
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Internal RPC error';
+    // Always log the real error server-side; only expose it to clients
+    // when configured (see configureRPC / exposeErrors).
+    console.error(`[AstraJS RPC] Handler "${id}" failed:`, err);
     return new Response(
-      JSON.stringify({ error: message }),
+      JSON.stringify({
+        error: rpcSecurity.exposeErrors ? message : 'Internal RPC error',
+      }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }

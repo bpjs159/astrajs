@@ -45,7 +45,10 @@ export interface AiProvider {
 const providerCache = new Map<string, AiProvider>();
 
 function providerKey(cfg: AiRuntimeConfig): string {
-  return `${cfg.provider}::${cfg.baseURL}`;
+  // The API key IS part of the identity: omitting it kept stale providers
+  // (old credentials) alive after configureAi()/env changes. The key is a
+  // private in-memory Map key and is never logged.
+  return `${cfg.provider}::${cfg.baseURL}::${cfg.apiKey ?? ''}`;
 }
 
 /** Returns the provider for the active runtime configuration. */

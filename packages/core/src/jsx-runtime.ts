@@ -242,7 +242,17 @@ function setProps(
         el.className = String(value ?? '');
       }
     } else if (key === 'style' && typeof value === 'object' && value !== null) {
-      Object.assign(el.style, value);
+      // SECURITY: assign properties individually — a `__proto__` or
+      // `constructor` key inside a style object must never reach the
+      // prototype chain of CSSStyleDeclaration.
+      const style = value as Record<string, unknown>;
+      for (const prop of Object.keys(style)) {
+        if (prop === '__proto__' || prop === 'constructor' || prop === 'prototype') continue;
+        const styleValue = style[prop];
+        if (typeof styleValue === 'string' || typeof styleValue === 'number') {
+          (el.style as unknown as Record<string, unknown>)[prop] = styleValue;
+        }
+      }
     } else if (key === 'ref') {
       if (typeof value === 'function') (value as (el: HTMLElement) => void)(el);
     } else if (key === 'controller' && typeof value === 'object' && value !== null) {

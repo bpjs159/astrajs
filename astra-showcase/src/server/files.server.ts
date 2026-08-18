@@ -1,7 +1,11 @@
 import { server } from 'astrajs.dev/server';
 
 export const uploadFile = server(async (fileName: string, _fileData: string): Promise<{ ok: boolean; url: string }> => {
-  return { ok: true, url: `/uploads/${fileName}` };
+  // SECURITY: fileName is client input — never trust it as a URL path.
+  // Keep only the final safe segment and percent-encode it.
+  const base = fileName.split(/[\\/]/).pop() ?? 'upload';
+  const safe = base.replace(/[^\w.\- ]/g, '').trim() || 'upload';
+  return { ok: true, url: `/uploads/${encodeURIComponent(safe)}` };
 });
 
 export const getUploads = server(async (): Promise<Array<{ name: string; size: string; date: string }>> => {

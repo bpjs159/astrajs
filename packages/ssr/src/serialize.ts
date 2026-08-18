@@ -31,6 +31,10 @@ import type { StoreOptions } from 'astrajs.dev/core';
 // These are lazily imported to avoid circular dependencies.
 let _formResume: ((root: ParentNode) => void) | null = null;
 
+/** Handler names installed on `window` BY bootstrap() — never overwrite
+ * pre-existing window properties (fetch, alert, …). */
+const installedWindowHandlers = new Set<string>();
+
 /**
  * Registers a form resume handler. Called by astrajs.dev/form to enable
  * SSR-resumable forms without creating a circular dependency.
@@ -247,12 +251,21 @@ export function bootstrap(
     // ── SSR: resume from server-rendered HTML ─────────────────────────
     resume(root);
 
-    // Install registered handlers on window so the delegated event
-    // system (registered by resume()) can find them via astra-on:click
-    // attributes.
+    // Install registered handlers on window for backwards compatibility.
+    // SECURITY: never overwrite a pre-existing window property (fetch,
+    // alert, setTimeout, …). Track what WE installed so hot re-runs can
+    // replace their own handlers.
     const registry = getHandlerRegistry();
     for (const [name, fn] of registry) {
-      (window as unknown as Record<string, unknown>)[name] = fn;
+      const win = window as unknown as Record<string, unknown>;
+      if (name in win && !installedWindowHandlers.has(name)) {
+        console.warn(
+          `[AstraJS] Skipping handler "${name}": would overwrite an existing window property.`
+        );
+        continue;
+      }
+      win[name] = fn;
+      installedWindowHandlers.add(name);
     }
 
     console.log('[AstraJS] ⚡ Resumed from SSR — no hydration needed');
@@ -324,21 +337,23 @@ function registerDelegatedEvents(root: ParentNode): void {
  * Executes a delegated event handler referenced by an `astra-on:*` attribute.
  *
  * The handler reference can be:
- * - A global function name: `"handleClick"` → `window.handleClick(event)`
+ * - A name registered via `registerHandler()` (from `astrajs.dev/core`)
  * - A module path: `"/assets/button.js#handleClick"` → dynamically import
  *
- * For now, we resolve against the global scope. In production, the
- * compiler generates a manifest mapping handler IDs to chunk paths.
+ * @internal — exported for tests.
  */
-function handleDelegatedEvent(
+export function handleDelegatedEvent(
   event: Event,
   handlerRef: string,
   _element: HTMLElement
 ): void {
-  // Try global scope
-  const fn = (globalThis as Record<string, unknown>)[handlerRef];
-  if (typeof fn === 'function') {
-    fn(event);
+  // SECURITY: resolve ONLY against the registered handler registry — never
+  // against arbitrary `globalThis` names. The handlerRef value comes from
+  // the SSR HTML attribute, so an injected attribute must not be able to
+  // call any global function (fetch/eval/alert/…).
+  const registered = getHandlerRegistry().get(handlerRef);
+  if (registered) {
+    registered(event);
     return;
   }
 
@@ -347,6 +362,19 @@ function handleDelegatedEvent(
   if (hashIdx !== -1) {
     const modulePath = handlerRef.slice(0, hashIdx);
     const exportName = handlerRef.slice(hashIdx + 1);
+
+    // SECURITY: the path comes from the SSR HTML attribute and is therefore
+    // untrusted. Allow only same-origin relative asset paths with a safe
+    // charset and known extensions — never arbitrary URLs or filesystem-ish
+    // paths.
+    const safePath = /^\/(?:assets|chunks)\/[A-Za-z0-9_\-./]+\.(?:js|mjs)$/.test(modulePath);
+    const safeExport = /^[A-Za-z_$][\w$]*$/.test(exportName);
+    if (!safePath || !safeExport) {
+      console.warn(
+        `[AstraJS] Rejected untrusted handler reference: ${handlerRef}`
+      );
+      return;
+    }
 
     // Dynamic import for lazy loading (JIT — path comes from SSR HTML attribute).
     // Vite cannot analyze this at build time because modulePath is a runtime variable.

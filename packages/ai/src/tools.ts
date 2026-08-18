@@ -92,12 +92,30 @@ export function aiAgent(
           if (!tool) {
             output = { error: `Unknown tool: ${call.name}` };
           } else {
-            try {
-              output = await tool.fn(...Object.values(call.arguments));
-            } catch (err) {
-              output = {
-                error: err instanceof Error ? err.message : 'Tool execution failed',
-              };
+            // SECURITY: tool arguments come from the MODEL (an untrusted
+            // actor under prompt injection). Only accept plain objects and
+            // pass ONLY the properties declared in the tool schema, in
+            // declared order — never arbitrary shapes or keys.
+            const raw = call.arguments;
+            if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) {
+              output = { error: `Invalid arguments for tool: ${call.name}` };
+            } else {
+              const declaredProps = tool.schema?.parameters?.properties as
+                | Record<string, unknown>
+                | undefined;
+              const args = declaredProps
+                ? Object.keys(declaredProps).map(
+                    (k) => (raw as Record<string, unknown>)[k]
+                  )
+                : Object.values(raw as Record<string, unknown>);
+              try {
+                output = await tool.fn(...args);
+              } catch (err) {
+                // Log the real error server-side; do NOT feed internal
+                // error details back to the model.
+                console.error(`[AstraJS AI] Tool "${call.name}" failed:`, err);
+                output = { error: `Tool execution failed: ${call.name}` };
+              }
             }
           }
           messages.push({

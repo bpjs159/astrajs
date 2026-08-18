@@ -1,10 +1,12 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach, beforeAll } from 'vitest';
 import {
   rpcHandler,
   getRPCHandler,
   revalidate,
   onCacheInvalidate,
   rpcClient,
+  handleRPCRequest,
+  configureRPC,
   type RPCError,
 } from '../rpc.js';
 
@@ -126,5 +128,87 @@ describe('handleRPCRequest() — stream handlers', () => {
     const text = await response.text();
     expect(text).toContain('ok');
     expect(text).toContain('model exploded');
+  });
+});
+
+// ─── SECURITY regressions (2026-08-18 audit) ───────────────────────────────
+
+describe('handleRPCRequest() security', () => {
+  beforeAll(() => {
+    configureRPC({ auth: undefined, maxBodyBytes: 1024 * 1024, exposeErrors: true });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    // Restore safe defaults for other tests.
+    configureRPC({ auth: undefined, maxBodyBytes: 1024 * 1024, exposeErrors: true });
+  });
+
+  it('rejects oversized bodies with 413 before executing the handler', async () => {
+    const fn = vi.fn().mockResolvedValue('ran');
+    rpcHandler('bigBody', fn);
+    configureRPC({ maxBodyBytes: 16 });
+
+    const response = await handleRPCRequest(
+      new Request('http://x/api/astra/bigBody', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Content-Length': '1000' },
+        body: '[' + 'x'.repeat(1000) + ']',
+      }),
+      'bigBody'
+    );
+    expect(response.status).toBe(413);
+    expect(fn).not.toHaveBeenCalled();
+  });
+
+  it('enforces the auth hook before running any handler', async () => {
+    const fn = vi.fn().mockResolvedValue('ran');
+    rpcHandler('protected', fn);
+    configureRPC({ auth: () => false });
+
+    const response = await handleRPCRequest(
+      new Request('http://x/api/astra/protected', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '[]',
+      }),
+      'protected'
+    );
+    expect(response.status).toBe(401);
+    expect(fn).not.toHaveBeenCalled();
+
+    configureRPC({ auth: () => true });
+    const ok = await handleRPCRequest(
+      new Request('http://x/api/astra/protected', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '[]',
+      }),
+      'protected'
+    );
+    expect(ok.status).toBe(200);
+  });
+
+  it('hides internal error details when exposeErrors is false', async () => {
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    rpcHandler('failing', async () => {
+      throw new Error('secret: db://user:pass@host');
+    });
+    configureRPC({ exposeErrors: false });
+
+    const response = await handleRPCRequest(
+      new Request('http://x/api/astra/failing', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '[]',
+      }),
+      'failing'
+    );
+    expect(response.status).toBe(500);
+    const body = JSON.parse(await response.text()) as { error: string };
+    expect(body.error).toBe('Internal RPC error');
+    // The real message is still logged server-side.
+    expect(errSpy).toHaveBeenCalled();
+    errSpy.mockRestore();
   });
 });

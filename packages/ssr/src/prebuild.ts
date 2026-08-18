@@ -147,7 +147,18 @@ export function generatePreBuildCode(
   data: string,
   varName: string
 ): string {
-  return `/* @astra pre-build — resolved at build time */\nconst ${varName} = ${data};`;
+  // SECURITY: the inlined JSON must be safe inside a `<script>` context —
+  // escape closing script tags and JS line separators (U+2028/U+2029).
+  const safeData = data
+    .replace(/<\/script/gi, '<\\/script')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
+
+  // SECURITY: varName becomes an identifier in generated code — only allow
+  // real identifier shapes, otherwise fall back to a safe name.
+  const safeVar = /^[A-Za-z_$][\w$]*$/.test(varName) ? varName : '__astra_prebuilt';
+
+  return `/* @astra pre-build — resolved at build time */\nconst ${safeVar} = ${safeData};`;
 }
 
 /**
