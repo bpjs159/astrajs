@@ -9,18 +9,17 @@
  * Pipeline:
  *   1. node tools/deploy-build.mjs → builds site/blog/showcase/examples into
  *      a staging dir (default $TMPDIR/astrajs-deploy).
- *   2. rsync --delete → admin@SERVER_HOST:/var/www/astrajs/
- *   3. pm2 restart all on the server (12 backend apps).
+ *   2. rsync --delete → <host>:/var/www/astrajs/
+ *   3. pm2 restart all on the server (15 backend apps).
+ *
+ * Target resolution (no infrastructure details live in this public repo):
+ *   1. env overrides: ASTRA_DEPLOY_HOST / ASTRA_DEPLOY_USER / ASTRA_SSH_KEY
+ *   2. local, git-ignored `keys/deploy-target.json` → { host, user, key }
  *
  * NOTE: nginx vhosts in /etc/nginx are CERTBOT-MANAGED (TLS blocks). This
  * script deliberately does NOT touch them — web files only. If a vhost needs
  * changing, edit the template in tools/deploy-build.mjs and update
  * /etc/nginx/sites-available manually on the server.
- *
- * Overrides:
- *   ASTRA_DEPLOY_HOST   server host        (default SERVER_HOST)
- *   ASTRA_STAGE_DIR     staging directory  (default $TMPDIR/astrajs-deploy)
- *   ASTRA_SSH_KEY       path to ssh key    (default keys/astrajs-dev-key.pem)
  */
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -28,13 +27,31 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const HOST = process.env.ASTRA_DEPLOY_HOST ?? 'SERVER_HOST';
-const USER = process.env.ASTRA_DEPLOY_USER ?? 'admin';
+
+/** Local-only deploy target (git-ignored) — keeps prod details out of git. */
+function readLocalTarget() {
+  try {
+    const raw = fs.readFileSync(path.join(ROOT, 'keys', 'deploy-target.json'), 'utf8');
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+const TARGET = readLocalTarget();
+const HOST = process.env.ASTRA_DEPLOY_HOST ?? TARGET.host ?? '';
+const USER = process.env.ASTRA_DEPLOY_USER ?? TARGET.user ?? 'admin';
 const KEY = process.env.ASTRA_SSH_KEY
   ? path.resolve(ROOT, process.env.ASTRA_SSH_KEY)
-  : path.join(ROOT, 'keys', 'astrajs-dev-key.pem');
+  : path.resolve(ROOT, 'keys', TARGET.key ?? 'astrajs-dev-key.pem');
 const STAGE =
   process.env.ASTRA_STAGE_DIR ?? path.join(process.env.TMPDIR ?? '/tmp', 'astrajs-deploy');
+
+if (!HOST) {
+  console.error(red('✖ no deploy target configured — set ASTRA_DEPLOY_HOST or create keys/deploy-target.json'));
+  process.exit(1);
+}
 
 const args = process.argv.slice(2);
 const skipBuild = args.includes('--skip-build');
