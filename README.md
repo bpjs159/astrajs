@@ -107,6 +107,9 @@ MIT — all packages. Branding assets (logos, images) are © AstraJS.
 
 ## 📋 Changelog
 
+- **0.1.3** (2026-08-18): removing vite config on git
+
+
 - **0.1.2** (2026-08-18): Removed astra files into git compiled
 
 
