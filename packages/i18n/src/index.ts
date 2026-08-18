@@ -1,5 +1,5 @@
 /**
- * @bpjs159/i18n — Public API.
+ * astrajs.dev/i18n — Public API.
  */
 export { createI18n, WORLD_LOCALES } from './i18n.js';
 export type {

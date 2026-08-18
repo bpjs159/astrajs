@@ -1,5 +1,5 @@
 /**
- * @bpjs159/ai — Tool calling + agent loop (Phase 5)
+ * astrajs.dev/ai — Tool calling + agent loop (Phase 5)
  *
  * `aiAgent()` runs a model loop where the model can call your own functions.
  * It is meant to run ON THE SERVER — either inside a `server()`/`ai()`

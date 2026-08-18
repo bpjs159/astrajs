@@ -1,5 +1,5 @@
 /**
- * @bpjs159/core — Component Lifecycle
+ * astrajs.dev/core — Component Lifecycle
  *
  * `mounted(fn)` registers a callback that fires when the component's
  * root element is inserted into the live DOM. The callback can return

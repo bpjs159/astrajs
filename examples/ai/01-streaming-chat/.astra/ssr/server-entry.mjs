@@ -561,7 +561,7 @@ function ai(configOrFn, fn) {
   if (fn) {
     return fn;
   }
-  throw new Error("[AstraJS] ai() macro was not transformed by the compiler. Make sure the ../compiler/index.js vite plugin is active.");
+  throw new Error("[AstraJS] ai() macro was not transformed by the compiler. Make sure the astrajs.dev/compiler vite plugin is active.");
 }
 function aiStream(configOrFn, fn) {
   if (typeof configOrFn === "function") {
@@ -570,7 +570,7 @@ function aiStream(configOrFn, fn) {
   if (fn) {
     return fn;
   }
-  throw new Error("[AstraJS] aiStream() macro was not transformed by the compiler. Make sure the ../compiler/index.js vite plugin is active.");
+  throw new Error("[AstraJS] aiStream() macro was not transformed by the compiler. Make sure the astrajs.dev/compiler vite plugin is active.");
 }
 const summarize = ai(
   { model: "qwen2.5-coder:7b", maxAge: 300, tags: ["summaries"] },

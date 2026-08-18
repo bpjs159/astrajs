@@ -1,5 +1,5 @@
 /**
- * @bpjs159/router — Tests
+ * astrajs.dev/router — Tests
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { _resetRoutingDepth, route, fallbackRoute, _nextRenderCycle } from '../route.js';

@@ -1,7 +1,7 @@
 /// <reference path="./jsx.d.ts" />
 
 /**
- * @bpjs159/core — Public API Entry Point
+ * astrajs.dev/core — Public API Entry Point
  *
  * AstraJS Core provides:
  * - `store()` — ES6 Proxy-based fine-grained reactivity (~3KB)

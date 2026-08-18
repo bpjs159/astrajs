@@ -1,5 +1,5 @@
 /**
- * @bpjs159/adapters — Public API Entry Point
+ * astrajs.dev/adapters — Public API Entry Point
  *
  * Deployment adapters for AstraJS:
  *
@@ -7,10 +7,10 @@
  *   - `createNodeHandler`    Node `(req, res)` handler + static files
  *   - `startAstraServer`     standalone `node:http` server (Fly/Railway/Docker)
  *   - `createVercelHandler`  Vercel serverless function (Node runtime)
- *   - `createCloudflareHandler` (via `@bpjs159/adapters/edge`)
+ *   - `createCloudflareHandler` (via `astrajs.dev/adapters/edge`)
  *   - `emit*Adapter`         build-time emitters used by `astra build`
  *
- * Import from `@bpjs159/adapters/edge` when bundling for edge runtimes —
+ * Import from `astrajs.dev/adapters/edge` when bundling for edge runtimes —
  * that entry never pulls in Node.js built-ins.
  */
 export { createAstraHandler } from './core.js';

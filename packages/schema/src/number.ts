@@ -1,5 +1,5 @@
 /**
- * @bpjs159/schema — NumberSchema
+ * astrajs.dev/schema — NumberSchema
  */
 import type { BaseSchema, ValidationResult } from './types.js';
 

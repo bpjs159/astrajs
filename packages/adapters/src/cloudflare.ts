@@ -1,9 +1,9 @@
 /**
- * @bpjs159/adapters — Cloudflare (edge) handler
+ * astrajs.dev/adapters — Cloudflare (edge) handler
  *
  * Produces the default export for a Cloudflare Worker / Pages Function:
  *
- *   import { createCloudflareHandler } from '@bpjs159/adapters/edge';
+ *   import { createCloudflareHandler } from 'astrajs.dev/adapters/edge';
  *   export default createCloudflareHandler({ apiPrefix: '/api/astra' });
  *
  * Static assets are served by Cloudflare's own static pipeline (Pages

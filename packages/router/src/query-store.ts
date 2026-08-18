@@ -1,5 +1,5 @@
 /**
- * @bpjs159/router — queryStore()
+ * astrajs.dev/router — queryStore()
  *
  * Reactive proxy bidirectionally synced with URL query parameters.
  *
@@ -9,7 +9,7 @@
  * ```
  */
 
-import { store } from '@bpjs159/core';
+import { store } from 'astrajs.dev/core';
 import { onRouteChange } from './listener.js';
 
 export function queryStore<T extends Record<string, string>>(defaults: T): T {

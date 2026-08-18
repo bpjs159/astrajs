@@ -1,5 +1,5 @@
 /**
- * @bpjs159/adapters — Node adapter (long-running server)
+ * astrajs.dev/adapters — Node adapter (long-running server)
  *
  * One `node:http` server that handles:
  *   - RPC (`/api/astra/:id`) via the platform-neutral core
@@ -105,7 +105,7 @@ export function createNodeHandler(options: NodeAdapterOptions = {}) {
  *
  * Typical generated entry:
  * ```ts
- * import { startAstraServer } from '@bpjs159/adapters';
+ * import { startAstraServer } from 'astrajs.dev/adapters';
  * startAstraServer({ apiPrefix: '/api/astra', staticDir: '...' });
  * ```
  */

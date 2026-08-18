@@ -1,13 +1,13 @@
 /**
- * @bpjs159/core/validation — Re-export of @bpjs159/validation
+ * astrajs.dev/core/validation — Re-export of astrajs.dev/validation
  *
  * Convenience re-export so developers can import validators
- * directly from `@bpjs159/core` without installing a separate package.
+ * directly from `astrajs.dev/core` without installing a separate package.
  *
  * ```ts
- * import { isEmail, isRequired, all } from '@bpjs159/core/validation';
+ * import { isEmail, isRequired, all } from 'astrajs.dev/core/validation';
  * // or
- * import { isEmail, isRequired, all } from '@bpjs159/validation';
+ * import { isEmail, isRequired, all } from 'astrajs.dev/validation';
  * ```
  */
 
@@ -24,6 +24,6 @@ export {
   oneOf,
   all,
   any,
-} from '@bpjs159/validation';
+} from 'astrajs.dev/validation';
 
-export type { Validator, AsyncValidator } from '@bpjs159/validation';
+export type { Validator, AsyncValidator } from 'astrajs.dev/validation';

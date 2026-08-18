@@ -1,5 +1,5 @@
 /**
- * @bpjs159/router — <Outlet /> component
+ * astrajs.dev/router — <Outlet /> component
  *
  * Renders the matched child route. Works with the declarative
  * `route()` / `fallbackRoute()` system — no wrapper components needed.

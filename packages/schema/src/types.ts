@@ -1,5 +1,5 @@
 /**
- * @bpjs159/schema — Core Types
+ * astrajs.dev/schema — Core Types
  *
  * All schemas return their inferred TypeScript type via the
  * phantom `_type` property, enabling full type inference

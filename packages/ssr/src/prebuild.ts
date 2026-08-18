@@ -1,5 +1,5 @@
 /**
- * @bpjs159/ssr — Constant Folding (Pre-Build Execution)
+ * astrajs.dev/ssr — Constant Folding (Pre-Build Execution)
  *
  * When `server()` is called with `{ type: 'pre-build' }`, the function
  * is executed at build time (during SSG) and its result is inlined into

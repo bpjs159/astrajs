@@ -24,10 +24,10 @@ function readAiConfig(root) {
   }
 }
 
-/** Loads @bpjs159/ai (project install → root node_modules). */
+/** Loads astrajs.dev/ai (project install → root node_modules). */
 async function loadAi() {
   try {
-    return await import('@bpjs159/ai');
+    return await import('astrajs.dev/ai');
   } catch {
     throw new Error(
       'astrajs.dev/ai is not installed. Run: npm install astrajs.dev'

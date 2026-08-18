@@ -1,5 +1,5 @@
 /**
- * @bpjs159/ai — Provider interface + dispatch
+ * astrajs.dev/ai — Provider interface + dispatch
  *
  * A provider is a thin translation layer between normalized messages/tools
  * and a vendor HTTP API. Everything is fetch-based (edge-safe).

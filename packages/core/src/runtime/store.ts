@@ -1,5 +1,5 @@
 /**
- * @bpjs159/core — Reactive Store (Proxy-based Fine-Grained Reactivity)
+ * astrajs.dev/core — Reactive Store (Proxy-based Fine-Grained Reactivity)
  *
  * ## Architecture
  *

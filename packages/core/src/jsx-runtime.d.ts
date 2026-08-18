@@ -1,8 +1,8 @@
 /**
- * @bpjs159/core/jsx-runtime — Type Declarations
+ * astrajs.dev/core/jsx-runtime — Type Declarations
  *
  * TypeScript uses this when `"jsx": "react-jsx"` and
- * `"jsxImportSource": "@bpjs159/core"` are configured.
+ * `"jsxImportSource": "astrajs.dev/core"` are configured.
  *
  * The runtime implementations are in `jsx-runtime.ts` and
  * `jsx-dev-runtime.ts`.

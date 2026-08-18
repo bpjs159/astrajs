@@ -1,5 +1,5 @@
 /**
- * @bpjs159/compiler/css — CSS Zero-Runtime Macro
+ * astrajs.dev/compiler/css — CSS Zero-Runtime Macro
  *
  * In production, the Vite compiler plugin processes `css`...`` templates
  * and replaces them with hashed class-name maps.

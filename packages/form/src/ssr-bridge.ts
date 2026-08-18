@@ -1,5 +1,5 @@
 /**
- * @bpjs159/form — SSR Resumability Bridge
+ * astrajs.dev/form — SSR Resumability Bridge
  *
  * Enables form controllers to survive SSR → client transition.
  * When a form is server-rendered with `astra-data` attributes containing
@@ -25,12 +25,12 @@
  *
  * ## Registration
  *
- * This module auto-registers with `@bpjs159/ssr` on import, so the
+ * This module auto-registers with `astrajs.dev/ssr` on import, so the
  * SSR `resume()` function automatically handles forms.
- * Just importing `@bpjs159/form` on the client entry point is enough.
+ * Just importing `astrajs.dev/form` on the client entry point is enough.
  */
 
-import { registerFormResumeHandler } from '@bpjs159/ssr';
+import { registerFormResumeHandler } from 'astrajs.dev/ssr';
 import { deserializeValidators } from './validator-extractor.js';
 import { form } from './controller.js';
 import type { FormController } from './controller.js';
@@ -38,7 +38,7 @@ import type { FormController } from './controller.js';
 // ─── Auto-registration ───────────────────────────────────────────────────────
 
 /**
- * Register the form resume handler with @bpjs159/ssr.
+ * Register the form resume handler with astrajs.dev/ssr.
  *
  * This is called at module import time (side-effect). When the SSR
  * `resume()` function runs, it will invoke this handler to restore
@@ -52,7 +52,7 @@ registerFormResumeHandler(resumeFormControllers);
 let _resumeRegistered = false;
 
 /**
- * Ensures the form resume handler is registered with @bpjs159/ssr.
+ * Ensures the form resume handler is registered with astrajs.dev/ssr.
  *
  * Called by the form controller's `_attach()` method so that forms
  * created after `resume()` (e.g., client-side navigation) also

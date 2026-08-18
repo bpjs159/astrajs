@@ -39,7 +39,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createNodeHandler = createNodeHandler;
 exports.startAstraServer = startAstraServer;
 /**
- * @bpjs159/adapters — Node adapter (long-running server)
+ * astrajs.dev/adapters — Node adapter (long-running server)
  *
  * One `node:http` server that handles:
  *   - RPC (`/api/astra/:id`) via the platform-neutral core
@@ -147,7 +147,7 @@ function createNodeHandler(options) {
  *
  * Typical generated entry:
  * ```ts
- * import { startAstraServer } from '@bpjs159/adapters';
+ * import { startAstraServer } from 'astrajs.dev/adapters';
  * startAstraServer({ apiPrefix: '/api/astra', staticDir: '...' });
  * ```
  */

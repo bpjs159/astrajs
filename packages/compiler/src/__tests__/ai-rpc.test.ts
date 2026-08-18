@@ -1,5 +1,5 @@
 /**
- * @bpjs159/compiler — ai()/aiStream() transform tests
+ * astrajs.dev/compiler — ai()/aiStream() transform tests
  */
 import { describe, it, expect } from 'vitest';
 import {

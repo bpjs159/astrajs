@@ -1,7 +1,7 @@
 /// <reference path="./jsx.d.ts" />
 
 /**
- * @bpjs159/core — JSX Runtime (automatic mode)
+ * astrajs.dev/core — JSX Runtime (automatic mode)
  *
  * This module implements the "automatic" JSX transform (React 17+ style).
  * Vite/TypeScript calls `jsx(type, props, key)` and `jsxs(type, props, key)`
@@ -15,7 +15,7 @@
  * {
  *   "compilerOptions": {
  *     "jsx": "react-jsx",
- *     "jsxImportSource": "@bpjs159/core"
+ *     "jsxImportSource": "astrajs.dev/core"
  *   }
  * }
  * ```
@@ -51,7 +51,7 @@ import { untrack } from './runtime/effect.js';
  */
 let _ssrResumable = false;
 
-/** Enables SSR-resumable mode (called by @bpjs159/ssr before rendering). */
+/** Enables SSR-resumable mode (called by astrajs.dev/ssr before rendering). */
 export function setSSRResumable(mode: boolean): void {
   _ssrResumable = mode;
 }
@@ -66,7 +66,7 @@ export function isSSRResumable(): boolean {
  *
  * Populated at module level by `registerHandler()` calls. During SSR
  * the JSX runtime also auto-registers handlers encountered in
- * `onClick={fn}` props. On the client, `bootstrap()` from @bpjs159/ssr
+ * `onClick={fn}` props. On the client, `bootstrap()` from astrajs.dev/ssr
  * installs these handlers on `window` so the delegated `astra-on:*`
  * event system can find them.
  */
@@ -87,7 +87,7 @@ export function registerHandler(fn: Function): string {
   return name;
 }
 
-/** Returns the full handler registry (for @bpjs159/ssr bootstrap). */
+/** Returns the full handler registry (for astrajs.dev/ssr bootstrap). */
 export function getHandlerRegistry(): ReadonlyMap<string, Function> {
   return _handlerRegistry;
 }
@@ -280,7 +280,7 @@ function setProps(
       // Deferred: installed after children are appended (see jsx())
       (el as any).__astraValidate = value;
       // Register validator metadata for SSR extraction
-      // Use dynamic import to avoid circular dependency with @bpjs159/form
+      // Use dynamic import to avoid circular dependency with astrajs.dev/form
       const inputName = (props as Record<string, unknown>)?.name as string | undefined;
       if (inputName) {
         try {

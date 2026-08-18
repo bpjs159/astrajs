@@ -1,5 +1,5 @@
 /**
- * @bpjs159/validation — Validator Functions
+ * astrajs.dev/validation — Validator Functions
  *
  * Each validator is a pure function `(value: string) => string | true`:
  * - Returns `true` when the value passes validation.

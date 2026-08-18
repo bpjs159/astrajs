@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { rpcHandler } from '@bpjs159/server';
+import { rpcHandler } from 'astrajs.dev/server';
 import { createAstraHandler } from '../../dist/core.js';
 import { createCloudflareHandler } from '../../dist/cloudflare.js';
 

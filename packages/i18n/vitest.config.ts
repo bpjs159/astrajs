@@ -10,7 +10,7 @@ export default defineConfig({
   resolve: {
     conditions: ['development'],
     alias: [
-      { find: '@bpjs159/core', replacement: path.resolve(root, 'packages/core/src/index.ts') },
+      { find: 'astrajs.dev/core', replacement: path.resolve(root, 'packages/core/src/index.ts') },
     ],
   },
 });

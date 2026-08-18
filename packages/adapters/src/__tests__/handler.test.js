@@ -37,7 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var vitest_1 = require("vitest");
-var server_1 = require("@bpjs159/server");
+var server_1 = require("astrajs.dev/server");
 var core_js_1 = require("../core.js");
 var cloudflare_js_1 = require("../cloudflare.js");
 var PREFIX = '/api/astra';

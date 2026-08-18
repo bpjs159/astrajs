@@ -153,42 +153,8 @@ function server(configOrFn, fn) {
     return configOrFn;
   }
   throw new Error(
-    "[AstraJS] server() macro was not transformed by the compiler. Make sure @bpjs159/core/vite is in your vite.config.ts plugins."
+    "[AstraJS] server() macro was not transformed by the compiler. Make sure astrajs.dev/compiler is in your vite.config.ts plugins."
   );
-}
-const activeCleanups$1 = /* @__PURE__ */ new Map();
-let observer$1 = null;
-function getObserver$1() {
-  if (typeof MutationObserver === "undefined" || typeof document === "undefined") {
-    return null;
-  }
-  if (!observer$1) {
-    observer$1 = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        for (const node of mutation.removedNodes) {
-          if (typeof HTMLElement !== "undefined" && node instanceof HTMLElement) {
-            const cleanup = activeCleanups$1.get(node);
-            if (cleanup) {
-              cleanup();
-              activeCleanups$1.delete(node);
-            }
-            node.querySelectorAll("[data-astra-lifecycle]").forEach((el) => {
-              const c = activeCleanups$1.get(el);
-              if (c) {
-                c();
-                activeCleanups$1.delete(el);
-              }
-            });
-          }
-        }
-      }
-    });
-    observer$1.observe(document.body, { childList: true, subtree: true });
-  }
-  return observer$1;
-}
-if (typeof MutationObserver !== "undefined" && typeof document !== "undefined") {
-  getObserver$1();
 }
 const STORE_SYMBOL = Symbol("astra-store");
 const rawDeps = /* @__PURE__ */ new WeakMap();
@@ -197,8 +163,7 @@ const proxyToRaw = /* @__PURE__ */ new WeakMap();
 const pendingNotifications = /* @__PURE__ */ new Set();
 let microtaskScheduled = false;
 function scheduleMicrotaskFlush() {
-  if (microtaskScheduled)
-    return;
+  if (microtaskScheduled) return;
   microtaskScheduled = true;
   queueMicrotask(() => {
     microtaskScheduled = false;
@@ -207,11 +172,9 @@ function scheduleMicrotaskFlush() {
 }
 function trigger(raw, prop) {
   const propMap = rawDeps.get(raw);
-  if (!propMap)
-    return;
+  if (!propMap) return;
   const subscribers = propMap.get(prop);
-  if (!subscribers || subscribers.size === 0)
-    return;
+  if (!subscribers || subscribers.size === 0) return;
   for (const sub of subscribers) {
     pendingNotifications.add(sub);
   }
@@ -227,8 +190,7 @@ function flushPending() {
   }
 }
 function isProxyable(value) {
-  if (Array.isArray(value))
-    return true;
+  if (Array.isArray(value)) return true;
   const proto = Object.getPrototypeOf(value);
   return proto === Object.prototype || proto === null;
 }
@@ -238,25 +200,21 @@ function isArrayIndex(prop) {
 }
 function createReactiveProxy(raw) {
   const existing = rawToProxy.get(raw);
-  if (existing)
-    return existing;
+  if (existing) return existing;
   const handler = {
     get(target, prop, receiver) {
-      if (prop === STORE_SYMBOL)
-        return true;
+      if (prop === STORE_SYMBOL) return true;
       const value = Reflect.get(target, prop, receiver);
       if (value !== null && typeof value === "object" && !ArrayBuffer.isView(value) && isProxyable(value)) {
         const existingProxy = rawToProxy.get(value);
-        if (existingProxy)
-          return existingProxy;
+        if (existingProxy) return existingProxy;
         return createReactiveProxy(value);
       }
       return value;
     },
     set(target, prop, value, receiver) {
       const oldValue = Reflect.get(target, prop, receiver);
-      if (oldValue === value)
-        return true;
+      if (oldValue === value) return true;
       const isArrayIndexWrite = Array.isArray(target) && typeof prop === "string" && isArrayIndex(prop);
       const oldLength = isArrayIndexWrite ? Reflect.get(target, "length", receiver) : 0;
       const result = Reflect.set(target, prop, value, receiver);
@@ -297,7 +255,9 @@ function store(initialState, _options) {
     return proxy;
   }
   if (typeof initialState !== "object" || initialState === null) {
-    throw new TypeError(`[AstraJS] store() expects a plain object, received ${typeof initialState}`);
+    throw new TypeError(
+      `[AstraJS] store() expects a plain object, received ${typeof initialState}`
+    );
   }
   return createReactiveProxy(initialState);
 }

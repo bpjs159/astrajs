@@ -1,5 +1,5 @@
 /**
- * @bpjs159/core — Runtime Barrel Export
+ * astrajs.dev/core — Runtime Barrel Export
  *
  * Re-exports all public runtime APIs from a single entry point.
  */

@@ -1,5 +1,5 @@
 /**
- * @bpjs159/compiler — CSS Zero-Runtime Transformer
+ * astrajs.dev/compiler — CSS Zero-Runtime Transformer
  *
  * Extracts `css` tagged template literals from source code and emits
  * them as static `.css` files. The `css` call is replaced with a

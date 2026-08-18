@@ -1,5 +1,5 @@
 /**
- * @bpjs159/router — navigate() + history management
+ * astrajs.dev/router — navigate() + history management
  */
 import { _onNavigation } from './listener.js';
 import { _pathState } from './path-state.js';

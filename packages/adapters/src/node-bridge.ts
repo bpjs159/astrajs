@@ -1,5 +1,5 @@
 /**
- * @bpjs159/adapters — Node HTTP bridge (internal)
+ * astrajs.dev/adapters — Node HTTP bridge (internal)
  *
  * Translates between Node's `IncomingMessage`/`ServerResponse` and the
  * Web-standard `Request`/`Response` used by the platform-neutral core.

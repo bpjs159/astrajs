@@ -1,12 +1,12 @@
 /**
- * @bpjs159/router — Public API
+ * astrajs.dev/router — Public API
  *
  * Declarative, fractal, relative-path-aware routing without wrapper components.
  *
  * ## Quick Start
  *
  * ```tsx
- * import { route, fallbackRoute, params, navigate } from '@bpjs159/router';
+ * import { route, fallbackRoute, params, navigate } from 'astrajs.dev/router';
  *
  * export const App = () => (
  *   <main>

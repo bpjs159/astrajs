@@ -1,5 +1,5 @@
 /**
- * @bpjs159/ai — Shared types
+ * astrajs.dev/ai — Shared types
  *
  * All runtime types are edge-safe: plain data structures and Web APIs only.
  */

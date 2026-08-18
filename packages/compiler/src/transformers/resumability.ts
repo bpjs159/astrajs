@@ -1,5 +1,5 @@
 /**
- * @bpjs159/compiler — Resumability Transformer
+ * astrajs.dev/compiler — Resumability Transformer
  *
  * When `resumability: true` is set in astra.config.json (or plugin options),
  * this transformer scans the source for JSX event handler props and
@@ -12,7 +12,7 @@
  *
  * The compiler injects:
  * ```ts
- * import { registerHandler } from '@bpjs159/core';
+ * import { registerHandler } from 'astrajs.dev/core';
  * registerHandler(handleIncrement);
  * ```
  *

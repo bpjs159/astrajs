@@ -1,5 +1,5 @@
 /**
- * @bpjs159/ssr — Server-Side Renderer
+ * astrajs.dev/ssr — Server-Side Renderer
  *
  * Renders AstraJS component trees to HTML strings on the server.
  *
@@ -22,7 +22,7 @@
  */
 
 import type { SSRConfig, SSGConfig } from './index.js';
-import { setSSRResumable } from '@bpjs159/core';
+import { setSSRResumable } from 'astrajs.dev/core';
 
 // ─── DOM Node → HTML String Serializer ───────────────────────────────────────
 
@@ -179,7 +179,7 @@ function defaultTemplate(appHtml: string): string {
  *
  * @example
  * ```ts
- * import { renderToString } from '@bpjs159/ssr';
+ * import { renderToString } from 'astrajs.dev/ssr';
  * import App from './App';
  *
  * const html = await renderToString({

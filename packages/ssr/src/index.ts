@@ -1,5 +1,5 @@
 /**
- * @bpjs159/ssr — Public API Entry Point
+ * astrajs.dev/ssr — Public API Entry Point
  *
  * Server-Side Rendering (SSR) and Static Site Generation (SSG) engine.
  *
@@ -10,7 +10,7 @@
  *
  * @example
  * ```ts
- * import { renderToString, generateStaticSite } from '@bpjs159/ssr';
+ * import { renderToString, generateStaticSite } from 'astrajs.dev/ssr';
  *
  * const html = await renderToString({
  *   root: () => <App />,
@@ -23,7 +23,7 @@
 
 /**
  * A route definition used by the SSG crawler.
- * Matches the shape expected by `@bpjs159/router` routes.
+ * Matches the shape expected by `astrajs.dev/router` routes.
  */
 export interface RouteDefinition {
   path: string;

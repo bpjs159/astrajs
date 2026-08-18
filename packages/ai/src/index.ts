@@ -1,5 +1,5 @@
 /**
- * @bpjs159/ai — Public API Entry Point
+ * astrajs.dev/ai — Public API Entry Point
  *
  * Typed AI endpoints, streaming, tool calling and RAG for AstraJS apps.
  * All modules are edge-safe (Web APIs only) and provider-agnostic.
@@ -13,7 +13,7 @@
  * | Build-time AI      | `ai({ type: 'pre-build' }, async () => ...)`   |
  * | One-shot completion| `complete(prompt, { model, temperature })`     |
  * | Tools / agents     | `aiAgent(tools, { system })` → `.run(prompt)`  |
- * | RAG                | `createRag()` (see `@bpjs159/ai/rag`)         |
+ * | RAG                | `createRag()` (see `astrajs.dev/ai/rag`)         |
  * | Configuration      | `configureAi({ provider, baseURL, model })`    |
  */
 

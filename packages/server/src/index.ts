@@ -1,12 +1,12 @@
 /**
- * @bpjs159/server — Public API Entry Point
+ * astrajs.dev/server — Public API Entry Point
  *
  * Server RPC, SWR, cache invalidation, and autoSync primitives.
  * The `server` macro is processed at compile time by the Vite AST plugin.
  *
  * @example
  * ```ts
- * import { server, revalidate } from '@bpjs159/server';
+ * import { server, revalidate } from 'astrajs.dev/server';
  *
  * const getProducts = server(
  *   { type: 'pre-build', tags: ['products'], maxAge: 3600 },
@@ -122,6 +122,6 @@ export function server<Args extends unknown[], Return>(
   }
   throw new Error(
     '[AstraJS] server() macro was not transformed by the compiler. ' +
-    'Make sure @bpjs159/core/vite is in your vite.config.ts plugins.'
+    'Make sure astrajs.dev/compiler is in your vite.config.ts plugins.'
   );
 }

@@ -1,12 +1,12 @@
 /**
- * @bpjs159/ai — RAG (Phase 6)
+ * astrajs.dev/ai — RAG (Phase 6)
  *
  * In-memory vector index with cosine similarity over provider embeddings.
  * Edge-safe: plain arrays + fetch. Designed for server-side use inside
  * `server()`/`ai()` handlers (or at build time for SSG corpora).
  *
  * ```ts
- * import { createRag } from '@bpjs159/ai/rag';
+ * import { createRag } from 'astrajs.dev/ai/rag';
  *
  * const rag = createRag();
  * await rag.index('docs', ['AstraJS compiles JSX to DOM mutations', ...]);

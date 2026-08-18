@@ -1,5 +1,5 @@
 /**
- * @bpjs159/compiler — AST Utility Helpers
+ * astrajs.dev/compiler — AST Utility Helpers
  *
  * Low-level utilities for walking and manipulating AST nodes during
  * the JSX → DOM, CSS extraction, and server compilation passes.

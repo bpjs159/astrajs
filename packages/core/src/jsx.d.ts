@@ -1,5 +1,5 @@
 /**
- * @bpjs159/core — JSX Namespace Extension
+ * astrajs.dev/core — JSX Namespace Extension
  *
  * AstraJS components produce real DOM elements, not Virtual DOM nodes.
  * This declaration tells TypeScript that JSX expressions evaluate to
@@ -285,7 +285,7 @@ declare namespace JSX {
   interface FormHTMLAttributes<T> extends HTMLAttributes<T> {
     action?: string;
     method?: 'get' | 'post';
-    /** Attaches a form metadata controller from @bpjs159/form. */
+    /** Attaches a form metadata controller from astrajs.dev/form. */
     controller?: object;
     /**
      * Called on validation failure with a map of field→error messages.

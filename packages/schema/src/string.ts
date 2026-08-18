@@ -1,5 +1,5 @@
 /**
- * @bpjs159/schema — StringSchema
+ * astrajs.dev/schema — StringSchema
  */
 import type { BaseSchema, FieldValidator, ValidationResult } from './types.js';
 

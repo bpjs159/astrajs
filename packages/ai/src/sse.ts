@@ -1,5 +1,5 @@
 /**
- * @bpjs159/ai — SSE / stream parsing helpers (edge-safe)
+ * astrajs.dev/ai — SSE / stream parsing helpers (edge-safe)
  */
 
 /**

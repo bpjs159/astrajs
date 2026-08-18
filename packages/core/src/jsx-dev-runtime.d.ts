@@ -1,5 +1,5 @@
 /**
- * @bpjs159/core/jsx-dev-runtime — Type Declarations
+ * astrajs.dev/core/jsx-dev-runtime — Type Declarations
  *
  * Development-mode JSX runtime with source tracking.
  */

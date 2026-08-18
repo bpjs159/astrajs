@@ -1,5 +1,5 @@
 /**
- * @bpjs159/form — ValidityState → Error Code Mapping
+ * astrajs.dev/form — ValidityState → Error Code Mapping
  *
  * Translates the browser's native ValidityState flags into
  * stable, i18n-friendly error codes. The developer uses these

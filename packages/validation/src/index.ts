@@ -1,5 +1,5 @@
 /**
- * @bpjs159/validation — Public API
+ * astrajs.dev/validation — Public API
  *
  * Lightweight, standalone validator functions for forms and schemas.
  * Each validator returns `true` on success or an error `string` on failure.
@@ -7,7 +7,7 @@
  * ## Quick Start
  *
  * ```ts
- * import { isEmail, isRequired, minLength, all } from '@bpjs159/validation';
+ * import { isEmail, isRequired, minLength, all } from 'astrajs.dev/validation';
  *
  * // Use directly as validate prop in JSX:
  * // <input validate={isEmail} />

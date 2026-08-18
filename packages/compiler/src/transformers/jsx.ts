@@ -1,5 +1,5 @@
 /**
- * @bpjs159/compiler — JSX → Vanilla DOM Transformer
+ * astrajs.dev/compiler — JSX → Vanilla DOM Transformer
  *
  * ## Transformation Pipeline
  *
@@ -21,7 +21,7 @@
  *
  * **Output (Vanilla JS + Bindings):**
  * ```js
- * import { bindText } from '@bpjs159/core';
+ * import { bindText } from 'astrajs.dev/core';
  *
  * const App = () => {
  *   const _el0 = document.createElement('div');
@@ -157,7 +157,7 @@ const ROUTER_REACTIVE_IDS = new Set(['route', 'fallbackRoute', 'params']);
  *
  * **3. Optimisation:**
  *    - Expressions already wrapped in `dynamic(...)` are skipped
- *    - `dynamic` is auto-imported from `@bpjs159/core` when needed
+ *    - `dynamic` is auto-imported from `astrajs.dev/core` when needed
  *
  * @param source  — The full source code of a .tsx/.jsx file.
  * @param reactiveVars — Set of variable names from `store()` declarations.
@@ -442,7 +442,7 @@ export function autoWrapDynamic(
  *
  * **Output (AST-injected):**
  * ```ts
- * import { memo } from '@bpjs159/core';
+ * import { memo } from 'astrajs.dev/core';
  * const total = memo(() => ui.x + ui.y);
  * ```
  *

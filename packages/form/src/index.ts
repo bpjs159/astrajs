@@ -1,11 +1,11 @@
 /**
- * @bpjs159/form — Public API
+ * astrajs.dev/form — Public API
  *
  * Reactive form metadata controller. Delegates validation to
  * the browser's native Constraint Validation API.
  *
  * ```ts
- * import { form } from '@bpjs159/form';
+ * import { form } from 'astrajs.dev/form';
  *
  * const registerForm = form();
  * // <form controller={registerForm}> — wired automatically by JSX runtime

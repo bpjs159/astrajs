@@ -1,5 +1,5 @@
 /**
- * @bpjs159/compiler — Vite Plugin
+ * astrajs.dev/compiler — Vite Plugin
  *
  * ## Architecture
  *
@@ -142,7 +142,7 @@ function readConfigFile(root: string): Partial<AstraViteConfig> {
  * ```ts
  * // vite.config.ts
  * import { defineConfig } from 'vite';
- * import astra from 'astrajs.dev/core/vite';
+ * import astra from 'astrajs.dev/compiler';
  *
  * export default defineConfig({
  *   plugins: [astra({ cssPrefix: 'app-', apiPrefix: '/api/rpc' })]
@@ -214,7 +214,7 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
       // and build share one provider configuration (apiKey read from env).
       if (config.ai) {
         const ai = config.ai;
-        import('@bpjs159/ai')
+        import('astrajs.dev/ai')
           .then(({ configureAi }) => {
             configureAi({
               ...(ai.provider ? { provider: ai.provider } : {}),
@@ -238,7 +238,7 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
 
     async configureServer(server) {
       // Server-side handler state must live in the SAME module instance as the
-      // SSR-loaded app modules that register handlers. Resolving @bpjs159/server
+      // SSR-loaded app modules that register handlers. Resolving astrajs.dev/server
       // through Vite's SSR graph (not a plain `import()`) guarantees the RPC
       // middleware and the app modules share one handler registry.
       let rpcSsrPromise: Promise<any> | null = null;
@@ -666,6 +666,6 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
 }
 
 /**
- * Default export for `import astra from 'astrajs.dev/core/vite'`.
+ * Default export for `import astra from 'astrajs.dev/compiler'`.
  */
 export default astraVitePlugin;

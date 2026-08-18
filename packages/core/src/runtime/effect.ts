@@ -1,5 +1,5 @@
 /**
- * @bpjs159/core — Effect & Memo System
+ * astrajs.dev/core — Effect & Memo System
  *
  * ## How Tracking Works
  *

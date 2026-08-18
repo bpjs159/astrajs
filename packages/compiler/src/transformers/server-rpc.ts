@@ -1,5 +1,5 @@
 /**
- * @bpjs159/compiler — server RPC Transformer
+ * astrajs.dev/compiler — server RPC Transformer
  *
  * Transforms `server()` calls into:
  * 1. **Server side**: An API endpoint handler.
@@ -47,7 +47,7 @@
  */
 
 import type { AstraViteConfig } from '../index.js';
-import type { ServerConfig } from '@bpjs159/server';
+import type { ServerConfig } from 'astrajs.dev/server';
 import { hashContent } from '../utils/ast.js';
 
 // ─── server Call Parser ─────────────────────────────────────────────────────

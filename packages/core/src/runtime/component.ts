@@ -1,5 +1,5 @@
 /**
- * @bpjs159/core — Component Wrapper
+ * astrajs.dev/core — Component Wrapper
  *
  * `component(fn)` wraps a function that uses `store()` + JSX so that
  * reactive expressions auto-update the DOM when the store changes.
