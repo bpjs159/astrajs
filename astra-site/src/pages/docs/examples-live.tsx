@@ -522,13 +522,12 @@ const ex18 = component(() => {
 
 const ex19 = component(() => {
   const state = store({ resumed: false });
-  const serialized = JSON.stringify({ items: 3, total: 42, user: 'Ada' }, null, 2);
   return (
     <div class="lv">
       <h4>Resumibilidad: el estado vive en el HTML</h4>
       <div class="lv-card">
         <p>HTML enviado por el servidor:</p>
-        <pre style="font-size:.66rem;color:#00dfff;background:#04060d;padding:10px;border-radius:6px;margin:8px 0">{"<div data-astra-store=\"cart\"\n     data-astra-value='"}<br/>{serialized.replace(/\n/g, ' · ')}</pre>
+        <pre style="font-size:.66rem;color:#00dfff;background:#04060d;padding:10px;border-radius:6px;margin:8px 0">{"<div astra-data='{\"items\":3,\"total\":42,\"user\":\"Ada\"}'"}<br/><button astra-on:click>Checkout</button></pre>
       </div>
       <button class="lv-btn" onclick={() => { state.resumed = true; }}>
         resume()
@@ -582,8 +581,8 @@ export const frontendExamples: LiveExample[] = [
 export const Counter = component(() => (
   <div>
     <h2>Counter: {counter.value}</h2>
-    <button onClick={() => counter.value--}>-1</button>
-    <button onClick={() => counter.value++}>+1</button>
+    <button onclick={() => counter.value--}>-1</button>
+    <button onclick={() => counter.value++}>+1</button>
   </div>
 ));` },
   { num: '02', title: 'ex2.title', description: 'ex2.desc', concepts: ['store compartido'], docsHref: '/docs/fundamentals#reactividad', render: ex02,
@@ -747,10 +746,10 @@ export const getProduct = server(
 
 const p = await getProduct(params.id);` },
   { num: '05', title: 'ex15.title', description: 'ex15.desc', concepts: ['schema', 'validation'], docsHref: '/docs/server-data#server', render: ex15,
-    code: `const UserSchema = schema({
-  name: { type: 'string', min: 2, required: true },
-  email: { type: 'email', required: true },
-  age: { type: 'number', min: 18 },
+    code: `const UserSchema = schema.object({
+  name: schema.string().min(2),
+  email: schema.string().email(),
+  age: schema.number().min(18).optional(),
 });
 
 // Client:
@@ -758,7 +757,7 @@ const result = UserSchema.validate(formData);
 
 // Server:
 const valid = UserSchema.validate(data);
-if (!valid.ok) return { errors: valid.errors };`,
+if (!valid.success) return { errors: valid.errors };`,
     commentsKey: 'ex15' },
   { num: '06', title: 'ex16.title', description: 'ex16.desc', concepts: ['optimistic', 'rollback'], docsHref: '/docs/server-data#caching', render: ex16,
     code: `async function handleToggle(id: string) {
@@ -800,14 +799,14 @@ if (!valid.ok) return { errors: valid.errors };`,
     commentsKey: 'ex18' },
   { num: '09', title: 'ex19.title', description: 'ex19.desc', concepts: ['resume()', 'SSR'], docsHref: '/docs/rendering#resumibilidad', render: ex19,
     code: `// Server HTML:
-<div data-astra-store="cart"
-     data-astra-value='{"items":3,"total":42}'>
+<div astra-data="{&quot;items&quot;:3,&quot;total&quot;:42}">
   3 items · $42
 </div>
+<button astra-on:click>Checkout</button>
 
 // Client: resume()
-// 1. Reads the state from the HTML
-// 2. Store initialized without re-running
+// 1. astra-data → state restored from the HTML
+// 2. astra-on:click → delegated listener, nothing re-runs
 // 3. Handlers load on-demand`,
     commentsKey: 'ex19' },
   { num: '10', title: 'ex20.title', description: 'ex20.desc', concepts: ['SSG', 'pre-build'], docsHref: '/docs/rendering#ssg', render: ex20,

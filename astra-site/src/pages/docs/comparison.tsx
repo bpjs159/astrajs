@@ -341,7 +341,8 @@ button { background: #818cf8; }
 // --- vs ---
 
 // AstraJS TSX (same file)
-import { component, store, css } from 'astrajs.dev/core';
+import { component, store } from 'astrajs.dev/core';
+import { css } from 'astrajs.dev/compiler/css';
 
 const btnStyle = css\`
   button { background: #818cf8; }

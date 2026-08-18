@@ -92,7 +92,7 @@ export const loadProducts = server(async () => {
 // Usage — call it anywhere in the client:
 const products = await loadProducts();
 // products is Product[] — the type is inferred from the server`,
-    css: `import { css } from 'astrajs.dev/core';
+    css: `import { css } from 'astrajs.dev/compiler/css';
 
 const cardStyle = css\`
     background: #0f172a;
@@ -713,7 +713,7 @@ function App() {
           <h2>{i18n.t('home.cta.title')}</h2>
           <p>{i18n.t('home.cta.sub')}</p>
           <div class="cta-code">
-            <span>npx astrajs.dev/cli@latest</span>
+            <span>npx astrajs.dev@latest my-app</span>
           </div>
           <br/>
           <button class="btn-primary" onclick={() => navigate('/docs/introduction')} style="font-size:.92rem;padding:14px 36px">

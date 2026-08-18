@@ -179,8 +179,8 @@ export const SNIPPET_COMMENTS_EAST: Record<string, Record<string, string[]>> = {
     'zh-CN': ['// ISR: maxAge 控制重新生成的频率', '// 构建时生成', '// 可失效', '// 每小时重新生成 (ISR)', '// ISR 流程:', '// t=0: 构建 → 含数据的 HTML', '// t=30min: 访问 → 获取缓存的 HTML（快）', '// t=61min: 缓存过期 → 提供 stale + 后台重新生成', '// t=62min: 下次访问 → 含新数据的新鲜 HTML'],
   },
   'rendering.resume': {
-    ja: ['// サーバー生成の HTML には次が含まれる:', '//   <div id="app">', '//     <span data-astra-store="counter" data-astra-value="42">', '//       Counter: 42', '//     </span>', '//     <button data-astra-handler="increment">', '//       +', '//     </button>', '//   </div>', '// クライアントが「再開」するとき:', '//   1. data-astra-store を読み、値 42 でストアを初期化', '//   2. data-astra-handler を読み、保留中の onclick を認識', '//   3. コンポーネントを実行しない、diff もしない', '//   4. ハンドラの JS は「+」をクリックした時だけ読み込まれる'],
-    'zh-CN': ['// 服务端生成的 HTML 包括:', '//   <div id="app">', '//     <span data-astra-store="counter" data-astra-value="42">', '//       Counter: 42', '//     </span>', '//     <button data-astra-handler="increment">', '//       +', '//     </button>', '//   </div>', '// 客户端「恢复」时:', '//   1. 读取 data-astra-store → 以值 42 初始化 store', '//   2. 读取 data-astra-handler → 知道有 pending onclick', '//   3. 不执行组件，不做 diffing', '//   4. 点击 "+" 时才加载 handler 的 JS'],
+    ja: ['// サーバー HTML（ソースを表示）— コンパイラは SSR マーカーを生成する:', '//   <div id="app">', '//     <span astra-data="{&quot;count&quot;:42}">', '//       Counter: 42', '//     </span>', '//     <button astra-on:click>', '//       +', '//     </button>', '//   </div>', '// クライアントが「再開」するとき:', '//   1. astra-data を読み、値 42 でストアを初期化', '//   2. astra-on:click を読み、保留中の onclick を認識', '//   3. コンポーネントを実行しない、diff もしない', '//   4. ハンドラの JS は「+」をクリックした時だけ読み込まれる'],
+    'zh-CN': ['// 服务端 HTML（查看源码）— 编译器生成 SSR 标记:', '//   <div id="app">', '//     <span astra-data="{&quot;count&quot;:42}">', '//       Counter: 42', '//     </span>', '//     <button astra-on:click>', '//       +', '//     </button>', '//   </div>', '// 客户端「恢复」时:', '//   1. 读取 astra-data → 以值 42 初始化 store', '//   2. 读取 astra-on:click → 知道有 pending onclick', '//   3. 不执行组件，不做 diffing', '//   4. 点击 "+" 时才加载 handler 的 JS'],
   },
   'router.routes': {
     ja: ['// routes.ts — リアクティブなゲッターを持つオブジェクト', '// レイアウト内:'],
@@ -223,8 +223,8 @@ export const SNIPPET_COMMENTS_EAST: Record<string, Record<string, string[]>> = {
     'zh-CN': ['// 函数只定义一次', '// 缓存 TTL（秒）', '// 在客户端 — 看起来像普通 async 调用', '// ↑ 这是对 /api/astra/getUsers?args=["admin"] 的 fetch', '// 类型自动推断 — admins 是 User[]'],
   },
   'sd.config': {
-    ja: ['// 実行タイプ', '// default: \'dynamic\'', '// キャッシュ', '// ピンポイント無効化のためのタグ', '// TTL（秒）（0 = キャッシュなし）', '// リアルタイム同期', '// ETag によるポーリング', '// 間隔（ms）（default: 3000）', '// 変換', '// クライアントへ送信する前にデータを変換'],
-    'zh-CN': ['// 执行类型', '// default: \'dynamic\'', '// 缓存', '// 用于精确失效的标签', '// TTL（秒）（0 = 无缓存）', '// 实时同步', '// 基于 ETag 的轮询', '// 间隔（ms）（default: 3000）', '// 转换', '// 发送给客户端前转换数据'],
+    ja: ['// 実行タイプ', '// default: \'dynamic\'', '// キャッシュ', '// ピンポイント無効化のためのタグ', '// TTL（秒）（0 = キャッシュなし）', '// リアルタイム同期', '// ETag によるポーリング', '// 間隔（ms）（default: 3000）'],
+    'zh-CN': ['// 执行类型', '// default: \'dynamic\'', '// 缓存', '// 用于精确失效的标签', '// TTL（秒）（0 = 无缓存）', '// 实时同步', '// 基于 ETag 的轮询', '// 间隔（ms）（default: 3000）'],
   },
   'sd.prebuild': {
     ja: ['// 最適: メニュー、設定、静的コンテンツ', '// ビルド時: db.menu.findMany() → 結果を HTML にシリアライズ', '// クライアント: siteNav() → データは既に利用可能、fetch なし', '// 各ビルドまたは ISR で再生成'],
@@ -315,8 +315,8 @@ export const SNIPPET_COMMENTS_EAST: Record<string, Record<string, string[]>> = {
     'zh-CN': ['// DOM 只在', '// 服务端返回新数据时更新。', '// 无 WebSockets、无订阅。'],
   },
   'ex19': {
-    ja: ['// サーバーの HTML:', '// クライアント: resume()', '// 1. HTML から状態を読み取る', '// 2. 再実行なしでストアを初期化', '// 3. ハンドラはオンデマンドで読み込み'],
-    'zh-CN': ['// 服务端的 HTML:', '// 客户端: resume()', '// 1. 从 HTML 读取状态', '// 2. 无需重新执行即可初始化 store', '// 3. 处理函数按需加载'],
+    ja: ['// サーバーの HTML:', '// クライアント: resume()', '// 1. astra-data → HTML から状態を復元', '// 2. astra-on:click → 委譲リスナー、再実行なし', '// 3. ハンドラはオンデマンドで読み込み'],
+    'zh-CN': ['// 服务端的 HTML:', '// 客户端: resume()', '// 1. astra-data → 从 HTML 恢复状态', '// 2. astra-on:click → 委托监听器，不重新执行', '// 3. 处理函数按需加载'],
   },
   'ex20': {
     ja: ['// ビルド時: クエリ実行済み', '// HTML: データ埋め込み済み (astra-data)', '// クライアント: fetch 0 回、JS 0 KB'],

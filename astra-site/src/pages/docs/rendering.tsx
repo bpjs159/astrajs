@@ -113,20 +113,20 @@ const featuredProducts = server(
           <li><strong>{i18n.t('rr.vs2.name')}:</strong> {i18n.t('rr.vs2')}</li>
         </ul>
 
-        <CodeBlock code={`// The server-generated HTML includes:
+        <CodeBlock code={`// Server HTML (view source) — the compiler emits SSR markers:
 //   <div id="app">
-//     <span data-astra-store="counter" data-astra-value="42">
+//     <span astra-data="{&quot;count&quot;:42}">
 //       Counter: 42
 //     </span>
-//     <button data-astra-handler="increment">
+//     <button astra-on:click>
 //       +
 //     </button>
 //   </div>
 
-// When the client "resumes":
-//   1. Reads data-astra-store → initializes the store with value 42
-//   2. Reads data-astra-handler → knows there is a pending onclick
-//   3. Runs no components, does no diffing
+// When the client calls resume():
+//   1. astra-data → initializes the store from the serialized state
+//   2. astra-on:click → registers the delegated listener on demand
+//   3. No components re-run, no diffing
 //   4. The handler JS loads only when you click "+"`} commentsKey="rendering.resume" />
       </div>
     </main>

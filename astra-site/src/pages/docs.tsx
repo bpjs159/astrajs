@@ -103,7 +103,7 @@ export default function Counter() {
       {/* ── MAIN CONTENT ── */}
       <main class="docs-main">
         <div class="docs-content">
-          <div class="docs-hero-badge">v1.0.0</div>
+          <div class="docs-hero-badge">v0.1.8</div>
           <h1>{i18n.t('d.welcome')}</h1>
           <p class="docs-hero-text">
             {i18n.t('d.hero')}
@@ -243,9 +243,9 @@ export default function Counter() {
           {/* Placeholder sections for sidebar nav */}
           <h2 id="instalacion">{i18n.t('sb.install')}</h2>
           <p>{i18n.t('d.install1')}</p>
-          <CodeBlock code={`npx astrajs.dev/cli@latest`} />
+          <CodeBlock code={`npx astrajs.dev@latest my-app`} />
           <p>{i18n.t('d.install2')}</p>
-          <CodeBlock code={`pnpm add astrajs.dev/core astrajs.dev/compiler
+          <CodeBlock code={`pnpm add astrajs.dev
 // vite.config.ts
 import astra from 'astrajs.dev/compiler';
 
@@ -354,7 +354,7 @@ const admins = await getUsers('admin');
 
           <h2 id="estilos">{i18n.t('sb.css')}</h2>
           <p>{i18n.t('d.css.p')}</p>
-          <CodeBlock code={`import { css } from 'astrajs.dev/core';
+          <CodeBlock code={`import { css } from 'astrajs.dev/compiler/css';
 
 const card = css\`
   background: #0f172a;
@@ -380,7 +380,7 @@ function Card() {
 const menu = server({ type: 'pre-build' }, () => db.menu.findMany());
 
 // dynamic: ejecutado en cada request  
-const session = server({ type: 'dynamic' }, (req) => getSession(req));`} />
+const session = server({ type: 'dynamic' }, (userId) => getSession(userId));`} />
 
           <h2 id="caching">{i18n.t('sb.caching')}</h2>
           <p>{i18n.t('d.caching.p')}</p>
@@ -389,7 +389,7 @@ const products = server({ tags: ['products'] }, () => db.product.findMany());
 
 // Invalidar quirúrgicamente
 import { revalidate } from 'astrajs.dev/server';
-await revalidate(['products']);`} />
+await revalidate('products');`} />
 
           <h2 id="autosync">{i18n.t('sb.autosync')}</h2>
           <p>{i18n.t('d.autosync.p')}</p>

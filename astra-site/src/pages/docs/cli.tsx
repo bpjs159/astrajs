@@ -34,7 +34,7 @@ export const DocsCli = component(() => (
     <main class="docs-main">
       <div class="docs-content">
         <h1>CLI</h1>
-        <p><code>astra</code> {i18n.t('cl.hero.a')}<code>astra dev</code>{i18n.t('cl.hero.b')}<code>astra build</code>{i18n.t('cl.hero.c')}<code>astra test</code>{i18n.t('cl.hero.d')}</p>
+        <p><code>astrajs</code> {i18n.t('cl.hero.a')}<code>astrajs dev</code>{i18n.t('cl.hero.b')}<code>astrajs build</code>{i18n.t('cl.hero.c')}<code>astrajs test</code>{i18n.t('cl.hero.d')}</p>
 
         <h2 id="que-es">{i18n.t('sb.cliWhat')}</h2>
         <p>{i18n.t('cl.what.p1')}</p>
@@ -42,20 +42,20 @@ export const DocsCli = component(() => (
 
         <h2 id="crear-proyecto">{i18n.t('sb.cliCreate')}</h2>
         <p>{i18n.t('cl.create.p')}</p>
-        <CodeBlock code={`astra my-app
-npx astrajs.dev/cli@latest my-app
-pnpm create astrajs my-app`} />
+        <CodeBlock code={`astrajs my-app
+npx astrajs.dev@latest my-app
+npm create astrajs.dev@latest my-app`} />
 
         <h3>{i18n.t('cl.run.title')}</h3>
         <p>{i18n.t('cl.run.p')}</p>
-        <CodeBlock code={`astra dev        # vite dev server with HMR
-astra build      # production build (pre-built requests run here)
-astra preview    # preview the production build
-astra test       # vitest run`} />
+        <CodeBlock code={`astrajs dev        # vite dev server with HMR
+astrajs build      # production build (pre-built requests run here)
+astrajs preview    # preview the production build
+astrajs test       # vitest run`} />
 
         <h3>{i18n.t('cl.wizard.title')}</h3>
         <p>{i18n.t('cl.wizard.p')}</p>
-        <CodeBlock code={`$ astra
+        <CodeBlock code={`$ astrajs
 
 ◇ Project name: my-app
 ◇ Select a template:
@@ -68,7 +68,7 @@ astra test       # vitest run`} />
 Generated 11 files in ./my-app
 ◇ Next steps:
   cd my-app
-  astra dev
+  astrajs dev
 
 Happy building!`} />
 
@@ -93,8 +93,8 @@ Happy building!`} />
         </table>
 
         <h3>{i18n.t('cl.select.title')}</h3>
-        <CodeBlock code={`astra my-app --template fullstack
-astra my-app -t minimal`} />
+        <CodeBlock code={`astrajs my-app --template fullstack
+astrajs my-app -t minimal`} />
 
         <h2 id="opciones">{i18n.t('sb.cliOptions')}</h2>
         <table>
@@ -108,13 +108,13 @@ astra my-app -t minimal`} />
         </table>
 
         <CodeBlock code={`# Skip prompts entirely
-astra my-app --yes
+astrajs my-app --yes
 
 # Scaffold without installing
-astra my-app --template frontend --no-install
+astrajs my-app --template frontend --no-install
 
 # Preview the file tree first
-astra my-app --dry-run`} />
+astrajs my-app --dry-run`} />
 
         <h2>{i18n.t('cl.structure.title')}</h2>
         <p>{i18n.t('cl.structure.p.a')}<code>--template fullstack</code>{i18n.t('cl.structure.p.b')}</p>
@@ -158,7 +158,7 @@ mounted(() => {
 });`} commentsKey="cli.server-split" />
 
         <h2>{i18n.t('cl.pm.title')}</h2>
-        <p>{i18n.t('cl.pm.a')}<code>npm_config_user_agent</code>{i18n.t('cl.pm.b')}<code>pnpm dlx astra</code>{i18n.t('cl.pm.c')}<code>npx astra</code>{i18n.t('cl.pm.d')}</p>
+        <p>{i18n.t('cl.pm.a')}<code>npm_config_user_agent</code>{i18n.t('cl.pm.b')}<code>pnpm dlx astrajs</code>{i18n.t('cl.pm.c')}<code>npx astrajs</code>{i18n.t('cl.pm.d')}</p>
 
         <div class="note">
           <strong>{i18n.t('lbl.legacy')}:</strong> {i18n.t('cl.legacy.a')}<code>basic</code>{i18n.t('cl.legacy.b')}<code>--template basic</code>{i18n.t('cl.legacy.c')}<code>frontend</code>{i18n.t('cl.legacy.d')}

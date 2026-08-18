@@ -120,8 +120,8 @@ export const askDocs = server(async (q: string) => rag.answer('docs', q));`} />
 
         <h2 id="cli">{i18n.t('sb.aiCli')}</h2>
         <p>{i18n.t('ai.cli.p')}</p>
-        <CodeBlock code={`astra ai chat "explain direct DOM mutations"
-astra ai translate fr src/i18n-en.json`} />
+        <CodeBlock code={`astrajs ai chat "explain direct DOM mutations"
+astrajs ai translate fr src/i18n-en.json`} />
 
         <h2 id="config">{i18n.t('sb.aiConfig')}</h2>
         <p>{i18n.t('ai.env.p')}</p>

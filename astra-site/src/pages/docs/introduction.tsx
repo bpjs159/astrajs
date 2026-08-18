@@ -76,7 +76,7 @@ export const DocsIntroduction = component(() => (
     <DocSidebar />
     <main class="docs-main">
       <div class="docs-content">
-        <div class="docs-hero-badge">v1.0.0</div>
+        <div class="docs-hero-badge">v0.1.8</div>
         <h1>{i18n.t('d.welcome')}</h1>
         <p class="docs-hero-text">
           {i18n.t('d.hero')}
@@ -128,9 +128,9 @@ export const DocsIntroduction = component(() => (
         </ul>
         <h2 id="instalacion">{i18n.t('sb.install')}</h2>
         <p>{i18n.t('d2.install1')}</p>
-        <CodeBlock code={`npx astrajs.dev/cli@latest`} />
+        <CodeBlock code={`npx astrajs.dev@latest my-app`} />
         <p>{i18n.t('d2.install2')}</p>
-        <CodeBlock code={`pnpm add astrajs.dev/core astrajs.dev/compiler
+        <CodeBlock code={`pnpm add astrajs.dev
 
 // vite.config.ts
 import astra from 'astrajs.dev/compiler';

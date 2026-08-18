@@ -179,8 +179,8 @@ export const SNIPPET_COMMENTS_EU: Record<string, Record<string, string[]>> = {
     ru: ['// ISR: maxAge управляет частотой перегенерации', '// генерируется при сборке', '// инвалидируемый', '// перегенерировать каждый час (ISR)', '// Поток ISR:', '// t=0: Сборка → HTML со встроенными данными', '// t=30мин: Посетитель → получает закешированный HTML (быстро)', '// t=61мин: Кеш истёк → отдаётся stale + фоновая перегенерация', '// t=62мин: Следующий визит → свежий HTML с новыми данными'],
   },
   'rendering.resume': {
-    de: ['// Das vom Server generierte HTML enthält:', '//   <div id="app">', '//     <span data-astra-store="counter" data-astra-value="42">', '//       Counter: 42', '//     </span>', '//     <button data-astra-handler="increment">', '//       +', '//     </button>', '//   </div>', '// Wenn der Client "resume" macht:', '//   1. Liest data-astra-store → initialisiert den Store mit Wert 42', '//   2. Liest data-astra-handler → weiß, dass ein onclick aussteht', '//   3. Führt keine Komponenten aus, kein Diffing', '//   4. Das Handler-JS lädt erst beim Klick auf "+"'],
-    ru: ['// HTML, сгенерированный сервером, включает:', '//   <div id="app">', '//     <span data-astra-store="counter" data-astra-value="42">', '//       Counter: 42', '//     </span>', '//     <button data-astra-handler="increment">', '//       +', '//     </button>', '//   </div>', '// Когда клиент «возобновляется»:', '//   1. Читает data-astra-store → инициализирует store значением 42', '//   2. Читает data-astra-handler → знает о pending onclick', '//   3. Не выполняет компоненты, не делает diffing', '//   4. JS обработчика загружается только при клике на "+"'],
+    de: ['// Server-HTML (Quelltext ansehen) — der Compiler emittiert SSR-Marker:', '//   <div id="app">', '//     <span astra-data="{&quot;count&quot;:42}">', '//       Counter: 42', '//     </span>', '//     <button astra-on:click>', '//       +', '//     </button>', '//   </div>', '// Wenn der Client "resume" macht:', '//   1. Liest astra-data → initialisiert den Store mit Wert 42', '//   2. Liest astra-on:click → weiß, dass ein onclick aussteht', '//   3. Führt keine Komponenten aus, kein Diffing', '//   4. Das Handler-JS lädt erst beim Klick auf "+"'],
+    ru: ['// HTML сервера (просмотр кода) — компилятор генерирует SSR-маркеры:', '//   <div id="app">', '//     <span astra-data="{&quot;count&quot;:42}">', '//       Counter: 42', '//     </span>', '//     <button astra-on:click>', '//       +', '//     </button>', '//   </div>', '// Когда клиент «возобновляется»:', '//   1. Читает astra-data → инициализирует store значением 42', '//   2. Читает astra-on:click → знает о pending onclick', '//   3. Не выполняет компоненты, не делает diffing', '//   4. JS обработчика загружается только при клике на "+"'],
   },
   'router.routes': {
     de: ['// routes.ts — ein Objekt mit reaktiven Gettern', '// In deinem Layout:'],
@@ -223,8 +223,8 @@ export const SNIPPET_COMMENTS_EU: Record<string, Record<string, string[]>> = {
     ru: ['// Определите функцию ОДИН РАЗ', '// TTL кеша в секундах', '// В КЛИЕНТЕ — выглядит как обычный async-вызов', '// ↑ Это fetch на /api/astra/getUsers?args=["admin"]', '// Типы выводятся автоматически — admins это User[]'],
   },
   'sd.config': {
-    de: ['// Ausführungstyp', '// default: \'dynamic\'', '// Cache', '// Tags für chirurgische Invalidierung', '// TTL in Sekunden (0 = kein Cache)', '// Echtzeit-Synchronisierung', '// Polling mit ETags', '// Intervall in ms (default: 3000)', '// Transformation', '// Transformiert Daten vor dem Senden an den Client'],
-    ru: ['// Тип выполнения', '// default: \'dynamic\'', '// Кеш', '// Теги для точечной инвалидации', '// TTL в секундах (0 = без кеша)', '// Синхронизация в реальном времени', '// Поллинг с ETag', '// Интервал в мс (default: 3000)', '// Трансформация', '// Преобразует данные перед отправкой клиенту'],
+    de: ['// Ausführungstyp', '// default: \'dynamic\'', '// Cache', '// Tags für chirurgische Invalidierung', '// TTL in Sekunden (0 = kein Cache)', '// Echtzeit-Synchronisierung', '// Polling mit ETags', '// Intervall in ms (default: 3000)'],
+    ru: ['// Тип выполнения', '// default: \'dynamic\'', '// Кеш', '// Теги для точечной инвалидации', '// TTL в секундах (0 = без кеша)', '// Синхронизация в реальном времени', '// Поллинг с ETag', '// Интервал в мс (default: 3000)'],
   },
   'sd.prebuild': {
     de: ['// Ideal für: Menüs, Einstellungen, statische Inhalte', '// Zur Buildzeit: db.menu.findMany() → Ergebnis ins HTML serialisiert', '// Im Client: siteNav() → Daten sofort verfügbar, ohne Fetch', '// Wird bei jedem Build oder per ISR neu generiert'],
@@ -315,8 +315,8 @@ export const SNIPPET_COMMENTS_EU: Record<string, Record<string, string[]>> = {
     ru: ['// DOM обновляется только когда', '// сервер возвращает новые данные.', '// Без WebSockets, без подписок.'],
   },
   'ex19': {
-    de: ['// HTML des Servers:', '// Client: resume()', '// 1. Liest den Zustand aus dem HTML', '// 2. Store ohne erneute Ausführung initialisiert', '// 3. Handler laden on-demand'],
-    ru: ['// HTML сервера:', '// Клиент: resume()', '// 1. Читает состояние из HTML', '// 2. Store инициализируется без повторного выполнения', '// 3. Обработчики загружаются по требованию'],
+    de: ['// HTML des Servers:', '// Client: resume()', '// 1. astra-data → Zustand aus dem HTML wiederhergestellt', '// 2. astra-on:click → delegierter Listener, nichts wird erneut ausgeführt', '// 3. Handler laden on-demand'],
+    ru: ['// HTML сервера:', '// Клиент: resume()', '// 1. astra-data → состояние восстановлено из HTML', '// 2. astra-on:click → делегированный слушатель, ничего не перезапускается', '// 3. Обработчики загружаются по требованию'],
   },
   'ex20': {
     de: ['// Buildzeit: Abfrage ausgeführt', '// HTML: eingebettete Daten (astra-data)', '// Client: 0 Fetch, 0 KB JS'],

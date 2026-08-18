@@ -62,7 +62,7 @@ export const Header = component(() => {
         <a class={`header-logo${state.scrolled ? ' scrolled' : ''}`} onclick={() => { navigate('/'); closeMenu(); }}>
           <img class="header-isotype" src="/images/logo.png" alt="AstraJS" />
           <BrandLogo cls="header-wordmark" />
-          <span class="header-beta">beta · v0.1.0</span>
+          <span class="header-beta">beta · v0.1.8</span>
         </a>
         <button class="header-mobile-btn" onclick={toggleMenu} aria-label="Menu">
           <Icon name="menu" size={20} />

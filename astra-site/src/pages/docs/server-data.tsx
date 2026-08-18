@@ -73,9 +73,6 @@ const admins = await getUsers('admin');
   // Real-time sync
   autoSync?: boolean;           // Polling with ETags
   autoSyncInterval?: number;    // Interval in ms (default: 3000)
-  
-  // Transformation
-  transform?: (data: T) => U;   // Transforms data before sending to the client
 }`} commentsKey="sd.config" />
 
         <h2 id="tipos-server">{i18n.t('sb.serverTypes')}</h2>
@@ -134,14 +131,14 @@ const getCategories = server(
 await db.product.create({ data: newProduct });
 
 // Only queries with these tags revalidate
-await revalidate(['products']);
+await revalidate('products');
 // ↑ getProducts revalidates (has the 'products' tag)
 // ↑ getProductById revalidates (has the 'products' tag)
 // getCategories does NOT revalidate (no 'products' tag)
 
 // After updating a category:
 await db.category.update({ where: { id }, data: update });
-await revalidate(['categories']);
+await revalidate('categories');
 // ↑ Only getCategories revalidates`} commentsKey="sd.revalidate" />
 
         <div class="note">
@@ -171,9 +168,14 @@ const liveStats = server(
 );
 
 // In the component:
+const state = store({ stats: { totalSales: 0 } });
+mounted(() => {
+  liveStats().then(stats => { state.stats = stats; });
+});
+
 <div>
   <h3>Real-time sales</h3>
-  <p>\${liveStats.totalSales}</p>
+  <p>\${state.stats.totalSales}</p>
   {/* ↑ Updates only when the server returns new data */}
   {/* No manual polling, no useEffect, no subscriptions */}
 </div>`} commentsKey="sd.autosync" />

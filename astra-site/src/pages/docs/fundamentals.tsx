@@ -187,7 +187,7 @@ bindConditional(marker, () => show,
 
         <h2 id="estilos">{i18n.t('sb.css')}</h2>
         <p>{i18n.t('f.css.a')}<code>css</code>{i18n.t('f.css.b')}</p>
-        <CodeBlock code={`import { css } from 'astrajs.dev/core';
+        <CodeBlock code={`import { css } from 'astrajs.dev/compiler/css';
 
 const cardStyle = css\`
   background: #0f172a;

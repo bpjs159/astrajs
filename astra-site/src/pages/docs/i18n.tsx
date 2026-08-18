@@ -180,7 +180,9 @@ export const DocsI18n = component(() => (
 
         <h2 id="instalacion">{siteI18n.t('sb.install')}</h2>
         <CodeBlock code={`// package.json
-"dependencies": { "astrajs.dev/i18n": "0.1.0" }
+"dependencies": { "astrajs.dev": "0.1.8" }
+
+import { createI18n } from 'astrajs.dev/i18n';
 
 // vite.config.ts
 resolve: { alias: { 'astrajs.dev/i18n': 'astrajs.dev/i18n/src' } } // monorepo only`} commentsKey="i18n.install" />
