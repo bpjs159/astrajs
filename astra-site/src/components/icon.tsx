@@ -17,7 +17,7 @@ export type IconName =
   | 'terminal' | 'code' | 'arrow-right' | 'search' | 'menu'
   | 'check' | 'x' | 'clock' | 'info' | 'loader' | 'refresh'
   | 'square' | 'play' | 'ast' | 'ssr' | 'layout-pages' | 'js-off'
-  | 'pointer';
+  | 'pointer' | 'kanban';
 
 interface IconDef {
   /** Filled paths. */
@@ -196,6 +196,14 @@ const DEFS: Record<string, IconDef> = {
   pen: {
     f: [
       'M4.4 19.6 5.6 14.9 18.6 1.9a1.7 1.7 0 0 1 2.4 0l1.1 1.1a1.7 1.7 0 0 1 0 2.4L9.1 18.4Z',
+    ],
+  },
+  // ── Full sites: kanban board (AstraTasks) ──────────────────────
+  kanban: {
+    f: [
+      'M4 4.5h4.5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-13a1 1 0 0 1 1-1Z',
+      'M10.5 4.5H15a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-4.5a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1Z',
+      'M17 4.5h4a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-5a1 1 0 0 1 1-1Z',
     ],
   },
   home: {

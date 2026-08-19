@@ -136,6 +136,14 @@ export const DocsExamples = component(() => {
                 </span>
                 <span class="ex-full-arrow"><Icon name="arrow-right" size={14} /></span>
               </a>
+              <a class="ex-full-card" href="https://tasks.astrajs.dev" target="_blank" rel="noopener">
+                <span class="ex-full-icon"><Icon name="kanban" size={22} /></span>
+                <span class="ex-full-body">
+                  <span class="ex-full-name">AstraTasks</span>
+                  <span class="ex-full-desc">{i18n.t('ex.fullTasksDesc')}</span>
+                </span>
+                <span class="ex-full-arrow"><Icon name="arrow-right" size={14} /></span>
+              </a>
             </div>
           </section>
 

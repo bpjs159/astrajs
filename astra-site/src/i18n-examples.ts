@@ -17,6 +17,7 @@ export const EXAMPLES_STRINGS: Record<string, Record<string, string>> = {
     'ex.fullStoreDesc': 'SSR store: RPC, ISR, auth, AI + i18n',
     'ex.fullBlogDesc': 'A blog built 100% with pre-build server()',
     'ex.fullDashDesc': 'Live dashboard: autoSync, streaming AI, uploads and resumability',
+    'ex.fullTasksDesc': 'Collaborative kanban: real-time sync, drag & drop, optimistic UI',
   },
   es: {
     'ex.h.a': '20 ejemplos completos y funcionales que cubren cada concepto del framework. Cada tarjeta abre un visor: ',
@@ -33,6 +34,7 @@ export const EXAMPLES_STRINGS: Record<string, Record<string, string>> = {
     'ex.fullStoreDesc': 'Tienda SSR: RPC, ISR, auth, IA + i18n',
     'ex.fullBlogDesc': 'Un blog construido 100% con server() pre-build',
     'ex.fullDashDesc': 'Dashboard en vivo: autoSync, AI streaming, uploads y resumabilidad',
+    'ex.fullTasksDesc': 'Kanban colaborativo: sync en tiempo real, drag & drop, UI optimista',
   },
   pt: {
     'ex.h.a': '20 exemplos completos e funcionais cobrindo cada conceito do framework. Cada cartão abre um visor: ',
@@ -49,6 +51,7 @@ export const EXAMPLES_STRINGS: Record<string, Record<string, string>> = {
     'ex.fullStoreDesc': 'Loja SSR: RPC, ISR, auth, IA + i18n',
     'ex.fullBlogDesc': 'Um blog construído 100% com server() pre-build',
     'ex.fullDashDesc': 'Dashboard ao vivo: autoSync, AI streaming, uploads e resumibilidade',
+    'ex.fullTasksDesc': 'Kanban colaborativo: sync em tempo real, drag & drop, UI otimista',
   },
   fr: {
     'ex.h.a': '20 exemples complets et fonctionnels couvrant chaque concept du framework. Chaque carte ouvre un visualiseur : ',
@@ -65,6 +68,7 @@ export const EXAMPLES_STRINGS: Record<string, Record<string, string>> = {
     'ex.fullStoreDesc': 'Boutique SSR : RPC, ISR, auth, IA + i18n',
     'ex.fullBlogDesc': 'Un blog construit à 100 % avec server() pre-build',
     'ex.fullDashDesc': 'Dashboard en direct : autoSync, IA en streaming, uploads et resumabilité',
+    'ex.fullTasksDesc': 'Kanban collaboratif : sync temps réel, drag & drop, UI optimiste',
   },
   it: {
     'ex.h.a': '20 esempi completi e funzionanti che coprono ogni concetto del framework. Ogni card apre un visualizzatore: ',
@@ -81,6 +85,7 @@ export const EXAMPLES_STRINGS: Record<string, Record<string, string>> = {
     'ex.fullStoreDesc': 'Store SSR: RPC, ISR, auth, IA + i18n',
     'ex.fullBlogDesc': 'Un blog costruito al 100% con server() pre-build',
     'ex.fullDashDesc': 'Dashboard live: autoSync, AI in streaming, upload e resumabilità',
+    'ex.fullTasksDesc': 'Kanban collaborativo: sync in tempo reale, drag & drop, UI ottimista',
   },
   de: {
     'ex.h.a': '20 vollständige, funktionierende Beispiele zu jedem Konzept des Frameworks. Jede Karte öffnet einen Viewer: ',
@@ -97,6 +102,7 @@ export const EXAMPLES_STRINGS: Record<string, Record<string, string>> = {
     'ex.fullStoreDesc': 'SSR-Shop: RPC, ISR, Auth, KI + i18n',
     'ex.fullBlogDesc': 'Ein Blog, zu 100 % mit pre-build server() gebaut',
     'ex.fullDashDesc': 'Live-Dashboard: autoSync, KI-Streaming, Uploads und Resumability',
+    'ex.fullTasksDesc': 'Kollaboratives Kanban: Echtzeit-Sync, Drag & Drop, optimistische UI',
   },
   ru: {
     'ex.h.a': '20 полных рабочих примеров, покрывающих каждую концепцию фреймворка. Каждая карточка открывает вьюер: ',
@@ -113,6 +119,7 @@ export const EXAMPLES_STRINGS: Record<string, Record<string, string>> = {
     'ex.fullStoreDesc': 'SSR-магазин: RPC, ISR, auth, ИИ + i18n',
     'ex.fullBlogDesc': 'Блог, на 100 % построенный на pre-build server()',
     'ex.fullDashDesc': 'Живой дашборд: autoSync, стриминг ИИ, загрузки и resumability',
+    'ex.fullTasksDesc': 'Совместная канбан-доска: real-time sync, drag & drop, оптимистичный UI',
   },
   ja: {
     'ex.h.a': 'フレームワークの全概念をカバーする、完全に動作する20の例。各カードでビューアが開きます：',
@@ -129,6 +136,7 @@ export const EXAMPLES_STRINGS: Record<string, Record<string, string>> = {
     'ex.fullStoreDesc': 'SSRストア：RPC、ISR、認証、AI + i18n',
     'ex.fullBlogDesc': 'pre-build server() で100%構築されたブログ',
     'ex.fullDashDesc': 'ライブダッシュボード：autoSync、AIストリーミング、アップロード、再開可能',
+    'ex.fullTasksDesc': 'コラボレーティブカンバン：リアルタイム同期、ドラッグ＆ドロップ、楽観的UI',
   },
   'zh-CN': {
     'ex.h.a': '20 个完整可运行的示例，覆盖框架的每个概念。每张卡片都会打开一个查看器：',
@@ -145,5 +153,6 @@ export const EXAMPLES_STRINGS: Record<string, Record<string, string>> = {
     'ex.fullStoreDesc': 'SSR 商店：RPC、ISR、认证、AI + i18n',
     'ex.fullBlogDesc': '100% 使用 pre-build server() 构建的博客',
     'ex.fullDashDesc': '实时仪表盘：autoSync、AI 流式、上传与可恢复性',
+    'ex.fullTasksDesc': '协作看板：实时同步、拖放、乐观 UI',
   },
 };

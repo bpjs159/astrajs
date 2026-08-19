@@ -107,6 +107,9 @@ MIT — all packages. Branding assets (logos, images) are © AstraJS.
 
 ## 📋 Changelog
 
+- **0.1.18** (2026-08-19): New card example added
+
+
 - **0.1.17** (2026-08-19): Added workspaces names astrajs
 
 
