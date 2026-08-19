@@ -1,6 +1,6 @@
 {
-  "name": "@bpjs159/adapters",
-  "version": "0.1.16",
+  "name": "@astrajs/adapters",
+  "version": "0.1.17",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bpjs159/astrajs.git"
@@ -35,7 +35,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@bpjs159/server": "0.1.0"
+    "@astrajs/server": "*"
   },
   "devDependencies": {
     "typescript": "^5.5.0",

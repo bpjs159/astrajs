@@ -1,6 +1,6 @@
 {
   "name": "astrajs-benchmarks",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "private": true,
   "description": "AstraJS vs React vs Vue vs Solid — DOM benchmark PoC (jsdom, no paint). Used to feed the /docs/comparison benchmarks section.",
   "type": "module",

@@ -1,6 +1,6 @@
 {
-  "name": "@bpjs159/compiler",
-  "version": "0.1.16",
+  "name": "@astrajs/compiler",
+  "version": "0.1.17",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bpjs159/astrajs.git"
@@ -34,9 +34,9 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@bpjs159/ai": "0.1.0",
-    "@bpjs159/core": "0.1.0",
-    "@bpjs159/server": "0.1.0"
+    "@astrajs/ai": "*",
+    "@astrajs/core": "*",
+    "@astrajs/server": "*"
   },
   "devDependencies": {
     "@types/node": "^26.1.2",

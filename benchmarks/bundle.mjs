@@ -17,9 +17,9 @@ const ENTRIES = [
   {
     name: 'AstraJS',
     loader: 'ts',
-    alias: { '@bpjs159/core': join(__dirname, '../packages/core/src/index.ts') },
+    alias: { '@astrajs/core': join(__dirname, '../packages/core/src/index.ts') },
     code: ROWS_APP + `
-import { store, bindList, bindText } from '@bpjs159/core';
+import { store, bindList, bindText } from '@astrajs/core';
 const st = store({ rows });
 const tbody = document.createElement('tbody');
 bindList(tbody, () => st.rows.map((r) => r), (r) => {

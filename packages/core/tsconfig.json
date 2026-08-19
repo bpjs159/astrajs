@@ -4,7 +4,7 @@
     "composite": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "jsxImportSource": "@bpjs159/core"
+    "jsxImportSource": "@astrajs/core"
   },
   "include": ["src"],
   "exclude": ["src/compiler", "**/*.test.ts"]

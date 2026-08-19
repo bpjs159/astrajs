@@ -1,6 +1,6 @@
 {
-  "name": "@bpjs159/core",
-  "version": "0.1.16",
+  "name": "@astrajs/core",
+  "version": "0.1.17",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bpjs159/astrajs.git"
@@ -64,7 +64,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@bpjs159/validation": "0.1.0"
+    "@astrajs/validation": "*"
   },
   "devDependencies": {
     "typescript": "^5.5.0",

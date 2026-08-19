@@ -1,17 +1,17 @@
-# @bpjs159/validation
+# @astrajs/validation
 
 Standalone validator functions for forms and schemas. Zero dependencies, isomorphic (client and server).
 
 ## Install
 
 ```bash
-npm install @bpjs159/validation
+npm install @astrajs/validation
 ```
 
 ## Usage
 
 ```ts
-import { isEmail, isRequired, minLength, oneOf, all } from '@bpjs159/validation';
+import { isEmail, isRequired, minLength, oneOf, all } from '@astrajs/validation';
 
 isEmail('dev@astra.dev');                    // true
 minLength(3)('abc');                           // true

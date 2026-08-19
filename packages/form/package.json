@@ -1,6 +1,6 @@
 {
-  "name": "@bpjs159/form",
-  "version": "0.1.16",
+  "name": "@astrajs/form",
+  "version": "0.1.17",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bpjs159/astrajs.git"
@@ -28,7 +28,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@bpjs159/core": "0.1.0"
+    "@astrajs/core": "*"
   },
   "devDependencies": {
     "typescript": "^5.5.0"

@@ -38,7 +38,7 @@ const useNpm11 = has('--npm11');
 const NPM_BIN = useNpm11 ? ['npx', '-y', 'npm@11.16.0'] : ['npm'];
 
 // ── Publish order: only the self-contained umbrella ships to npm ──
-// (astrajs.dev vendors all internal packages, so @bpjs159/* stays off the registry;
+// (astrajs.dev vendors all internal packages, so @astrajs/* stays off the registry;
 //  create-astrajs.dev is the thin `npm create` delegate)
 const ORDER = ['astra-js', 'create-astrajs-dev'];
 

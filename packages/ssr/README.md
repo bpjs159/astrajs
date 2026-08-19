@@ -1,4 +1,4 @@
-# @bpjs159/ssr
+# @astrajs/ssr
 
 > **Server-Side Rendering, Static Site Generation, and Incremental Static Regeneration for AstraJS.**
 
@@ -16,7 +16,7 @@
 ### SSR (Node.js server)
 
 ```ts
-import { renderToString } from '@bpjs159/ssr';
+import { renderToString } from '@astrajs/ssr';
 import App from './App';
 
 async function handleRequest(req: Request): Promise<Response> {
@@ -37,7 +37,7 @@ async function handleRequest(req: Request): Promise<Response> {
 ### SSG (Static Site Generation)
 
 ```ts
-import { generateStaticSite } from '@bpjs159/ssr';
+import { generateStaticSite } from '@astrajs/ssr';
 import { appRoutes } from './routes';
 import App from './App';
 
@@ -53,8 +53,8 @@ await generateStaticSite({
 ### State Serialization (Resumability)
 
 ```ts
-import { store } from '@bpjs159/core';
-import { serializeState, deserializeState } from '@bpjs159/ssr';
+import { store } from '@astrajs/core';
+import { serializeState, deserializeState } from '@astrajs/ssr';
 
 // Server: serialize state into HTML
 const state = store({ count: 0, user: { name: 'Alice' } });

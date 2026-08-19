@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const dirs = [join(root, 'examples'), join(root, 'astra-blog')];
 
-const isAstraKey = (k) => k.startsWith('astrajs.dev') || k.startsWith('@bpjs159');
+const isAstraKey = (k) => k.startsWith('astrajs.dev') || k.startsWith('@astrajs');
 
 const files = [];
 for (const d of dirs) {

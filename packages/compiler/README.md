@@ -1,4 +1,4 @@
-# @bpjs159/compiler
+# @astrajs/compiler
 
 > **AST-based Vite plugin: JSX → Vanilla DOM, CSS extraction, server compilation.**
 
@@ -15,7 +15,7 @@
 ```ts
 // vite.config.ts
 import { defineConfig } from 'vite';
-import astra from '@bpjs159/core/vite';
+import astra from '@astrajs/core/vite';
 
 export default defineConfig({
   plugins: [

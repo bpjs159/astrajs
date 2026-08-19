@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * Vendors the built output of every internal @bpjs159/* package into
+ * Vendors the built output of every internal @astrajs/* package into
  * packages/astra-js/vendor so the astrajsx umbrella tarball is fully
  * self-contained (zero external dependencies). Cross-package imports
- * ('@bpjs159/xyz[/sub]') are rewritten to relative paths inside vendor/.
+ * ('@astrajs/xyz[/sub]') are rewritten to relative paths inside vendor/.
  */
 import { cpSync, mkdirSync, rmSync, readdirSync, statSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join, dirname, relative } from 'node:path';
@@ -41,7 +41,7 @@ for (const sub of ['bin', 'lib', 'templates']) {
 cpSync(join(root, 'packages', 'astra', 'package.json'), join(vendorDir, 'cli', 'package.json'));
 console.log('✓ vendored cli (bin/lib/templates/package.json)');
 
-// 3. Rewrite @bpjs159/* references to relative paths
+// 3. Rewrite @astrajs/* references to relative paths
 function walk(dir, fn) {
   for (const e of readdirSync(dir)) {
     const p = join(dir, e);
@@ -53,7 +53,7 @@ let rewrites = 0;
 walk(vendorDir, (file) => {
   if (!/\.(js|mjs|d\.ts)$/.test(file)) return;
   const before = readFileSync(file, 'utf8');
-  const after = before.replace(/@bpjs159\/([a-z-]+)(\/[A-Za-z0-9_./-]+)?/g, (m, pkg, sub) => {
+  const after = before.replace(/@astrajs\/([a-z-]+)(\/[A-Za-z0-9_./-]+)?/g, (m, pkg, sub) => {
     const target = join(vendorDir, pkg, sub ? `${sub}.js` : 'index.js');
     let rel = relative(dirname(file), target).split('\\').join('/');
     if (!rel.startsWith('.')) rel = `./${rel}`;
@@ -64,4 +64,4 @@ walk(vendorDir, (file) => {
     writeFileSync(file, after);
   }
 });
-console.log(`✓ rewrote @bpjs159/* imports in ${rewrites} files`);
+console.log(`✓ rewrote @astrajs/* imports in ${rewrites} files`);

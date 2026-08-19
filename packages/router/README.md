@@ -1,4 +1,4 @@
-# @bpjs159/router
+# @astrajs/router
 
 > **Isomorphic router with nested layouts and View Transitions API support.**
 
@@ -13,8 +13,8 @@
 ## Usage
 
 ```tsx
-import { createRouter, Outlet, useLocation } from '@bpjs159/router';
-import { Component } from '@bpjs159/core';
+import { createRouter, Outlet, useLocation } from '@astrajs/router';
+import { Component } from '@astrajs/core';
 
 // Define routes
 const router = createRouter({

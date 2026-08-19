@@ -1,4 +1,4 @@
-# @bpjs159/ai
+# @astrajs/ai
 
 Typed AI endpoints, streaming, tool-calling agents and in-memory RAG.
 Edge-safe and provider-agnostic (Ollama, OpenAI-compatible, mock).
@@ -6,13 +6,13 @@ Edge-safe and provider-agnostic (Ollama, OpenAI-compatible, mock).
 ## Install
 
 ```bash
-npm install @bpjs159/ai
+npm install @astrajs/ai
 ```
 
 ## Usage
 
 ```ts
-import { complete, stream, configureAi } from '@bpjs159/ai';
+import { complete, stream, configureAi } from '@astrajs/ai';
 
 configureAi({ provider: 'ollama', model: 'qwen2.5-coder:7b' });
 
@@ -27,7 +27,7 @@ for await (const token of stream('Write a haiku about compilers')) {
 
 - `complete()` / `stream()` — typed model calls
 - `aiAgent(tools, options)` — tool-calling agent loop
-- `createRag()` — in-memory cosine-similarity retrieval (`@bpjs159/ai/rag`)
+- `createRag()` — in-memory cosine-similarity retrieval (`@astrajs/ai/rag`)
 - `configureAi()` / `getAiRuntime()` — provider configuration via
   `ASTRA_AI_PROVIDER`, `ASTRA_AI_BASE_URL`, `ASTRA_AI_API_KEY`, `ASTRA_AI_MODEL`
 - Providers: `ollama`, `openai`, `mock` (deterministic, offline)

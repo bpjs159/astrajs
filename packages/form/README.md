@@ -1,4 +1,4 @@
-# @bpjs159/form
+# @astrajs/form
 
 Reactive metadata controller for AstraJS forms. Delegates validation to the
 HTML5 Constraint Validation API — no extra validators to configure.
@@ -6,13 +6,13 @@ HTML5 Constraint Validation API — no extra validators to configure.
 ## Install
 
 ```bash
-npm install @bpjs159/form
+npm install @astrajs/form
 ```
 
 ## Usage
 
 ```ts
-import { form } from '@bpjs159/form';
+import { form } from '@astrajs/form';
 
 const login = form({ email: '', password: '' });
 

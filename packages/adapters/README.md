@@ -1,12 +1,12 @@
-# @bpjs159/adapters
+# @astrajs/adapters
 
 Deployment adapters for AstraJS — one API, four targets.
 
 | Adapter | Import | Output (written by `astra build`) |
 | --- | --- | --- |
-| Node | `@bpjs159/adapters` | `dist/server/server.mjs` + `Dockerfile` |
-| Vercel | `@bpjs159/adapters` | `api/astra.mjs` + `vercel.json` |
-| Cloudflare | `@bpjs159/adapters/edge` | `dist/_worker.js` + `wrangler.toml` |
+| Node | `@astrajs/adapters` | `dist/server/server.mjs` + `Dockerfile` |
+| Vercel | `@astrajs/adapters` | `api/astra.mjs` + `vercel.json` |
+| Cloudflare | `@astrajs/adapters/edge` | `dist/_worker.js` + `wrangler.toml` |
 | Static | — | plain `dist/` (SSG + pre-build only) |
 
 ## How it works
@@ -24,27 +24,27 @@ Deployment adapters for AstraJS — one API, four targets.
 
 ```ts
 // platform-neutral core (edge-safe)
-import { createAstraHandler } from '@bpjs159/adapters';
+import { createAstraHandler } from '@astrajs/adapters';
 const handle = createAstraHandler({ apiPrefix: '/api/astra' });
 const response = await handle(new Request('https://app/api/astra/getProducts', { method: 'POST', body: '[]' }));
 
 // Node standalone server (RPC + static + optional SSR)
-import { startAstraServer } from '@bpjs159/adapters';
+import { startAstraServer } from '@astrajs/adapters';
 startAstraServer({ apiPrefix: '/api/astra', staticDir: './dist', port: 3000 });
 
 // Vercel serverless function (Node runtime)
-import { createVercelHandler } from '@bpjs159/adapters';
+import { createVercelHandler } from '@astrajs/adapters';
 export default createVercelHandler({ apiPrefix: '/api/astra' });
 
 // Cloudflare Worker (edge)
-import { createCloudflareHandler } from '@bpjs159/adapters/edge';
+import { createCloudflareHandler } from '@astrajs/adapters/edge';
 export default createCloudflareHandler({ apiPrefix: '/api/astra' });
 ```
 
 ## Edge safety
 
-`@bpjs159/adapters/edge` never imports Node built-ins — bundle it for
-Cloudflare Workers / Pages with confidence. `@bpjs159/server` is
+`@astrajs/adapters/edge` never imports Node built-ins — bundle it for
+Cloudflare Workers / Pages with confidence. `@astrajs/server` is
 edge-safe too (Web APIs only).
 
 ## Build-time emitters
