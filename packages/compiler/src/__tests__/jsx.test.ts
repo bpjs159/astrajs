@@ -7,6 +7,36 @@ import { describe, it, expect } from 'vitest';
 import { transformJSX, autoWrapDynamic } from '../transformers/jsx.js';
 
 describe('JSX → DOM Transform', () => {
+  it('preserves spread props on component calls (SSR regression)', () => {
+    const source = `
+      const Card = (p) => <div class="card">{p.name}</div>;
+      const list = <Card {...product} />;
+    `;
+    const result = transformJSX(source, 'test.tsx');
+    expect(result.code).toContain('Card({ ...product })');
+  });
+
+  it('bindList getter returns raw items so spread props reach components', () => {
+    const source = `
+      const Card = (p) => <div class="card">{p.name}</div>;
+      const grid = <div class="grid">{items.map((p) => <Card {...p} />)}</div>;
+    `;
+    const result = transformJSX(source, 'test.tsx');
+    expect(result.code).toContain('bindList(');
+    // Getter must return the raw array (not pre-rendered elements).
+    expect(result.code).toContain('items.length; return items;');
+    expect(result.code).toContain('(p) => (/* component */ Card({ ...p }))');
+  });
+
+  it('ignores spread props on intrinsic elements', () => {
+    const source = `
+      const el = <div {...props} class="x" />;
+    `;
+    const result = transformJSX(source, 'test.tsx');
+    expect(result.code).toContain("createElement('div')");
+    expect(result.code).not.toContain('setAttribute(\'__spread');
+  });
+
   it('transforms a simple div to document.createElement', () => {
     const source = `
       const el = <div class="hello">world</div>;

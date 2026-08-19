@@ -26,6 +26,10 @@ examples/deploy/02-vercel/vercel.json
 examples/deploy/03-cloudflare/wrangler.toml
 examples/deploy/03-cloudflare/deploy.sh
 
+# Prerender working copy (astra-store)
+.prerender-shell.html
+dist-ssr/
+
 # Environment
 .env
 .env.*

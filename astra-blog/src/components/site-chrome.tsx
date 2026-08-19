@@ -50,7 +50,10 @@ function LangSelectMarkup(extraStyle = ''): JSX.Element {
 export function BrandMarkup(): JSX.Element {
   return (
     <Link href="/" class="brand">
-      <span class="brand-mark">◈</span>
+      <span class="brand-logo">
+        <span class="bl-first">A<span class="bl-star"><img src="/images/logo_star.png" alt="" /></span></span>
+        <span>STRA</span><span class="bl-js">JS</span>
+      </span>
       <span class="brand-name">{db.site().name}</span>
     </Link>
   );
@@ -75,6 +78,14 @@ export function SiteHeaderMarkup(): JSX.Element {
             </a>
           ))}
           {LangSelectMarkup()}
+          <a
+            class="nav-link docs-link"
+            href="https://astrajs.dev"
+            target="_blank"
+            rel="noopener"
+          >
+            Volver a Docs ↗
+          </a>
         </nav>
       </div>
     </header>
@@ -88,7 +99,11 @@ export function SiteFooterMarkup(): JSX.Element {
       <div class="footer-inner">
         <div class="footer-about">
           <div class="footer-brand">
-            <span class="brand-mark">◈</span> {db.site().name}
+            <span class="brand-logo">
+              <span class="bl-first">A<span class="bl-star"><img src="/images/logo_star.png" alt="" /></span></span>
+              <span>STRA</span><span class="bl-js">JS</span>
+            </span>
+            {' ' + db.site().name}
           </div>
           <p>{i18n.t('footer.about')}</p>
           <div class="footer-socials">

@@ -642,7 +642,7 @@ export function autoMemoDerivedFunctions(
  */
 export function generateDOMCode(
   tag: string,
-  attrs: Record<string, { value: string; isExpression: boolean }>,
+  attrs: Record<string, ParsedAttr>,
   children: string[],
   config: JSXTransformConfig = DEFAULT_CONFIG
 ): { code: string; needsBindText: boolean; needsBindAttr: boolean } {
@@ -735,7 +735,7 @@ export function generateDOMCode(
       lines.push(`${varName}.appendChild(document.createTextNode(${child}));`);
     } else if (child.trim()) {
       // Expression (non-reactive) — might be another element or text
-      lines.push(`if (${child} instanceof Node) {`);
+      lines.push(`if ((${child}) instanceof Node) {`);
       lines.push(`  ${varName}.appendChild(${child});`);
       lines.push(`} else if (${child} != null && ${child} !== false && ${child} !== true) {`);
       lines.push(`  ${varName}.appendChild(document.createTextNode(String(${child})));`);
@@ -1218,17 +1218,38 @@ function _extractBracedExpr(source: string, start: number): { expr: string; endP
 /**
  * Parses JSX attributes from a string like ' class="foo" onClick={handler} disabled'.
  */
-function _parseAttrs(attrsStr: string): Record<string, { value: string; isExpression: boolean }> {
-  const attrs: Record<string, { value: string; isExpression: boolean }> = {};
+interface ParsedAttr {
+  value: string;
+  isExpression: boolean;
+  /** True for JSX spread attributes `{...expr}`. */
+  isSpread?: boolean;
+}
+
+function _parseAttrs(attrsStr: string): Record<string, ParsedAttr> {
+  const attrs: Record<string, ParsedAttr> = {};
   if (!attrsStr.trim()) return attrs;
 
   let pos = 0;
   const len = attrsStr.length;
+  let spreadCount = 0;
 
   while (pos < len) {
     // Skip whitespace
     while (pos < len && /\s/.test(attrsStr[pos]!)) pos++;
     if (pos >= len) break;
+
+    // Spread attribute: {...expr}
+    if (attrsStr[pos] === '{' && attrsStr[pos + 1] === '.' && attrsStr[pos + 2] === '.' && attrsStr[pos + 3] === '.') {
+      const { expr, endPos } = _extractBracedExpr(attrsStr, pos);
+      // _extractBracedExpr keeps the inner '...' — store the expression only.
+      attrs[`__spread_${spreadCount++}`] = {
+        value: expr.replace(/^\.\.\./, ''),
+        isExpression: true,
+        isSpread: true,
+      };
+      pos = endPos;
+      continue;
+    }
 
     // Match attribute name
     const nameMatch = attrsStr.slice(pos).match(/^(\w[\w-]*)/);
@@ -1316,7 +1337,7 @@ function _transformElement(
 
 function _generateStandardElement(
   tag: string,
-  attrs: Record<string, { value: string; isExpression: boolean }>,
+  attrs: Record<string, ParsedAttr>,
   children: ParsedChild[],
   config: JSXTransformConfig
 ): string {
@@ -1325,10 +1346,10 @@ function _generateStandardElement(
 
   const isComponent = /^[A-Z]/.test(tag);
   if (isComponent) {
-    // Component call
+    // Component call — props object literal, spread attributes pass through.
     const attrParts = Object.entries(attrs)
       .filter(([k]) => k !== 'children')
-      .map(([k, v]) => `${k}: ${v.value}`)
+      .map(([k, v]) => (v.isSpread ? `...${v.value}` : `${k}: ${v.value}`))
       .join(', ');
     return `/* component */ ${tag}({ ${attrParts} })`;
   }
@@ -1338,6 +1359,7 @@ function _generateStandardElement(
 
   for (const [attrName, attr] of Object.entries(attrs)) {
     if (attrName === 'children') continue;
+    if (attr.isSpread) continue; // spread attrs only apply to component props
     const { domName, isEvent } = classifyAttribute(attrName);
 
     if (isEvent && attr.isExpression) {
@@ -1373,7 +1395,11 @@ function _generateStandardElement(
         lines.push(`  bindText(${tnVar}, () => String(${child.code}));`);
         lines.push(`  ${varName}.appendChild(${tnVar});`);
       } else {
-        lines.push(`  ${varName}.appendChild(${child.code} instanceof Node ? ${child.code} : document.createTextNode(String(${child.code} ?? '')));`);
+        // Parenthesize the child expression: unparenthesized ternaries break
+        // operator precedence (`cond ? a : b instanceof Node` parses as
+        // `cond ? a : (b instanceof Node)` and returns raw strings to
+        // appendChild).
+        lines.push(`  ${varName}.appendChild((${child.code}) instanceof Node ? (${child.code}) : document.createTextNode(String(${child.code} ?? '')));`);
       }
     } else if (child.kind === 'text') {
       // Trim and normalize whitespace for text nodes
@@ -1392,7 +1418,7 @@ function _generateStandardElement(
 
 function _generateWithBindValue(
   tag: string,
-  attrs: Record<string, { value: string; isExpression: boolean }>,
+  attrs: Record<string, ParsedAttr>,
   children: ParsedChild[],
   _config: JSXTransformConfig
 ): string {
@@ -1435,7 +1461,7 @@ function _generateWithBindValue(
 
 function _generateBindList(
   tag: string,
-  attrs: Record<string, { value: string; isExpression: boolean }>,
+  attrs: Record<string, ParsedAttr>,
   mapExpr: string,
   config: JSXTransformConfig
 ): string {
@@ -1463,7 +1489,7 @@ function _generateBindList(
     }
   }
 
-  lines.push(`  bindList(${varName}, () => ${arrayExpr}.map(${itemVar} => (${renderExpr})), (${itemVar}) => (${renderExpr}));`);
+  lines.push(`  bindList(${varName}, () => { ${arrayExpr}.length; return ${arrayExpr}; }, (${itemVar}) => (${renderExpr}));`);
   lines.push(`  return ${varName};`);
   lines.push(`})()`);
   return lines.join('\n');

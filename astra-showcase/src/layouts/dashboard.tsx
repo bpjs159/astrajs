@@ -10,6 +10,7 @@ import { routes } from '../routes.js';
 
 export const DashboardLayout = component(() => (
   <div class="layout">
+    <a class="docs-float" href="https://astrajs.dev" target="_blank" rel="noopener">Volver a Docs ↗</a>
     <Sidebar />
     <main class="main-content">
       {(() => {

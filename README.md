@@ -107,6 +107,9 @@ MIT — all packages. Branding assets (logos, images) are © AstraJS.
 
 ## 📋 Changelog
 
+- **0.1.14** (2026-08-19): Added new store example
+
+
 - **0.1.13** (2026-08-18): deploy: move prod host/key defaults out of tracked code (keys/deploy-target.json)
 
 

@@ -52,12 +52,18 @@ function serveStatic(staticDir: string, pathname: string): Response | null {
 
   // Normalize both sides — `staticDir` may carry a trailing slash.
   const base = resolve(staticDir);
-  const abs = resolve(base, rel);
+  let abs = resolve(base, rel);
   if (abs !== base && !abs.startsWith(base + sep)) {
     return null;
   }
 
   try {
+    // Directories (prerendered routes like /products/p2/) resolve to index.html.
+    if (existsSync(abs) && statSync(abs).isDirectory()) {
+      const index = resolve(abs, 'index.html');
+      if (index !== abs && !index.startsWith(abs + sep)) return null;
+      abs = index;
+    }
     if (!existsSync(abs) || !statSync(abs).isFile()) return null;
   } catch {
     return null;

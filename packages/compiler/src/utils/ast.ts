@@ -271,22 +271,36 @@ export function ensureImport(
   // first real statement — otherwise `import`-looking lines inside template
   // literals (e.g. code snippets on docs pages) would swallow the insertion
   // point and bury the new import inside a string.
+  //
+  // Multi-line imports (`import {\n  A,\n  B,\n} from 'x';`) are followed to
+  // their terminating semicolon — inserting after the opening `import {`
+  // line would splice the new import INSIDE the statement.
   const lines = source.split('\n');
   let lastImportIdx = -1;
   let inBlockComment = false;
+  let importContinues = false;
   for (let i = 0; i < lines.length; i++) {
     const trimmed = lines[i]!.trim();
     if (inBlockComment) {
       if (trimmed.includes('*/')) inBlockComment = false;
+      if (importContinues) lastImportIdx = i;
       continue;
     }
     if (trimmed.startsWith('/*')) {
       if (!trimmed.includes('*/')) inBlockComment = true;
+      if (importContinues) lastImportIdx = i;
+      continue;
+    }
+    if (importContinues) {
+      // Inside a multi-line import statement — extend until its terminator.
+      lastImportIdx = i;
+      if (/;\s*$/.test(trimmed)) importContinues = false;
       continue;
     }
     if (trimmed.startsWith('//') || trimmed === '') continue;
     if (/^import\s.+/.test(trimmed)) {
       lastImportIdx = i;
+      if (!/;\s*$/.test(trimmed)) importContinues = true;
       continue;
     }
     // First real statement — the import block ends here.

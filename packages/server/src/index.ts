@@ -51,9 +51,11 @@ export {
   getAllHandlerIds,
   getHandlerRegistry,
   handleRPCRequest,
+  configureRPC,
   revalidate,
   onCacheInvalidate,
 } from './rpc.js';
+export type { RPCSecurityConfig } from './rpc.js';
 
 // SWR: Stale-While-Revalidate for reactive stores
 export { swr, mutate, clearSWRCache } from './swr.js';

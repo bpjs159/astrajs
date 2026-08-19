@@ -67,7 +67,13 @@ function withConfig(relDir, writeConfig, fn) {
 /** Prefixes each example's RPC api under its own deployment path. */
 const prefixFor = (exampleRel) => `/examples/${exampleRel}/api/astra`;
 const baseFor = (exampleRel) => `/examples/${exampleRel}/`;
-const astraBin = (exampleRel) => path.join(ROOT, exampleRel, 'node_modules', '.bin', 'astra');
+const astraBin = (exampleRel) => {
+  // Workspaces hoist bins to the ROOT node_modules — fall back there when the
+  // project-local .bin/astra does not exist (fresh workspaces).
+  const local = path.join(ROOT, exampleRel, 'node_modules', '.bin', 'astra');
+  if (fs.existsSync(local)) return local;
+  return path.join(ROOT, 'node_modules', '.bin', 'astra');
+};
 
 function checkServerManifest(relDir) {
   const manifestPath = path.join(ROOT, relDir, 'dist', 'astra-server-modules.json');
@@ -103,6 +109,19 @@ withConfig('astra-showcase', { adapter: 'node', apiPrefix: '/api/astra' }, () =>
 });
 checkServerManifest('astra-showcase');
 copyDir(path.join(ROOT, 'astra-showcase', 'dist'), path.join(STAGE, 'showcase'));
+
+// astra-store — the complete SSR eCommerce example. The node adapter emits the
+// RPC server bundle; scripts/prerender.mjs then renders every public route to
+// real HTML (SSG-style SSR) into dist/<route>/index.html.
+console.log('== astra-store (node adapter + SSR prerender) ==');
+withConfig('astra-store', { adapter: 'node', apiPrefix: '/api/astra' }, () => {
+  run(astraBin('astra-store'), ['build'], path.join(ROOT, 'astra-store'), {
+    ASTRA_API_PREFIX: '/api/astra',
+  });
+});
+run('node', [path.join(ROOT, 'astra-store', 'scripts', 'prerender.mjs')], path.join(ROOT, 'astra-store'));
+checkServerManifest('astra-store');
+copyDir(path.join(ROOT, 'astra-store', 'dist'), path.join(STAGE, 'store'));
 
 // ────────────────────────────────────────────────────────────────────────────
 // 2. Examples — static (plain vite build)
@@ -264,7 +283,8 @@ const humanize = (name) =>
     .replace(/^\d+-/, '')
     .split('-')
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ');
+    .join(' ')
+    .replace(/\bSsg\b/g, 'SSG');
 
 const cards = GROUPS.map(
   ([group, items]) => `
@@ -296,39 +316,52 @@ fs.writeFileSync(
   :root { color-scheme: dark; }
   * { box-sizing: border-box; }
   body {
-    margin: 0; min-height: 100vh; color: #e6e6f0;
-    background: radial-gradient(1200px 600px at 20% -10%, #1b2340 0%, #0a0d18 55%, #07080f 100%);
-    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    margin: 0; min-height: 100vh; color: #e2e8f0; line-height: 1.6;
+    background: radial-gradient(1200px 600px at 20% -10%, rgba(139,77,255,.12) 0%, rgba(4,6,13,0) 55%), radial-gradient(900px 500px at 90% 110%, rgba(0,223,255,.05) 0%, rgba(4,6,13,0) 60%), #04060d;
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
   header { padding: 56px 24px 8px; max-width: 1060px; margin: 0 auto; }
   h1 {
     margin: 0; font-size: 34px; letter-spacing: -0.5px;
-    background: linear-gradient(90deg, #b7c4ff, #8b5cf6 55%, #22d3ee);
+    background: linear-gradient(135deg,#b84cff 0%,#4d7cff 50%,#00dfff 100%);
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
-  header p { color: #9aa1c0; margin: 10px 0 0; max-width: 640px; line-height: 1.55; }
+  header p { color: #94a3b8; margin: 10px 0 0; max-width: 640px; line-height: 1.55; }
   main { max-width: 1060px; margin: 28px auto 80px; padding: 0 24px; }
   .group h2 {
     font-size: 13px; text-transform: uppercase; letter-spacing: 2.5px;
-    color: #6f77a8; margin: 38px 0 14px; font-weight: 600;
+    color: #64748b; margin: 38px 0 14px; font-weight: 600;
   }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
   .card {
     display: flex; flex-direction: column; gap: 10px; text-decoration: none;
-    padding: 18px; border-radius: 14px; border: 1px solid #222a4d;
-    background: linear-gradient(180deg, #12172c, #0d1122);
+    padding: 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,.08);
+    background: rgba(255,255,255,.03);
     transition: transform .15s ease, border-color .15s ease;
   }
-  .card:hover { transform: translateY(-2px); border-color: #4f5ba8; }
-  .card-num { font-size: 12px; color: #8b5cf6; font-variant-numeric: tabular-nums; letter-spacing: 1px; }
+  .card:hover { transform: translateY(-2px); border-color: rgba(139,77,255,.4); }
+  .card-num { font-size: 12px; color: #b84cff; font-variant-numeric: tabular-nums; letter-spacing: 1px; }
   .card-title { color: #dde2ff; font-size: 16px; font-weight: 600; }
-  footer { color: #5c6388; text-align: center; padding: 24px; font-size: 13px; }
+  .hub-logo {
+    height: 56px; width: auto; display: block; margin-bottom: 14px;
+    filter: drop-shadow(0 0 20px rgba(184,76,255,.5)) drop-shadow(0 0 50px rgba(77,124,255,.3)) drop-shadow(0 0 90px rgba(0,223,255,.15));
+  }
+  .docs-float {
+    position: fixed; top: 18px; right: 24px; z-index: 300; text-decoration: none;
+    color: #c4a0ff; font-size: .78rem; font-weight: 700; padding: 8px 14px;
+    border-radius: 999px; background: rgba(139,77,255,.1); border: 1px solid rgba(139,77,255,.35);
+    box-shadow: 0 0 12px rgba(139,77,255,.25); transition: background .15s, border-color .15s;
+  }
+  .docs-float:hover { background: rgba(139,77,255,.2); border-color: rgba(139,77,255,.6); }
+  footer { color: #64748b; text-align: center; padding: 24px; font-size: 13px; }
 </style>
 </head>
 <body>
+<a class="docs-float" href="https://astrajs.dev" target="_blank" rel="noopener">Volver a Docs ↗</a>
 <header>
-  <h1>AstraJS Examples</h1>
-  <p>Every example from the repository, built for production and served behind
+  <img class="hub-logo" src="/examples/images/logo_star.png" alt="AstraJS logo" />
+  <h1>AstraJS Examples</h1>  <p>Every example from the repository, built for production and served behind
   nginx. Server-backed demos run real RPC handlers in Node — try the forms,
   uploads, AI streaming chat and the deploy-target adapters.</p>
 </header>
@@ -337,6 +370,13 @@ fs.writeFileSync(
 </body>
 </html>
 `
+);
+
+// Copy the AstraJS logo (star) for the hub header.
+fs.mkdirSync(path.join(STAGE, 'examples', 'images'), { recursive: true });
+fs.copyFileSync(
+  path.join(ROOT, 'astra-site', 'public', 'images', 'logo_star.png'),
+  path.join(STAGE, 'examples', 'images', 'logo_star.png')
 );
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -427,6 +467,19 @@ if (fs.existsSync(path.join(STAGE, 'showcase', 'server', 'server.mjs'))) {
   });
 } else {
   console.warn('⚠️  astra-showcase: no server bundle emitted — deploying static (client-side fallback).');
+}
+
+// astra-store — SSR eCommerce on its own port (store.astrajs.dev).
+// The AI assistant uses the deterministic mock provider in production.
+if (fs.existsSync(path.join(STAGE, 'store', 'server', 'server.mjs'))) {
+  apps.push({
+    name: 'store',
+    cwd: `${WWW}/store`,
+    script: 'server/server.mjs',
+    env: { PORT: 5302, ASTRA_AI_PROVIDER: 'mock' },
+  });
+} else {
+  console.warn('⚠️  astra-store: no server bundle emitted — deploying static only.');
 }
 
 fs.writeFileSync(
@@ -575,6 +628,40 @@ server {
 
     location / {
         try_files $uri $uri/ /index.html;
+    }
+}
+`
+);
+
+fs.writeFileSync(
+  path.join(STAGE, 'config', 'nginx-store.conf'),
+  `# store.astrajs.dev — SSR eCommerce (pm2 app 'store' on 127.0.0.1:5302)
+server {
+    listen 80;
+    server_name store.astrajs.dev;
+
+    root ${WWW}/store;
+    index index.html;
+
+    # server() RPC endpoints → node adapter backend
+    location ^~ /api/astra/ {
+        proxy_pass http://127.0.0.1:5302;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Connection "";
+        proxy_buffering off;
+        proxy_read_timeout 300s;
+    }
+
+    location /assets/ {
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+        add_header Cache-Control "no-cache";
     }
 }
 `

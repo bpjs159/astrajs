@@ -66,9 +66,15 @@ function findStatic(pathname) {
   const rel = pathname === '/' ? 'index.html' : pathname.replace(/^\\/+/, '');
   if (rel.includes('..') || rel.includes('\\0')) return null;
   const base = resolve(distDir);
-  const abs = resolve(base, rel);
+  let abs = resolve(base, rel);
   if (abs !== base && !abs.startsWith(base + sep)) return null;
   try {
+    // Directories (e.g. prerendered /products/p2/) resolve to index.html.
+    if (existsSync(abs) && statSync(abs).isDirectory()) {
+      const index = resolve(abs, 'index.html');
+      if (index !== abs && !index.startsWith(abs + sep)) return null;
+      abs = index;
+    }
     if (!existsSync(abs) || !statSync(abs).isFile()) return null;
   } catch {
     return null;

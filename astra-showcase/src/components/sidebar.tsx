@@ -25,8 +25,8 @@ export function Sidebar(): JSX.Element {
   return (
     <nav class="sidebar">
       <div class="sidebar-brand">
-        <span class="brand-icon">⚡</span>
-        <span class="brand-text">AstraJS</span>
+        <span class="brand-icon"><img src="/images/logo_star.png" alt="AstraJS logo" /></span>
+        <span class="brand-text">Astra<em>JS</em></span>
       </div>
 
       <div class="sidebar-nav">

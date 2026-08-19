@@ -1,0 +1,21 @@
+{
+  "name": "astra-store",
+  "private": true,
+  "type": "module",
+  "version": "0.1.14",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:all": "astra build && node scripts/prerender.mjs",
+    "prerender": "node scripts/prerender.mjs",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "astrajs.dev": "0.1.13"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0",
+    "typescript": "^5.5.0",
+    "jsdom": "^29.1.1"
+  }
+}
