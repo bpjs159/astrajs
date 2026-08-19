@@ -102,7 +102,7 @@ describe('Counter', () => {
 });`} commentsKey="testing.flush" />
 
         <div class="note">
-          <strong>{i18n.t('lbl.tip')}:</strong> {i18n.t('t.note1')}<code>examples/frontend-only/</code>{i18n.t('t.note2')}<code>examples/fullstack/</code>{i18n.t('t.note3')}<code>src/__tests__/</code>{i18n.t('t.note4')}
+          <strong>{i18n.t('lbl.tip')}:</strong> {i18n.t('t.note1')}<code>examples/frontend/</code>{i18n.t('t.note2')}<code>examples/fullstack/</code>{i18n.t('t.note3')}<code>src/__tests__/</code>{i18n.t('t.note4')}
         </div>
 
         <h2 id="jest">{i18n.t('sb.testJest')}</h2>

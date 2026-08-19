@@ -106,7 +106,7 @@ export const DocsExamples = component(() => {
           <p>
             {i18n.t('ex.h.a')}
             <strong>{i18n.t('ex.h.b')}</strong>
-            {i18n.t('ex.h.c')}<code>examples/frontend-only/</code>{i18n.t('ex.h.d')}<code>examples/fullstack/</code>{i18n.t('ex.h.e')}
+            {i18n.t('ex.h.c')}<code>examples/frontend/</code>{i18n.t('ex.h.d')}<code>examples/fullstack/</code>{i18n.t('ex.h.e')}
           </p>
 
           <section class="ex-full" id="full">

@@ -63,7 +63,7 @@ pnpm dev          # run the docs site
 
 ## Examples
 
-- `examples/frontend-only/` — state, global state, forms, routing, CSS macro,
+- `examples/frontend/` — state, global state, forms, routing, CSS macro,
   conditional lists, async data, lifecycle, composition, dynamic attrs
 - `examples/fullstack/` — server RPC, SWR, form actions, router params,
   schema validation, optimistic mutations, uploads, autoSync, resumability,
@@ -106,6 +106,9 @@ locales): `pnpm --filter astra-site dev`.
 MIT — all packages. Branding assets (logos, images) are © AstraJS.
 
 ## 📋 Changelog
+
+- **0.1.20** (2026-08-19): rename from frontend-only to just frontend
+
 
 - **0.1.19** (2026-08-19): Fix for ssl on new examples
 

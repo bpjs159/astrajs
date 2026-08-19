@@ -76,7 +76,7 @@ astra-showcase/
   tsconfig.json
   vite.config.ts
 examples/
-  frontend-only/
+  frontend/
     01-simple-state/
       src/
         __tests__/
@@ -2389,7 +2389,7 @@ export default defineConfig({
 });
 </file>
 
-<file path="examples/frontend-only/01-simple-state/src/__tests__/counter.test.ts">
+<file path="examples/frontend/01-simple-state/src/__tests__/counter.test.ts">
 import { describe, it, expect } from 'vitest';
 import { Counter } from '../main.js';
 
@@ -2411,7 +2411,7 @@ describe('Counter', () => {
 });
 </file>
 
-<file path="examples/frontend-only/01-simple-state/src/app.tsx">
+<file path="examples/frontend/01-simple-state/src/app.tsx">
 /**
  * 01 — Simple State · App Entry
  *
@@ -2445,7 +2445,7 @@ document.head.appendChild(style);
 document.getElementById('app')!.appendChild(Counter({}));
 </file>
 
-<file path="examples/frontend-only/01-simple-state/src/styles.ts">
+<file path="examples/frontend/01-simple-state/src/styles.ts">
 /**
  * 01 — Simple State · Styles
  *
@@ -2460,8 +2460,8 @@ export const styles = css`
 `;
 </file>
 
-<file path="examples/frontend-only/01-simple-state/testout.txt">
-[1m[7m[36m RUN [39m[27m[22m [36mv2.1.9 [39m[90mC:/Users/azureuser/Documents/astrajs/examples/frontend-only/01-simple-state[39m
+<file path="examples/frontend/01-simple-state/testout.txt">
+[1m[7m[36m RUN [39m[27m[22m [36mv2.1.9 [39m[90mC:/Users/azureuser/Documents/astrajs/examples/frontend/01-simple-state[39m
 
  [31mΓ¥»[39m src/__tests__/counter.test.ts [2m([22m[2m0 test[22m[2m)[22m
 
@@ -2480,7 +2480,7 @@ src/__tests__/counter.test.ts ][22m
 [31m[1mError[22m: Failed to resolve import "@astrajs/core/jsx-dev-runtime" 
 from "src/main.tsx". Does the file exist?[39m
   Plugin: [35mvite:import-analysis[39m
-  File: [36mC:/Users/azureuser/Documents/astrajs/examples/frontend-only/01-sim
+  File: [36mC:/Users/azureuser/Documents/astrajs/examples/frontend/01-sim
 ple-state/src/main.tsx[39m:16:19
 [33m  1  |  import { jsxDEV } from "@astrajs/core/jsx-dev-runtime";
      |                          ^
@@ -2513,7 +2513,7 @@ e_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:[2m51978:27[22m[39m
 [2m   Duration [22m 11.49s[2m (transform 182ms, setup 0ms, collect 0ms, tests 0ms, environment 7.62s, prepare 805ms)[22m
 </file>
 
-<file path="examples/frontend-only/01-simple-state/vitest.config.ts">
+<file path="examples/frontend/01-simple-state/vitest.config.ts">
 import { defineConfig } from 'vitest/config';
 import path from 'path';
 
@@ -2533,7 +2533,7 @@ export default defineConfig({
 });
 </file>
 
-<file path="examples/frontend-only/02-global-state/src/likes.tsx">
+<file path="examples/frontend/02-global-state/src/likes.tsx">
 /**
  * 02 — Global State · LikesDislikes Component
  *
@@ -2572,7 +2572,7 @@ export const LikesDislikes = component(() => {
 });
 </file>
 
-<file path="examples/frontend-only/02-global-state/src/store.ts">
+<file path="examples/frontend/02-global-state/src/store.ts">
 /**
  * 02 — Global State · Shared Store
  *
@@ -2592,7 +2592,7 @@ export const appStore = store({
 export const total = () => appStore.likes + appStore.dislikes + appStore.comments;
 </file>
 
-<file path="examples/frontend-only/02-global-state/src/styles.ts">
+<file path="examples/frontend/02-global-state/src/styles.ts">
 import { css } from '@astrajs/compiler/css';
 
 export const styles = css`
@@ -2610,7 +2610,7 @@ export const styles = css`
 `;
 </file>
 
-<file path="examples/frontend-only/02-global-state/src/total.tsx">
+<file path="examples/frontend/02-global-state/src/total.tsx">
 /**
  * 02 — Global State · TotalBox Component
  *
@@ -2631,11 +2631,11 @@ export const TotalBox = component(() => {
 });
 </file>
 
-<file path="examples/frontend-only/02-global-state/package.json">
+<file path="examples/frontend/02-global-state/package.json">
 {"name":"02-global-state","private":true,"type":"module","scripts":{"dev":"vite","build":"vite build"},"dependencies":{"@astrajs/core":"workspace:*"},"devDependencies":{"vite":"^5.4.0","typescript":"^5.5.0"}}
 </file>
 
-<file path="examples/frontend-only/02-global-state/vite.config.ts">
+<file path="examples/frontend/02-global-state/vite.config.ts">
 import { defineConfig } from 'vitest/config';
 import path from 'path';
 
@@ -2654,7 +2654,7 @@ export default defineConfig({
 });
 </file>
 
-<file path="examples/frontend-only/02-global-state/vitest.config.ts">
+<file path="examples/frontend/02-global-state/vitest.config.ts">
 import { defineConfig } from 'vitest/config';
 import path from 'path';
 
@@ -2674,7 +2674,7 @@ export default defineConfig({
 });
 </file>
 
-<file path="examples/frontend-only/03-forms/src/__tests__/form.test.ts">
+<file path="examples/frontend/03-forms/src/__tests__/form.test.ts">
 import { describe, it, expect } from 'vitest';
 import { Form } from '../main.js';
 
@@ -2689,7 +2689,7 @@ describe('Form', () => {
 });
 </file>
 
-<file path="examples/frontend-only/03-forms/src/styles.ts">
+<file path="examples/frontend/03-forms/src/styles.ts">
 import { css } from '@astrajs/compiler/css';
 
 export const styles = css`
@@ -2711,8 +2711,8 @@ export const styles = css`
 `;
 </file>
 
-<file path="examples/frontend-only/03-forms/testout.txt">
-[1m[7m[36m RUN [39m[27m[22m [36mv2.1.9 [39m[90mC:/Users/azureuser/Documents/astrajs/examples/frontend-only/03-forms[39m
+<file path="examples/frontend/03-forms/testout.txt">
+[1m[7m[36m RUN [39m[27m[22m [36mv2.1.9 [39m[90mC:/Users/azureuser/Documents/astrajs/examples/frontend/03-forms[39m
 
 
 node.exe : [31mΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»ΓÄ»[1m[7m Failed Suites 1 
@@ -2749,7 +2749,7 @@ src/__tests__/form.test.ts ][22m
 [2m   Duration [22m 10.61s[2m (transform 469ms, setup 0ms, collect 0ms, tests 0ms, environment 8.11s, prepare 639ms)[22m
 </file>
 
-<file path="examples/frontend-only/03-forms/vite.config.ts">
+<file path="examples/frontend/03-forms/vite.config.ts">
 import { defineConfig } from 'vite';
 import path from 'path';
 
@@ -2770,7 +2770,7 @@ export default defineConfig({
 });
 </file>
 
-<file path="examples/frontend-only/03-forms/vitest.config.ts">
+<file path="examples/frontend/03-forms/vitest.config.ts">
 import { defineConfig } from 'vitest/config';
 import path from 'path';
 
@@ -2790,7 +2790,7 @@ export default defineConfig({
 });
 </file>
 
-<file path="examples/frontend-only/04-routing/src/__tests__/router.test.ts">
+<file path="examples/frontend/04-routing/src/__tests__/router.test.ts">
 import { describe, it, expect } from 'vitest';
 import { RouterDemo } from '../main.js';
 
@@ -2803,7 +2803,7 @@ describe('Router Demo', () => {
 });
 </file>
 
-<file path="examples/frontend-only/04-routing/src/pages/About.tsx">
+<file path="examples/frontend/04-routing/src/pages/About.tsx">
 /**
  * About page — exact match on /about
  */
@@ -2825,7 +2825,7 @@ export const About = () => (
 );
 </file>
 
-<file path="examples/frontend-only/04-routing/src/pages/Home.tsx">
+<file path="examples/frontend/04-routing/src/pages/Home.tsx">
 /**
  * Home page — exact match on /
  */
@@ -2839,7 +2839,7 @@ export const Home = () => (
 );
 </file>
 
-<file path="examples/frontend-only/04-routing/src/pages/NotFound.tsx">
+<file path="examples/frontend/04-routing/src/pages/NotFound.tsx">
 /**
  * 404 — fallbackRoute() triggers this
  */
@@ -2857,7 +2857,7 @@ export const NotFound = () => (
 );
 </file>
 
-<file path="examples/frontend-only/04-routing/src/pages/Products.tsx">
+<file path="examples/frontend/04-routing/src/pages/Products.tsx">
 /**
  * Products page — prefix match on /products
  */
@@ -2886,7 +2886,7 @@ export const Products = () => (
 );
 </file>
 
-<file path="examples/frontend-only/04-routing/src/pages/UserID.tsx">
+<file path="examples/frontend/04-routing/src/pages/UserID.tsx">
 /**
  * UserID — sub-route inside UserProfile
  * Displays the ID from params.
@@ -2909,7 +2909,7 @@ export const UserID = () => (
 );
 </file>
 
-<file path="examples/frontend-only/04-routing/src/pages/UserProfile.tsx">
+<file path="examples/frontend/04-routing/src/pages/UserProfile.tsx">
 /**
  * UserProfile — layout for /users
  * Uses sub-routing: route(':id') matches /users/40, /users/42, etc.
@@ -2943,7 +2943,7 @@ export const UserProfile = () => (
 );
 </file>
 
-<file path="examples/frontend-only/04-routing/src/styles.ts">
+<file path="examples/frontend/04-routing/src/styles.ts">
 import { css } from '@astrajs/compiler/css';
 
 export const styles = css`
@@ -2960,11 +2960,11 @@ export const styles = css`
 `;
 </file>
 
-<file path="examples/frontend-only/04-routing/package.json">
+<file path="examples/frontend/04-routing/package.json">
 {"name":"04-routing","private":true,"type":"module","scripts":{"dev":"vite","build":"vite build"},"dependencies":{"@astrajs/core":"workspace:*","@astrajs/router":"workspace:*"},"devDependencies":{"vite":"^5.4.0","typescript":"^5.5.0"}}
 </file>
 
-<file path="examples/frontend-only/04-routing/vite.config.ts">
+<file path="examples/frontend/04-routing/vite.config.ts">
 import { defineConfig } from 'vite';
 import path from 'path';
 
@@ -2984,7 +2984,7 @@ export default defineConfig({
 });
 </file>
 
-<file path="examples/frontend-only/04-routing/vitest.config.ts">
+<file path="examples/frontend/04-routing/vitest.config.ts">
 import { defineConfig } from 'vitest/config';
 import path from 'path';
 
@@ -3004,7 +3004,7 @@ export default defineConfig({
 });
 </file>
 
-<file path="examples/frontend-only/05-css-macro/src/__tests__/cssdemo.test.ts">
+<file path="examples/frontend/05-css-macro/src/__tests__/cssdemo.test.ts">
 import { describe, it, expect } from 'vitest';
 import { CSSDemo } from '../main.js';
 
@@ -3017,7 +3017,7 @@ describe('CSS Macro Demo', () => {
 });
 </file>
 
-<file path="examples/frontend-only/05-css-macro/src/app.tsx">
+<file path="examples/frontend/05-css-macro/src/app.tsx">
 /**
  * 05 — CSS Macro · App Entry
  */
@@ -3029,7 +3029,7 @@ document.getElementById('app')!.innerHTML = '<div class="container"><h1>CSS Macr
 CSSDemo({});
 </file>
 
-<file path="examples/frontend-only/05-css-macro/src/styles.ts">
+<file path="examples/frontend/05-css-macro/src/styles.ts">
 /**
  * 05 — CSS Macro · Styles
  */
@@ -3049,11 +3049,11 @@ export const styles = css`
 `;
 </file>
 
-<file path="examples/frontend-only/05-css-macro/package.json">
+<file path="examples/frontend/05-css-macro/package.json">
 {"name":"05-css-macro","private":true,"type":"module","scripts":{"dev":"vite","build":"vite build"},"dependencies":{"@astrajs/core":"workspace:*","@astrajs/compiler":"workspace:*"},"devDependencies":{"vite":"^5.4.0","typescript":"^5.5.0"}}
 </file>
 
-<file path="examples/frontend-only/05-css-macro/vite.config.ts">
+<file path="examples/frontend/05-css-macro/vite.config.ts">
 import { defineConfig } from 'vite';
 import path from 'path';
 
@@ -3073,7 +3073,7 @@ export default defineConfig({
 });
 </file>
 
-<file path="examples/frontend-only/05-css-macro/vitest.config.ts">
+<file path="examples/frontend/05-css-macro/vitest.config.ts">
 import { defineConfig } from 'vitest/config';
 import path from 'path';
 
@@ -3093,7 +3093,7 @@ export default defineConfig({
 });
 </file>
 
-<file path="examples/frontend-only/06-batch-memo/src/__tests__/batchmemo.test.ts">
+<file path="examples/frontend/06-batch-memo/src/__tests__/batchmemo.test.ts">
 import { describe, it, expect } from 'vitest';
 import { BatchMemoDemo } from '../main.js';
 
@@ -3105,7 +3105,7 @@ describe('Batch & Memo Demo', () => {
 });
 </file>
 
-<file path="examples/frontend-only/06-batch-memo/src/app.tsx">
+<file path="examples/frontend/06-batch-memo/src/app.tsx">
 /**
  * 06 — Batch & Memo · App Entry
  */
@@ -3116,7 +3116,7 @@ document.head.appendChild(s);
 document.getElementById('app')!.appendChild(BatchMemoDemo({}));
 </file>
 
-<file path="examples/frontend-only/06-batch-memo/src/styles.ts">
+<file path="examples/frontend/06-batch-memo/src/styles.ts">
 import { css } from '@astrajs/compiler/css';
 
 export const styles = css`
@@ -3130,11 +3130,11 @@ export const styles = css`
 `;
 </file>
 
-<file path="examples/frontend-only/06-batch-memo/package.json">
+<file path="examples/frontend/06-batch-memo/package.json">
 {"name":"09-batch-memo","private":true,"type":"module","scripts":{"dev":"vite","build":"vite build"},"dependencies":{"@astrajs/core":"workspace:*"},"devDependencies":{"vite":"^5.4.0","typescript":"^5.5.0"}}
 </file>
 
-<file path="examples/frontend-only/06-batch-memo/vite.config.ts">
+<file path="examples/frontend/06-batch-memo/vite.config.ts">
 import { defineConfig } from 'vite';
 import path from 'path';
 
@@ -3154,7 +3154,7 @@ export default defineConfig({
 });
 </file>
 
-<file path="examples/frontend-only/06-batch-memo/vitest.config.ts">
+<file path="examples/frontend/06-batch-memo/vitest.config.ts">
 import { defineConfig } from 'vitest/config';
 import path from 'path';
 
@@ -3174,7 +3174,7 @@ export default defineConfig({
 });
 </file>
 
-<file path="examples/frontend-only/07-effects/src/__tests__/effects.test.ts">
+<file path="examples/frontend/07-effects/src/__tests__/effects.test.ts">
 import { describe, it, expect } from 'vitest';
 import { EffectsDemo } from '../main.js';
 
@@ -3186,7 +3186,7 @@ describe('Effects Demo', () => {
 });
 </file>
 
-<file path="examples/frontend-only/07-effects/src/app.tsx">
+<file path="examples/frontend/07-effects/src/app.tsx">
 /**
  * 07 — Effects · App Entry
  */
@@ -3197,7 +3197,7 @@ document.head.appendChild(s);
 document.getElementById('app')!.appendChild(EffectsDemo({}));
 </file>
 
-<file path="examples/frontend-only/07-effects/src/styles.ts">
+<file path="examples/frontend/07-effects/src/styles.ts">
 import { css } from '@astrajs/compiler/css';
 
 export const styles = css`
@@ -3214,11 +3214,11 @@ export const styles = css`
 `;
 </file>
 
-<file path="examples/frontend-only/07-effects/package.json">
+<file path="examples/frontend/07-effects/package.json">
 {"name":"10-effects","private":true,"type":"module","scripts":{"dev":"vite","build":"vite build"},"dependencies":{"@astrajs/core":"workspace:*"},"devDependencies":{"vite":"^5.4.0","typescript":"^5.5.0"}}
 </file>
 
-<file path="examples/frontend-only/07-effects/vite.config.ts">
+<file path="examples/frontend/07-effects/vite.config.ts">
 import { defineConfig } from 'vite';
 import path from 'path';
 
@@ -3238,7 +3238,7 @@ export default defineConfig({
 });
 </file>
 
-<file path="examples/frontend-only/07-effects/vitest.config.ts">
+<file path="examples/frontend/07-effects/vitest.config.ts">
 import { defineConfig } from 'vitest/config';
 import path from 'path';
 
@@ -3258,7 +3258,7 @@ export default defineConfig({
 });
 </file>
 
-<file path="examples/frontend-only/08-lifecycle/src/__tests__/lifecycle.test.ts">
+<file path="examples/frontend/08-lifecycle/src/__tests__/lifecycle.test.ts">
 /**
  * End-to-end tests for the 08-lifecycle demo.
  * Tests the full Zero-VDOM flow: component → dynamic() → bindings → DOM updates.
@@ -3654,7 +3654,7 @@ describe('Timer component integration', () => {
 });
 </file>
 
-<file path="examples/frontend-only/08-lifecycle/src/main.tsx">
+<file path="examples/frontend/08-lifecycle/src/main.tsx">
 /**
  * 08 — Lifecycle Demo
  *
@@ -3711,7 +3711,7 @@ export const LifecycleDemo = component(() => {
 });
 </file>
 
-<file path="examples/frontend-only/08-lifecycle/src/timer.tsx">
+<file path="examples/frontend/08-lifecycle/src/timer.tsx">
 /**
  * Timer — generic count-up component.
  * Uses mounted() to start an interval and cleans it up on unmount.
@@ -3759,15 +3759,15 @@ export const Timer = component((props: TimerEvents) => {
 });
 </file>
 
-<file path="examples/frontend-only/08-lifecycle/package.json">
+<file path="examples/frontend/08-lifecycle/package.json">
 {"name":"08-lifecycle","private":true,"type":"module","scripts":{"dev":"vite","build":"vite build","test":"vitest run --config vitest.config.ts"},"dependencies":{"@astrajs/core":"workspace:*"},"devDependencies":{"vite":"^5.4.0","typescript":"^5.5.0"}}
 </file>
 
-<file path="examples/frontend-only/08-lifecycle/tsconfig.json">
+<file path="examples/frontend/08-lifecycle/tsconfig.json">
 {"extends":"../../../tsconfig.base.json","compilerOptions":{"jsx":"react-jsx","jsxImportSource":"@astrajs/core","rootDir":"../../..","paths":{"@astrajs/core":["../../../packages/core/src"],"@astrajs/core/jsx-runtime":["../../../packages/core/src/jsx-runtime"],"@astrajs/core/jsx-dev-runtime":["../../../packages/core/src/jsx-dev-runtime"],"@astrajs/compiler/css":["../../../packages/compiler/src/css"]}},"include":["src","../../../packages/core/src/jsx.d.ts"]}
 </file>
 
-<file path="examples/frontend-only/08-lifecycle/vitest.config.ts">
+<file path="examples/frontend/08-lifecycle/vitest.config.ts">
 import { defineConfig } from 'vitest/config';
 import path from 'path';
 
@@ -9029,7 +9029,7 @@ export const App: Component = () => {
 }
 </file>
 
-<file path="examples/frontend-only/01-simple-state/index.html">
+<file path="examples/frontend/01-simple-state/index.html">
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9060,7 +9060,7 @@ export const App: Component = () => {
 </html>
 </file>
 
-<file path="examples/frontend-only/01-simple-state/package.json">
+<file path="examples/frontend/01-simple-state/package.json">
 {
   "name": "01-simple-state",
   "private": true,
@@ -9071,7 +9071,7 @@ export const App: Component = () => {
 }
 </file>
 
-<file path="examples/frontend-only/01-simple-state/vite.config.ts">
+<file path="examples/frontend/01-simple-state/vite.config.ts">
 import { defineConfig } from 'vite';
 import path from 'path';
 import astra from '../../../packages/compiler/src/plugin.js';
@@ -9095,7 +9095,7 @@ export default defineConfig({
 });
 </file>
 
-<file path="examples/frontend-only/02-global-state/src/__tests__/global.test.ts">
+<file path="examples/frontend/02-global-state/src/__tests__/global.test.ts">
 import { describe, it, expect } from 'vitest';
 import { appStore, total } from '../store.js';
 import { LikesDislikes } from '../likes.js';
@@ -9119,7 +9119,7 @@ describe('Global State', () => {
 });
 </file>
 
-<file path="examples/frontend-only/02-global-state/index.html">
+<file path="examples/frontend/02-global-state/index.html">
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9157,7 +9157,7 @@ describe('Global State', () => {
 </html>
 </file>
 
-<file path="examples/frontend-only/03-forms/index.html">
+<file path="examples/frontend/03-forms/index.html">
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9198,11 +9198,11 @@ describe('Global State', () => {
 </html>
 </file>
 
-<file path="examples/frontend-only/03-forms/package.json">
+<file path="examples/frontend/03-forms/package.json">
 {"name":"03-forms","private":true,"type":"module","scripts":{"dev":"vite","build":"vite build"},"dependencies":{"@astrajs/core":"workspace:*","@astrajs/form":"workspace:*"},"devDependencies":{"vite":"^5.4.0","typescript":"^5.5.0"}}
 </file>
 
-<file path="examples/frontend-only/04-routing/src/app.tsx">
+<file path="examples/frontend/04-routing/src/app.tsx">
 /**
  * 04 — Routing · App Entry
  */
@@ -9218,7 +9218,7 @@ if (!root.hasChildNodes()) {
 }
 </file>
 
-<file path="examples/frontend-only/04-routing/index.html">
+<file path="examples/frontend/04-routing/index.html">
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9251,7 +9251,7 @@ if (!root.hasChildNodes()) {
 </html>
 </file>
 
-<file path="examples/frontend-only/05-css-macro/index.html">
+<file path="examples/frontend/05-css-macro/index.html">
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9296,7 +9296,7 @@ if (!root.hasChildNodes()) {
 </html>
 </file>
 
-<file path="examples/frontend-only/06-batch-memo/src/main.tsx">
+<file path="examples/frontend/06-batch-memo/src/main.tsx">
 import { component, store, batch, memo } from '@astrajs/core';
 import { styles as s } from './styles.js';
 
@@ -9329,7 +9329,7 @@ export const BatchMemoDemo = component(() => {
 });
 </file>
 
-<file path="examples/frontend-only/06-batch-memo/index.html">
+<file path="examples/frontend/06-batch-memo/index.html">
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9369,7 +9369,7 @@ export const BatchMemoDemo = component(() => {
 </html>
 </file>
 
-<file path="examples/frontend-only/07-effects/index.html">
+<file path="examples/frontend/07-effects/index.html">
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9413,7 +9413,7 @@ export const BatchMemoDemo = component(() => {
 </html>
 </file>
 
-<file path="examples/frontend-only/08-lifecycle/src/app.tsx">
+<file path="examples/frontend/08-lifecycle/src/app.tsx">
 /**
  * 08 — Lifecycle · Bootstrap
  *
@@ -9429,7 +9429,7 @@ document.head.appendChild(s);
 document.getElementById('app')!.appendChild(LifecycleDemo({}) as Node);
 </file>
 
-<file path="examples/frontend-only/08-lifecycle/index.html">
+<file path="examples/frontend/08-lifecycle/index.html">
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9540,7 +9540,7 @@ document.getElementById('app')!.appendChild(LifecycleDemo({}) as Node);
 </html>
 </file>
 
-<file path="examples/frontend-only/08-lifecycle/vite.config.ts">
+<file path="examples/frontend/08-lifecycle/vite.config.ts">
 import { defineConfig } from 'vite';
 import path from 'path';
 import astra from '../../../packages/compiler/src/plugin.js';
@@ -12907,7 +12907,7 @@ export { lazy } from './lazy.js';
 }
 </file>
 
-<file path="examples/frontend-only/01-simple-state/tsconfig.json">
+<file path="examples/frontend/01-simple-state/tsconfig.json">
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
@@ -12932,7 +12932,7 @@ export { lazy } from './lazy.js';
 }
 </file>
 
-<file path="examples/frontend-only/02-global-state/src/app.tsx">
+<file path="examples/frontend/02-global-state/src/app.tsx">
 /**
  * 02 — Global State · JSX Entry
  */
@@ -12957,7 +12957,7 @@ const App = component(() => (
 document.getElementById('app')!.appendChild(App({}) as Node);
 </file>
 
-<file path="examples/frontend-only/02-global-state/src/main.tsx">
+<file path="examples/frontend/02-global-state/src/main.tsx">
 /**
  * 02 — Global State · Likes/Dislikes
  *
@@ -13003,7 +13003,7 @@ export const LikesDislikes = component(() => {
 });
 </file>
 
-<file path="examples/frontend-only/02-global-state/tsconfig.json">
+<file path="examples/frontend/02-global-state/tsconfig.json">
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
@@ -13023,7 +13023,7 @@ export const LikesDislikes = component(() => {
 }
 </file>
 
-<file path="examples/frontend-only/03-forms/src/app.tsx">
+<file path="examples/frontend/03-forms/src/app.tsx">
 /**
  * 03 — Forms · App Entry (validate-based)
  */
@@ -13034,7 +13034,7 @@ document.head.appendChild(s);
 document.getElementById('app')!.appendChild(Form({}) as Node);
 </file>
 
-<file path="examples/frontend-only/03-forms/src/main.tsx">
+<file path="examples/frontend/03-forms/src/main.tsx">
 /**
  * 03 — @astrajs/form Controller
  *
@@ -13215,7 +13215,7 @@ export const Form = component(() => {
 });
 </file>
 
-<file path="examples/frontend-only/04-routing/src/main.tsx">
+<file path="examples/frontend/04-routing/src/main.tsx">
 /**
  * 04 — Declarative Routing with @astrajs/router
  *
@@ -13252,7 +13252,7 @@ export const RouterDemo = component(() => (
 ));
 </file>
 
-<file path="examples/frontend-only/04-routing/tsconfig.json">
+<file path="examples/frontend/04-routing/tsconfig.json">
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
@@ -13274,7 +13274,7 @@ export const RouterDemo = component(() => (
 }
 </file>
 
-<file path="examples/frontend-only/05-css-macro/src/main.tsx">
+<file path="examples/frontend/05-css-macro/src/main.tsx">
 import { component, store } from '@astrajs/core';
 import { styles as s } from './styles.js';
 const themes = ['primary','success','warning','danger'];
@@ -13302,7 +13302,7 @@ export const CSSDemo = component(() => {
 });
 </file>
 
-<file path="examples/frontend-only/05-css-macro/tsconfig.json">
+<file path="examples/frontend/05-css-macro/tsconfig.json">
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
@@ -13323,7 +13323,7 @@ export const CSSDemo = component(() => {
 }
 </file>
 
-<file path="examples/frontend-only/06-batch-memo/tsconfig.json">
+<file path="examples/frontend/06-batch-memo/tsconfig.json">
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
@@ -13344,7 +13344,7 @@ export const CSSDemo = component(() => {
 }
 </file>
 
-<file path="examples/frontend-only/07-effects/src/main.tsx">
+<file path="examples/frontend/07-effects/src/main.tsx">
 import { component, store, mounted } from '@astrajs/core';
 import { styles as s } from './styles.js';
 
@@ -13382,7 +13382,7 @@ export const EffectsDemo = component(() => {
 });
 </file>
 
-<file path="examples/frontend-only/07-effects/tsconfig.json">
+<file path="examples/frontend/07-effects/tsconfig.json">
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
@@ -13792,7 +13792,7 @@ export { jsx as jsx, jsx as jsxs } from './jsx-runtime.js';
 }
 </file>
 
-<file path="examples/frontend-only/01-simple-state/src/main.tsx">
+<file path="examples/frontend/01-simple-state/src/main.tsx">
 /**
  * 01 — Simple State — Counter
  *
@@ -13817,7 +13817,7 @@ export const Counter = component(() => {
 });
 </file>
 
-<file path="examples/frontend-only/03-forms/tsconfig.json">
+<file path="examples/frontend/03-forms/tsconfig.json">
 {
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {

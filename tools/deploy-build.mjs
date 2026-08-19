@@ -141,16 +141,16 @@ copyDir(path.join(ROOT, 'astra-tasks', 'dist'), path.join(STAGE, 'tasks'));
 // 2. Examples — static (plain vite build)
 // ────────────────────────────────────────────────────────────────────────────
 const STATIC_VITE = [
-  'frontend-only/01-simple-state',
-  'frontend-only/02-global-state',
-  'frontend-only/03-forms',
-  'frontend-only/04-routing',
-  'frontend-only/05-css-macro',
-  'frontend-only/06-conditional-lists',
-  'frontend-only/07-async-data',
-  'frontend-only/08-lifecycle',
-  'frontend-only/09-composition',
-  'frontend-only/10-dynamic-attrs',
+  'frontend/01-simple-state',
+  'frontend/02-global-state',
+  'frontend/03-forms',
+  'frontend/04-routing',
+  'frontend/05-css-macro',
+  'frontend/06-conditional-lists',
+  'frontend/07-async-data',
+  'frontend/08-lifecycle',
+  'frontend/09-composition',
+  'frontend/10-dynamic-attrs',
   'fullstack/10-ssg-prebuilt',
 ];
 
@@ -286,7 +286,7 @@ not_found_handling = "none"
 // 5. Examples hub index.html
 // ────────────────────────────────────────────────────────────────────────────
 const GROUPS = [
-  ['Frontend-only', STATIC_VITE.filter((e) => e.startsWith('frontend-only'))],
+  ['Frontend', STATIC_VITE.filter((e) => e.startsWith('frontend/'))],
   ['Fullstack', ['fullstack/01-server-dynamic', 'fullstack/02-swr-server', 'fullstack/03-form-server', 'fullstack/04-router-server-params', 'fullstack/05-schema-validation', 'fullstack/06-optimistic-mutations', 'fullstack/07-file-upload', 'fullstack/08-autosync', 'fullstack/09-resumability', 'fullstack/10-ssg-prebuilt']],
   ['AI', ['ai/01-streaming-chat', 'ai/02-tools', 'ai/03-build-time', 'ai/04-rag']],
   ['Deploy targets', ['deploy/01-node', 'deploy/02-vercel', 'deploy/03-cloudflare', 'deploy/04-static']],
@@ -563,8 +563,8 @@ server {
 ${apiLocations}
 
     # Client-side routed examples need an index.html fallback
-    location /examples/frontend-only/04-routing/ {
-        try_files $uri $uri/ /examples/frontend-only/04-routing/index.html;
+    location /examples/frontend/04-routing/ {
+        try_files $uri $uri/ /examples/frontend/04-routing/index.html;
     }
     location /examples/fullstack/04-router-server-params/ {
         try_files $uri $uri/ /examples/fullstack/04-router-server-params/index.html;
