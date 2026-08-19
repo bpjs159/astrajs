@@ -665,9 +665,24 @@ server {
 fs.writeFileSync(
   path.join(STAGE, 'config', 'nginx-dash.conf'),
   `# dash.astrajs.dev — real-time dashboard (pm2 app 'dash' on 127.0.0.1:5303)
+# HTTP → HTTPS redirect
 server {
     listen 80;
     server_name dash.astrajs.dev;
+    return 301 https://$host$request_uri;
+}
+
+# HTTPS
+server {
+    listen 443 ssl http2;
+    server_name dash.astrajs.dev;
+
+    ssl_certificate     /etc/letsencrypt/live/dash.astrajs.dev/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/dash.astrajs.dev/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers off;
+    add_header Strict-Transport-Security "max-age=63072000" always;
 
     root ${WWW}/dash;
     index index.html;
@@ -699,9 +714,24 @@ server {
 fs.writeFileSync(
   path.join(STAGE, 'config', 'nginx-tasks.conf'),
   `# tasks.astrajs.dev — collaborative kanban (pm2 app 'tasks' on 127.0.0.1:5304)
+# HTTP → HTTPS redirect
 server {
     listen 80;
     server_name tasks.astrajs.dev;
+    return 301 https://$host$request_uri;
+}
+
+# HTTPS
+server {
+    listen 443 ssl http2;
+    server_name tasks.astrajs.dev;
+
+    ssl_certificate     /etc/letsencrypt/live/tasks.astrajs.dev/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/tasks.astrajs.dev/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers off;
+    add_header Strict-Transport-Security "max-age=63072000" always;
 
     root ${WWW}/tasks;
     index index.html;

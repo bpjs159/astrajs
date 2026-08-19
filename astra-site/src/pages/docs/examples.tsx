@@ -61,7 +61,8 @@ const s = `
   .ex-full{background:#060b14;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:28px;margin-bottom:28px}
   .ex-full h2{margin-top:0!important;border-top:none!important;padding-top:0!important;font-size:1.15rem}
   .ex-full>p{font-size:.82rem}
-  .ex-full-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .ex-full-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  @media(max-width:960px){.ex-full-cards{grid-template-columns:1fr}}
   .ex-full-card{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.015);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:18px 20px;text-decoration:none;transition:border-color .15s,transform .15s,background .15s}
   .ex-full-card:hover{border-color:rgba(139,77,255,.4);background:rgba(139,77,255,.04);transform:translateY(-2px)}
   .ex-full-icon{display:flex;align-items:center;line-height:1}

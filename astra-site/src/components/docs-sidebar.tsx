@@ -70,9 +70,6 @@ const docSections: DocSection[] = [
       { label: '', k: 'sb.exFrontend', href: '/docs/examples#frontend' },
       { label: '', k: 'sb.exBackend', href: '/docs/examples#backend' },
     ],
-    cards: [
-      { icon: 'chart', title: 'AstraDash', href: 'https://dash.astrajs.dev' },
-    ],
   },
   {
     title: 'Comparativa',
