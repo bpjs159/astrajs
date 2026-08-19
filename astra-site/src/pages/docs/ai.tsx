@@ -140,7 +140,7 @@ astrajs ai translate fr src/i18n-en.json`} />
         </div>
 
         <h2>{i18n.t('sb.examples')}</h2>
-        <p>{i18n.t('ai.next.a')}<a href="/docs/examples#fullstack">{i18n.t('ai.next.c')}</a>{i18n.t('ai.next.b')}<a href="/docs/deployment">{i18n.t('sb.deploy')}</a>{i18n.t('ai.next.d')}</p>
+        <p>{i18n.t('ai.next.a')}<a href="/docs/examples#backend">{i18n.t('ai.next.c')}</a>{i18n.t('ai.next.b')}<a href="/docs/deployment">{i18n.t('sb.deploy')}</a>{i18n.t('ai.next.d')}</p>
       </div>
     </main>
     <DocRightToc items={[

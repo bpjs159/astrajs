@@ -6,7 +6,9 @@
  * Staging layout (mirrors /var/www/astrajs on the server):
  *   site/               astra-site static build
  *   blog/               astra-blog static build
- *   showcase/           astra-showcase build (client + dist/server/server.mjs)
+ *   store/              astra-store SSR prerender + node adapter
+ *   dash/               astra-dash real-time dashboard (node adapter)
+ *   tasks/              astra-tasks collaborative kanban (node adapter)
  *   examples/<cat>/<name>/   one dir per example (client + server bundle)
  *   examples/index.html      hub page linking every example
  *   runners/                 run-vercel.mjs (Node (req,res) demo of the real
@@ -98,18 +100,6 @@ console.log('== astra-blog (static, pre-built) ==');
 run(astraBin('astra-blog'), ['build'], path.join(ROOT, 'astra-blog'));
 copyDir(path.join(ROOT, 'astra-blog', 'dist'), path.join(STAGE, 'blog'));
 
-// Showcase ships REAL RPC handlers now: the compiler parses return-type
-// annotations on server() arrows, so the node adapter emits a full server
-// bundle (dist/server/server.mjs) that runs under pm2 on port 5301.
-console.log('== astra-showcase (node adapter) ==');
-withConfig('astra-showcase', { adapter: 'node', apiPrefix: '/api/astra' }, () => {
-  run(astraBin('astra-showcase'), ['build'], path.join(ROOT, 'astra-showcase'), {
-    ASTRA_API_PREFIX: '/api/astra',
-  });
-});
-checkServerManifest('astra-showcase');
-copyDir(path.join(ROOT, 'astra-showcase', 'dist'), path.join(STAGE, 'showcase'));
-
 // astra-store — the complete SSR eCommerce example. The node adapter emits the
 // RPC server bundle; scripts/prerender.mjs then renders every public route to
 // real HTML (SSG-style SSR) into dist/<route>/index.html.
@@ -122,6 +112,30 @@ withConfig('astra-store', { adapter: 'node', apiPrefix: '/api/astra' }, () => {
 run('node', [path.join(ROOT, 'astra-store', 'scripts', 'prerender.mjs')], path.join(ROOT, 'astra-store'));
 checkServerManifest('astra-store');
 copyDir(path.join(ROOT, 'astra-store', 'dist'), path.join(STAGE, 'store'));
+
+// astra-dash — real-time dashboard (autoSync live data, streaming AI,
+// uploads with progress, resumable island).
+console.log('== astra-dash (node adapter + SSR prerender) ==');
+withConfig('astra-dash', { adapter: 'node', apiPrefix: '/api/astra' }, () => {
+  run(astraBin('astra-dash'), ['build'], path.join(ROOT, 'astra-dash'), {
+    ASTRA_API_PREFIX: '/api/astra',
+  });
+});
+run('node', [path.join(ROOT, 'astra-dash', 'scripts', 'prerender.mjs')], path.join(ROOT, 'astra-dash'));
+checkServerManifest('astra-dash');
+copyDir(path.join(ROOT, 'astra-dash', 'dist'), path.join(STAGE, 'dash'));
+
+// astra-tasks — collaborative kanban (optimistic mutations + rollback,
+// multi-tab autoSync, serverForm, AI agent with tools).
+console.log('== astra-tasks (node adapter + SSR prerender) ==');
+withConfig('astra-tasks', { adapter: 'node', apiPrefix: '/api/astra' }, () => {
+  run(astraBin('astra-tasks'), ['build'], path.join(ROOT, 'astra-tasks'), {
+    ASTRA_API_PREFIX: '/api/astra',
+  });
+});
+run('node', [path.join(ROOT, 'astra-tasks', 'scripts', 'prerender.mjs')], path.join(ROOT, 'astra-tasks'));
+checkServerManifest('astra-tasks');
+copyDir(path.join(ROOT, 'astra-tasks', 'dist'), path.join(STAGE, 'tasks'));
 
 // ────────────────────────────────────────────────────────────────────────────
 // 2. Examples — static (plain vite build)
@@ -457,18 +471,6 @@ for (const [ex, port] of Object.entries(SERVER_PORT)) {
   });
 }
 
-// astra-showcase — real RPC backend on its own port (showcase.astrajs.dev)
-if (fs.existsSync(path.join(STAGE, 'showcase', 'server', 'server.mjs'))) {
-  apps.push({
-    name: 'showcase',
-    cwd: `${WWW}/showcase`,
-    script: 'server/server.mjs',
-    env: { PORT: 5301 },
-  });
-} else {
-  console.warn('⚠️  astra-showcase: no server bundle emitted — deploying static (client-side fallback).');
-}
-
 // astra-store — SSR eCommerce on its own port (store.astrajs.dev).
 // The AI assistant uses the deterministic mock provider in production.
 if (fs.existsSync(path.join(STAGE, 'store', 'server', 'server.mjs'))) {
@@ -480,6 +482,32 @@ if (fs.existsSync(path.join(STAGE, 'store', 'server', 'server.mjs'))) {
   });
 } else {
   console.warn('⚠️  astra-store: no server bundle emitted — deploying static only.');
+}
+
+// astra-dash — real-time dashboard on its own port (dash.astrajs.dev).
+// The streaming AI uses the deterministic mock provider in production.
+if (fs.existsSync(path.join(STAGE, 'dash', 'server', 'server.mjs'))) {
+  apps.push({
+    name: 'dash',
+    cwd: `${WWW}/dash`,
+    script: 'server/server.mjs',
+    env: { PORT: 5303, ASTRA_AI_PROVIDER: 'mock' },
+  });
+} else {
+  console.warn('⚠️  astra-dash: no server bundle emitted — deploying static only.');
+}
+
+// astra-tasks — collaborative kanban on its own port (tasks.astrajs.dev).
+// The AI agent uses the deterministic mock provider in production.
+if (fs.existsSync(path.join(STAGE, 'tasks', 'server', 'server.mjs'))) {
+  apps.push({
+    name: 'tasks',
+    cwd: `${WWW}/tasks`,
+    script: 'server/server.mjs',
+    env: { PORT: 5304, ASTRA_AI_PROVIDER: 'mock' },
+  });
+} else {
+  console.warn('⚠️  astra-tasks: no server bundle emitted — deploying static only.');
 }
 
 fs.writeFileSync(
@@ -601,18 +629,18 @@ server {
 );
 
 fs.writeFileSync(
-  path.join(STAGE, 'config', 'nginx-showcase.conf'),
-  `# showcase.astrajs.dev — real RPC backend on 127.0.0.1:5301 (pm2 app 'showcase')
+  path.join(STAGE, 'config', 'nginx-store.conf'),
+  `# store.astrajs.dev — SSR eCommerce (pm2 app 'store' on 127.0.0.1:5302)
 server {
     listen 80;
-    server_name showcase.astrajs.dev;
+    server_name store.astrajs.dev;
 
-    root ${WWW}/showcase;
+    root ${WWW}/store;
     index index.html;
 
     # server() RPC endpoints → node adapter backend
     location ^~ /api/astra/ {
-        proxy_pass http://127.0.0.1:5301;
+        proxy_pass http://127.0.0.1:5302;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -628,24 +656,59 @@ server {
 
     location / {
         try_files $uri $uri/ /index.html;
+        add_header Cache-Control "no-cache";
     }
 }
 `
 );
 
 fs.writeFileSync(
-  path.join(STAGE, 'config', 'nginx-store.conf'),
-  `# store.astrajs.dev — SSR eCommerce (pm2 app 'store' on 127.0.0.1:5302)
+  path.join(STAGE, 'config', 'nginx-dash.conf'),
+  `# dash.astrajs.dev — real-time dashboard (pm2 app 'dash' on 127.0.0.1:5303)
 server {
     listen 80;
-    server_name store.astrajs.dev;
+    server_name dash.astrajs.dev;
 
-    root ${WWW}/store;
+    root ${WWW}/dash;
     index index.html;
 
     # server() RPC endpoints → node adapter backend
     location ^~ /api/astra/ {
-        proxy_pass http://127.0.0.1:5302;
+        proxy_pass http://127.0.0.1:5303;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Connection "";
+        proxy_buffering off;
+        proxy_read_timeout 300s;
+    }
+
+    location /assets/ {
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+        add_header Cache-Control "no-cache";
+    }
+}
+`
+);
+
+fs.writeFileSync(
+  path.join(STAGE, 'config', 'nginx-tasks.conf'),
+  `# tasks.astrajs.dev — collaborative kanban (pm2 app 'tasks' on 127.0.0.1:5304)
+server {
+    listen 80;
+    server_name tasks.astrajs.dev;
+
+    root ${WWW}/tasks;
+    index index.html;
+
+    # server() RPC endpoints → node adapter backend
+    location ^~ /api/astra/ {
+        proxy_pass http://127.0.0.1:5304;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;

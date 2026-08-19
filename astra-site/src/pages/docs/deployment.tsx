@@ -115,7 +115,7 @@ vercel --prod     # production`} />
         </div>
 
         <h2>{i18n.t('sb.examples')}</h2>
-        <p>{i18n.t('dp.next.a')}<code>astrajs my-app</code>{i18n.t('dp.next.b')}<a href="/docs/examples#fullstack">{i18n.t('dp.next.c')}</a>{i18n.t('dp.next.d')}</p>
+        <p>{i18n.t('dp.next.a')}<code>astrajs my-app</code>{i18n.t('dp.next.b')}<a href="/docs/examples#backend">{i18n.t('dp.next.c')}</a>{i18n.t('dp.next.d')}</p>
       </div>
     </main>
     <DocRightToc items={[

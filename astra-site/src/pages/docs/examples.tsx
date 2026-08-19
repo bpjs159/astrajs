@@ -56,6 +56,21 @@ const s = `
   .ex-card-tags{display:flex;flex-wrap:wrap;gap:6px}
   .ex-tag{font-size:.62rem;font-weight:600;color:#b84cff;background:rgba(139,77,255,.08);border:1px solid rgba(139,77,255,.15);padding:2px 10px;border-radius:12px}
   .ex-card-open{font-size:.66rem;font-weight:700;color:#8d4dff}
+
+  /* === FULL EXAMPLES === */
+  .ex-full{background:#060b14;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:28px;margin-bottom:28px}
+  .ex-full h2{margin-top:0!important;border-top:none!important;padding-top:0!important;font-size:1.15rem}
+  .ex-full>p{font-size:.82rem}
+  .ex-full-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .ex-full-card{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.015);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:18px 20px;text-decoration:none;transition:border-color .15s,transform .15s,background .15s}
+  .ex-full-card:hover{border-color:rgba(139,77,255,.4);background:rgba(139,77,255,.04);transform:translateY(-2px)}
+  .ex-full-icon{display:flex;align-items:center;line-height:1}
+  .ex-full-body{display:flex;flex-direction:column;gap:4px;min-width:0}
+  .ex-full-name{font-size:.9rem;font-weight:700;color:#f7f7ff}
+  .ex-full-desc{font-size:.74rem;color:#94a3b8;line-height:1.5}
+  .ex-full-arrow{margin-left:auto;display:flex;align-items:center;color:#64748b}
+  .ex-full-card:hover .ex-full-arrow{color:#b84cff}
+  @media(max-width:768px){.ex-full-cards{grid-template-columns:1fr}}
   @media(max-width:768px){.ex-cards-grid{grid-template-columns:1fr}}
 `;
 
@@ -67,9 +82,17 @@ export const DocsExamples = component(() => {
     selectedNum: null as string | null,
   });
 
-  // Deep-link: /docs/examples#fullstack switches to the fullstack tab
-  if (typeof window !== 'undefined' && window.location.hash === '#fullstack') {
-    state.tab = 'fullstack';
+  // Deep-link: /docs/examples#backend (legacy #fullstack) cambia a backend.
+  // Escucha hashchange para reaccionar también a clics del sidebar en vivo
+  // (el sidebar usa history.replaceState y avisa manualmente).
+  if (typeof window !== 'undefined') {
+    const applyHash = () => {
+      const h = window.location.hash;
+      if (h === '#backend' || h === '#fullstack') state.tab = 'fullstack';
+      else if (h === '#frontend') state.tab = 'frontend';
+    };
+    applyHash();
+    window.addEventListener('hashchange', applyHash);
   }
 
   return (
@@ -85,20 +108,51 @@ export const DocsExamples = component(() => {
             {i18n.t('ex.h.c')}<code>examples/frontend-only/</code>{i18n.t('ex.h.d')}<code>examples/fullstack/</code>{i18n.t('ex.h.e')}
           </p>
 
+          <section class="ex-full" id="full">
+            <h2>{i18n.t('ex.fullTitle')}</h2>
+            <p>{i18n.t('ex.fullDesc')}</p>
+            <div class="ex-full-cards">
+              <a class="ex-full-card" href="https://store.astrajs.dev" target="_blank" rel="noopener">
+                <span class="ex-full-icon"><Icon name="store" size={22} /></span>
+                <span class="ex-full-body">
+                  <span class="ex-full-name">AstraStore</span>
+                  <span class="ex-full-desc">{i18n.t('ex.fullStoreDesc')}</span>
+                </span>
+                <span class="ex-full-arrow"><Icon name="arrow-right" size={14} /></span>
+              </a>
+              <a class="ex-full-card" href="https://blog.astrajs.dev" target="_blank" rel="noopener">
+                <span class="ex-full-icon"><Icon name="pen" size={22} /></span>
+                <span class="ex-full-body">
+                  <span class="ex-full-name">AstraBlog</span>
+                  <span class="ex-full-desc">{i18n.t('ex.fullBlogDesc')}</span>
+                </span>
+                <span class="ex-full-arrow"><Icon name="arrow-right" size={14} /></span>
+              </a>
+              <a class="ex-full-card" href="https://dash.astrajs.dev" target="_blank" rel="noopener">
+                <span class="ex-full-icon"><Icon name="chart" size={22} /></span>
+                <span class="ex-full-body">
+                  <span class="ex-full-name">AstraDash</span>
+                  <span class="ex-full-desc">{i18n.t('ex.fullDashDesc')}</span>
+                </span>
+                <span class="ex-full-arrow"><Icon name="arrow-right" size={14} /></span>
+              </a>
+            </div>
+          </section>
+
           <div class="ex-tabs">
             <button
               id="frontend"
               class={`ex-tab${state.tab === 'frontend' ? ' active' : ''}`}
               onclick={() => { state.tab = 'frontend'; state.selectedNum = null; }}
             >
-              Frontend-only (10)
+              Frontend (10)
             </button>
             <button
-              id="fullstack"
+              id="backend"
               class={`ex-tab${state.tab === 'fullstack' ? ' active' : ''}`}
               onclick={() => { state.tab = 'fullstack'; state.selectedNum = null; }}
             >
-              Fullstack (10)
+              Backend (10)
             </button>
           </div>
 
@@ -160,8 +214,9 @@ export const DocsExamples = component(() => {
         </div>
       </main>
       <DocRightToc items={[
-        { href: '/docs/examples#frontend', label: 'Frontend-only (10)' },
-        { href: '/docs/examples#fullstack', label: 'Fullstack (10)' },
+        { href: '/docs/examples#full', label: 'Full examples' },
+        { href: '/docs/examples#frontend', label: 'Frontend examples' },
+        { href: '/docs/examples#backend', label: 'Backend examples' },
       ]} />
     </div>
   );

@@ -1,7 +1,7 @@
 {
   "name": "09-composition",
   "private": true,
-  "version": "0.1.15",
+  "version": "0.1.16",
   "type": "module",
   "scripts": {
     "test": "vitest run --config vitest.config.ts",

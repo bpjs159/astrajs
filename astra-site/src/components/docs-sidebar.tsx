@@ -8,6 +8,8 @@ interface DocSection {
   title: string;
   titleK?: string;
   items: { label: string; k?: string; href: string }[];
+  /** Mini-cards con icono (p. ej. sitios completos externos). */
+  cards?: { icon: string; title: string; href: string }[];
 }
 
 const docSections: DocSection[] = [
@@ -64,8 +66,12 @@ const docSections: DocSection[] = [
     title: 'Ejemplos',
     titleK: 'sb.examples',
     items: [
-      { label: 'Frontend-only (10)', href: '/docs/examples#frontend' },
-      { label: 'Fullstack (10)', href: '/docs/examples#fullstack' },
+      { label: '', k: 'sb.exFull', href: '/docs/examples#full' },
+      { label: '', k: 'sb.exFrontend', href: '/docs/examples#frontend' },
+      { label: '', k: 'sb.exBackend', href: '/docs/examples#backend' },
+    ],
+    cards: [
+      { icon: 'chart', title: 'AstraDash', href: 'https://dash.astrajs.dev' },
     ],
   },
   {
@@ -285,6 +291,12 @@ export const DocSidebar = component(() => {
     .docs-sidebar-item{display:block;padding:7px 28px;font-size:.8rem;color:#94a3b8;font-weight:500;transition:color .12s,background .12s;border-left:2px solid transparent}
     .docs-sidebar-item:hover{color:#e2e8f0;background:rgba(255,255,255,.02)}
     .docs-sidebar-item.active{color:#b84cff;background:rgba(184,76,255,.06);border-left-color:#b84cff;font-weight:700}
+    .docs-sidebar-card{display:flex;align-items:center;gap:9px;margin:8px 20px;padding:9px 12px;border:1px solid rgba(255,255,255,.07);border-radius:10px;background:rgba(255,255,255,.02);text-decoration:none;transition:border-color .15s,background .15s,transform .15s}
+    .docs-sidebar-card:hover{border-color:rgba(139,77,255,.45);background:rgba(139,77,255,.06);transform:translateY(-1px)}
+    .docs-sidebar-card-icon{display:flex;align-items:center;line-height:1}
+    .docs-sidebar-card-title{font-size:.78rem;font-weight:600;color:#e2e8f0}
+    .docs-sidebar-card-arrow{margin-left:auto;display:flex;align-items:center;color:#64748b;transition:color .15s}
+    .docs-sidebar-card:hover .docs-sidebar-card-arrow{color:#b84cff}
     .docs-sidebar-footer{padding:20px 28px;border-top:1px solid rgba(255,255,255,.06);margin-top:16px}
     .docs-sidebar-footer a{display:flex;align-items:center;gap:8px;font-size:.78rem;color:#64748b;font-weight:500;transition:color .15s}
     .docs-sidebar-footer a:hover{color:#e2e8f0}
@@ -371,6 +383,9 @@ export const DocSidebar = component(() => {
                     const full = window.location.pathname + '#' + hash;
                     if (window.location.pathname + window.location.hash !== full) {
                       window.history.replaceState(null, '', full);
+                      // replaceState no dispara hashchange: avísalo manualmente
+                      // para que las páginas que reaccionan al hash se enteren.
+                      window.dispatchEvent(new Event('hashchange'));
                     }
                     navHref.href = full;
                     const scrollToHash = () => {
@@ -402,6 +417,13 @@ export const DocSidebar = component(() => {
                     }}
                   >
                     {item.k ? i18n.t(item.k) : item.label}
+                  </a>
+                ))}
+                {section.cards?.map((c) => (
+                  <a class="docs-sidebar-card" href={c.href} target="_blank" rel="noopener">
+                    <span class="docs-sidebar-card-icon"><Icon name={c.icon} size={15} /></span>
+                    <span class="docs-sidebar-card-title">{c.title}</span>
+                    <span class="docs-sidebar-card-arrow"><Icon name="arrow-right" size={11} /></span>
                   </a>
                 ))}
             </div>

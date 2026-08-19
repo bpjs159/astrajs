@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * One-shot: collapse astra package deps in examples/, astra-blog, astra-showcase
+ * One-shot: collapse astra package deps in examples/ and astra-blog
  * package.json files into a single "astrajs.dev" dependency (subpaths are not
  * valid as dependency names after the rename pass).
  */
@@ -9,7 +9,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const dirs = [join(root, 'examples'), join(root, 'astra-blog'), join(root, 'astra-showcase')];
+const dirs = [join(root, 'examples'), join(root, 'astra-blog')];
 
 const isAstraKey = (k) => k.startsWith('astrajs.dev') || k.startsWith('@bpjs159');
 

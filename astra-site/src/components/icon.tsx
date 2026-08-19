@@ -13,7 +13,7 @@ import { component } from 'astrajs.dev/core';
 export type IconName =
   | 'chip' | 'bolt' | 'server' | 'monitor' | 'layout' | 'sparkles'
   | 'book' | 'layers' | 'database' | 'chart' | 'shield' | 'grid'
-  | 'star' | 'github' | 'cart' | 'home' | 'wrench' | 'route'
+  | 'star' | 'github' | 'cart' | 'store' | 'pen' | 'home' | 'wrench' | 'route'
   | 'terminal' | 'code' | 'arrow-right' | 'search' | 'menu'
   | 'check' | 'x' | 'clock' | 'info' | 'loader' | 'refresh'
   | 'square' | 'play' | 'ast' | 'ssr' | 'layout-pages' | 'js-off'
@@ -182,6 +182,21 @@ const DEFS: Record<string, IconDef> = {
       'M16.8 17.5a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4Z',
     ],
     sw: 1.8,
+  },
+  // ── Full sites: storefront (AstraStore) ────────────────────────
+  store: {
+    f: [
+      'M4.6 9.5v9a1.5 1.5 0 0 0 1.5 1.5h11.8a1.5 1.5 0 0 0 1.5-1.5v-9Z',
+      'M3.2 9.5 5.6 4.9h12.8l2.4 4.6Z',
+    ],
+    s: ['M9.6 20v-4.8a1 1 0 0 1 1-1h2.8a1 1 0 0 1 1 1V20'],
+    sw: 1.6,
+  },
+  // ── Full sites: writing (AstraBlog) ────────────────────────────
+  pen: {
+    f: [
+      'M4.4 19.6 5.6 14.9 18.6 1.9a1.7 1.7 0 0 1 2.4 0l1.1 1.1a1.7 1.7 0 0 1 0 2.4L9.1 18.4Z',
+    ],
   },
   home: {
     f: ['M12 3.4l9 7.1v9a1.5 1.5 0 0 1-1.5 1.5h-4.6v-5.6h-5.8V21H4.5A1.5 1.5 0 0 1 3 19.5v-9Z'],

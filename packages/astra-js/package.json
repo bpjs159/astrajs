@@ -1,6 +1,6 @@
 {
   "name": "astrajs.dev",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "AstraJS — Full-Stack TypeScript Framework. One install, dynamic subpath imports: astrajs.dev/core, astrajs.dev/compiler, astrajs.dev/server…",
   "type": "module",
   "repository": {

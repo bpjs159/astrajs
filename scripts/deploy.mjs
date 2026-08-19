@@ -7,7 +7,7 @@
  *   npm run deploy -- --skip-build   # upload the existing staging dir only
  *
  * Pipeline:
- *   1. node tools/deploy-build.mjs → builds site/blog/showcase/examples into
+ *   1. node tools/deploy-build.mjs → builds site/blog/store/examples into
  *      a staging dir (default $TMPDIR/astrajs-deploy).
  *   2. rsync --delete → <host>:/var/www/astrajs/
  *   3. pm2 restart all on the server (15 backend apps).
@@ -74,7 +74,7 @@ function run(cmd, cmdArgs, { label, cwd } = {}) {
 
 if (!skipBuild) {
   run('node', [path.join(ROOT, 'tools', 'deploy-build.mjs')], {
-    label: 'build (site + blog + showcase + 28 examples)',
+    label: 'build (site + blog + store + dash + tasks + 28 examples)',
   });
 } else {
   console.log(cyan('\n── skipping build (--skip-build)'));
@@ -106,6 +106,6 @@ run('ssh', [
 
 console.log(green('\n✓ deploy complete'));
 console.log(
-  `  https://astrajs.dev · https://blog.astrajs.dev · https://showcase.astrajs.dev · https://examples.astrajs.dev`
+  `  https://astrajs.dev · https://blog.astrajs.dev · https://store.astrajs.dev · https://dash.astrajs.dev · https://tasks.astrajs.dev · https://examples.astrajs.dev`
 );
 console.log('  (nginx vhosts are certbot-managed — this script never touches them)\n');
