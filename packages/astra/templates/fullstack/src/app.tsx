@@ -6,6 +6,32 @@ import { PostsPage } from './pages/posts.js';
 
 const style = document.createElement('style');
 style.textContent = `
+  /* === FONTS (loaded from astrajs.dev) === */
+  @font-face {
+    font-family: 'Fauna Pro';
+    src: url('https://astrajs.dev/fonts/fauna/FaunaPro-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'Fauna Pro';
+    src: url('https://astrajs.dev/fonts/fauna/FaunaPro-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'Fauna Pro';
+    src: url('https://astrajs.dev/fonts/fauna/FaunaPro-Semibold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'Fauna Pro';
+    src: url('https://astrajs.dev/fonts/fauna/FaunaPro-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+  }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: system-ui, sans-serif; background: #04060d; color: #e2e8f0; }
   a { color: inherit; text-decoration: none; }
@@ -17,9 +43,21 @@ style.textContent = `
     padding: 16px 32px;
     display: flex; align-items: center; gap: 24px;
   }
-  .header .brand { font-weight: 800; letter-spacing: 0.02em; }
-  .header nav { display: flex; gap: 16px; }
-  .header nav a { font-size: 0.85rem; color: #94a3b8; }
+  .header .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .brand-word {
+    font-family: 'Fauna Pro', serif;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    line-height: 1;
+    color: #fff;
+  }
+  .brand-js {
+    background: linear-gradient(135deg, #8d4dff, #4d7cff);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .header nav { display: flex; align-items: center; gap: 16px; }
+  .header nav a { font-size: 0.85rem; line-height: 1; color: #94a3b8; }
   .header nav a:hover { color: #e2e8f0; }
   .page { max-width: 720px; margin: 0 auto; padding: 64px 32px; }
   .page h1 {
@@ -35,7 +73,9 @@ document.head.appendChild(style);
 export const App = component(() => (
   <div>
     <header class="header">
-      <span class="brand">ASTRAJS</span>
+      <a class="brand" href="/">
+        <span class="brand-word">ASTRA<span class="brand-js">JS</span></span>
+      </a>
       <nav>
         <Link href="/">Home</Link>
         <Link href="/posts">Posts</Link>

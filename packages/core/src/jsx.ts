@@ -1,0 +1,337 @@
+/**
+ * astrajs.dev/core — JSX Namespace
+ *
+ * AstraJS components produce real DOM elements, not Virtual DOM nodes.
+ * This namespace tells TypeScript that JSX expressions evaluate to
+ * native `HTMLElement | DocumentFragment`.
+ *
+ * It also extends the standard HTML attribute set with AstraJS-specific
+ * attributes for resumability and state serialization.
+ *
+ * The namespace is exported from the `jsx-runtime` module so that
+ * TypeScript's automatic JSX transform (`"jsx": "react-jsx"` with
+ * `"jsxImportSource": "astrajs.dev/core"`) can resolve `JSX.Element`
+ * and `JSX.IntrinsicElements` in consumer projects.
+ */
+
+export declare namespace JSX {
+  /**
+   * AstraJS JSX elements are real, live DOM nodes — not virtual representations.
+   * This is the foundation of Zero-VDOM: components return physical DOM.
+   *
+   * Includes arrays for `.map()` render patterns and Fragment support.
+   * Functions (from `dynamic()`) are detected at runtime as reactive markers.
+   */
+  type Element = HTMLElement | DocumentFragment | false | null | readonly Element[] | (() => Element);
+
+  /**
+   * Children can be any renderable value.
+   * `unknown` ensures maximum compatibility — null, undefined, booleans,
+   * async fragments, and arrays all pass the JSX child type check.
+   * The actual flattening logic is in jsx-runtime.ts's `flattenChildren()`.
+   */
+  type ElementChildrenAttribute = { children: any };
+
+  /**
+   * Intrinsic elements map to standard HTML tag names.
+   * Each produces its corresponding HTMLElement subtype.
+   */
+  interface IntrinsicElements {
+    // Document structure
+    html: HTMLAttributes<HTMLHtmlElement>;
+    head: HTMLAttributes<HTMLHeadElement>;
+    body: HTMLAttributes<HTMLBodyElement>;
+    title: HTMLAttributes<HTMLTitleElement>;
+    meta: HTMLAttributes<HTMLMetaElement>;
+    link: HTMLAttributes<HTMLLinkElement>;
+    script: HTMLAttributes<HTMLScriptElement>;
+    style: HTMLAttributes<HTMLStyleElement>;
+    base: HTMLAttributes<HTMLBaseElement>;
+
+    // Content sectioning
+    header: HTMLAttributes<HTMLElement>;
+    footer: HTMLAttributes<HTMLElement>;
+    main: HTMLAttributes<HTMLElement>;
+    nav: HTMLAttributes<HTMLElement>;
+    aside: HTMLAttributes<HTMLElement>;
+    section: HTMLAttributes<HTMLElement>;
+    article: HTMLAttributes<HTMLElement>;
+    address: HTMLAttributes<HTMLElement>;
+
+    // Text content
+    h1: HTMLAttributes<HTMLHeadingElement>;
+    h2: HTMLAttributes<HTMLHeadingElement>;
+    h3: HTMLAttributes<HTMLHeadingElement>;
+    h4: HTMLAttributes<HTMLHeadingElement>;
+    h5: HTMLAttributes<HTMLHeadingElement>;
+    h6: HTMLAttributes<HTMLHeadingElement>;
+    hgroup: HTMLAttributes<HTMLElement>;
+    p: HTMLAttributes<HTMLParagraphElement>;
+    blockquote: HTMLAttributes<HTMLQuoteElement>;
+    pre: HTMLAttributes<HTMLPreElement>;
+    hr: HTMLAttributes<HTMLHRElement>;
+    ul: HTMLAttributes<HTMLUListElement>;
+    ol: HTMLAttributes<HTMLOListElement>;
+    li: HTMLAttributes<HTMLLIElement>;
+    dl: HTMLAttributes<HTMLDListElement>;
+    dt: HTMLAttributes<HTMLElement>;
+    dd: HTMLAttributes<HTMLElement>;
+    figure: HTMLAttributes<HTMLElement>;
+    figcaption: HTMLAttributes<HTMLElement>;
+    div: HTMLAttributes<HTMLDivElement>;
+
+    // Inline text
+    a: AnchorHTMLAttributes<HTMLAnchorElement>;
+    em: HTMLAttributes<HTMLElement>;
+    strong: HTMLAttributes<HTMLElement>;
+    small: HTMLAttributes<HTMLElement>;
+    s: HTMLAttributes<HTMLElement>;
+    cite: HTMLAttributes<HTMLElement>;
+    q: HTMLAttributes<HTMLQuoteElement>;
+    code: HTMLAttributes<HTMLElement>;
+    br: HTMLAttributes<HTMLBRElement>;
+    wbr: HTMLAttributes<HTMLElement>;
+    span: HTMLAttributes<HTMLSpanElement>;
+    b: HTMLAttributes<HTMLElement>;
+    i: HTMLAttributes<HTMLElement>;
+    u: HTMLAttributes<HTMLElement>;
+    mark: HTMLAttributes<HTMLElement>;
+    sub: HTMLAttributes<HTMLElement>;
+    sup: HTMLAttributes<HTMLElement>;
+    time: HTMLAttributes<HTMLTimeElement>;
+    data: HTMLAttributes<HTMLDataElement>;
+    abbr: HTMLAttributes<HTMLElement>;
+    dfn: HTMLAttributes<HTMLElement>;
+    kbd: HTMLAttributes<HTMLElement>;
+    samp: HTMLAttributes<HTMLElement>;
+    var: HTMLAttributes<HTMLElement>;
+
+    // Forms
+    form: FormHTMLAttributes<HTMLFormElement>;
+    input: InputHTMLAttributes<HTMLInputElement>;
+    textarea: TextareaHTMLAttributes<HTMLTextAreaElement>;
+    button: ButtonHTMLAttributes<HTMLButtonElement>;
+    select: SelectHTMLAttributes<HTMLSelectElement>;
+    optgroup: HTMLAttributes<HTMLOptGroupElement>;
+    option: OptionHTMLAttributes<HTMLOptionElement>;
+    label: LabelHTMLAttributes<HTMLLabelElement>;
+    fieldset: HTMLAttributes<HTMLFieldSetElement>;
+    legend: HTMLAttributes<HTMLLegendElement>;
+    datalist: HTMLAttributes<HTMLDataListElement>;
+    output: HTMLAttributes<HTMLOutputElement>;
+    progress: HTMLAttributes<HTMLProgressElement>;
+    meter: HTMLAttributes<HTMLMeterElement>;
+
+    // Media
+    img: ImgHTMLAttributes<HTMLImageElement>;
+    picture: HTMLAttributes<HTMLElement>;
+    source: HTMLAttributes<HTMLSourceElement>;
+    video: VideoHTMLAttributes<HTMLVideoElement>;
+    audio: AudioHTMLAttributes<HTMLAudioElement>;
+    track: HTMLAttributes<HTMLTrackElement>;
+    iframe: HTMLAttributes<HTMLIFrameElement>;
+    object: HTMLAttributes<HTMLObjectElement>;
+    embed: HTMLAttributes<HTMLEmbedElement>;
+    canvas: HTMLAttributes<HTMLCanvasElement>;
+    svg: HTMLAttributes<SVGSVGElement>;
+    path: HTMLAttributes<SVGPathElement>;
+
+    // Table
+    table: HTMLAttributes<HTMLTableElement>;
+    caption: HTMLAttributes<HTMLTableCaptionElement>;
+    colgroup: HTMLAttributes<HTMLTableColElement>;
+    col: HTMLAttributes<HTMLTableColElement>;
+    tbody: HTMLAttributes<HTMLTableSectionElement>;
+    thead: HTMLAttributes<HTMLTableSectionElement>;
+    tfoot: HTMLAttributes<HTMLTableSectionElement>;
+    tr: HTMLAttributes<HTMLTableRowElement>;
+    td: HTMLAttributes<HTMLTableCellElement>;
+    th: HTMLAttributes<HTMLTableHeaderCellElement>;
+
+    // Interactive
+    details: HTMLAttributes<HTMLDetailsElement>;
+    summary: HTMLAttributes<HTMLElement>;
+    dialog: HTMLAttributes<HTMLDialogElement>;
+  }
+
+  /**
+   * AstraJS extends standard HTML attributes with resumability primitives
+   * and native View Transitions API support.
+   */
+  interface HTMLAttributes<T> {
+    // --- Standard ---
+    class?: string | (() => string | null | undefined);
+    id?: string;
+    title?: string;
+    lang?: string;
+    dir?: string;
+    hidden?: boolean | string;
+    tabindex?: number;
+    role?: string;
+    'aria-label'?: string;
+    'aria-hidden'?: boolean | string;
+    'aria-expanded'?: boolean | string;
+    'data-*'?: string;
+
+    // --- AstraJS Resumability ---
+    'astra-data'?: string | Record<string, unknown>;
+    'astra-on:click'?: string;
+    'astra-on:submit'?: string;
+    'astra-on:input'?: string;
+    'astra-on:change'?: string;
+    'astra-on:focus'?: string;
+    'astra-on:blur'?: string;
+    'astra-on:keydown'?: string;
+    'astra-on:keyup'?: string;
+    'astra-on:mouseenter'?: string;
+    'astra-on:mouseleave'?: string;
+
+    /**
+     * Schema-driven form validation.
+     * Any object with a validate() method matching this signature works.
+     */
+    'astra-schema'?: {
+      validate(data: unknown): { success: boolean; errors?: Record<string, string>; data?: unknown };
+    };
+
+    // --- View Transitions ---
+    style?: Partial<CSSStyleDeclaration> & { 'view-transition-name'?: string };
+
+    // --- Event Handlers (DOM style) ---
+    onclick?: (event: MouseEvent) => void;
+    onsubmit?: (event: SubmitEvent) => void;
+    oninput?: (event: Event) => void;
+    onchange?: (event: Event) => void;
+    onfocus?: (event: FocusEvent) => void;
+    onblur?: (event: FocusEvent) => void;
+    onkeydown?: (event: KeyboardEvent) => void;
+    onkeyup?: (event: KeyboardEvent) => void;
+
+    // --- Event Handlers (React style — normalized by JSX runtime) ---
+    onClick?: (event: MouseEvent) => void;
+    // onSubmit may receive the parsed FormData when `astra-schema` is present
+    // (see FormHTMLAttributes). The union keeps the base type compatible with
+    // the form-specific override.
+    onSubmit?: ((event: SubmitEvent) => void) | ((formData: FormData) => void | Promise<void>);
+    onInput?: (event: Event) => void;
+    onChange?: (event: Event) => void;
+    onFocus?: (event: FocusEvent) => void;
+    onBlur?: (event: FocusEvent) => void;
+    onKeyDown?: (event: KeyboardEvent) => void;
+    onKeyUp?: (event: KeyboardEvent) => void;
+    onMouseEnter?: (event: MouseEvent) => void;
+    onMouseLeave?: (event: MouseEvent) => void;
+
+    // --- Children ---
+    children?: JSX.Element | string | number | boolean | null | undefined | readonly (JSX.Element | string | number | boolean | null | undefined)[];
+  }
+
+  interface AnchorHTMLAttributes<T> extends HTMLAttributes<T> {
+    href?: string;
+    target?: string;
+    rel?: string;
+  }
+
+  interface ImgHTMLAttributes<T> extends HTMLAttributes<T> {
+    src?: string;
+    alt?: string;
+    width?: number | string;
+    height?: number | string;
+    loading?: 'lazy' | 'eager';
+  }
+
+  interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
+    type?: string;
+    name?: string;
+    value?: string | number;
+    placeholder?: string;
+    disabled?: boolean;
+    required?: boolean;
+    checked?: boolean;
+    /** Restricts selectable file types for `type="file"` inputs. */
+    accept?: string;
+    /** Native HTML5 constraint: minimum string length (maps to `minlength` attribute). */
+    minLength?: number;
+    /** Native HTML5 constraint: maximum string length (maps to `maxlength` attribute). */
+    maxLength?: number;
+    /**
+     * Inline async validator.
+     * Return `true` if valid, or a string error message if invalid.
+     * The AST transforms this into `input.setCustomValidity()` so the
+     * browser's native Constraint Validation API handles submit blocking,
+     * `input:invalid` CSS, and `form.checkValidity()`.
+     */
+    validate?: (value: string) => string | true | Promise<string | true>;
+  }
+
+  interface ButtonHTMLAttributes<T> extends HTMLAttributes<T> {
+    type?: 'button' | 'submit' | 'reset';
+    disabled?: boolean;
+  }
+
+  interface SelectHTMLAttributes<T> extends HTMLAttributes<T> {
+    name?: string;
+    value?: string;
+    disabled?: boolean;
+    /** Inline async validator — same contract as input.validate. */
+    validate?: (value: string) => string | true | Promise<string | true>;
+  }
+
+  interface OptionHTMLAttributes<T> extends HTMLAttributes<T> {
+    value?: string;
+    selected?: boolean;
+    disabled?: boolean;
+  }
+
+  interface LabelHTMLAttributes<T> extends HTMLAttributes<T> {
+    for?: string;
+  }
+
+  interface FormHTMLAttributes<T> extends HTMLAttributes<T> {
+    action?: string;
+    method?: 'get' | 'post';
+    /** Attaches a form metadata controller from astrajs.dev/form. */
+    controller?: object;
+    /**
+     * Called on validation failure with a map of field→error messages.
+     * Used with `astra-schema` on the form element.
+     */
+    onError?: (errors: Record<string, string>) => void;
+    /**
+     * When astra-schema is present, onSubmit receives the parsed FormData
+     * after successful validation (not the raw SubmitEvent).
+     * (Signature inherited from HTMLAttributes.)
+     */
+  }
+
+  interface VideoHTMLAttributes<T> extends HTMLAttributes<T> {
+    src?: string;
+    controls?: boolean;
+    autoplay?: boolean;
+    loop?: boolean;
+    muted?: boolean;
+  }
+
+  interface TextareaHTMLAttributes<T> extends HTMLAttributes<T> {
+    rows?: number | string;
+    cols?: number | string;
+    name?: string;
+    value?: string;
+    placeholder?: string;
+    disabled?: boolean;
+    required?: boolean;
+    minLength?: number;
+    maxLength?: number;
+    /** Inline async validator — same contract as input.validate. */
+    validate?: (value: string) => string | true | Promise<string | true>;
+  }
+
+  interface AudioHTMLAttributes<T> extends HTMLAttributes<T> {
+    src?: string;
+    controls?: boolean;
+    autoplay?: boolean;
+    loop?: boolean;
+    muted?: boolean;
+  }
+}
+

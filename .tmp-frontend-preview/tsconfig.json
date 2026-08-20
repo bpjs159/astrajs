@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "jsxImportSource": "astrajs.dev/core",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "paths": {
+      "astrajs.dev/core": ["/Users/sebastian_bonilla/Documents/astrajs/packages/core/src"],
+      "astrajs.dev/core/jsx-runtime": ["/Users/sebastian_bonilla/Documents/astrajs/packages/core/src/jsx-runtime"],
+      "astrajs.dev/core/jsx-dev-runtime": ["/Users/sebastian_bonilla/Documents/astrajs/packages/core/src/jsx-dev-runtime"],
+      "astrajs.dev/router": ["/Users/sebastian_bonilla/Documents/astrajs/packages/router/src"],
+      "astrajs.dev/form": ["/Users/sebastian_bonilla/Documents/astrajs/packages/form/src"],
+      "astrajs.dev/schema": ["/Users/sebastian_bonilla/Documents/astrajs/packages/schema/src"]
+    }
+  },
+  "include": ["src"]
+}
