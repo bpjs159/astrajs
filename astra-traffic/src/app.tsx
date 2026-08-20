@@ -6,7 +6,6 @@
  * nivel de nginx (ver nginx.conf).
  */
 import { component, store, mounted } from 'astrajs.dev/core';
-import { autoSync } from 'astrajs.dev/server';
 import { getTraffic, type TrafficSnapshot } from './server/traffic.server.js';
 
 const state = store({
@@ -14,12 +13,20 @@ const state = store({
   loading: true,
   error: '',
   lastSync: '',
+  site: '',
 });
 
 function apply(s: TrafficSnapshot): void {
   state.data = s;
   state.loading = false;
   state.lastSync = new Date().toLocaleTimeString();
+}
+
+function load(): void {
+  state.loading = true;
+  getTraffic(state.site)
+    .then(apply)
+    .catch((e) => { state.error = String(e); state.loading = false; });
 }
 
 const style = `
@@ -29,6 +36,8 @@ const style = `
   .brand-sub{margin-left:10px;font-size:.6rem;font-weight:700;color:#c4a0ff;background:rgba(139,77,255,.12);border:1px solid rgba(139,77,255,.35);border-radius:999px;padding:2px 8px;letter-spacing:.06em;text-transform:uppercase}
   .header-right{display:flex;align-items:center;gap:14px}
   .sync{font-size:.72rem;color:var(--muted)}
+  .site-select{background:rgba(255,255,255,.03);border:1px solid var(--line);color:var(--text);font-size:.78rem;font-weight:600;padding:7px 10px;border-radius:8px;cursor:pointer;outline:none}
+  .site-select option{background:#0a0f1a;color:var(--text)}
   .refresh{font-size:.78rem;font-weight:600;color:#fff;background:linear-gradient(135deg,#8d4dff,#4d7cff);border:none;border-radius:8px;padding:7px 16px;cursor:pointer;transition:opacity .15s}
   .refresh:hover{opacity:.9}
 
@@ -61,6 +70,7 @@ const style = `
   td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.04)}
   td.num{text-align:right;font-family:'JetBrains Mono',monospace;color:#f7f7ff}
   .path{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:#c4a0ff;word-break:break-all}
+  .time{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--muted);white-space:nowrap}
   .status-pill{display:inline-block;min-width:44px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:6px}
   .status-pill.s2{color:var(--ok);background:rgba(52,211,153,.1)}
   .status-pill.s3{color:var(--accent2);background:rgba(0,223,255,.1)}
@@ -125,10 +135,10 @@ function Dashboard(): JSX.Element {
         <div class="card">
           <h3>Top IPs</h3>
           <table>
-            <thead><tr><th>IP</th><th class="num">Req</th></tr></thead>
+            <thead><tr><th>IP</th><th>País</th><th class="num">Req</th></tr></thead>
             <tbody>
               {d.topIps.map((r) => (
-                <tr><td><code>{r.key}</code></td><td class="num">{r.count}</td></tr>
+                <tr><td><code>{r.key}</code></td><td>{r.country}</td><td class="num">{r.count}</td></tr>
               ))}
             </tbody>
           </table>
@@ -162,6 +172,25 @@ function Dashboard(): JSX.Element {
             </tbody>
           </table>
         </div>
+
+        <div class="card full">
+          <h3>Errores recientes (4xx / 5xx)</h3>
+          <table>
+            <thead><tr><th>Hora</th><th>Ruta</th><th class="num">Error</th></tr></thead>
+            <tbody>
+              {d.recentErrors.length === 0 && (
+                <tr><td colspan="3" style="text-align:center;color:var(--muted)">Sin errores</td></tr>
+              )}
+              {d.recentErrors.map((e) => (
+                <tr>
+                  <td class="time">{e.time}</td>
+                  <td class="path">{e.path}</td>
+                  <td class="num"><span class={`status-pill s${e.status[0]}`}>{e.status}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
@@ -169,10 +198,9 @@ function Dashboard(): JSX.Element {
 
 export const App = component(() => {
   mounted(() => {
-    getTraffic()
-      .then(apply)
-      .catch((e) => { state.error = String(e); state.loading = false; });
-    return autoSync('/api/astra/getTraffic', apply, { interval: 5000 });
+    load();
+    const id = setInterval(load, 5000);
+    return () => clearInterval(id);
   });
 
   return (
@@ -184,18 +212,18 @@ export const App = component(() => {
           <span class="brand-sub">Traffic</span>
         </div>
         <div class="header-right">
-          <span class="sync">Última sync: {state.lastSync || '—'}</span>
-          <button
-            class="refresh"
-            onclick={() => {
-              state.loading = true;
-              getTraffic()
-                .then(apply)
-                .catch((e) => { state.error = String(e); state.loading = false; });
-            }}
+          <select
+            class="site-select"
+            value={state.site}
+            onchange={(e) => { state.site = (e.target as HTMLSelectElement).value; load(); }}
           >
-            ↻ Actualizar
-          </button>
+            <option value="">Todos</option>
+            {state.data?.bySite.map((s) => (
+              <option value={s.site} selected={state.site === s.site}>{s.site}</option>
+            ))}
+          </select>
+          <span class="sync">Última sync: {state.lastSync || '—'}</span>
+          <button class="refresh" onclick={load}>↻ Actualizar</button>
         </div>
       </header>
 

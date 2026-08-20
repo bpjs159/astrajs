@@ -18,11 +18,12 @@ export interface TrafficSnapshot {
   total: number;
   uniqueIps: number;
   statusCodes: Record<string, number>;
-  topIps: { key: string; count: number }[];
+  topIps: { key: string; count: number; country: string }[];
   topPaths: { key: string; count: number }[];
   byHour: number[];
   byDay: { day: string; count: number }[];
   bySite: SiteTraffic[];
+  recentErrors: { time: string; path: string; status: string }[];
   logDir: string;
   lastLog: string;
 }
@@ -33,7 +34,28 @@ export interface TrafficSnapshot {
 // con delimitadores de string y rompa la detección de la llamada RPC.
 const LINE_RE = /^(\S+) \S+ \S+ \[([^\]]+)\] \x22(\S+) ([^\x22]*)\x22 (\d{3}) (\S+) \x22([^\x22]*)\x22 \x22([^\x22]*)\x22$/;
 
-async function parseLogs(): Promise<TrafficSnapshot> {
+// Caché de país por IP (ip-api.com, free tier 45 req/min).
+const countryCache = new Map<string, string>();
+
+async function lookupCountry(ip: string): Promise<string> {
+  const cached = countryCache.get(ip);
+  if (cached) return cached;
+  try {
+    const res = await fetch(`http://ip-api.com/json/${ip}?fields=country`);
+    if (res.ok) {
+      const data = (await res.json()) as { country?: string };
+      const country = data.country || '—';
+      countryCache.set(ip, country);
+      return country;
+    }
+  } catch {
+    /* sin red — ignorar */
+  }
+  countryCache.set(ip, '—');
+  return '—';
+}
+
+async function parseLogs(site: string): Promise<TrafficSnapshot> {
   // node:fs se importa dinámicamente para que el bundle del cliente (que
   // reemplaza server() por un fetch wrapper) no intente resolver node:fs.
   const { readdirSync, readFileSync, existsSync } = await import('node:fs');
@@ -51,32 +73,27 @@ async function parseLogs(): Promise<TrafficSnapshot> {
     byHour: Array(24).fill(0),
     byDay: [],
     bySite: [],
+    recentErrors: [],
     logDir: LOG_DIR,
     lastLog: '',
   });
 
   if (!existsSync(LOG_DIR)) return empty();
 
-  let files: string[] = [];
+  let allFiles: string[] = [];
   try {
     // Todos los access logs del directorio (excluye error.log y rotados .gz).
-    files = readdirSync(LOG_DIR).filter(
+    allFiles = readdirSync(LOG_DIR).filter(
       (f) => f.endsWith('.log') && !f.includes('error') && !f.includes('access.log.'),
     );
   } catch {
     return empty();
   }
 
-  const ipCount: Record<string, number> = {};
-  const pathCount: Record<string, number> = {};
-  const statusCount: Record<string, number> = {};
-  const hourCount = Array(24).fill(0) as number[];
-  const dayCount: Record<string, number> = {};
+  // bySite SIEMPRE de todos los logs (para poblar el selector).
   const siteCount: Record<string, { total: number; ips: Set<string> }> = {};
-  let lastLog = '';
-
-  for (const file of files) {
-    const site = file.replace(/\.log$/, '');
+  for (const file of allFiles) {
+    const s = file.replace(/\.log$/, '');
     const full = join(LOG_DIR, file);
     let raw = '';
     try {
@@ -85,7 +102,41 @@ async function parseLogs(): Promise<TrafficSnapshot> {
       continue;
     }
     const lines = raw.split('\n').filter(Boolean);
-    const siteIps = new Set<string>();
+    const ips = new Set<string>();
+    for (const line of lines) {
+      const m = LINE_RE.exec(line);
+      if (m) ips.add(m[1]);
+    }
+    siteCount[s] = { total: lines.length, ips };
+  }
+  const bySite: SiteTraffic[] = Object.entries(siteCount)
+    .map(([s, v]) => ({ site: s, total: v.total, uniqueIps: v.ips.size }))
+    .sort((a, b) => b.total - a.total);
+
+  // Archivos a procesar según el sitio seleccionado ('' = todos).
+  let files = allFiles;
+  if (site) {
+    const target = `${site}.log`;
+    files = allFiles.includes(target) ? [target] : [];
+  }
+
+  const ipCount: Record<string, number> = {};
+  const pathCount: Record<string, number> = {};
+  const statusCount: Record<string, number> = {};
+  const hourCount = Array(24).fill(0) as number[];
+  const dayCount: Record<string, number> = {};
+  const recentErrors: { time: string; path: string; status: string }[] = [];
+  let lastLog = '';
+
+  for (const file of files) {
+    const full = join(LOG_DIR, file);
+    let raw = '';
+    try {
+      raw = readFileSync(full, 'utf8');
+    } catch {
+      continue;
+    }
+    const lines = raw.split('\n').filter(Boolean);
 
     for (const line of lines) {
       const m = LINE_RE.exec(line);
@@ -98,7 +149,6 @@ async function parseLogs(): Promise<TrafficSnapshot> {
       ipCount[ip] = (ipCount[ip] ?? 0) + 1;
       pathCount[path] = (pathCount[path] ?? 0) + 1;
       statusCount[status] = (statusCount[status] ?? 0) + 1;
-      siteIps.add(ip);
 
       const hm = /:(\d{2}):/.exec(time);
       if (hm) hourCount[parseInt(hm[1], 10)]++;
@@ -106,9 +156,13 @@ async function parseLogs(): Promise<TrafficSnapshot> {
       const day = time.slice(0, 11); // "19/Aug/2026"
       dayCount[day] = (dayCount[day] ?? 0) + 1;
       lastLog = line;
-    }
 
-    siteCount[site] = { total: lines.length, ips: siteIps };
+      // Errores (4xx/5xx) con hora exacta, ruta y status.
+      if (status[0] === '4' || status[0] === '5') {
+        recentErrors.push({ time, path, status });
+        if (recentErrors.length > 50) recentErrors.shift();
+      }
+    }
   }
 
   const top = (obj: Record<string, number>, n: number) =>
@@ -117,21 +171,23 @@ async function parseLogs(): Promise<TrafficSnapshot> {
       .slice(0, n)
       .map(([k, v]) => ({ key: k, count: v }));
 
-  const bySite: SiteTraffic[] = Object.entries(siteCount)
-    .map(([site, v]) => ({ site, total: v.total, uniqueIps: v.ips.size }))
-    .sort((a, b) => b.total - a.total);
+  const topIps = top(ipCount, 10).map((t) => ({ ...t, country: '' }));
+  for (const t of topIps) {
+    t.country = await lookupCountry(t.key);
+  }
 
   return {
-    total: bySite.reduce((a, s) => a + s.total, 0),
+    total: Object.values(ipCount).reduce((a, b) => a + b, 0),
     uniqueIps: Object.keys(ipCount).length,
     statusCodes: statusCount,
-    topIps: top(ipCount, 10),
+    topIps,
     topPaths: top(pathCount, 10),
     byHour: hourCount,
     byDay: Object.entries(dayCount)
       .sort((a, b) => a[0].localeCompare(b[0]))
       .map(([day, count]) => ({ day, count })),
     bySite,
+    recentErrors,
     logDir: LOG_DIR,
     lastLog,
   };
@@ -139,5 +195,5 @@ async function parseLogs(): Promise<TrafficSnapshot> {
 
 export const getTraffic = server(
   { autoSync: true, autoSyncInterval: 5000 },
-  async (): Promise<TrafficSnapshot> => parseLogs(),
+  async (site: string = ''): Promise<TrafficSnapshot> => parseLogs(site),
 );
