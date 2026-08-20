@@ -25,7 +25,7 @@ const version = val('--version', null);
 
 const ORDER = [
   'validation', 'ai', 'core', 'form', 'i18n', 'router', 'schema',
-  'server', 'compiler', 'ssr', 'adapters', 'astra',
+  'server', 'compiler', 'ssr', 'adapters', 'astra', 'astra-js',
 ];
 
 let ok = true;
