@@ -137,6 +137,18 @@ run('node', [path.join(ROOT, 'astra-tasks', 'scripts', 'prerender.mjs')], path.j
 checkServerManifest('astra-tasks');
 copyDir(path.join(ROOT, 'astra-tasks', 'dist'), path.join(STAGE, 'tasks'));
 
+// astra-traffic — nginx traffic dashboard on its own port (traffic.astrajs.dev).
+// NOTE: NO prerender — el prerender.mjs borra dist/server (bug conocido). El
+// server node sirve el shell estático + RPC.
+console.log('== astra-traffic (node adapter) ==');
+withConfig('astra-traffic', { adapter: 'node', apiPrefix: '/api/astra' }, () => {
+  run(astraBin('astra-traffic'), ['build'], path.join(ROOT, 'astra-traffic'), {
+    ASTRA_API_PREFIX: '/api/astra',
+  });
+});
+checkServerManifest('astra-traffic');
+copyDir(path.join(ROOT, 'astra-traffic', 'dist'), path.join(STAGE, 'traffic'));
+
 // ────────────────────────────────────────────────────────────────────────────
 // 2. Examples — static (plain vite build)
 // ────────────────────────────────────────────────────────────────────────────
@@ -508,6 +520,18 @@ if (fs.existsSync(path.join(STAGE, 'tasks', 'server', 'server.mjs'))) {
   });
 } else {
   console.warn('⚠️  astra-tasks: no server bundle emitted — deploying static only.');
+}
+
+// astra-traffic — nginx traffic dashboard on its own port (traffic.astrajs.dev).
+if (fs.existsSync(path.join(STAGE, 'traffic', 'server', 'server.mjs'))) {
+  apps.push({
+    name: 'traffic',
+    cwd: `${WWW}/traffic`,
+    script: 'server/server.mjs',
+    env: { PORT: 5305 },
+  });
+} else {
+  console.warn('⚠️  astra-traffic: no server bundle emitted — deploying static only.');
 }
 
 fs.writeFileSync(
