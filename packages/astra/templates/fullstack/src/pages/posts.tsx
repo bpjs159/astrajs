@@ -26,7 +26,6 @@ export const PostsPage = component(() => {
           <ul style="list-style:none;display:flex;flex-direction:column;gap:12px">
             {state.posts.map((post) => (
               <li
-                key={post.id}
                 style="background:#0a0f1a;border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:20px"
               >
                 <strong style="color:#fff">{post.title}</strong>

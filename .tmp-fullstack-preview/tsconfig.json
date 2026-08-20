@@ -11,7 +11,14 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "paths": {
+      "astrajs.dev/core": ["/Users/sebastian_bonilla/Documents/astrajs/packages/core/src"],
+      "astrajs.dev/core/jsx-runtime": ["/Users/sebastian_bonilla/Documents/astrajs/packages/core/src/jsx-runtime"],
+      "astrajs.dev/core/jsx-dev-runtime": ["/Users/sebastian_bonilla/Documents/astrajs/packages/core/src/jsx-dev-runtime"],
+      "astrajs.dev/router": ["/Users/sebastian_bonilla/Documents/astrajs/packages/router/src"],
+      "astrajs.dev/server": ["/Users/sebastian_bonilla/Documents/astrajs/packages/server/src"]
+    }
   },
   "include": ["src"]
 }
