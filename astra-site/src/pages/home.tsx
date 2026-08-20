@@ -1,4 +1,4 @@
-import { component, store, dynamic } from 'astrajs.dev/core';
+import { component, store, dynamic, mounted } from 'astrajs.dev/core';
 import { navigate } from 'astrajs.dev/router';
 import { i18n } from '../i18n.js';
 import { Icon } from '../components/icon.js';
@@ -9,6 +9,14 @@ export const HomePage = component(() => {
 
   /** Divide claves con <br/> en líneas para renderizarlas con salto real. */
   const br = (key: string) => i18n.t(key).split('<br/>');
+
+  /** Spotlight: sigue el cursor dentro de una tarjeta vía CSS vars --mx/--my. */
+  const onCardMove = (e: Event) => {
+    const el = e.currentTarget as HTMLElement;
+    const r = el.getBoundingClientRect();
+    el.style.setProperty('--mx', `${e.clientX - r.left}px`);
+    el.style.setProperty('--my', `${e.clientY - r.top}px`);
+  };
 
   // ── Dashboard reactive state ──
   const dash = store({
@@ -72,6 +80,67 @@ export const HomePage = component(() => {
     dash.chartData = Array.from({ length: 20 }, () => Math.floor(Math.random() * 85 + 15));
   };
 
+  // ── Number ticker (dashboard) ──
+  const dashTicker = store({ sales: 0, orders: 0, customers: 0, conversion: 0 });
+  let tickerRAF: number | null = null;
+  let dashEl: HTMLElement | null = null;
+
+  const animateTicker = () => {
+    const targets = {
+      sales: 54780 * periodMultiplier[dash.period],
+      orders: 1428 * periodMultiplier[dash.period],
+      customers: 3987 * periodMultiplier[dash.period],
+      conversion: 2.43 * periodMultiplier[dash.period],
+    };
+    const from = { ...dashTicker };
+    const start = performance.now();
+    const dur = 1100;
+    const step = (now: number) => {
+      const p = Math.min(1, (now - start) / dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      dashTicker.sales = from.sales + (targets.sales - from.sales) * e;
+      dashTicker.orders = from.orders + (targets.orders - from.orders) * e;
+      dashTicker.customers = from.customers + (targets.customers - from.customers) * e;
+      dashTicker.conversion = from.conversion + (targets.conversion - from.conversion) * e;
+      if (p < 1) tickerRAF = requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+
+  // ── CTA copy ──
+  const ctaCopy = store({ copied: false });
+  const copyCommand = () => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText('npx astrajs.dev@latest my-app').catch(() => {});
+    }
+    ctaCopy.copied = true;
+    setTimeout(() => { ctaCopy.copied = false; }, 1500);
+  };
+
+  // ── Scroll-reveal global + ticker on view ──
+  mounted(() => {
+    const revealEls = document.querySelectorAll('.reveal');
+    const revealObs = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        if (en.isIntersecting) {
+          en.target.classList.add('revealed');
+          revealObs.unobserve(en.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    revealEls.forEach((el) => revealObs.observe(el));
+
+    const tickerObs = new IntersectionObserver((entries) => {
+      if (entries[0]?.isIntersecting) {
+        animateTicker();
+        tickerObs.disconnect();
+      }
+    }, { threshold: 0.3 });
+    if (dashEl) tickerObs.observe(dashEl);
+
+    return () => { revealObs.disconnect(); tickerObs.disconnect(); if (tickerRAF) cancelAnimationFrame(tickerRAF); };
+  });
+
   const tabCode: Record<string, string> = {
     store: `import { store } from 'astrajs.dev/core';
 
@@ -130,11 +199,18 @@ function App() {
 
   const style = `
     /* === HERO === */
-    .hero{position:relative;overflow:hidden;height:calc(100vh - 64px);text-align:center;display:flex;align-items:center;justify-content:flex-start;flex-direction:column;padding-top:16vh}
+    .hero{position:relative;overflow:hidden;min-height:calc(100vh - 64px);text-align:center;display:flex;align-items:center;justify-content:flex-start;flex-direction:column;padding-top:16vh}
     .hero .container{position:relative;z-index:1}
     .hero-bg{position:absolute;inset:0;pointer-events:none;background:url('/images/bg.png') center/cover no-repeat;opacity:.50}
     .hero-bg::before{content:'';position:absolute;top:-40%;left:50%;transform:translateX(-50%);width:900px;height:900px;background:radial-gradient(circle,rgba(139,77,255,.08) 0%,transparent 70%)}
     .hero-bg::after{content:'';position:absolute;bottom:-30%;left:50%;transform:translateX(-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(0,223,255,.05) 0%,transparent 70%)}
+
+    /* === AURORA (animated gradient blobs) === */
+    .aurora{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55;pointer-events:none;will-change:transform}
+    .aurora-1{width:640px;height:640px;background:radial-gradient(circle,rgba(139,77,255,.4) 0%,transparent 70%);top:-12%;left:-6%;animation:auroraFloat 18s ease-in-out infinite}
+    .aurora-2{width:540px;height:540px;background:radial-gradient(circle,rgba(0,223,255,.26) 0%,transparent 70%);bottom:-16%;right:-8%;animation:auroraFloat 24s ease-in-out infinite reverse}
+    .aurora-3{width:440px;height:440px;background:radial-gradient(circle,rgba(77,124,255,.3) 0%,transparent 70%);top:42%;left:56%;animation:auroraFloat 28s ease-in-out infinite}
+    @keyframes auroraFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(46px,-34px) scale(1.08)}66%{transform:translate(-34px,28px) scale(.94)}}
 
     /* === STARFIELD === */
     .stars{position:absolute;inset:0;overflow:hidden;pointer-events:none}
@@ -185,6 +261,11 @@ function App() {
     .stat-desc{font-size:.76rem;color:#64748b;font-weight:500;display:flex;align-items:center;justify-content:center;gap:6px}
     @media(max-width:640px){.stats-bar{gap:28px 36px}}
 
+    /* === SCROLL REVEAL === */
+    .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1)}
+    .reveal.revealed{opacity:1;transform:none}
+    @media (prefers-reduced-motion: reduce){.reveal{opacity:1;transform:none;transition:none}}
+
     /* === SECTION === */
     .section{padding:80px 0}
     .section-inner{max-width:1200px;margin:0 auto;padding:0 32px}
@@ -208,14 +289,32 @@ function App() {
     .code-box-body{padding:18px 20px;overflow-x:auto}
     @media(max-width:900px){.feature-showcase{grid-template-columns:1fr;gap:32px}}
 
-    /* === FEATURES GRID === */
-    .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:48px}
-    .feature-card{background:#0a0f1a;border:1px solid rgba(255,255,255,.05);border-radius:14px;padding:28px;transition:border-color .2s,transform .2s}
-    .feature-card:hover{border-color:rgba(139,77,255,.2);transform:translateY(-2px)}
-    .feature-card-icon{font-size:1.4rem;margin-bottom:16px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:rgba(139,77,255,.08);border-radius:10px}
-    .feature-card-icon img{width:24px;height:24px}
-    .feature-card h4{font-size:.95rem;font-weight:700;color:#f7f7ff;margin-bottom:8px;letter-spacing:-.01em}
-    .feature-card p{font-size:.8rem;color:#64748b;line-height:1.6}
+    /* === INCREMENTAL === */
+    .incremental{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;margin-top:48px}
+    .incremental-visual{display:flex;flex-direction:column;gap:14px}
+    .inc-level{display:flex;align-items:center;gap:12px;padding:16px 20px;border-radius:12px;background:#0a0f1a;border:1px solid rgba(255,255,255,.06);font-size:.9rem;font-weight:600;color:#e2e8f0;transition:border-color .2s,transform .2s}
+    .inc-level svg{color:#b84cff;flex-shrink:0}
+    .inc-level:hover{border-color:rgba(139,77,255,.3);transform:translateX(4px)}
+    .inc-level.inc-1{border-color:rgba(139,77,255,.35)}
+    .inc-level.inc-2{margin-left:24px}
+    .inc-level.inc-3{margin-left:48px}
+    .inc-level.inc-4{margin-left:72px}
+    .inc-level.inc-5{margin-left:96px}
+    .incremental-text p{font-size:.92rem;color:#94a3b8;line-height:1.7;max-width:520px}
+    @media(max-width:900px){.incremental{grid-template-columns:1fr;gap:32px}.inc-level{margin-left:0!important}}
+
+    /* === FEATURES GRID (uniform + spotlight) === */
+    .features-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:minmax(210px,auto);gap:20px;margin-top:48px}
+    .feature-card{position:relative;overflow:hidden;background:#0a0f1a;border:1px solid rgba(255,255,255,.05);border-radius:14px;padding:28px;transition:border-color .2s,transform .2s;min-height:210px}
+    .feature-card:hover{border-color:rgba(139,77,255,.25);transform:translateY(-3px)}
+    .feature-card::before{content:'';position:absolute;inset:0;background:radial-gradient(260px circle at var(--mx,50%) var(--my,50%),rgba(139,77,255,.16),transparent 60%);opacity:0;transition:opacity .25s;pointer-events:none}
+    .feature-card:hover::before{opacity:1}
+    .feature-card::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(135deg,rgba(139,77,255,.55),rgba(0,223,255,.3));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .25s;pointer-events:none}
+    .feature-card:hover::after{opacity:1}
+    .feature-card-icon{font-size:1.6rem;margin-bottom:18px;width:60px;height:60px;display:flex;align-items:center;justify-content:center;background:rgba(139,77,255,.1);border-radius:14px;position:relative;z-index:1}
+    .feature-card-icon img{width:32px;height:32px}
+    .feature-card h4{font-size:.95rem;font-weight:700;color:#f7f7ff;margin-bottom:8px;letter-spacing:-.01em;position:relative;z-index:1}
+    .feature-card p{font-size:.8rem;color:#94a3b8;line-height:1.6;position:relative;z-index:1}
     @media(max-width:900px){.features-grid{grid-template-columns:repeat(2,1fr)}}
     @media(max-width:600px){.features-grid{grid-template-columns:1fr}}
 
@@ -294,11 +393,21 @@ function App() {
     @media(max-width:768px){.dash-body{grid-template-columns:1fr}.dash-stats{grid-template-columns:repeat(2,1fr)}.dash-search{min-width:120px}}
 
     /* === CTA === */
-    .cta-section{text-align:center;padding:80px 0}
+    .cta-section{position:relative;text-align:center;padding:0;min-height:60vh;display:flex;align-items:center;justify-content:center}
+    .cta-section .container{position:relative;z-index:1;width:100%}
+    .cta-aurora{position:absolute;inset:0;pointer-events:none;z-index:0}
+    .cta-aurora-1{background:radial-gradient(60% 60% at 50% 45%, rgba(139,77,255,.32), transparent 85%)}
+    .cta-aurora-2{background:radial-gradient(50% 50% at 12% 85%, rgba(0,223,255,.16), transparent 85%)}
+    .cta-aurora-3{background:radial-gradient(50% 50% at 88% 85%, rgba(77,124,255,.2), transparent 85%)}
     .cta-section h2{font-size:2rem;font-weight:800;color:#f7f7ff;margin-bottom:12px;letter-spacing:-.02em}
-    .cta-section p{font-size:.92rem;color:#64748b;margin-bottom:32px;max-width:500px;margin-left:auto;margin-right:auto}
-    .cta-code{display:inline-flex;align-items:center;gap:12px;background:#0a0f1a;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 20px;font-family:'JetBrains Mono',monospace;font-size:.82rem;color:#cbd5e1;margin-bottom:24px}
-    .cta-code span{color:#8d4dff}
+    .cta-section p{font-size:.92rem;color:#94a3b8;margin-bottom:32px;max-width:500px;margin-left:auto;margin-right:auto}
+    .cta-code{position:relative;display:inline-flex;align-items:center;gap:12px;background:#0a0f1a;border-radius:10px;padding:10px 20px;font-family:'JetBrains Mono',monospace;font-size:.82rem;color:#cbd5e1;margin-bottom:24px;cursor:pointer}
+    .cta-copy-tip{position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(4px);background:#1a1030;border:1px solid rgba(184,76,255,.3);color:#f7f7ff;font-size:.66rem;font-weight:600;padding:4px 10px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s;font-family:'Inter',sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+    .cta-code:hover .cta-copy-tip{opacity:1;transform:translateX(-50%) translateY(0)}
+    .cta-copy-tip.copied{color:#34d399;border-color:rgba(52,211,153,.4)}
+    .cta-code::before{content:'';position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(135deg,#8d4dff,#00dfff,#4d7cff,#8d4dff);background-size:200% 200%;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:ctaBorder 6s linear infinite;pointer-events:none}
+    @keyframes ctaBorder{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    .cta-code span{color:#c4a0ff}
   `;
 
   return (
@@ -308,6 +417,9 @@ function App() {
       {/* ── HERO ── */}
       <section class="hero">
         <div class="hero-bg"></div>
+        <div class="aurora aurora-1"></div>
+        <div class="aurora aurora-2"></div>
+        <div class="aurora aurora-3"></div>
         <div class="stars">
           {/* Generate twinkling stars */}
           {(() => {
@@ -380,7 +492,7 @@ function App() {
       </div>
 
       {/* ── FEATURE: Sin Virtual DOM ── */}
-      <section class="section">
+      <section class="section reveal" style="padding-top:0">
         <div class="section-inner">
           <div class="feature-showcase">
             <div class="feature-text">
@@ -411,44 +523,64 @@ function App() {
         </div>
       </section>
 
+      {/* ── INCREMENTAL ── */}
+      <section class="section reveal">
+        <div class="section-inner">
+          <div class="incremental">
+            <div class="incremental-visual">
+              <div class="inc-level inc-1"><Icon name="bolt" size={16} /> {i18n.t('home.incremental.l1')}</div>
+              <div class="inc-level inc-2"><Icon name="server" size={16} /> {i18n.t('home.incremental.l2')}</div>
+              <div class="inc-level inc-3"><Icon name="ssr" size={16} /> {i18n.t('home.incremental.l3')}</div>
+              <div class="inc-level inc-4"><Icon name="route" size={16} /> {i18n.t('home.incremental.l4')}</div>
+              <div class="inc-level inc-5"><Icon name="chip" size={16} /> {i18n.t('home.incremental.l5')}</div>
+            </div>
+            <div class="incremental-text">
+              <div class="section-label">{i18n.t('home.incremental.label')}</div>
+              <h2 class="section-title">{i18n.t('home.incremental.title')}</h2>
+              <p>{i18n.t('home.incremental.text')}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── FEATURES GRID ── */}
-      <section class="section" style="padding-top:0">
+      <section class="section reveal" style="padding-top:0">
         <div class="section-inner">
           <div class="section-label">{i18n.t('home.features.label')}</div>
           <h2 class="section-title">{br('home.features.title')[0]}<br/>{br('home.features.title')[1]}</h2>
           <div class="features-grid">
-            <div class="feature-card">
-              <div class="feature-card-icon"><Icon name="ast" size={24} /></div>
+            <div class="feature-card" onmousemove={onCardMove}>
+              <div class="feature-card-icon"><Icon name="ast" size={32} /></div>
               <h4>{i18n.t('home.f1.title')}</h4>
               <p>{i18n.t('home.f1.text')}</p>
             </div>
-            <div class="feature-card">
-              <div class="feature-card-icon"><Icon name="bolt" size={24} /></div>
+            <div class="feature-card" onmousemove={onCardMove}>
+              <div class="feature-card-icon"><Icon name="bolt" size={32} /></div>
               <h4>{i18n.t('home.f2.title')}</h4>
               <p>{i18n.t('home.f2.text')}</p>
             </div>
-            <div class="feature-card">
-              <div class="feature-card-icon"><Icon name="server" size={24} /></div>
+            <div class="feature-card" onmousemove={onCardMove}>
+              <div class="feature-card-icon"><Icon name="server" size={32} /></div>
               <h4>{i18n.t('home.f3.title')}</h4>
               <p>{i18n.t('home.f3.text')}</p>
             </div>
-            <div class="feature-card">
-              <div class="feature-card-icon"><Icon name="ssr" size={24} /></div>
+            <div class="feature-card" onmousemove={onCardMove}>
+              <div class="feature-card-icon"><Icon name="ssr" size={32} /></div>
               <h4>{i18n.t('home.f4.title')}</h4>
               <p>{i18n.t('home.f4.text')}</p>
             </div>
-            <div class="feature-card">
-              <div class="feature-card-icon"><Icon name="layout-pages" size={24} /></div>
+            <div class="feature-card" onmousemove={onCardMove}>
+              <div class="feature-card-icon"><Icon name="layout-pages" size={32} /></div>
               <h4>{i18n.t('home.f5.title')}</h4>
               <p>{i18n.t('home.f5.text')}</p>
             </div>
-            <div class="feature-card">
-              <div class="feature-card-icon"><Icon name="sparkles" size={24} /></div>
+            <div class="feature-card" onmousemove={onCardMove}>
+              <div class="feature-card-icon"><Icon name="sparkles" size={32} /></div>
               <h4>{i18n.t('home.f6.title')}</h4>
               <p>{i18n.t('home.f6.text')}</p>
             </div>
-            <div class="feature-card">
-              <div class="feature-card-icon"><Icon name="chip" size={24} /></div>
+            <div class="feature-card" onmousemove={onCardMove}>
+              <div class="feature-card-icon"><Icon name="chip" size={32} /></div>
               <h4>{i18n.t('home.f7.title')}</h4>
               <p>{i18n.t('home.f7.text')}</p>
             </div>
@@ -457,7 +589,7 @@ function App() {
       </section>
 
       {/* ── HOW IT WORKS ── */}
-      <section class="section" style="background:rgba(255,255,255,.01)">
+      <section class="section reveal" style="background:rgba(255,255,255,.01)">
         <div class="section-inner" style="text-align:center">
           <div class="section-label">{i18n.t('home.how.label')}</div>
           <h2 class="section-title">{i18n.t('home.how.title')}</h2>
@@ -507,7 +639,7 @@ function App() {
       </section>
 
       {/* ── CODE PREVIEW ── */}
-      <section class="section">
+      <section class="section reveal">
         <div class="section-inner">
           <div class="section-label">{i18n.t('home.code.label')}</div>
           <h2 class="section-title">store · server · CSS · router</h2>
@@ -527,12 +659,12 @@ function App() {
       </section>
 
       {/* ── DASHBOARD PREVIEW ── */}
-      <section class="section" style="padding-top:0">
+      <section class="section reveal" style="padding-top:0">
         <div class="section-inner">
           <div class="section-label">{i18n.t('home.demo.label')}</div>
           <h2 class="section-title">Dashboard E-commerce</h2>
           <p style="font-size:.84rem;color:#64748b;margin-bottom:8px">{i18n.t('home.demo.sub1')}<code style="background:rgba(139,77,255,.1);color:#c4a0ff;padding:2px 6px;border-radius:4px;font-size:.78rem">store()</code>{i18n.t('home.demo.sub2')}</p>
-          <div class="dashboard-preview">
+          <div class="dashboard-preview" ref={(n) => { dashEl = n; }}>
             <div class="dash-header">
               <span class="dash-logo">
                 <img src="/images/logo.png" alt="A" />
@@ -564,31 +696,31 @@ function App() {
                       {periods.map((p, i) => (
                         <button
                           class={`dash-period-btn${dash.period === i ? ' active' : ''}`}
-                          onclick={() => { dash.period = i; }}
+                          onclick={() => { dash.period = i; animateTicker(); }}
                         >
                           {i18n.t(p)}
                         </button>
                       ))}
                     </div>
                     <div class="dash-stats">
-                      <div class="dash-stat" onclick={() => { dash.period = (dash.period + 1) % 3; }}>
+                      <div class="dash-stat">
                         <div class="dash-stat-lbl">{i18n.t('home.dash.totalSales')}</div>
-                        <div class="dash-stat-val">${getStatValue(54780)}</div>
+                        <div class="dash-stat-val">${Math.round(dashTicker.sales).toLocaleString()}</div>
                         <div class="dash-stat-up">↑ {getStatChange(12.3)}%</div>
                       </div>
-                      <div class="dash-stat" onclick={() => { dash.period = (dash.period + 1) % 3; }}>
+                      <div class="dash-stat">
                         <div class="dash-stat-lbl">{i18n.t('home.dash.orders')}</div>
-                        <div class="dash-stat-val">{getStatValue(1428)}</div>
+                        <div class="dash-stat-val">{Math.round(dashTicker.orders).toLocaleString()}</div>
                         <div class="dash-stat-up">↑ {getStatChange(8.3)}%</div>
                       </div>
-                      <div class="dash-stat" onclick={() => { dash.period = (dash.period + 1) % 3; }}>
+                      <div class="dash-stat">
                         <div class="dash-stat-lbl">{i18n.t('home.dash.customers')}</div>
-                        <div class="dash-stat-val">{getStatValue(3987)}</div>
+                        <div class="dash-stat-val">{Math.round(dashTicker.customers).toLocaleString()}</div>
                         <div class="dash-stat-up">↑ {getStatChange(8.2)}%</div>
                       </div>
-                      <div class="dash-stat" onclick={() => { dash.period = (dash.period + 1) % 3; }}>
+                      <div class="dash-stat">
                         <div class="dash-stat-lbl">{i18n.t('home.dash.conversion')}</div>
-                        <div class="dash-stat-val">{getStatValue(2.43, 2)}%</div>
+                        <div class="dash-stat-val">{dashTicker.conversion.toFixed(2)}%</div>
                         <div class="dash-stat-up">↑ {getStatChange(4.1)}%</div>
                       </div>
                     </div>
@@ -708,12 +840,16 @@ function App() {
       </section>
 
       {/* ── CTA ── */}
-      <section class="cta-section" style="background:rgba(255,255,255,.01)">
+      <section class="cta-section reveal" style="background:rgba(255,255,255,.01)">
+        <div class="cta-aurora cta-aurora-1"></div>
+        <div class="cta-aurora cta-aurora-2"></div>
+        <div class="cta-aurora cta-aurora-3"></div>
         <div class="container">
           <h2>{i18n.t('home.cta.title')}</h2>
           <p>{i18n.t('home.cta.sub')}</p>
-          <div class="cta-code">
+          <div class="cta-code" onclick={copyCommand}>
             <span>npx astrajs.dev@latest my-app</span>
+            <span class={`cta-copy-tip${ctaCopy.copied ? ' copied' : ''}`}>{ctaCopy.copied ? i18n.t('cb.copied') : i18n.t('cb.copy')}</span>
           </div>
           <br/>
           <button class="btn-primary" onclick={() => navigate('/docs/introduction')} style="font-size:.92rem;padding:14px 36px">

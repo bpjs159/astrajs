@@ -8,6 +8,9 @@ export default defineConfig({
       apiPrefix: '/api/astra',
     }),
   ],
+  server: {
+    port: 5050,
+  },
   resolve: {
   __ASTRA_ALIASES__
   },

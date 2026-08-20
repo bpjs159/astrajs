@@ -1,6 +1,6 @@
 {
   "name": "astrajs-workspace",
-  "version": "0.1.20",
+  "version": "0.1.21",
   "private": true,
   "description": "AstraJS — Full-Stack TypeScript Framework: Zero-VDOM, AST-compiled, Proxy-reactive",
   "scripts": {
