@@ -93,7 +93,7 @@ const style = `
   .code-block .cb-code{display:block;background:none;color:#cbd5e1;font-family:'JetBrains Mono',monospace;font-size:.76rem;line-height:1.85;white-space:pre;tab-size:2}
   .cb-kw{color:#c084fc}
   .cb-str{color:#7ce6c3}
-  .cb-com{color:#64748b;font-style:italic}
+  .cb-com{color:#94a3b8;font-style:italic}
   .cb-num{color:#fbbf24}
   .cb-fn{color:#7dd3fc}
   .cb-type{color:#67e8f9}
@@ -101,7 +101,7 @@ const style = `
   .cb-attr{color:#93c5fd}
   .cb-punc{color:#a78bfa}
   .cb-plain{color:#cbd5e1}
-  .code-block .cb-copy{position:absolute;right:12px;bottom:12px;display:inline-flex;align-items:center;gap:6px;font-size:.62rem;font-weight:700;color:#64748b;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:4px 10px;cursor:pointer;opacity:0;transition:opacity .15s,color .15s,border-color .15s;font-family:'Inter',sans-serif}
+  .code-block .cb-copy{position:absolute;right:12px;bottom:12px;display:inline-flex;align-items:center;gap:6px;font-size:.62rem;font-weight:700;color:#94a3b8;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:4px 10px;cursor:pointer;opacity:0;transition:opacity .15s,color .15s,border-color .15s;font-family:'Inter',sans-serif}
   .code-block:hover .cb-copy{opacity:1}
   .code-block .cb-copy:hover{color:#fff;border-color:rgba(139,77,255,.45)}
   .code-block .cb-copy.copied{color:#34d399;border-color:rgba(52,211,153,.4)}

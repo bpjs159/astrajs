@@ -38,7 +38,7 @@ export const DocsPage = component(() => {
     .docs-content pre code .op{color:#94a3b8}
 
     .docs-hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(139,77,255,.1);border:1px solid rgba(139,77,255,.2);border-radius:20px;padding:4px 14px;font-size:.72rem;font-weight:600;color:#b84cff;margin-bottom:20px}
-    .docs-hero-text{font-size:.92rem;color:#64748b;max-width:600px;line-height:1.7;margin-bottom:28px}
+    .docs-hero-text{font-size:.92rem;color:#94a3b8;max-width:600px;line-height:1.7;margin-bottom:28px}
 
     .docs-buttons{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:40px}
     .docs-btn-primary{display:inline-flex;align-items:center;gap:6px;font-size:.82rem;font-weight:600;color:#fff;background:linear-gradient(135deg,#8d4dff,#4d7cff);padding:10px 24px;border-radius:8px;transition:opacity .15s,transform .15s;cursor:pointer;border:none}
@@ -51,7 +51,7 @@ export const DocsPage = component(() => {
     .feature-pill-icon{margin-bottom:6px;display:flex;justify-content:center}
     @media(max-width:600px){.feature-pills{grid-template-columns:1fr}}
     .feature-pill-label{font-size:.72rem;font-weight:700;color:#f7f7ff}
-    .feature-pill-desc{font-size:.66rem;color:#64748b;margin-top:2px}
+    .feature-pill-desc{font-size:.66rem;color:#94a3b8;margin-top:2px}
 
     .code-demo{background:#060b14;border:1px solid rgba(255,255,255,.07);border-radius:12px;overflow:hidden;margin-bottom:28px}
     .code-demo-header{padding:10px 20px;display:flex;gap:20px;border-bottom:1px solid rgba(255,255,255,.06);font-size:.72rem;font-weight:600;background:rgba(255,255,255,.015)}
@@ -62,13 +62,13 @@ export const DocsPage = component(() => {
     .code-demo-result{padding:16px 24px;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:rgba(255,255,255,.01)}
     .code-demo-result-label{font-size:.68rem;color:#475569;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
     .code-demo-counter{font-size:1.3rem;font-weight:800;color:#f7f7ff}
-    .code-demo-note{font-size:.72rem;color:#64748b;margin-left:auto}
+    .code-demo-note{font-size:.72rem;color:#94a3b8;margin-left:auto}
 
     .steps-list{counter-reset:step;margin-top:24px}
     .steps-list-item{display:flex;gap:16px;align-items:flex-start;margin-bottom:24px}
     .steps-list-num{width:36px;height:36px;border-radius:50%;background:rgba(139,77,255,.1);border:1px solid rgba(139,77,255,.2);display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:800;color:#b84cff;flex-shrink:0}
     .steps-list-text h4{font-size:.88rem;font-weight:700;color:#f7f7ff;margin-bottom:4px}
-    .steps-list-text p{font-size:.8rem;color:#64748b;line-height:1.6;margin:0}
+    .steps-list-text p{font-size:.8rem;color:#94a3b8;line-height:1.6;margin:0}
 
     .promo-card{background:linear-gradient(135deg,rgba(139,77,255,.08),rgba(0,223,255,.04));border:1px solid rgba(139,77,255,.15);border-radius:12px;padding:24px;margin-top:32px}
     .promo-card h4{font-size:.9rem;font-weight:700;color:#f7f7ff;margin-bottom:8px}
@@ -77,7 +77,7 @@ export const DocsPage = component(() => {
 
     /* === RIGHT SIDEBAR === */
     .toc-label{font-size:.64rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px}
-    .toc-item{display:block;font-size:.76rem;color:#64748b;padding:5px 0;font-weight:500;transition:color .12s;border-left:2px solid transparent;padding-left:12px}
+    .toc-item{display:block;font-size:.76rem;color:#94a3b8;padding:5px 0;font-weight:500;transition:color .12s;border-left:2px solid transparent;padding-left:12px}
     .toc-item:hover{color:#e2e8f0}
     .toc-item.active{color:#b84cff;border-left-color:#b84cff}
   `;

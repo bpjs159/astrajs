@@ -69,7 +69,7 @@ const s = `
   .ex-full-body{display:flex;flex-direction:column;gap:4px;min-width:0}
   .ex-full-name{font-size:.9rem;font-weight:700;color:#f7f7ff}
   .ex-full-desc{font-size:.74rem;color:#94a3b8;line-height:1.5}
-  .ex-full-arrow{margin-left:auto;display:flex;align-items:center;color:#64748b}
+  .ex-full-arrow{margin-left:auto;display:flex;align-items:center;color:#94a3b8}
   .ex-full-card:hover .ex-full-arrow{color:#b84cff}
   @media(max-width:768px){.ex-full-cards{grid-template-columns:1fr}}
   @media(max-width:768px){.ex-cards-grid{grid-template-columns:1fr}}

@@ -45,7 +45,7 @@ const s = `
   .docs-content .demo-btn{width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03);color:#e2e8f0;font-size:1rem;font-weight:700;cursor:pointer;transition:background .15s}
   .docs-content .demo-btn:hover{background:rgba(184,76,255,.15)}
   .docs-content .demo-count{font-size:1.1rem;font-weight:800;color:#c4a0ff;min-width:34px;text-align:center}
-  .docs-content .demo-formatted{font-size:.82rem;color:#64748b;line-height:1.8}
+  .docs-content .demo-formatted{font-size:.82rem;color:#94a3b8;line-height:1.8}
 `;
 
 /* ── Mensajes de la demo (9 idiomas) ── */

@@ -444,7 +444,7 @@ const ex16 = component(() => {
       <div class="lv-list">
         {todos.items.map((t) => (
           <div class="lv-item" style="cursor:pointer" onclick={() => toggle(t.id)}>
-            <span style={t.done ? 'text-decoration:line-through;color:#64748b' : ''}>{t.text}</span>
+            <span style={t.done ? 'text-decoration:line-through;color:#94a3b8' : ''}>{t.text}</span>
             <span>{t.done && <Icon name="check" size={14} />}{!t.done && <Icon name="square" size={14} />}</span>
           </div>
         ))}

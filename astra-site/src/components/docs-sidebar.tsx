@@ -292,10 +292,10 @@ export const DocSidebar = component(() => {
     .docs-sidebar-card:hover{border-color:rgba(139,77,255,.45);background:rgba(139,77,255,.06);transform:translateY(-1px)}
     .docs-sidebar-card-icon{display:flex;align-items:center;line-height:1}
     .docs-sidebar-card-title{font-size:.78rem;font-weight:600;color:#e2e8f0}
-    .docs-sidebar-card-arrow{margin-left:auto;display:flex;align-items:center;color:#64748b;transition:color .15s}
+    .docs-sidebar-card-arrow{margin-left:auto;display:flex;align-items:center;color:#94a3b8;transition:color .15s}
     .docs-sidebar-card:hover .docs-sidebar-card-arrow{color:#b84cff}
     .docs-sidebar-footer{padding:20px 28px;border-top:1px solid rgba(255,255,255,.06);margin-top:16px}
-    .docs-sidebar-footer a{display:flex;align-items:center;gap:8px;font-size:.78rem;color:#64748b;font-weight:500;transition:color .15s}
+    .docs-sidebar-footer a{display:flex;align-items:center;gap:8px;font-size:.78rem;color:#94a3b8;font-weight:500;transition:color .15s}
     .docs-sidebar-footer a:hover{color:#e2e8f0}
     [id]{scroll-margin-top:84px}
     /* === DRAWER MÓVIL (≤960px) === */

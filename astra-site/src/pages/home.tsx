@@ -257,8 +257,8 @@ function App() {
     .stat-icon{width:58px;height:58px;border-radius:16px;background:rgba(139,77,255,.08);border:1px solid rgba(139,77,255,.16);display:flex;align-items:center;justify-content:center;margin-bottom:14px;box-shadow:0 0 24px rgba(139,77,255,.12)}
     .stat-icon img{width:30px;height:30px}
     .stat-num{font-size:1.35rem;font-weight:800;color:#f7f7ff;letter-spacing:-.01em;display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:5px}
-    .stat-num .grad-text{background:linear-gradient(135deg,#b84cff,#4d7cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .stat-desc{font-size:.76rem;color:#64748b;font-weight:500;display:flex;align-items:center;justify-content:center;gap:6px}
+    .stat-num .grad-text{color:#fff}
+    .stat-desc{font-size:.76rem;color:#94a3b8;font-weight:500;display:flex;align-items:center;justify-content:center;gap:6px}
     @media(max-width:640px){.stats-bar{gap:28px 36px}}
 
     /* === SCROLL REVEAL === */
@@ -271,11 +271,11 @@ function App() {
     .section-inner{max-width:1200px;margin:0 auto;padding:0 32px}
     .section-label{font-size:.7rem;font-weight:700;color:#8d4dff;text-transform:uppercase;letter-spacing:.12em;margin-bottom:12px}
     .section-title{font-size:2rem;font-weight:800;color:#f7f7ff;letter-spacing:-.02em;margin-bottom:16px;line-height:1.2}
-    .section-subtitle{font-size:.92rem;color:#64748b;max-width:600px;line-height:1.65}
+    .section-subtitle{font-size:.92rem;color:#94a3b8;max-width:600px;line-height:1.65}
     @media(max-width:640px){.section{padding:50px 0}.section-title{font-size:1.5rem}}
 
     /* === FEATURE SHOWCASE (Sin Virtual DOM) === */
-    .feature-showcase{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;margin-top:48px}
+    .feature-showcase{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;margin-top:48px}
     .feature-text h3{font-size:1.4rem;font-weight:700;color:#f7f7ff;margin-bottom:12px;letter-spacing:-.01em}
     .feature-text p{font-size:.88rem;color:#94a3b8;line-height:1.7;margin-bottom:20px}
     .feature-link{font-size:.82rem;font-weight:600;color:#b84cff;transition:color .15s;cursor:pointer}
@@ -290,7 +290,7 @@ function App() {
     @media(max-width:900px){.feature-showcase{grid-template-columns:1fr;gap:32px}}
 
     /* === INCREMENTAL === */
-    .incremental{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;margin-top:48px}
+    .incremental{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start;margin-top:48px}
     .incremental-visual{display:flex;flex-direction:column;gap:14px}
     .inc-level{display:flex;align-items:center;gap:12px;padding:16px 20px;border-radius:12px;background:#0a0f1a;border:1px solid rgba(255,255,255,.06);font-size:.9rem;font-weight:600;color:#e2e8f0;transition:border-color .2s,transform .2s}
     .inc-level svg{color:#b84cff;flex-shrink:0}
@@ -325,7 +325,7 @@ function App() {
     .step-num{width:80px;height:80px;margin:0 auto 16px;border-radius:50%;background:#0a0f1a;border:2px solid rgba(139,77,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;color:#b84cff;position:relative}
     .step-idx{position:absolute;top:-5px;right:-5px;width:21px;height:21px;border-radius:50%;background:linear-gradient(135deg,#8d4dff,#4d7cff);color:#fff;font-size:.62rem;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #060b14}
     .step h4{font-size:.88rem;font-weight:700;color:#f7f7ff;margin-bottom:6px}
-    .step p{font-size:.76rem;color:#64748b;line-height:1.5}
+    .step p{font-size:.76rem;color:#94a3b8;line-height:1.5}
     @media(max-width:768px){.steps{flex-direction:column;gap:24px}.steps::before{display:none}}
 
     /* === CODE TABS === */
@@ -354,7 +354,7 @@ function App() {
     .dash-list{display:flex;flex-direction:column;gap:4px}
     .dash-list-row{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:10px 14px;font-size:.78rem;transition:border-color .15s}
     .dash-list-row:hover{border-color:rgba(139,77,255,.2)}
-    .dash-row-id{color:#64748b;font-weight:600;font-family:'JetBrains Mono',monospace;font-size:.72rem;min-width:56px}
+    .dash-row-id{color:#94a3b8;font-weight:600;font-family:'JetBrains Mono',monospace;font-size:.72rem;min-width:56px}
     .dash-row-name{color:#e2e8f0;flex:1}
     .dash-row-total{color:#f7f7ff;font-weight:600}
     .dash-badge{font-size:.62rem;font-weight:700;padding:2px 10px;border-radius:10px;color:#b84cff;background:rgba(139,77,255,.1);border:1px solid rgba(139,77,255,.2)}
@@ -368,13 +368,13 @@ function App() {
     .dash-stat{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:18px 20px;cursor:pointer;transition:border-color .15s,background .15s;user-select:none}
     .dash-stat:hover{border-color:rgba(139,77,255,.2);background:rgba(139,77,255,.04)}
     .dash-stat-val{font-size:1.3rem;font-weight:800;color:#f7f7ff;letter-spacing:-.01em}
-    .dash-stat-lbl{font-size:.7rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+    .dash-stat-lbl{font-size:.7rem;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
     .dash-stat-up{font-size:.68rem;color:#34d399;margin-top:4px;font-weight:600}
     .dash-period{display:flex;align-items:center;gap:8px;margin-bottom:12px}
     .dash-period-btn{font-size:.66rem;font-weight:600;color:#475569;padding:4px 10px;border-radius:5px;cursor:pointer;border:1px solid transparent;background:transparent;transition:color .12s,background .12s,border-color .12s}
     .dash-period-btn:hover{color:#94a3b8}
     .dash-period-btn.active{color:#b84cff;background:rgba(139,77,255,.08);border-color:rgba(139,77,255,.15)}
-    .dash-chart-label{font-size:.7rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+    .dash-chart-label{font-size:.7rem;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
     .dash-chart-refresh{font-size:.66rem;color:#475569;cursor:pointer;padding:3px 8px;border-radius:4px;border:none;background:rgba(255,255,255,.03);transition:color .12s,background .12s}
     .dash-chart-refresh:hover{color:#94a3b8;background:rgba(255,255,255,.06)}
     .dash-chart{background:rgba(255,255,255,.015);border-radius:10px;height:200px;display:flex;align-items:flex-end;gap:5px;padding:16px 12px;position:relative}
@@ -388,7 +388,7 @@ function App() {
     .dash-product:hover{color:#f7f7ff}
     .dash-product-name{color:#94a3b8}
     .dash-product-price{font-weight:600;color:#f7f7ff;font-size:.8rem}
-    .dash-product-sales{font-size:.66rem;color:#64748b;margin-left:8px}
+    .dash-product-sales{font-size:.66rem;color:#94a3b8;margin-left:8px}
     .dash-empty{text-align:center;padding:20px;font-size:.76rem;color:#475569}
     @media(max-width:768px){.dash-body{grid-template-columns:1fr}.dash-stats{grid-template-columns:repeat(2,1fr)}.dash-search{min-width:120px}}
 
@@ -550,6 +550,11 @@ function App() {
           <h2 class="section-title">{br('home.features.title')[0]}<br/>{br('home.features.title')[1]}</h2>
           <div class="features-grid">
             <div class="feature-card" onmousemove={onCardMove}>
+              <div class="feature-card-icon"><Icon name="js-off" size={32} /></div>
+              <h4>{i18n.t('home.f8.title')}</h4>
+              <p>{i18n.t('home.f8.text')}</p>
+            </div>
+            <div class="feature-card" onmousemove={onCardMove}>
               <div class="feature-card-icon"><Icon name="ast" size={32} /></div>
               <h4>{i18n.t('home.f1.title')}</h4>
               <p>{i18n.t('home.f1.text')}</p>
@@ -558,6 +563,11 @@ function App() {
               <div class="feature-card-icon"><Icon name="bolt" size={32} /></div>
               <h4>{i18n.t('home.f2.title')}</h4>
               <p>{i18n.t('home.f2.text')}</p>
+            </div>
+            <div class="feature-card" onmousemove={onCardMove}>
+              <div class="feature-card-icon"><Icon name="layers" size={32} /></div>
+              <h4>{i18n.t('home.f9.title')}</h4>
+              <p>{i18n.t('home.f9.text')}</p>
             </div>
             <div class="feature-card" onmousemove={onCardMove}>
               <div class="feature-card-icon"><Icon name="server" size={32} /></div>
@@ -663,7 +673,7 @@ function App() {
         <div class="section-inner">
           <div class="section-label">{i18n.t('home.demo.label')}</div>
           <h2 class="section-title">Dashboard E-commerce</h2>
-          <p style="font-size:.84rem;color:#64748b;margin-bottom:8px">{i18n.t('home.demo.sub1')}<code style="background:rgba(139,77,255,.1);color:#c4a0ff;padding:2px 6px;border-radius:4px;font-size:.78rem">store()</code>{i18n.t('home.demo.sub2')}</p>
+          <p style="font-size:.84rem;color:#94a3b8;margin-bottom:8px">{i18n.t('home.demo.sub1')}<code style="background:rgba(139,77,255,.1);color:#c4a0ff;padding:2px 6px;border-radius:4px;font-size:.78rem">store()</code>{i18n.t('home.demo.sub2')}</p>
           <div class="dashboard-preview" ref={(n) => { dashEl = n; }}>
             <div class="dash-header">
               <span class="dash-logo">

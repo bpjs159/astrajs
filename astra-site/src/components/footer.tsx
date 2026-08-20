@@ -11,7 +11,7 @@ export function Footer(): JSX.Element {
     .footer-brand{display:flex;align-items:center;gap:10px}
     .footer-brand .footer-wordmark{font-size:1.15rem;font-weight:700}
     .footer-links{display:flex;gap:24px}
-    .footer-links a{font-size:.8rem;color:#64748b;font-weight:500;transition:color .15s}
+    .footer-links a{font-size:.8rem;color:#94a3b8;font-weight:500;transition:color .15s}
     .footer-links a:hover{color:#e2e8f0}
     .footer-copy{font-size:.78rem;color:#475569}
     @media(max-width:960px){

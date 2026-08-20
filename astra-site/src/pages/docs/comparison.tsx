@@ -127,11 +127,11 @@ const s = `
   .docs-content .bench-row{padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)}
   .docs-content .bench-row:last-child{border-bottom:none}
   .docs-content .bench-op-label{font-size:.8rem;font-weight:700;color:#e2e8f0;margin-bottom:8px}
-  .docs-content .bench-unit{font-size:.68rem;font-weight:500;color:#64748b;margin-left:8px}
+  .docs-content .bench-unit{font-size:.68rem;font-weight:500;color:#94a3b8;margin-left:8px}
   .docs-content .bench-line{display:flex;align-items:center;gap:10px;margin:4px 0}
   .docs-content .bench-name{width:64px;font-size:.72rem;color:#94a3b8;flex-shrink:0;text-align:right}
   .docs-content .bench-track{flex:1;height:10px;background:rgba(255,255,255,.05);border-radius:5px;overflow:hidden}
-  .docs-content .bench-bar{height:100%;border-radius:5px;background:#64748b}
+  .docs-content .bench-bar{height:100%;border-radius:5px;background:#94a3b8}
   .docs-content .bench-bar.astra{background:linear-gradient(90deg,#8b4dff,#6366f1)}
   .docs-content .bench-val{width:76px;font-size:.72rem;color:#cbd5e1;flex-shrink:0;font-variant-numeric:tabular-nums}
 `;
