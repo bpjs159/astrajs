@@ -1,6 +1,6 @@
 {
   "name": "astrajs-workspace",
-  "version": "0.1.23",
+  "version": "0.1.24",
   "private": true,
   "description": "AstraJS — Full-Stack TypeScript Framework: Zero-VDOM, AST-compiled, Proxy-reactive",
   "scripts": {
@@ -27,7 +27,8 @@
     "examples/*/*",
     "astra-store",
     "astra-dash",
-    "astra-tasks"
+    "astra-tasks",
+    "astra-traffic"
   ],
   "devDependencies": {
     "husky": "^9.1.7",
