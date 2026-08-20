@@ -28,8 +28,6 @@ style.textContent = `
   .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.05rem;letter-spacing:-.01em}
   .brand-logo{display:inline-flex;align-items:center;letter-spacing:.04em;color:#fff;line-height:1;cursor:pointer}
   .brand-logo .bl-first{position:relative;display:inline-block}
-  .brand-logo .bl-star{position:absolute;top:50%;left:50%;transform:translate(-50%,-52%);height:1.5em;pointer-events:none}
-  .brand-logo .bl-star img{height:100%;width:auto;max-width:none;display:block}
   .brand-logo .bl-js{background:linear-gradient(135deg,#8d4dff,#4d7cff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
   .brand-name{color:#94a3b8;font-weight:700;font-size:.95rem}
   .site-nav{display:flex;align-items:center;gap:4px}

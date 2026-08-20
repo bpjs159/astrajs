@@ -51,7 +51,7 @@ export function BrandMarkup(): JSX.Element {
   return (
     <Link href="/" class="brand">
       <span class="brand-logo">
-        <span class="bl-first">A<span class="bl-star"><img src="/images/logo_star.png" alt="" /></span></span>
+        <span class="bl-first">A</span>
         <span>STRA</span><span class="bl-js">JS</span>
       </span>
       <span class="brand-name">{db.site().name}</span>
@@ -100,7 +100,7 @@ export function SiteFooterMarkup(): JSX.Element {
         <div class="footer-about">
           <div class="footer-brand">
             <span class="brand-logo">
-              <span class="bl-first">A<span class="bl-star"><img src="/images/logo_star.png" alt="" /></span></span>
+              <span class="bl-first">A</span>
               <span>STRA</span><span class="bl-js">JS</span>
             </span>
             {' ' + db.site().name}

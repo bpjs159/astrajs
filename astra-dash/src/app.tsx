@@ -54,7 +54,7 @@ function Header(): JSX.Element {
   return (
     <header class="site-header">
       <div class="brand-logo" onclick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-        <span class="bl-first">A<span class="bl-star"><img src="/images/logo_star.png" alt="" /></span></span>
+        <span class="bl-first">A</span>
         <span>STRA</span><span class="bl-js">JS</span>
         <span class="brand-sub">Dash</span>
       </div>
