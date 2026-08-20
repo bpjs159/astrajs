@@ -1,4 +1,4 @@
-import { component, store, dynamic } from 'astrajs.dev/core';
+import { component, store, dynamic, mounted } from 'astrajs.dev/core';
 import { navigate } from 'astrajs.dev/router';
 import { i18n } from '../i18n.js';
 import { WORLD_LOCALES } from 'astrajs.dev/i18n';
@@ -6,7 +6,7 @@ import { Icon } from './icon.js';
 import { BrandLogo } from './brand-logo.js';
 
 export const Header = component(() => {
-  const state = store({ mobileOpen: false, scrolled: false });
+  const state = store({ mobileOpen: false, scrolled: false, version: '' });
 
   // Isotype swap on scroll: at the top we show the ASTRAJS wordmark;
   // once the user scrolls, the isotype (logo image) fades in and the
@@ -52,6 +52,14 @@ export const Header = component(() => {
     }
   `;
 
+  // Muestra la versión 'latest' publicada en npm.
+  mounted(() => {
+    fetch('https://registry.npmjs.org/astrajs.dev/latest')
+      .then((r) => r.json())
+      .then((d) => { state.version = d.version || ''; })
+      .catch(() => {});
+  });
+
   const toggleMenu = () => { state.mobileOpen = !state.mobileOpen; };
   const closeMenu = () => { state.mobileOpen = false; };
 
@@ -62,7 +70,7 @@ export const Header = component(() => {
         <a class={`header-logo${state.scrolled ? ' scrolled' : ''}`} onclick={() => { navigate('/'); closeMenu(); }}>
           <img class="header-isotype" src="/images/logo.png" alt="AstraJS" />
           <BrandLogo cls="header-wordmark" />
-          <span class="header-beta">beta · v0.1.8</span>
+          <span class="header-beta">v{state.version || '0.1.31'}</span>
         </a>
         <button class="header-mobile-btn" onclick={toggleMenu} aria-label="Menu">
           <Icon name="menu" size={20} />

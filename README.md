@@ -107,6 +107,9 @@ MIT — all packages. Branding assets (logos, images) are © AstraJS.
 
 ## 📋 Changelog
 
+- **0.1.33** (2026-08-20): new header action
+
+
 - **0.1.32** (2026-08-20): Fix for promote script
 
 
