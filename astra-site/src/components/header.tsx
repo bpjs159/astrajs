@@ -89,7 +89,7 @@ export const Header = component(() => {
                 </option>
               ))}
             </select>
-            <a href="/docs/introduction" class="header-cta" onclick={(e: Event) => { e.preventDefault(); navigate('/docs/introduction'); }}>{i18n.t('nav.getStarted')} <Icon name="arrow-right" size={13} color="#fff" /></a>
+            <a href="/docs/introduction#que-es-astrajs" class="header-cta" onclick={(e: Event) => { e.preventDefault(); navigate('/docs/introduction#que-es-astrajs'); }}>{i18n.t('nav.getStarted')} <Icon name="arrow-right" size={13} color="#fff" /></a>
           </div>
         </nav>
       </div>
@@ -115,7 +115,7 @@ export const Header = component(() => {
             </option>
           ))}
         </select>
-        <a href="/docs/introduction" class="header-cta" onclick={(e: Event) => { e.preventDefault(); navigate('/docs/introduction'); closeMenu(); }}>{i18n.t('nav.getStarted')} <Icon name="arrow-right" size={13} color="#fff" /></a>
+        <a href="/docs/introduction#que-es-astrajs" class="header-cta" onclick={(e: Event) => { e.preventDefault(); navigate('/docs/introduction#que-es-astrajs'); closeMenu(); }}>{i18n.t('nav.getStarted')} <Icon name="arrow-right" size={13} color="#fff" /></a>
       </div>
     </header>
   );

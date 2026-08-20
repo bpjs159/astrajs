@@ -86,9 +86,9 @@ function ProductPage() {
   const productId = params.id; // string
   
   // Use it with server() to load data
-  const product = await getProductById(productId);
+  const product = swr(() => getProductById(productId));
   
-  return <h1>Product: {product.name}</h1>;
+  return <h1>Product: {product.data?.name}</h1>;
 }`} commentsKey="router.params" />
 
         <h2 id="navegacion">{i18n.t('sb.navigation')}</h2>

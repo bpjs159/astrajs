@@ -17,7 +17,7 @@ const docSections: DocSection[] = [
     title: 'Introducción',
     titleK: 'sb.intro',
     items: [
-      { label: '', k: 'sb.what', href: '/docs/introduction' },
+      { label: '', k: 'sb.what', href: '/docs/introduction#que-es-astrajs' },
       { label: '', k: 'sb.install', href: '/docs/introduction#instalacion' },
       { label: '', k: 'sb.gettingStarted', href: '/docs/introduction#primeros-pasos' },
       { label: '', k: 'sb.keyConcepts', href: '/docs/introduction#conceptos-clave' },

@@ -202,7 +202,7 @@ export const i18n = createI18n({
         <h2 id="reactividad">{siteI18n.t('id.react.title')}</h2>
         <p>{siteI18n.t('id.react.a')}<code>t()</code>{siteI18n.t('id.react.b')}<code>dynamic()</code>{siteI18n.t('id.react.c')}</p>
         <CodeBlock code={`<h1>{i18n.t('hero.title')}</h1>           // ← only this node changes
-<button onClick={() => i18n.setLocale('en')}>EN</button>`} commentsKey="i18n.react" />
+<button onclick={() => i18n.setLocale('en')}>EN</button>`} commentsKey="i18n.react" />
 
         <h2 id="interpolacion">{siteI18n.t('sb.i18nInterp')}</h2>
         <CodeBlock code={`messages: { es: { greeting: '¡Hola, {name}!' } }

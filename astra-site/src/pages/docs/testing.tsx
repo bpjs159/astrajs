@@ -49,27 +49,26 @@ export default defineConfig({
 });`} commentsKey="testing.vitest" />
 
         <h3>{i18n.t('t.store.title')}</h3>
-        <p>{i18n.t('t.store.p1')}<code>effect()</code>{i18n.t('t.store.p2')}</p>
+        <p>{i18n.t('t.store.p1')}<code>flushPending()</code>{i18n.t('t.store.p2')}</p>
         <CodeBlock code={`import { describe, it, expect } from 'vitest';
-import { store, effect } from 'astrajs.dev/core';
+import { component, store, flushPending } from 'astrajs.dev/core';
 
 const cart = store({ items: [] as string[] });
 
-describe('store', () => {
-  it('fires surgical effects on mutation', () => {
-    let runs = 0;
-    effect(() => {
-      void cart.items.length; // subscription to the 'items' property
-      runs++;
-    });
+const CartCount = component(() => <span>{cart.items.length}</span>);
 
-    expect(runs).toBe(1); // the effect runs on subscription
+describe('store', () => {
+  it('updates the DOM surgically on mutation', () => {
+    const el = CartCount({}) as HTMLElement;
+    expect(el.textContent).toBe('0');
 
     cart.items = ['t-shirt', 'cap'];
-    expect(runs).toBe(2); // re-runs only for 'items'
+    flushPending(); // flush deferred store triggers
+    expect(el.textContent).toBe('2');
 
     cart.items.push('mug');
-    expect(runs).toBe(3);
+    flushPending();
+    expect(el.textContent).toBe('3');
     expect(cart.items).toHaveLength(3);
   });
 });`} commentsKey="testing.store" />

@@ -1,6 +1,6 @@
 {
   "name": "create-astrajs.dev",
-  "version": "0.1.28",
+  "version": "0.1.29",
   "description": "Scaffold a new AstraJS project — `npm create astrajs.dev`. Delegates to the astrajs.dev CLI.",
   "type": "module",
   "repository": {

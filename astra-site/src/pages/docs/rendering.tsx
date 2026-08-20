@@ -50,13 +50,15 @@ export const DocsRendering = component(() => (
         <CodeBlock code={`// SSR is enabled by default on the server
 // No special configuration needed
 
+import { swr } from 'astrajs.dev/core';
+
 export default function ProductPage() {
-  const product = await getProduct(params.id); // server()
+  const product = swr(() => getProduct(params.id)); // server()
   return (
     <article>
-      <h1>{product.name}</h1>
-      <p>{product.description}</p>
-      <span>\${product.price}</span>
+      <h1>{product.data?.name}</h1>
+      <p>{product.data?.description}</p>
+      <span>\${product.data?.price}</span>
     </article>
   );
 }`} commentsKey="rendering.ssr" />

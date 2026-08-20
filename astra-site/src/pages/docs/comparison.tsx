@@ -308,9 +308,9 @@ function SearchResults({ query }: { query: string }) {
   // The compiler memoizes automatically
   // No useCallback, no useMemo
   
-  const results = memo(() => searchData(query));
+  const results = searchData(query);
   
-  return <ul>{results().map(r => <Item />)}</ul>;
+  return <ul>{results.map(r => <Item />)}</ul>;
 }`} commentsKey="comparison.react-hooks" />
 
         <h3>{i18n.t('cp.react.next.title')}</h3>

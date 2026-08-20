@@ -451,7 +451,7 @@ function App() {
           <p class="hero-tagline">{i18n.t('hero.tagline1')}<br/>{i18n.t('hero.tagline2')}<span style="background:linear-gradient(135deg,#8d4dff,#4d7cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">{i18n.t('hero.tagline.js')}</span>.</p>
           <p class="hero-sub">{i18n.t('hero.sub')}</p>
           <div class="hero-buttons">
-            <button class="btn-primary" onclick={() => navigate('/docs/introduction')}>
+            <button class="btn-primary" onclick={() => navigate('/docs/introduction#que-es-astrajs')}>
               {i18n.t('hero.start')} <Icon name="arrow-right" size={13} color="#fff" />
             </button>
             <a class="btn-secondary" href="https://github.com" target="_blank" rel="noopener">
