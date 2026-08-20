@@ -20,6 +20,7 @@ function apply(s: TrafficSnapshot): void {
   state.data = s;
   state.loading = false;
   state.lastSync = new Date().toLocaleTimeString();
+  renderSiteOptions();
 }
 
 function load(): void {
@@ -29,9 +30,37 @@ function load(): void {
     .catch((e) => { state.error = String(e); state.loading = false; });
 }
 
+// Formatea un epoch ms en el timezone local del navegador.
+function fmtTime(ts: number): string {
+  if (!ts) return '—';
+  return new Date(ts).toLocaleString();
+}
+
+// El mapeo reactivo de <option> dentro de <select> se serializa como texto
+// ([object HTMLOptionElement]) — limitación del framework. Poblamos el select
+// imperativamente con innerHTML vía ref.
+let siteSelect: HTMLSelectElement | null = null;
+
+function renderSiteOptions(): void {
+  if (!siteSelect) return;
+  const d = state.data;
+  let html = '<option value="">Todos</option>';
+  if (d) {
+    for (const s of d.bySite) {
+      html += `<option value="${s.site}">${s.site}</option>`;
+    }
+  }
+  siteSelect.innerHTML = html;
+  siteSelect.value = state.site;
+}
+
 const style = `
+  @font-face{font-family:'Fauna Pro';src:url('https://astrajs.dev/fonts/fauna/FaunaPro-Regular.ttf') format('truetype');font-weight:400;font-style:normal}
+  @font-face{font-family:'Fauna Pro';src:url('https://astrajs.dev/fonts/fauna/FaunaPro-Medium.ttf') format('truetype');font-weight:500;font-style:normal}
+  @font-face{font-family:'Fauna Pro';src:url('https://astrajs.dev/fonts/fauna/FaunaPro-Semibold.ttf') format('truetype');font-weight:600;font-style:normal}
+  @font-face{font-family:'Fauna Pro';src:url('https://astrajs.dev/fonts/fauna/FaunaPro-Bold.ttf') format('truetype');font-weight:700;font-style:normal}
   .site-header{position:fixed;top:0;left:0;right:0;z-index:1000;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:rgba(4,6,13,.7);backdrop-filter:blur(20px);border-bottom:1px solid var(--line)}
-  .brand-logo{display:flex;align-items:center;gap:2px;font-weight:800;font-size:1.1rem;letter-spacing:.04em;color:#fff;cursor:pointer;line-height:1}
+  .brand-logo{display:flex;align-items:center;gap:2px;font-family:'Fauna Pro',serif;font-weight:500;font-size:1.1rem;letter-spacing:.04em;color:#fff;cursor:pointer;line-height:1}
   .bl-js{background:linear-gradient(135deg,#8d4dff,#4d7cff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
   .brand-sub{margin-left:10px;font-size:.6rem;font-weight:700;color:#c4a0ff;background:rgba(139,77,255,.12);border:1px solid rgba(139,77,255,.35);border-radius:999px;padding:2px 8px;letter-spacing:.06em;text-transform:uppercase}
   .header-right{display:flex;align-items:center;gap:14px}
@@ -64,6 +93,10 @@ const style = `
   .bar{flex:1;background:linear-gradient(180deg,#b84cff,#4d7cff);border-radius:3px 3px 0 0;min-height:2px;position:relative}
   .bar:hover{filter:brightness(1.3)}
   .bar-label{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);font-size:.55rem;color:var(--muted)}
+  .bar-tip{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(4px);background:#1a1030;border:1px solid rgba(184,76,255,.3);border-radius:8px;padding:6px 10px;font-size:.66rem;font-weight:600;color:#f7f7ff;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s;z-index:20;display:flex;flex-direction:column;gap:2px;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+  .bar:hover .bar-tip{opacity:1;transform:translateX(-50%) translateY(0)}
+  .bar-tip strong{color:#c4a0ff;font-size:.7rem}
+  .bar-tip .fail{color:var(--danger)}
 
   table{width:100%;border-collapse:collapse;font-size:.8rem}
   th{text-align:left;font-size:.66rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:6px 8px;border-bottom:1px solid var(--line)}
@@ -71,6 +104,7 @@ const style = `
   td.num{text-align:right;font-family:'JetBrains Mono',monospace;color:#f7f7ff}
   .path{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:#c4a0ff;word-break:break-all}
   .time{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--muted);white-space:nowrap}
+  .site{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:#c4a0ff}
   .status-pill{display:inline-block;min-width:44px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:6px}
   .status-pill.s2{color:var(--ok);background:rgba(52,211,153,.1)}
   .status-pill.s3{color:var(--accent2);background:rgba(0,223,255,.1)}
@@ -125,7 +159,12 @@ function Dashboard(): JSX.Element {
           <h3>Requests por hora</h3>
           <div class="chart">
             {d.byHour.map((h, i) => (
-              <div class="bar" style={`height:${Math.max(2, (h / maxHour) * 100)}%`} title={`${i}:00 — ${h}`}>
+              <div class="bar" style={`height:${Math.max(2, (h / maxHour) * 100)}%`}>
+                <span class="bar-tip">
+                  <strong>{i}:00</strong>
+                  <span>{h} requests</span>
+                  <span class={d.byHourFailed[i] > 0 ? 'fail' : ''}>{d.byHourFailed[i]} fallidos</span>
+                </span>
                 {i % 4 === 0 && <span class="bar-label">{i}</span>}
               </div>
             ))}
@@ -176,14 +215,15 @@ function Dashboard(): JSX.Element {
         <div class="card full">
           <h3>Errores recientes (4xx / 5xx)</h3>
           <table>
-            <thead><tr><th>Hora</th><th>Ruta</th><th class="num">Error</th></tr></thead>
+            <thead><tr><th>Hora</th><th>Sitio</th><th>Ruta</th><th class="num">Error</th></tr></thead>
             <tbody>
               {d.recentErrors.length === 0 && (
-                <tr><td colspan="3" style="text-align:center;color:var(--muted)">Sin errores</td></tr>
+                <tr><td colspan="4" style="text-align:center;color:var(--muted)">Sin errores</td></tr>
               )}
               {d.recentErrors.map((e) => (
                 <tr>
-                  <td class="time">{e.time}</td>
+                  <td class="time">{fmtTime(e.ts)}</td>
+                  <td><code class="site">{e.site}</code></td>
                   <td class="path">{e.path}</td>
                   <td class="num"><span class={`status-pill s${e.status[0]}`}>{e.status}</span></td>
                 </tr>
@@ -193,6 +233,29 @@ function Dashboard(): JSX.Element {
         </div>
       </div>
     </div>
+  );
+}
+
+// Header — lee el estado directamente para que el compilador lo envuelva en
+// dynamic() y el select/sync se actualicen al cambiar el sitio o los datos.
+function Header(): JSX.Element {
+  return (
+    <header class="site-header">
+      <div class="brand-logo">
+        <span class="bl-first">A</span><span>STRA</span><span class="bl-js">JS</span>
+        <span class="brand-sub">Traffic</span>
+      </div>
+      <div class="header-right">
+        <select
+          class="site-select"
+          ref={(el) => { siteSelect = el; }}
+          value={state.site}
+          onchange={(e) => { state.site = (e.target as HTMLSelectElement).value; load(); }}
+        ></select>
+        <span class="sync">Última sync: {state.lastSync || '—'}</span>
+        <button class="refresh" onclick={load}>↻ Actualizar</button>
+      </div>
+    </header>
   );
 }
 
@@ -206,35 +269,15 @@ export const App = component(() => {
   return (
     <div class="traffic">
       <style>{style}</style>
-      <header class="site-header">
-        <div class="brand-logo">
-          <span class="bl-first">A</span><span>STRA</span><span class="bl-js">JS</span>
-          <span class="brand-sub">Traffic</span>
-        </div>
-        <div class="header-right">
-          <select
-            class="site-select"
-            value={state.site}
-            onchange={(e) => { state.site = (e.target as HTMLSelectElement).value; load(); }}
-          >
-            <option value="">Todos</option>
-            {state.data?.bySite.map((s) => (
-              <option value={s.site} selected={state.site === s.site}>{s.site}</option>
-            ))}
-          </select>
-          <span class="sync">Última sync: {state.lastSync || '—'}</span>
-          <button class="refresh" onclick={load}>↻ Actualizar</button>
-        </div>
-      </header>
+      {Header()}
 
       <main class="wrap">
         <h1 class="title">Tráfico Nginx</h1>
         <p class="sub">Leyendo {state.data?.logDir ?? '…'} · auto-actualiza cada 5s</p>
 
-        {state.loading && !state.data && <div class="loading">Cargando…</div>}
         {state.error && <div class="error">{state.error}</div>}
 
-        {state.data && Dashboard()}
+        {Dashboard()}
       </main>
     </div>
   );

@@ -21,9 +21,10 @@ export interface TrafficSnapshot {
   topIps: { key: string; count: number; country: string }[];
   topPaths: { key: string; count: number }[];
   byHour: number[];
+  byHourFailed: number[];
   byDay: { day: string; count: number }[];
   bySite: SiteTraffic[];
-  recentErrors: { time: string; path: string; status: string }[];
+  recentErrors: { time: string; path: string; status: string; site: string; ts: number }[];
   logDir: string;
   lastLog: string;
 }
@@ -33,6 +34,20 @@ export interface TrafficSnapshot {
 // server() (stripCommentsAndStrings) no confunda las comillas del regex
 // con delimitadores de string y rompa la detección de la llamada RPC.
 const LINE_RE = /^(\S+) \S+ \S+ \[([^\]]+)\] \x22(\S+) ([^\x22]*)\x22 (\d{3}) (\S+) \x22([^\x22]*)\x22 \x22([^\x22]*)\x22$/;
+
+// Convierte la hora del log ("20/Aug/2026:14:14:10 +0000") a epoch ms (UTC).
+const MONTHS: Record<string, number> = { Jan:0, Feb:1, Mar:2, Apr:3, May:4, Jun:5, Jul:6, Aug:7, Sep:8, Oct:9, Nov:10, Dec:11 };
+function parseLogTime(time: string): number {
+  const m = /^(\d{2})\/([A-Za-z]{3})\/(\d{4}):(\d{2}):(\d{2}):(\d{2}) ([+-]\d{4})$/.exec(time);
+  if (!m) return 0;
+  const month = MONTHS[m[2]!];
+  if (month === undefined) return 0;
+  const utc = Date.UTC(parseInt(m[3]!, 10), month, parseInt(m[1]!, 10), parseInt(m[4]!, 10), parseInt(m[5]!, 10), parseInt(m[6]!, 10));
+  const off = m[7]!;
+  const sign = off[0] === '-' ? -1 : 1;
+  const offMs = sign * (parseInt(off.slice(1, 3), 10) * 3600 + parseInt(off.slice(3, 5), 10) * 60) * 1000;
+  return utc - offMs;
+}
 
 // Caché de país por IP (ip-api.com, free tier 45 req/min).
 const countryCache = new Map<string, string>();
@@ -71,6 +86,7 @@ async function parseLogs(site: string): Promise<TrafficSnapshot> {
     topIps: [],
     topPaths: [],
     byHour: Array(24).fill(0),
+    byHourFailed: Array(24).fill(0),
     byDay: [],
     bySite: [],
     recentErrors: [],
@@ -124,11 +140,13 @@ async function parseLogs(site: string): Promise<TrafficSnapshot> {
   const pathCount: Record<string, number> = {};
   const statusCount: Record<string, number> = {};
   const hourCount = Array(24).fill(0) as number[];
+  const hourFailed = Array(24).fill(0) as number[];
   const dayCount: Record<string, number> = {};
-  const recentErrors: { time: string; path: string; status: string }[] = [];
+  const recentErrors: { time: string; path: string; status: string; site: string; ts: number }[] = [];
   let lastLog = '';
 
   for (const file of files) {
+    const site = file.replace(/\.log$/, '');
     const full = join(LOG_DIR, file);
     let raw = '';
     try {
@@ -151,15 +169,19 @@ async function parseLogs(site: string): Promise<TrafficSnapshot> {
       statusCount[status] = (statusCount[status] ?? 0) + 1;
 
       const hm = /:(\d{2}):/.exec(time);
-      if (hm) hourCount[parseInt(hm[1], 10)]++;
+      if (hm) {
+        const h = parseInt(hm[1], 10);
+        hourCount[h]++;
+        if (status[0] === '4' || status[0] === '5') hourFailed[h]++;
+      }
 
       const day = time.slice(0, 11); // "19/Aug/2026"
       dayCount[day] = (dayCount[day] ?? 0) + 1;
       lastLog = line;
 
-      // Errores (4xx/5xx) con hora exacta, ruta y status.
+      // Errores (4xx/5xx) con hora exacta, ruta, status, sitio y epoch ms.
       if (status[0] === '4' || status[0] === '5') {
-        recentErrors.push({ time, path, status });
+        recentErrors.push({ time, path, status, site, ts: parseLogTime(time) });
         if (recentErrors.length > 50) recentErrors.shift();
       }
     }
@@ -183,6 +205,7 @@ async function parseLogs(site: string): Promise<TrafficSnapshot> {
     topIps,
     topPaths: top(pathCount, 10),
     byHour: hourCount,
+    byHourFailed: hourFailed,
     byDay: Object.entries(dayCount)
       .sort((a, b) => a[0].localeCompare(b[0]))
       .map(([day, count]) => ({ day, count })),

@@ -22,11 +22,15 @@ style.textContent = `
   .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
   .page{padding-bottom:72px}
 
+  @font-face{font-family:'Fauna Pro';src:url('https://astrajs.dev/fonts/fauna/FaunaPro-Regular.ttf') format('truetype');font-weight:400;font-style:normal}
+  @font-face{font-family:'Fauna Pro';src:url('https://astrajs.dev/fonts/fauna/FaunaPro-Medium.ttf') format('truetype');font-weight:500;font-style:normal}
+  @font-face{font-family:'Fauna Pro';src:url('https://astrajs.dev/fonts/fauna/FaunaPro-Semibold.ttf') format('truetype');font-weight:600;font-style:normal}
+  @font-face{font-family:'Fauna Pro';src:url('https://astrajs.dev/fonts/fauna/FaunaPro-Bold.ttf') format('truetype');font-weight:700;font-style:normal}
   /* ── Header ── */
   .site-header{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(4,6,13,.55);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid rgba(255,255,255,.04)}
   .site-header-inner{max-width:1080px;margin:0 auto;padding:0 28px;height:64px;display:flex;align-items:center;justify-content:space-between}
   .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.05rem;letter-spacing:-.01em}
-  .brand-logo{display:inline-flex;align-items:center;letter-spacing:.04em;color:#fff;line-height:1;cursor:pointer}
+  .brand-logo{display:inline-flex;align-items:center;font-family:'Fauna Pro',serif;font-weight:500;letter-spacing:.04em;color:#fff;line-height:1;cursor:pointer}
   .brand-logo .bl-first{position:relative;display:inline-block}
   .brand-logo .bl-js{background:linear-gradient(135deg,#8d4dff,#4d7cff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
   .brand-name{color:#94a3b8;font-weight:700;font-size:.95rem}
