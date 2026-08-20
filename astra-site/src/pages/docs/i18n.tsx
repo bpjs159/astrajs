@@ -156,7 +156,7 @@ export const DocsI18n = component(() => (
             {WORLD_LOCALES.map((loc) => (
               <button
                 class={`locale-btn${demoI18n.locale === loc.code ? ' active' : ''}`}
-                onclick={() => {
+                onClick={() => {
                   demoI18n.setLocale(loc.code);
                 }}
               >
@@ -167,9 +167,9 @@ export const DocsI18n = component(() => (
           <div class="demo-sentence">{demoI18n.t('demo.title')}</div>
           <div class="demo-secondary">{demoI18n.t('demo.subtitle')}</div>
           <div class="demo-controls">
-            <button class="demo-btn" onclick={() => { demoState.count = Math.max(0, demoState.count - 1); }}>−</button>
+            <button class="demo-btn" onClick={() => { demoState.count = Math.max(0, demoState.count - 1); }}>−</button>
             <span class="demo-count">{demoState.count}</span>
-            <button class="demo-btn" onclick={() => { demoState.count += 1; }}>+</button>
+            <button class="demo-btn" onClick={() => { demoState.count += 1; }}>+</button>
           </div>
           <div class="demo-sentence" style="font-size:1rem">{demoI18n.t('demo.counter', { count: demoState.count })}</div>
           <div class="demo-formatted">
@@ -202,7 +202,7 @@ export const i18n = createI18n({
         <h2 id="reactividad">{siteI18n.t('id.react.title')}</h2>
         <p>{siteI18n.t('id.react.a')}<code>t()</code>{siteI18n.t('id.react.b')}<code>dynamic()</code>{siteI18n.t('id.react.c')}</p>
         <CodeBlock code={`<h1>{i18n.t('hero.title')}</h1>           // ← only this node changes
-<button onclick={() => i18n.setLocale('en')}>EN</button>`} commentsKey="i18n.react" />
+<button onClick={() => i18n.setLocale('en')}>EN</button>`} commentsKey="i18n.react" />
 
         <h2 id="interpolacion">{siteI18n.t('sb.i18nInterp')}</h2>
         <CodeBlock code={`messages: { es: { greeting: '¡Hola, {name}!' } }

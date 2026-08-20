@@ -101,7 +101,7 @@ export const Button = component(() => (
       'px-4 py-2 rounded-lg transition-colors',
       state.active ? 'bg-pink-600 text-white' : 'bg-slate-700 text-slate-200'
     )}
-    onclick={() => { state.active = !state.active; }}
+    onClick={() => { state.active = !state.active; }}
   >
     {state.active ? 'Active' : 'Inactive'}
   </button>
@@ -127,7 +127,7 @@ export const Form = component(() => (
     <md-filled-text-field label="Email" type="email" />
     <md-filled-text-field label="Password" type="password" />
     <div class="flex gap-3">
-      <md-filled-button onclick={() => console.log('Save')}>Save</md-filled-button>
+      <md-filled-button onClick={() => console.log('Save')}>Save</md-filled-button>
       <md-outlined-button>Cancel</md-outlined-button>
     </div>
   </div>
@@ -138,7 +138,7 @@ export const Form = component(() => (
         <CodeBlock code={`// Shoelace
 import '@shoelace-style/shoelace/dist/components/button/button.js';
 
-<sl-button variant="primary" onclick={save}>Save</sl-button>`} commentsKey="integrations.shoelace" />
+<sl-button variant="primary" onClick={save}>Save</sl-button>`} commentsKey="integrations.shoelace" />
 
         <div class="note">
           <strong>{i18n.t('lbl.note')}:</strong> {i18n.t('ig.wcn.a')}<code>mounted()</code>{i18n.t('ig.wcn.b')}

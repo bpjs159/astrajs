@@ -57,7 +57,7 @@ export const Counter = component(() => {
   return (
     <div>
       <h2>Counter: {state.count}</h2>
-      <button onclick={() => state.count++}>
+      <button onClick={() => state.count++}>
         Increment
       </button>
     </div>
@@ -230,7 +230,7 @@ function Card({ title, featured }: { title: string; featured?: boolean }) {
         <h2 id="eventos">{i18n.t('sb.events')}</h2>
         <p>{i18n.t('f.ev.a')}<strong>{i18n.t('f.ev.b')}</strong>{i18n.t('f.ev.c')}</p>
         <CodeBlock code={`// Eventos nativos — se ejecutan inmediatamente
-<button onclick={() => state.count++}>
+<button onClick={() => state.count++}>
   Increment
 </button>
 
@@ -239,7 +239,7 @@ function Card({ title, featured }: { title: string; featured?: boolean }) {
   Complex action (code loaded on-demand)
 </button>`} commentsKey="fund.events" />
         <div class="note">
-          <strong>{i18n.t('lbl.keydiff')}:</strong> <code>onclick</code> {i18n.t('f.ev.n1')}<code>astra-on:click</code>{i18n.t('f.ev.n2')}
+          <strong>{i18n.t('lbl.keydiff')}:</strong> <code>onClick</code> {i18n.t('f.ev.n1')}<code>astra-on:click</code>{i18n.t('f.ev.n2')}
         </div>
       </div>
     </main>

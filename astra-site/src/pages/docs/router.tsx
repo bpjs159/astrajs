@@ -119,12 +119,12 @@ async function handleCreate() {
 }
 
 // In event handlers
-<button onclick={() => navigate('/cart')}>
+<button onClick={() => navigate('/cart')}>
   Go to cart
 </button>
 
 // With a hash for scrolling
-<button onclick={() => navigate('/docs#instalacion')}>
+<button onClick={() => navigate('/docs#instalacion')}>
   View installation
 </button>`} commentsKey="router.navigate" />
 

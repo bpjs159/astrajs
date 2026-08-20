@@ -59,8 +59,8 @@ const ex01 = component(() => {
       <div class="lv-card" style="text-align:center">
         <div style="font-size:2.2rem;font-weight:800;color:#fff;margin:8px 0">{counter.value}</div>
         <div class="lv-row" style="justify-content:center">
-          <button class="lv-btn" onclick={() => counter.value--}>− 1</button>
-          <button class="lv-btn" onclick={() => counter.value++}>+ 1</button>
+          <button class="lv-btn" onClick={() => counter.value--}>− 1</button>
+          <button class="lv-btn" onClick={() => counter.value++}>+ 1</button>
         </div>
       </div>
       <p><Icon name="clock" size={13} /> Solo el número se actualiza. El componente no se re-ejecuta.</p>
@@ -75,7 +75,7 @@ const ex02 = component(() => (
     <div class="lv-card">
       <div class="lv-row" style="justify-content:space-between">
         <span class="lv-tag">Componente A (Header)</span>
-        <button class="lv-btn" onclick={() => cartStore.items++}>Agregar item</button>
+        <button class="lv-btn" onClick={() => cartStore.items++}>Agregar item</button>
       </div>
     </div>
     <div class="lv-card">
@@ -113,9 +113,9 @@ const ex04 = component(() => {
     <div class="lv">
       <h4>Router con guards booleanos</h4>
       <div class="lv-row">
-        <button class={`lv-btn ${nav.page === 'home' ? '' : 'ghost'}`} onclick={() => { nav.page = 'home'; }}>Home</button>
-        <button class={`lv-btn ${nav.page === 'about' ? '' : 'ghost'}`} onclick={() => { nav.page = 'about'; }}>About</button>
-        <button class={`lv-btn ${nav.page === '404' ? '' : 'ghost'}`} onclick={() => { nav.page = '404'; }}>Ruta inválida</button>
+        <button class={`lv-btn ${nav.page === 'home' ? '' : 'ghost'}`} onClick={() => { nav.page = 'home'; }}>Home</button>
+        <button class={`lv-btn ${nav.page === 'about' ? '' : 'ghost'}`} onClick={() => { nav.page = 'about'; }}>About</button>
+        <button class={`lv-btn ${nav.page === '404' ? '' : 'ghost'}`} onClick={() => { nav.page = '404'; }}>Ruta inválida</button>
       </div>
       <div class="lv-card">
         {nav.page === 'home' && <p><Icon name="home" size={13} /> Home — route('/', {'{ exact: true }'})</p>}
@@ -162,13 +162,13 @@ const ex06 = component(() => {
     <div class="lv">
       <h4>Condicionales y listas</h4>
       <div class="lv-row">
-        <button class={`lv-btn ${app.show ? '' : 'ghost'}`} onclick={() => { app.show = !app.show; }}>
+        <button class={`lv-btn ${app.show ? '' : 'ghost'}`} onClick={() => { app.show = !app.show; }}>
           {app.show ? 'Ocultar lista' : 'Mostrar lista'}
         </button>
-        <button class="lv-btn" onclick={() => { app.items.push({ id: app.nextId, name: `Item ${app.nextId}` }); app.nextId++; }}>
+        <button class="lv-btn" onClick={() => { app.items.push({ id: app.nextId, name: `Item ${app.nextId}` }); app.nextId++; }}>
           + Agregar
         </button>
-        <button class="lv-btn ghost" onclick={() => { app.items.pop(); }}>
+        <button class="lv-btn ghost" onClick={() => { app.items.pop(); }}>
           − Quitar
         </button>
       </div>
@@ -202,7 +202,7 @@ const ex07 = component(() => {
   return (
     <div class="lv">
       <h4>Carga asíncrona (mounted + fetch simulado)</h4>
-      <button class="lv-btn" onclick={load} disabled={state.loading}>
+      <button class="lv-btn" onClick={load} disabled={state.loading}>
         {state.loading ? 'Cargando...' : 'Cargar datos'}
       </button>
       <div class="lv-card">
@@ -258,7 +258,7 @@ const ex10 = component(() => {
     <div class="lv">
       <h4>Atributos dinámicos (bindAttr)</h4>
       <div class="lv-row">
-        <button class={`lv-btn ${ui.active ? '' : 'ghost'}`} onclick={() => { ui.active = !ui.active; }}>
+        <button class={`lv-btn ${ui.active ? '' : 'ghost'}`} onClick={() => { ui.active = !ui.active; }}>
           Toggle active
         </button>
       </div>
@@ -287,7 +287,7 @@ const ex11 = component(() => {
   return (
     <div class="lv">
       <h4>server({'{ type: "dynamic" }'}) — RPC simulado</h4>
-      <button class="lv-btn" onclick={load} disabled={state.loading}>
+      <button class="lv-btn" onClick={load} disabled={state.loading}>
         {state.loading ? 'Ejecutando en servidor...' : 'getUsers()'}
       </button>
       <div class="lv-card">
@@ -320,7 +320,7 @@ const ex12 = component(() => {
   return (
     <div class="lv">
       <h4>SWR: stale-while-revalidate</h4>
-      <button class="lv-btn" onclick={load}>getProducts()</button>
+      <button class="lv-btn" onClick={load}>getProducts()</button>
       <div class="lv-card">
         {state.status === 'idle' && <p>Haz clic para consumir la API.</p>}
         {state.status === 'cached' && <p class="lv-ok"><Icon name="bolt" size={13} /> Respuesta instantánea desde caché (SWR)...</p>}
@@ -341,7 +341,7 @@ const ex13 = component(() => {
       <input class="lv-input" placeholder="Contenido" value={form.body}
         onInput={(e: Event) => { form.body = (e.target as HTMLInputElement).value; }} />
       <button class="lv-btn" disabled={!form.title || !form.body}
-        onclick={() => { form.sent = true; }}>
+        onClick={() => { form.sent = true; }}>
         createPost()
       </button>
       {form.sent && (
@@ -368,7 +368,7 @@ const ex14 = component(() => {
       <div class="lv-row">
         {products.map((p) => (
           <button class={`lv-btn ${state.selected === p.id ? '' : 'ghost'}`}
-            onclick={() => { state.selected = p.id; }}>
+            onClick={() => { state.selected = p.id; }}>
             #{p.id}
           </button>
         ))}
@@ -443,7 +443,7 @@ const ex16 = component(() => {
       <h4>Mutaciones optimistas + rollback</h4>
       <div class="lv-list">
         {todos.items.map((t) => (
-          <div class="lv-item" style="cursor:pointer" onclick={() => toggle(t.id)}>
+          <div class="lv-item" style="cursor:pointer" onClick={() => toggle(t.id)}>
             <span style={t.done ? 'text-decoration:line-through;color:#94a3b8' : ''}>{t.text}</span>
             <span>{t.done && <Icon name="check" size={14} />}{!t.done && <Icon name="square" size={14} />}</span>
           </div>
@@ -529,7 +529,7 @@ const ex19 = component(() => {
         <p>HTML enviado por el servidor:</p>
         <pre style="font-size:.66rem;color:#00dfff;background:#04060d;padding:10px;border-radius:6px;margin:8px 0">{"<div astra-data='{\"items\":3,\"total\":42,\"user\":\"Ada\"}'"}<br/><button astra-on:click>Checkout</button></pre>
       </div>
-      <button class="lv-btn" onclick={() => { state.resumed = true; }}>
+      <button class="lv-btn" onClick={() => { state.resumed = true; }}>
         resume()
       </button>
       {state.resumed && (
@@ -581,8 +581,8 @@ export const frontendExamples: LiveExample[] = [
 export const Counter = component(() => (
   <div>
     <h2>Counter: {counter.value}</h2>
-    <button onclick={() => counter.value--}>-1</button>
-    <button onclick={() => counter.value++}>+1</button>
+    <button onClick={() => counter.value--}>-1</button>
+    <button onClick={() => counter.value++}>+1</button>
   </div>
 ));` },
   { num: '02', title: 'ex2.title', description: 'ex2.desc', concepts: ['store compartido'], docsHref: '/docs/fundamentals#reactividad', render: ex02,
@@ -590,7 +590,7 @@ export const Counter = component(() => (
 export const cart = store({ items: 0 });
 
 // Component A
-<button onclick={() => cart.items++}>
+<button onClick={() => cart.items++}>
   Add ({cart.items})
 </button>
 

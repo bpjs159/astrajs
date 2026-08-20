@@ -277,7 +277,7 @@ const Counter = component(() => {
   console.log('mount'); // ← prints ONCE
   
   return (
-    <button onclick={() => state.count++}>
+    <button onClick={() => state.count++}>
       Count: {state.count}
     </button>
     // Only the state.count TextNode updates
@@ -351,7 +351,7 @@ const btnStyle = css\`
 export const Counter = component(() => {
   const state = store({ count: 0 });
   return (
-    <button class={btnStyle} onclick={() => state.count++}>
+    <button class={btnStyle} onClick={() => state.count++}>
       Count: {state.count}
     </button>
   );
@@ -382,7 +382,7 @@ export class CounterComponent {
 const Counter = component(() => {
   const state = store({ count: 0 });
   return (
-    <button onclick={() => state.count++}>
+    <button onClick={() => state.count++}>
       Count: {state.count}
     </button>
     // Only this TextNode updates. Nothing else.

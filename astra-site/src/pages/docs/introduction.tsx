@@ -181,12 +181,12 @@ export const Hello = component(() => {
         <div class="promo-card">
           <h4>{i18n.t('d.promo1.title')}</h4>
           <p>{i18n.t('d2.promo1.text')}</p>
-          <a href="/docs/advanced" onclick={(e: Event) => { e.preventDefault(); navigate('/docs/advanced'); }}>{i18n.t('d.promo1.link')} →</a>
+          <a href="/docs/advanced" onClick={(e: Event) => { e.preventDefault(); navigate('/docs/advanced'); }}>{i18n.t('d.promo1.link')} →</a>
         </div>
         <div class="promo-card" style="margin-top:16px;background:linear-gradient(135deg,rgba(0,223,255,.06),rgba(139,77,255,.04));border-color:rgba(0,223,255,.15)">
           <h4><Icon name="play" size={15} /> {i18n.t('d2.promo2.title')}</h4>
           <p>{i18n.t('d2.promo2.text')}</p>
-          <a href="/docs/fundamentals" onclick={(e: Event) => { e.preventDefault(); navigate('/docs/fundamentals'); }}>{i18n.t('d2.promo2.link')} →</a>
+          <a href="/docs/fundamentals" onClick={(e: Event) => { e.preventDefault(); navigate('/docs/fundamentals'); }}>{i18n.t('d2.promo2.link')} →</a>
         </div>
       </div>
     </main>

@@ -2,7 +2,7 @@
   "name": "astra-store",
   "private": true,
   "type": "module",
-  "version": "0.1.29",
+  "version": "0.1.30",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

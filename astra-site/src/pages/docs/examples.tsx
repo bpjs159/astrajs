@@ -152,14 +152,14 @@ export const DocsExamples = component(() => {
             <button
               id="frontend"
               class={`ex-tab${state.tab === 'frontend' ? ' active' : ''}`}
-              onclick={() => { state.tab = 'frontend'; state.selectedNum = null; }}
+              onClick={() => { state.tab = 'frontend'; state.selectedNum = null; }}
             >
               Frontend (10)
             </button>
             <button
               id="backend"
               class={`ex-tab${state.tab === 'fullstack' ? ' active' : ''}`}
-              onclick={() => { state.tab = 'fullstack'; state.selectedNum = null; }}
+              onClick={() => { state.tab = 'fullstack'; state.selectedNum = null; }}
             >
               Backend (10)
             </button>
@@ -174,7 +174,7 @@ export const DocsExamples = component(() => {
                 const list = state.tab === 'frontend' ? frontendExamples : fullstackExamples;
                 return list.flatMap((ex) => {
                   const card = (
-                    <div class="ex-card" onclick={() => { state.selectedNum = ex.num; }}>
+                    <div class="ex-card" onClick={() => { state.selectedNum = ex.num; }}>
                       <div class="ex-card-top">
                         <span class="ex-num">{ex.num}</span>
                         <h3>{i18n.t(ex.title)}</h3>
@@ -197,7 +197,7 @@ export const DocsExamples = component(() => {
                         <div class="ex-viewer-header">
                           <span class="ex-num">{ex.num}</span>
                           <h3>{i18n.t(ex.title)}</h3>
-                          <button class="ex-viewer-close" onclick={() => { state.selectedNum = null; }}>
+                          <button class="ex-viewer-close" onClick={() => { state.selectedNum = null; }}>
                             <Icon name="x" size={11} /> {i18n.t('ex.close')}
                           </button>
                         </div>
