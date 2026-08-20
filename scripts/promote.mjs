@@ -23,10 +23,9 @@ const fromTag = val('--from', 'beta');
 const toTag = val('--to', 'latest');
 const version = val('--version', null);
 
-const ORDER = [
-  'validation', 'ai', 'core', 'form', 'i18n', 'router', 'schema',
-  'server', 'compiler', 'ssr', 'adapters', 'astra', 'astra-js',
-];
+// Solo los paquetes realmente publicados en npm (los @astrajs/* internos
+// NO están en el registro — solo el umbrella astrajs.dev y create-astrajs.dev).
+const ORDER = ['astra-js', 'create-astrajs-dev'];
 
 let ok = true;
 for (const dir of ORDER) {
