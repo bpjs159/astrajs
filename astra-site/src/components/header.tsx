@@ -80,7 +80,7 @@ export const Header = component(() => {
           <a href="/docs/introduction" onclick={(e: Event) => { e.preventDefault(); navigate('/docs/introduction'); }}>{i18n.t('nav.guide')}</a>
           <a href="/docs/server-data" onclick={(e: Event) => { e.preventDefault(); navigate('/docs/server-data'); }}>API</a>
           <a href="/docs/examples" onclick={(e: Event) => { e.preventDefault(); navigate('/docs/examples'); }}>{i18n.t('nav.examples')}</a>
-          <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/bpjs159/astrajs" target="_blank" rel="noopener">GitHub</a>
           <span class="nav-divider" aria-hidden="true"></span>
           <div class="nav-right">
             <select
@@ -106,7 +106,7 @@ export const Header = component(() => {
         <a href="/docs/introduction" onclick={(e: Event) => { e.preventDefault(); navigate('/docs/introduction'); closeMenu(); }}>{i18n.t('nav.guide')}</a>
         <a href="/docs/server-data" onclick={(e: Event) => { e.preventDefault(); navigate('/docs/server-data'); closeMenu(); }}>API</a>
         <a href="/docs/examples" onclick={(e: Event) => { e.preventDefault(); navigate('/docs/examples'); closeMenu(); }}>{i18n.t('nav.examples')}</a>
-        <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/bpjs159/astrajs" target="_blank" rel="noopener">GitHub</a>
         <select
           class="lang-select"
           style="margin:10px 0;text-align:center"

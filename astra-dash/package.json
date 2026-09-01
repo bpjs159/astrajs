@@ -2,7 +2,7 @@
   "name": "astra-dash",
   "private": true,
   "type": "module",
-  "version": "0.1.38",
+  "version": "0.1.39",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

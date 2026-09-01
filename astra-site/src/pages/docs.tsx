@@ -113,7 +113,7 @@ export default function Counter() {
             <a class="docs-btn-primary" href="/docs#primeros-pasos">
               {i18n.t('d.start')} →
             </a>
-            <a class="docs-btn-ghost" href="https://github.com" target="_blank" rel="noopener">
+            <a class="docs-btn-ghost" href="https://github.com/bpjs159/astrajs" target="_blank" rel="noopener">
               {i18n.t('d.github')}
             </a>
           </div>

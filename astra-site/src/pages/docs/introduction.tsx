@@ -83,7 +83,7 @@ export const DocsIntroduction = component(() => (
         </p>
         <div class="docs-buttons">
           <a class="docs-btn-primary" href="/docs/introduction#instalacion">{i18n.t('d.installNow')} →</a>
-          <a class="docs-btn-ghost" href="https://github.com" target="_blank" rel="noopener">{i18n.t('d.github')}</a>
+          <a class="docs-btn-ghost" href="https://github.com/bpjs159/astrajs" target="_blank" rel="noopener">{i18n.t('d.github')}</a>
         </div>
         <div class="feature-pills">
           <div class="feature-pill"><div class="feature-pill-icon"><Icon name="bolt" size={24} /></div><div class="feature-pill-label">Zero-VDOM</div><div class="feature-pill-desc">{i18n.t('d2.pill1.desc')}</div></div>

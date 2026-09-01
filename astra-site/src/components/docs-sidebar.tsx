@@ -427,7 +427,7 @@ export const DocSidebar = component(() => {
           ))}
       </nav>
       <div class="docs-sidebar-footer">
-        <a href="https://github.com" target="_blank" rel="noopener">
+        <a href="https://github.com/bpjs159/astrajs" target="_blank" rel="noopener">
           <Icon name="star" size={13} /> 0.0 GitHub
         </a>
       </div>

@@ -33,7 +33,7 @@ export function Footer(): JSX.Element {
         <div class="footer-links">
           <a href="/docs/introduction" onclick={(e: Event) => { e.preventDefault(); navigate('/docs/introduction'); }}>{i18n.t('footer.docs')}</a>
           <a href="/docs/server-data" onclick={(e: Event) => { e.preventDefault(); navigate('/docs/server-data'); }}>API</a>
-          <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/bpjs159/astrajs" target="_blank" rel="noopener">GitHub</a>
           <a href="https://discord.com" target="_blank" rel="noopener">Discord</a>
           <a href="https://x.com" target="_blank" rel="noopener">X (Twitter)</a>
         </div>

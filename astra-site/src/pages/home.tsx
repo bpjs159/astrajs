@@ -454,7 +454,7 @@ function App() {
             <button class="btn-primary" onclick={() => navigate('/docs/introduction#que-es-astrajs')}>
               {i18n.t('hero.start')} <Icon name="arrow-right" size={13} color="#fff" />
             </button>
-            <a class="btn-secondary" href="https://github.com" target="_blank" rel="noopener">
+            <a class="btn-secondary" href="https://github.com/bpjs159/astrajs" target="_blank" rel="noopener">
               <Icon name="github" size={14} /> {i18n.t('hero.github')}
             </a>
           </div>

@@ -71,7 +71,7 @@ export const getSiteConfig = server({ type: 'pre-build', tags: ['site'] }, async
       ],
     },
     socials: [
-      { label: 'GitHub', href: 'https://github.com' },
+      { label: 'GitHub', href: 'https://github.com/bpjs159/astrajs' },
       { label: 'Discord', href: 'https://discord.com' },
       { label: 'X', href: 'https://x.com' },
     ],
@@ -690,7 +690,7 @@ export const getStaticPages = server({ type: 'pre-build', tags: ['pages'] }, asy
         { day: 'Domingos', hours: 'Cerrado (las flores descansan)' },
       ],
       socials: [
-        { label: 'GitHub', href: 'https://github.com', handle: '@astra' },
+        { label: 'GitHub', href: 'https://github.com/bpjs159/astrajs', handle: '@astra' },
         { label: 'Discord', href: 'https://discord.com', handle: 'discord.gg/astrajs' },
         { label: 'X', href: 'https://x.com', handle: '@floresdelmundo' },
       ],
