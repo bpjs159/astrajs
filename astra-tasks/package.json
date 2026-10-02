@@ -2,7 +2,7 @@
   "name": "astra-tasks",
   "private": true,
   "type": "module",
-  "version": "0.1.42",
+  "version": "0.1.43",
   "scripts": {
     "dev": "vite",
     "build": "astra build --adapter vercel && node scripts/prerender.mjs",

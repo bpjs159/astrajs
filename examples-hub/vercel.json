@@ -1,0 +1,14 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/api/astra/(.*)",
+      "destination": "/api/astra?p=$1"
+    },
+    {
+      "source": "/examples/([^/]+)/([^/]+)/api/astra/(.*)",
+      "destination": "/api/astra?p=$1/$2/$3"
+    }
+  ],
+  "outputDirectory": "dist"
+}
