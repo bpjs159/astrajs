@@ -107,6 +107,9 @@ MIT — all packages. Branding assets (logos, images) are © AstraJS.
 
 ## 📋 Changelog
 
+- **0.1.45** (2026-10-02): vercel fix json
+
+
 - **0.1.44** (2026-10-02): Fix for example site
 
 

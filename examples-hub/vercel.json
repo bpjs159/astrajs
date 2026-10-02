@@ -10,11 +10,5 @@
       "destination": "/api/astra?p=$1/$2/$3"
     }
   ],
-  "outputDirectory": "dist",
-  "redirects": [
-    {
-      "source": "/",
-      "destination": "/examples/"
-    }
-  ]
+  "outputDirectory": "dist"
 }
