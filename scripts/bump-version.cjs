@@ -7,7 +7,13 @@
  * just-created commit via `git log -1`, determines the bump level, updates
  * the `version` field in EVERY package.json in the repo (root, packages,
  * examples, apps, templates), appends an entry to the README.md changelog,
- * stages the changes, and amends the commit to include them.
+ * stages the changes, and creates a SEPARATE `chore(release): vX.Y.Z` commit.
+ *
+ * It used to `git commit --amend` the bump into the commit that triggered it,
+ * which mixed ~55 package.json version bumps into every commit's diff (and made
+ * the version field meaningless, since it bumped even for docs-only commits).
+ * A dedicated release commit keeps the real change clean and makes the bumps
+ * easy to filter or skip. (Reverting to `--amend` is a one-line change below.)
  *
  * Bump rules:
  *   BREAKING CHANGE / !:   → major
@@ -174,13 +180,16 @@ function performBump(repoRoot, message) {
   execFileSync("git", ["add", "--", ...files, README_FILE], { cwd: repoRoot });
   console.log("[bump-version] Staged version bump + changelog.");
 
-  // ── Amend the commit to include the bump ─────────────────────────────
-  console.log("[bump-version] Amending commit to include version bump...");
-  execFileSync("git", ["commit", "--amend", "--no-edit"], {
+  // ── Create a SEPARATE release commit (do NOT amend) ──────────────────
+  // Amending mixed the 55 version bumps into every commit's diff. A dedicated
+  // commit keeps the real change clean; the lock in main() prevents this
+  // commit from re-triggering the bump.
+  console.log("[bump-version] Creating release commit...");
+  execFileSync("git", ["commit", "-m", `chore(release): v${newVersion}`], {
     cwd: repoRoot,
     stdio: "inherit",
   });
-  console.log("[bump-version] Commit amended successfully.");
+  console.log(`[bump-version] Release commit created (v${newVersion}).`);
 
   return true;
 }
@@ -221,9 +230,10 @@ function main() {
     process.exit(0);
   }
 
-  // Skip if already a bump commit
-  if (/^chore:\s*bump/i.test(message)) {
-    console.log("[bump-version] Bump commit detected. Skipping.");
+  // Skip when this IS an automated release commit (the bump we create below),
+  // or a legacy "chore: bump" commit, so the hook never bumps its own bump.
+  if (/^chore\(release\):\s*v\d/i.test(message) || /^chore:\s*bump/i.test(message)) {
+    console.log("[bump-version] Release/bump commit detected. Skipping.");
     process.exit(0);
   }
 

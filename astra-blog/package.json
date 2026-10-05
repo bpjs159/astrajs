@@ -9,13 +9,13 @@
     "test": "astra test"
   },
   "dependencies": {
-    "astrajs.dev": "0.1.4"
+    "astrajs.dev": "file:../packages/astra-js"
   },
   "devDependencies": {
     "vite": "^5.4.0",
     "typescript": "^5.5.0",
     "vitest": "^2.1.0",
-    "astrajs.dev": "0.1.4"
+    "astrajs.dev": "file:../packages/astra-js"
   },
   "version": "0.1.48"
 }

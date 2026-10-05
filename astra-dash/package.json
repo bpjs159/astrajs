@@ -11,7 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "astrajs.dev": "0.1.14"
+    "astrajs.dev": "file:../packages/astra-js"
   },
   "devDependencies": {
     "vite": "^5.4.0",
