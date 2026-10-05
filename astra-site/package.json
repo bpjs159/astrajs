@@ -8,11 +8,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "astrajs.dev": "0.1.4"
+    "astrajs.dev": "file:../packages/astra-js"
   },
   "devDependencies": {
     "vite": "^5.4.0",
     "typescript": "^5.5.0"
   },
-  "version": "0.1.47"
+  "version": "0.1.48"
 }

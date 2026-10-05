@@ -2,7 +2,7 @@
   "name": "astra-store",
   "private": true,
   "type": "module",
-  "version": "0.1.47",
+  "version": "0.1.48",
   "scripts": {
     "dev": "vite",
     "build": "astra build --adapter vercel && node scripts/prerender.mjs",

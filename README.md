@@ -107,6 +107,9 @@ MIT — all packages. Branding assets (logos, images) are © AstraJS.
 
 ## 📋 Changelog
 
+- **0.1.48** (2026-10-05): fix(deploy): astra-site must use the monorepo compiler, not the published astrajs.dev@0.1.4
+
+
 - **0.1.47** (2026-10-05): fix(build): make clean-checkout builds work (fixes Vercel deploy)
 
 
