@@ -15,5 +15,5 @@
     "typescript": "^5.5.0",
     "astrajs.dev": "file:../../../packages/astra-js"
   },
-  "version": "0.1.48"
+  "version": "0.1.49"
 }

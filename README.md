@@ -107,6 +107,9 @@ MIT — all packages. Branding assets (logos, images) are © AstraJS.
 
 ## 📋 Changelog
 
+- **0.1.49** (2026-10-05): chore: stop version-bump hook from amending commits; pin apps to the workspace
+
+
 - **0.1.48** (2026-10-05): fix(deploy): astra-site must use the monorepo compiler, not the published astrajs.dev@0.1.4
 
 
