@@ -4,7 +4,7 @@
  * Shared reactive store so route() calls inside component()
  * re-evaluate when navigate() changes the path.
  */
-import { store } from 'astrajs.dev/core';
+import { store } from '@astrajs/core';
 
 export const _pathState = store({ path: '/' });
 

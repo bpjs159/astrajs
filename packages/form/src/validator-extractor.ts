@@ -22,7 +22,7 @@
  * - Merge server results back into the form controller via `setServerErrors()`
  */
 
-import type { Validator, AsyncValidator } from 'astrajs.dev/validation';
+import type { Validator, AsyncValidator } from '@astrajs/validation';
 import { resolveBuiltinValidator } from './builtin-validators.js';
 import type { ServerValidator } from './builtin-validators.js';
 

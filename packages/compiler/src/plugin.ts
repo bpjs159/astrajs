@@ -214,7 +214,7 @@ export function astraVitePlugin(userConfig: AstraViteConfig = {}): Plugin {
       // and build share one provider configuration (apiKey read from env).
       if (config.ai) {
         const ai = config.ai;
-        import('astrajs.dev/ai')
+        import('@astrajs/ai')
           .then(({ configureAi }) => {
             configureAi({
               ...(ai.provider ? { provider: ai.provider } : {}),

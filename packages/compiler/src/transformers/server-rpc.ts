@@ -47,7 +47,7 @@
  */
 
 import type { AstraViteConfig } from '../index.js';
-import type { ServerConfig } from 'astrajs.dev/server';
+import type { ServerConfig } from '@astrajs/server';
 import { hashContent } from '../utils/ast.js';
 
 // ─── server Call Parser ─────────────────────────────────────────────────────

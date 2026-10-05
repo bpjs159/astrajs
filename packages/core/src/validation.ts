@@ -24,6 +24,6 @@ export {
   oneOf,
   all,
   any,
-} from 'astrajs.dev/validation';
+} from '@astrajs/validation';
 
-export type { Validator, AsyncValidator } from 'astrajs.dev/validation';
+export type { Validator, AsyncValidator } from '@astrajs/validation';

@@ -1,6 +1,6 @@
 {
   "name": "@astrajs/form",
-  "version": "0.1.46",
+  "version": "0.1.47",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bpjs159/astrajs.git"
@@ -28,7 +28,9 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@astrajs/core": "*"
+    "@astrajs/core": "*",
+    "@astrajs/ssr": "*",
+    "@astrajs/validation": "*"
   },
   "devDependencies": {
     "typescript": "^5.5.0"

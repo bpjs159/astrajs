@@ -13,7 +13,7 @@
 
 import { params } from './params.js';
 import { getCurrentPath } from './navigate.js';
-import { setBindingUpdate } from 'astrajs.dev/core';
+import { setBindingUpdate } from '@astrajs/core';
 
 // ─── Route matching state ────────────────────────────────────────────────────
 

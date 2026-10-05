@@ -12,7 +12,7 @@
  * - **No manual validation loops** — we read `ValidityState` from the DOM.
  */
 
-import { store, mounted } from 'astrajs.dev/core';
+import { store, mounted } from '@astrajs/core';
 import { getFormErrors } from './validity-map.js';
 
 // ─── Types ───────────────────────────────────────────────────────────────────

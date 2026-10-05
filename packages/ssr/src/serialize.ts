@@ -23,9 +23,9 @@
  * 5. The app is interactive — no component re-execution needed.
  */
 
-import { store, toRaw } from 'astrajs.dev/core';
-import { getHandlerRegistry } from 'astrajs.dev/core';
-import type { StoreOptions } from 'astrajs.dev/core';
+import { store, toRaw } from '@astrajs/core';
+import { getHandlerRegistry } from '@astrajs/core';
+import type { StoreOptions } from '@astrajs/core';
 
 // ─── Forward declarations for form resumability ──────────────────────────────
 // These are lazily imported to avoid circular dependencies.

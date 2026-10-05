@@ -71,7 +71,7 @@
  * ```
  */
 
-import { store } from 'astrajs.dev/core';
+import { store } from '@astrajs/core';
 import type { FormController } from './controller.js';
 import { extractValidators, runValidators } from './validator-extractor.js';
 import type { ServerValidator } from './builtin-validators.js';

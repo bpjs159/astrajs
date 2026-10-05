@@ -22,7 +22,7 @@
  */
 
 import type { SSRConfig, SSGConfig } from './index.js';
-import { setSSRResumable } from 'astrajs.dev/core';
+import { setSSRResumable } from '@astrajs/core';
 
 // ─── DOM Node → HTML String Serializer ───────────────────────────────────────
 

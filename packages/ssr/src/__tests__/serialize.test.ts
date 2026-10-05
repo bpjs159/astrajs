@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { store, registerHandler } from 'astrajs.dev/core';
+import { store, registerHandler } from '@astrajs/core';
 import { serializeState, deserializeState, handleDelegatedEvent } from '../serialize.js';
 import { nodeToHTML, escapeHtmlText } from '../renderer.js';
 

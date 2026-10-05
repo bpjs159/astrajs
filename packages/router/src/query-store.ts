@@ -9,7 +9,7 @@
  * ```
  */
 
-import { store } from 'astrajs.dev/core';
+import { store } from '@astrajs/core';
 import { onRouteChange } from './listener.js';
 
 export function queryStore<T extends Record<string, string>>(defaults: T): T {

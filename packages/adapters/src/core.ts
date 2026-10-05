@@ -10,7 +10,7 @@
  * This module is **edge-safe** (Web APIs only): Node, Vercel and Cloudflare
  * adapters are all thin shells around this core.
  */
-import { handleRPCRequest } from 'astrajs.dev/server';
+import { handleRPCRequest } from '@astrajs/server';
 
 /**
  * Configuration for the platform-neutral Astra handler.

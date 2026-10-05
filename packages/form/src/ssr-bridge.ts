@@ -30,7 +30,7 @@
  * Just importing `astrajs.dev/form` on the client entry point is enough.
  */
 
-import { registerFormResumeHandler } from 'astrajs.dev/ssr';
+import { registerFormResumeHandler } from '@astrajs/ssr';
 import { deserializeValidators } from './validator-extractor.js';
 import { form } from './controller.js';
 import type { FormController } from './controller.js';

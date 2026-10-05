@@ -11,7 +11,7 @@
  * This is the client-side counterpart to server-side ISR `maxAge`.
  */
 
-import type { StoreOptions } from 'astrajs.dev/core';
+import type { StoreOptions } from '@astrajs/core';
 
 /**
  * Extended store options for SWR.

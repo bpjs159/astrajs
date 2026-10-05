@@ -30,8 +30,8 @@ import {
   oneOf,
   all,
   any,
-} from 'astrajs.dev/validation';
-import type { Validator, AsyncValidator } from 'astrajs.dev/validation';
+} from '@astrajs/validation';
+import type { Validator, AsyncValidator } from '@astrajs/validation';
 
 // ─── Registry Type ───────────────────────────────────────────────────────────
 

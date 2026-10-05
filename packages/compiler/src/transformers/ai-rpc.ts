@@ -33,7 +33,7 @@
  */
 
 import type { AstraViteConfig } from '../index.js';
-import type { AiCallConfig } from 'astrajs.dev/ai';
+import type { AiCallConfig } from '@astrajs/ai';
 import { hashContent } from '../utils/ast.js';
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -440,7 +440,7 @@ export async function executeAiPreBuildCall(
   }
 
   try {
-    const { executePrompt } = await import('astrajs.dev/ai');
+    const { executePrompt } = await import('@astrajs/ai');
     // Run the prompt body in isolation → the prompt string.
     const promptFn = new Function(
       `return (async function() { ${call.functionBody} })();`

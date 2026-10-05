@@ -10,6 +10,6 @@
  * ```
  */
 
-import { store } from 'astrajs.dev/core';
+import { store } from '@astrajs/core';
 
 export const params = store<Record<string, string>>({});

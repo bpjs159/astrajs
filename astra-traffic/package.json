@@ -2,7 +2,7 @@
   "name": "astra-traffic",
   "private": true,
   "type": "module",
-  "version": "0.1.46",
+  "version": "0.1.47",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

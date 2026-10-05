@@ -1,6 +1,6 @@
 {
   "name": "astrajs.dev",
-  "version": "0.1.46",
+  "version": "0.1.47",
   "description": "AstraJS — Full-Stack TypeScript Framework. One install, dynamic subpath imports: astrajs.dev/core, astrajs.dev/compiler, astrajs.dev/server…",
   "type": "module",
   "repository": {
@@ -111,7 +111,7 @@
     "vendor"
   ],
   "scripts": {
-    "build": "node scripts/vendor.mjs && tsc"
+    "build": "node scripts/build-deps.mjs && tsc"
   },
   "dependencies": {
     "typescript": "^5.5.0"

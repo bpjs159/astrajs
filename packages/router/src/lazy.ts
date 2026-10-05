@@ -14,7 +14,7 @@
  * ```
  */
 
-import { store } from 'astrajs.dev/core';
+import { store } from '@astrajs/core';
 
 type ComponentModule = { [key: string]: (props?: Record<string, unknown>) => JSX.Element };
 

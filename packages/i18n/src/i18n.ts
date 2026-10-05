@@ -25,7 +25,7 @@
  *   - Number / date / list formatting with Intl (native, locale-aware)
  *   - RTL detection for right-to-left languages (ar, he, fa, ur)
  */
-import { store } from 'astrajs.dev/core';
+import { store } from '@astrajs/core';
 
 // ─── Public types ─────────────────────────────────────────────────────────────
 

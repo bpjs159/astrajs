@@ -12,7 +12,7 @@
  */
 
 import { navigate } from './navigate.js';
-import { bindAttr } from 'astrajs.dev/core';
+import { bindAttr } from '@astrajs/core';
 
 export interface LinkProps {
   href: string;
