@@ -2,7 +2,7 @@
   "name": "astra-dash",
   "private": true,
   "type": "module",
-  "version": "0.1.45",
+  "version": "0.1.46",
   "scripts": {
     "dev": "vite",
     "build": "astra build --adapter vercel && node scripts/prerender.mjs",

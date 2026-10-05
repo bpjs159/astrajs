@@ -1,43 +1,53 @@
-# @astrajs/core
+# astrajs.dev/core
 
-> **Proxy-based fine-grained reactivity runtime for AstraJS.**
+> **Proxy-based, fine-grained reactivity runtime for AstraJS (~3 KB).**
+
+Zero-VDOM: components run **once** and return real DOM. Updates are surgical
+mutations of the specific nodes subscribed to a store property — no diffing,
+no re-render.
 
 ## Features
 
-- **`store()`** — ES6 Proxy-based reactive state with property-level tracking (~3KB)
-- **`effect()`** — Auto-tracking side effects
-- **`memo()`** — Lazy derived signals
-- **`batch()`** — Atomic multi-mutation batching
-- **`untrack()`** — Escape hatches for non-reactive reads
-- **DOM bindings** — `bindText`, `bindAttr`, `bindClass`, `bindValue`, `bindList`
+- **`store()`** — ES6 Proxy-based reactive state with property-level tracking
+- **`component()`** — Single-execution component wrapper (returns real DOM)
+- **`mounted()`** — DOM lifecycle hook (mount + unmount cleanup)
+- **`onCleanup()`** — Register cleanup inside `mounted()` callbacks
+- **`swr()`** — Stale-While-Revalidate data helper
+- **`classes()`** — Class-name composer
+- **DOM bindings** — `bindText`, `bindAttr`, `bindClass`, `bindValue`, `bindList` (auto-injected by the compiler)
 - **JSX runtime** — Automatic JSX transform producing real DOM elements
+
+> **Internal primitives — never use in application code:**
+> `effect`, `batch`, `untrack`, `dynamic`, `memo` and the `bind*` functions are
+> *framework machinery*. The AST compiler injects `dynamic()`/`memo()`/`bind*()`
+> where they are needed; developers write plain reactive JSX instead. These
+> primitives are intentionally **not typed** in the published package so you
+> cannot call them by accident. Use `mounted()` + `onCleanup()` for side effects.
 
 ## Usage
 
-```ts
-import { store, effect, memo, batch, Component } from '@astrajs/core';
+```tsx
+import { store, component, mounted, onCleanup } from 'astrajs.dev/core';
 
-// Create reactive state
-const counter = store({ count: 0 });
+const Counter = component(() => {
+  const counter = store({ count: 0 });
 
-// Auto-tracking effect
-effect(() => {
-  console.log(`Count: ${counter.count}`);
-  // Logs "Count: 0" immediately, then "Count: 1" on mutation
+  mounted(() => {
+    const id = setInterval(() => counter.count++, 1000);
+    onCleanup(() => clearInterval(id)); // runs on unmount
+  });
+
+  return (
+    <div>
+      <span>{counter.count}</span>
+      <button onclick={() => counter.count++}>+ 1</button>
+    </div>
+  );
 });
-
-counter.count++; // Triggers only the subscribers of `count`
-
-// Derived values
-const doubled = memo(() => counter.count * 2);
-console.log(doubled()); // 2
-
-// Batch mutations
-batch(() => {
-  counter.count = 10;
-  counter.count = 20;
-}); // Only one notification cycle
 ```
+
+The compiler turns `{counter.count}` into an O(1) effect that updates **only
+that TextNode**. The component never re-runs.
 
 ## JSX
 
@@ -47,17 +57,9 @@ Configure `tsconfig.json`:
 {
   "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "@astrajs/core"
+    "jsxImportSource": "astrajs.dev/core"
   }
 }
-```
-
-Then components return real DOM:
-
-```tsx
-const Greeting: Component<{ name: string }> = ({ name }) => (
-  <h1>Hello, {name}!</h1>
-);
 ```
 
 ## License

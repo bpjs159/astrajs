@@ -11,6 +11,10 @@
  * component re-render.
  */
 
+import { disposeNodeEffects } from './disposal.js';
+import { _collectCleanups } from './effect.js';
+import { isDev, isTest } from './env.js';
+
 // ─── Global State ────────────────────────────────────────────────────────────
 
 type MountCallback = () => void | (() => void);
@@ -64,6 +68,10 @@ function getObserver(): MutationObserver | null {
                 activeCleanups.delete(el as HTMLElement);
               }
             });
+
+            // Dispose all reactive effects bound to this node and its descendants
+            // This prevents memory leaks from orphaned bindText/bindAttr/etc.
+            disposeNodeEffects(node);
           }
         }
       }
@@ -109,6 +117,23 @@ export function mounted(fn: MountCallback): void {
   if (!_currentWrapper) {
     // No active component wrapper — this is a programming error.
     // mounted() must be called synchronously inside a component() function.
+    const message =
+      '[AstraJS] mounted() was called outside of a component() function. ' +
+      'mounted() must be called synchronously during component execution. ' +
+      'If you need side effects outside components, use onCleanup-less ' +
+      'module code or component composition instead.';
+
+    // In tests, throw so the mistake is caught early.
+    if (isTest()) {
+      throw new Error(message);
+    }
+    // In development, warn loudly. In production, log to console for
+    // debugging without breaking the app.
+    if (isDev()) {
+      console.warn(message);
+    } else {
+      console.error(message);
+    }
     return;
   }
   let entries = pendingByWrapper.get(_currentWrapper);
@@ -165,10 +190,25 @@ export function flushMountCallbacks(wrapper: HTMLElement): void {
   // (O(1) surgical DOM updates), not a full component re-render.
   queueMicrotask(() => {
     for (const entry of callbacks) {
-      const cleanup = entry.callback();
-      if (typeof cleanup === 'function') {
+      // Run the callback inside a cleanup scope so onCleanup() calls
+      // register against this mounted() invocation (dev-facing API —
+      // developers never touch effect() directly).
+      const { result: returnedCleanup, cleanups } = _collectCleanups(entry.callback);
+
+      const allCleanups: Array<() => void> = [...cleanups];
+      if (typeof returnedCleanup === 'function') {
+        allCleanups.push(returnedCleanup);
+      }
+
+      if (allCleanups.length > 0) {
         wrapper.setAttribute('data-astra-lifecycle', '');
-        activeCleanups.set(wrapper, cleanup);
+        // Combine with any cleanup already registered for this wrapper
+        // (multiple mounted() calls in one component).
+        const existing = activeCleanups.get(wrapper);
+        activeCleanups.set(wrapper, () => {
+          for (const c of allCleanups) c();
+          existing?.();
+        });
       }
     }
   });

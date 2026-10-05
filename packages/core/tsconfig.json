@@ -4,7 +4,8 @@
     "composite": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "jsxImportSource": "@astrajs/core"
+    "jsxImportSource": "@astrajs/core",
+    "stripInternal": true
   },
   "include": ["src"],
   "exclude": ["src/compiler", "**/*.test.ts"]

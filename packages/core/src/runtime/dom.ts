@@ -15,6 +15,7 @@
 
 import { effect } from './effect.js';
 import { setBindingUpdate } from './store.js';
+import { registerNodeEffect } from './disposal.js';
 
 /**
  * Binds a TextNode's `.data` (or `.textContent`) to a reactive expression.
@@ -27,17 +28,20 @@ import { setBindingUpdate } from './store.js';
  * bindText(tn, () => String(store.count));
  * ```
  *
+ * The effect is registered for disposal when the node is removed from the DOM.
+ *
  * @param node — The TextNode to keep updated.
  * @param getter — A function returning the current string value (reactive).
  */
 export function bindText(node: Text, getter: () => string): void {
-  effect(() => {
+  const fx = effect(() => {
     const value = getter();
     // Only update if the value actually changed (avoids layout thrashing)
     if (node.data !== value) {
       node.data = value;
     }
   });
+  registerNodeEffect(node, fx);
 }
 
 /**
@@ -52,7 +56,7 @@ export function bindAttr(
   attr: string,
   getter: () => string | null | boolean
 ): void {
-  effect(() => {
+  const fx = effect(() => {
     const value = getter();
     if (value === null || value === undefined || value === false || value === '') {
       el.removeAttribute(attr);
@@ -60,6 +64,7 @@ export function bindAttr(
       el.setAttribute(attr, String(value));
     }
   });
+  registerNodeEffect(el, fx);
 }
 
 /**
@@ -75,9 +80,10 @@ export function bindClass(
   className: string,
   getter: () => boolean
 ): void {
-  effect(() => {
+  const fx = effect(() => {
     el.classList.toggle(className, !!getter());
   });
+  registerNodeEffect(el, fx);
 }
 
 /**
@@ -88,12 +94,13 @@ export function bindClass(
  * @param getter — A function returning the text content.
  */
 export function bindTextContent(el: HTMLElement, getter: () => string): void {
-  effect(() => {
+  const fx = effect(() => {
     const value = getter();
     if (el.textContent !== value) {
       el.textContent = value;
     }
   });
+  registerNodeEffect(el, fx);
 }
 
 /**
@@ -112,12 +119,13 @@ export function bindValue(
   getter: () => string,
   setter?: (value: string) => void
 ): void {
-  effect(() => {
+  const fx = effect(() => {
     const value = getter();
     if (el.value !== value) {
       el.value = value;
     }
   });
+  registerNodeEffect(el, fx);
 
   if (setter) {
     const handler = (): void => {
@@ -129,7 +137,18 @@ export function bindValue(
       setBindingUpdate(false);
     };
     el.addEventListener('input', handler);
-    // Store for potential cleanup
+
+    // Register cleanup to remove the event listener when the node is disposed.
+    // This prevents listener accumulation when bindConditional recreates inputs.
+    registerNodeEffect(el, {
+      dispose: () => {
+        el.removeEventListener('input', handler);
+        delete (el as unknown as Record<string, unknown>).__astra_value_handler;
+      },
+      disposed: false,
+    });
+
+    // Store for potential manual cleanup
     (el as unknown as Record<string, unknown>).__astra_value_handler = handler;
   }
 }
@@ -165,7 +184,7 @@ export function bindList<T>(
       ? ((rendered.firstChild ?? rendered) as ChildNode)
       : rendered;
 
-  effect(() => {
+  const fx = effect(() => {
     const nextItems = getter();
     const nextKeys = new Map<string | number, T>();
 
@@ -284,6 +303,7 @@ export function bindList<T>(
     el.textContent = '';
     el.appendChild(fragment);
   });
+  registerNodeEffect(el, fx);
 }
 
 // ─── Granular Bindings for dynamic() expressions ──────────────────────────
@@ -318,7 +338,7 @@ export function bindConditional(
 ): void {
   let current: Node = anchor;
 
-  effect(() => {
+  const fx = effect(() => {
     const next = toNode(getter());
 
     // Same node instance → nothing to do
@@ -335,13 +355,18 @@ export function bindConditional(
     (current as ChildNode).remove();
     current = next;
   });
+  registerNodeEffect(anchor, fx);
 }
 
 /**
  * Binds a dynamic list of DOM nodes to a reactive getter.
  *
- * Each time the getter returns a new array, the old nodes are removed
- * and the new ones inserted before the anchor marker.
+ * Uses reference-based reconciliation: nodes that appear in both the old
+ * and new arrays (by reference) are kept in place. Only removed nodes are
+ * taken out and only new nodes are inserted.
+ *
+ * For optimal performance with large lists, prefer `bindList()` with a
+ * `keyFn` — it provides O(delta) fast paths for append/remove operations.
  *
  * @param parent  — The parent element.
  * @param anchor  — Comment marker for insertion point.
@@ -352,28 +377,52 @@ export function bindDynamicList(
   anchor: Comment,
   getter: () => readonly Node[]
 ): void {
-  let currentNodes: Node[] = [];
+  let currentNodes: readonly Node[] = [];
 
-  effect(() => {
+  const fx = effect(() => {
     const nextNodes = getter();
 
     // Fast path: same reference
     if (nextNodes === currentNodes) return;
 
-    // Remove old nodes
-    for (const n of currentNodes) {
-      if (n.parentNode === parent) (n as ChildNode).remove();
-    }
+    // Build a set of next nodes for O(1) lookup
+    const nextSet = new Set(nextNodes);
 
-    // Insert new nodes before anchor
-    for (const n of nextNodes) {
-      if (n instanceof Node) {
-        parent.insertBefore(n, anchor);
+    // Remove nodes that are no longer present
+    for (const n of currentNodes) {
+      if (!nextSet.has(n) && n.parentNode === parent) {
+        (n as ChildNode).remove();
       }
     }
 
-    currentNodes = [...nextNodes];
+    // Insert/reorder nodes: walk nextNodes and ensure each is before anchor
+    // in the correct position. We use a simple approach: track the last
+    // inserted node and insert after it.
+    let prevNode: Node | null = null;
+    for (let i = 0; i < nextNodes.length; i++) {
+      const node = nextNodes[i]!;
+      if (!(node instanceof Node)) continue;
+
+      if (prevNode === null) {
+        // First node: insert right after the anchor's previous sibling
+        // or at the beginning of the parent
+        const anchorPrev: Node | null = anchor.previousSibling;
+        if (anchorPrev !== node) {
+          parent.insertBefore(node, anchor);
+        }
+      } else {
+        // Ensure node comes after prevNode
+        const expected: Node | null = prevNode.nextSibling;
+        if (expected !== node) {
+          parent.insertBefore(node, anchor);
+        }
+      }
+      prevNode = node;
+    }
+
+    currentNodes = nextNodes;
   });
+  registerNodeEffect(anchor, fx);
 }
 
 /**
@@ -393,7 +442,7 @@ export function bindDynamicText(
 ): void {
   let current: Node = anchor;
 
-  effect(() => {
+  const fx = effect(() => {
     const value = String(getter());
     if (current instanceof Text) {
       if (current.data !== value) {
@@ -406,4 +455,5 @@ export function bindDynamicText(
       current = tn;
     }
   });
+  registerNodeEffect(anchor, fx);
 }

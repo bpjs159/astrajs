@@ -190,6 +190,85 @@ function server(configOrFn, fn) {
     "[AstraJS] server() macro was not transformed by the compiler. Make sure astrajs.dev/compiler is in your vite.config.ts plugins."
   );
 }
+configureRPC({ maxBodyBytes: 1 << 20 });
+const SEED_HISTORY = [
+  42,
+  45,
+  41,
+  52,
+  55,
+  49,
+  60,
+  58,
+  66,
+  61,
+  70,
+  68,
+  74,
+  71,
+  78,
+  76,
+  81,
+  79,
+  85,
+  82,
+  88,
+  86,
+  91,
+  89
+];
+let snapshot = {
+  visits: 8421,
+  orders: 517,
+  revenue: 23480,
+  cpu: 34,
+  history: [...SEED_HISTORY],
+  lastTick: Date.now()
+};
+if (typeof window === "undefined") {
+  setInterval(() => {
+    const jitter = (n) => Math.max(1, n + Math.round((Math.random() - 0.45) * 12));
+    const visits = jitter(snapshot.visits);
+    snapshot = {
+      visits,
+      orders: snapshot.orders + (Math.random() > 0.55 ? 1 : 0),
+      revenue: snapshot.revenue + Math.round(Math.random() * 140),
+      cpu: Math.min(96, Math.max(6, snapshot.cpu + Math.round((Math.random() - 0.5) * 14))),
+      history: [...snapshot.history.slice(-23), visits],
+      lastTick: Date.now()
+    };
+  }, 2200);
+}
+const getSnapshot = server(
+  { autoSync: true, autoSyncInterval: 2500 },
+  async () => snapshot
+);
+const MAX_BYTES = 512 * 1024;
+const uploadReport = server(
+  async (text, name) => {
+    const bytes = Buffer.from(text, "utf8").length;
+    if (bytes > MAX_BYTES) {
+      return { ok: false, error: "up.tooLarge" };
+    }
+    const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
+    if (lines.length === 0) {
+      return { ok: false, error: "up.empty" };
+    }
+    const cols = (lines[0] ?? "").split(",").length;
+    return {
+      ok: true,
+      summary: {
+        name: name.slice(0, 120),
+        bytes,
+        rows: lines.length,
+        cols,
+        at: (/* @__PURE__ */ new Date()).toISOString()
+      }
+    };
+  }
+);
+rpcHandler("getSnapshot", getSnapshot, { "autoSync": true });
+rpcHandler("uploadReport", uploadReport);
 function getAiRuntime() {
   const provider = process.env.ASTRA_AI_PROVIDER || "ollama";
   const baseURL = process.env.ASTRA_AI_BASE_URL ?? (provider === "ollama" ? "http://127.0.0.1:11434" : provider === "openai" ? "https://api.openai.com/v1" : "mock://");
@@ -597,85 +676,6 @@ rpcHandler("askInsight", async function* (question) {
     yield _chunk;
   }
 }, { stream: true });
-configureRPC({ maxBodyBytes: 1 << 20 });
-const SEED_HISTORY = [
-  42,
-  45,
-  41,
-  52,
-  55,
-  49,
-  60,
-  58,
-  66,
-  61,
-  70,
-  68,
-  74,
-  71,
-  78,
-  76,
-  81,
-  79,
-  85,
-  82,
-  88,
-  86,
-  91,
-  89
-];
-let snapshot = {
-  visits: 8421,
-  orders: 517,
-  revenue: 23480,
-  cpu: 34,
-  history: [...SEED_HISTORY],
-  lastTick: Date.now()
-};
-if (typeof window === "undefined") {
-  setInterval(() => {
-    const jitter = (n) => Math.max(1, n + Math.round((Math.random() - 0.45) * 12));
-    const visits = jitter(snapshot.visits);
-    snapshot = {
-      visits,
-      orders: snapshot.orders + (Math.random() > 0.55 ? 1 : 0),
-      revenue: snapshot.revenue + Math.round(Math.random() * 140),
-      cpu: Math.min(96, Math.max(6, snapshot.cpu + Math.round((Math.random() - 0.5) * 14))),
-      history: [...snapshot.history.slice(-23), visits],
-      lastTick: Date.now()
-    };
-  }, 2200);
-}
-const getSnapshot = server(
-  { autoSync: true, autoSyncInterval: 2500 },
-  async () => snapshot
-);
-const MAX_BYTES = 512 * 1024;
-const uploadReport = server(
-  async (text, name) => {
-    const bytes = Buffer.from(text, "utf8").length;
-    if (bytes > MAX_BYTES) {
-      return { ok: false, error: "up.tooLarge" };
-    }
-    const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
-    if (lines.length === 0) {
-      return { ok: false, error: "up.empty" };
-    }
-    const cols = (lines[0] ?? "").split(",").length;
-    return {
-      ok: true,
-      summary: {
-        name: name.slice(0, 120),
-        bytes,
-        rows: lines.length,
-        cols,
-        at: (/* @__PURE__ */ new Date()).toISOString()
-      }
-    };
-  }
-);
-rpcHandler("getSnapshot", getSnapshot, { "autoSync": true });
-rpcHandler("uploadReport", uploadReport);
 const apiPrefix = "/api/astra";
 async function handler(req, res) {
   try {

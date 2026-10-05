@@ -41,12 +41,42 @@ export {
 } from './runtime/store.js';
 
 export {
-  /** @internal Auto-injected by the AST compiler. Do not use directly. */
+  /**
+   * Auto-injected by the AST compiler. Do not use directly.
+   * (Typed because the compiler emits `memo` imports into app code.)
+   */
   memo,
-  /** @internal Framework primitive. Auto-batching handles this transparently. */
-  batch,
-  untrack,
+  onCleanup,
 } from './runtime/effect.js';
+export type { DisposableEffect } from './runtime/effect.js';
+
+// ─── Internal Framework Primitives ───────────────────────────────────────────
+// `effect`, `batch` and `untrack` are CORE machinery — application code must
+// NEVER call them (developers use `dynamic()`, `mounted()` and `onCleanup()`).
+// They are re-exported here as const bindings (not `export {}` specifiers)
+// so that `stripInternal` removes them from the published `.d.ts` while they
+// remain available in the JS bundle for the compiler/runtime and for tests
+// (which resolve to `src/` via the `development` condition).
+import {
+  effect as _effectInternal,
+  batch as _batchInternal,
+  untrack as _untrackInternal,
+} from './runtime/effect.js';
+
+/** @internal Framework primitive. Use `mounted()` for side effects. */
+export const effect = _effectInternal;
+/** @internal Framework primitive. Auto-batching handles this transparently. */
+export const batch = _batchInternal;
+/** @internal Framework primitive. Used by the JSX runtime internals. */
+export const untrack = _untrackInternal;
+
+// Effect disposal registry — for advanced use cases and testing
+export {
+  registerNodeEffect,
+  disposeNodeEffects,
+  disposeNodeEffectsShallow,
+  hasNodeEffects,
+} from './runtime/disposal.js';
 
 export {
   bindText,
@@ -63,8 +93,11 @@ export {
 // Component wrapper
 export { component } from './runtime/component.js';
 
-// Zero-VDOM reactive expression marker (internal — injected by compiler)
-export { /** @internal Auto-injected by the AST compiler. Do not use directly. */
+// Zero-VDOM reactive expression marker (injected by compiler)
+export { /**
+  * Auto-injected by the AST compiler. Do not use directly.
+  * (Typed because the compiler emits `dynamic` imports into app code.)
+  */
 dynamic } from './jsx-runtime.js';
 
 // SSR Resumability — transparent handler registration & SSR-mode control
@@ -81,11 +114,6 @@ export { mounted } from './runtime/lifecycle.js';
 // CSS class name composer
 export { classes } from './runtime/classes.js';
 export type { ClassValue } from './runtime/classes.js';
-
-// Effect primitive — internal, used by bindText/bindAttr/dynamic/mounted.
-// Not part of the public API. Developers use mounted() for side effects.
-export { /** @internal Framework primitive. Use `mounted()` for side effects. */
-effect } from './runtime/effect.js';
 
 // SWR — Stale-While-Revalidate caching
 // One import, zero boilerplate: swr(() => fetch('/api/data').then(r => r.json()))

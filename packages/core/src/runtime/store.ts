@@ -136,6 +136,8 @@ export function captureReactiveExpression<T>(fn: () => T): {
   isReactive: boolean;
   getter: (() => string) | null;
 } {
+  // Save and reset the flag so nested calls don't interfere
+  const prevReactiveAccessDetected = reactiveAccessDetected;
   reactiveAccessDetected = false;
 
   const prevTracker = currentTracker;
@@ -150,12 +152,16 @@ export function captureReactiveExpression<T>(fn: () => T): {
     currentTracker = prevTracker;
   }
 
+  // Capture the result before restoring the previous flag
+  const detected = reactiveAccessDetected;
+  reactiveAccessDetected = prevReactiveAccessDetected;
+
   // If we detected a store access during evaluation,
   // fn itself IS the getter (re-running it would get the latest value)
   return {
     value,
-    isReactive: reactiveAccessDetected,
-    getter: reactiveAccessDetected ? (() => String(fn())) : null,
+    isReactive: detected,
+    getter: detected ? (() => String(fn())) : null,
   };
 }
 
@@ -241,7 +247,52 @@ export function track(raw: object, prop: string | symbol): void {
     propMap.set(prop, subscribers);
   }
 
+  // Avoid duplicate tracking within the same run
+  if (subscribers.has(currentTracker)) {
+    // Already subscribed — but still record in reverse map if not present
+    const deps = trackerDeps.get(currentTracker);
+    if (deps && !deps.some(d => d.raw === raw && d.prop === prop)) {
+      deps.push({ raw, prop });
+    }
+    return;
+  }
+
   subscribers.add(currentTracker);
+
+  // Also record in reverse map for O(own deps) disposal
+  let deps = trackerDeps.get(currentTracker);
+  if (!deps) {
+    deps = [];
+    trackerDeps.set(currentTracker, deps);
+  }
+  deps.push({ raw, prop });
+}
+
+/**
+ * Removes all subscriptions for a tracker, preparing it for re-execution
+ * or disposal. Called by effect() before each re-run to avoid stale deps.
+ *
+ * @param tracker — The tracker function whose subscriptions to clear.
+ */
+export function clearTrackerSubscriptions(tracker: () => void): void {
+  const deps = trackerDeps.get(tracker);
+  if (!deps) return;
+
+  for (const { raw, prop } of deps) {
+    const propMap = rawDeps.get(raw);
+    if (propMap) {
+      const subscribers = propMap.get(prop);
+      if (subscribers) {
+        subscribers.delete(tracker);
+        if (subscribers.size === 0) {
+          propMap.delete(prop);
+        }
+      }
+    }
+  }
+
+  // Clear the reverse map entry (will be repopulated on next run)
+  deps.length = 0;
 }
 
 /**
@@ -283,6 +334,29 @@ export function trigger(raw: object, prop: string | symbol): void {
 }
 
 // ─── Batch Processing ────────────────────────────────────────────────────────
+
+/**
+ * Removes a tracker function from ALL dependency subscriptions.
+ * Called when an effect is disposed to prevent memory leaks.
+ *
+ * Uses the reverse dependency map for O(own subscriptions) disposal.
+ *
+ * @param tracker — The tracker function to remove.
+ */
+export function disposeTracker(tracker: () => void): void {
+  // Remove from pending notifications (if queued)
+  pendingNotifications.delete(tracker);
+
+  // Clear all subscriptions and remove the reverse map entry
+  clearTrackerSubscriptions(tracker);
+  trackerDeps.delete(tracker);
+}
+
+/**
+ * Reverse dependency map: tracker → list of {raw, prop} it subscribes to.
+ * Enables O(own subscriptions) disposal instead of O(all subscriptions).
+ */
+const trackerDeps = new Map<() => void, Array<{ raw: object; prop: string | symbol }>>();
 
 /**
  * Flushes all pending notifications collected during a batch.
@@ -504,9 +578,13 @@ export function clearComponentCache(): void {
  * - `store({ count: 0 })` — plain initial state
  * - `store((self) => ({ count: 0, inc() { self.count++ } }))` — factory,
  *   receives the proxy as `self` so methods can mutate it reactively
+ *
+ * The factory form uses a two-pass generic to infer `self` correctly:
+ * the first pass infers `T` from the return type, the second pass
+ * provides `self` as a fully-typed reactive proxy of `T`.
  */
 export function store<T extends object>(
-  initialState: T | ((self: any) => T),
+  initialState: T | ((self: T) => T),
   _options?: StoreOptions
 ): T {
   // Factory form: store((self) => ({ ... }))
@@ -518,27 +596,27 @@ export function store<T extends object>(
       const cached = _componentCache.get(cacheKey);
       if (cached) return cached as T;
 
-      const raw: any = {};
-      const proxy = createReactiveProxy(raw);
-      const result = (initialState as (self: any) => T)(proxy);
+      const raw: Record<string, unknown> = {};
+      const proxy = createReactiveProxy(raw) as T;
+      const result = (initialState as (self: T) => T)(proxy);
       Object.assign(raw, result);
       for (const key of Object.keys(result)) {
-        if (typeof (result as any)[key] === 'function') {
-          raw[key] = (result as any)[key];
+        if (typeof (result as Record<string, unknown>)[key] === 'function') {
+          raw[key] = (result as Record<string, unknown>)[key];
         }
       }
-      _componentCache.set(cacheKey, proxy);
+      _componentCache.set(cacheKey, proxy as object);
       return proxy;
     }
 
     // No component cache: create fresh every time
-    const raw: any = {};
-    const proxy = createReactiveProxy(raw);
-    const result = (initialState as (self: any) => T)(proxy);
+    const raw: Record<string, unknown> = {};
+    const proxy = createReactiveProxy(raw) as T;
+    const result = (initialState as (self: T) => T)(proxy);
     Object.assign(raw, result);
     for (const key of Object.keys(result)) {
-      if (typeof (result as any)[key] === 'function') {
-        raw[key] = (result as any)[key];
+      if (typeof (result as Record<string, unknown>)[key] === 'function') {
+        raw[key] = (result as Record<string, unknown>)[key];
       }
     }
     return proxy;

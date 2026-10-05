@@ -31,6 +31,7 @@
  */
 
 import { store } from './store.js';
+import { isDev } from './env.js';
 
 // ─── Simple FNV-1a Hash ─────────────────────────────────────────────────────
 
@@ -65,6 +66,20 @@ export function swr<T>(
   options?: SWROptions
 ): SWRState<T> {
   const CACHE_PREFIX = '__astra_swr_';
+
+  // Warn in development when no explicit key is provided.
+  // Auto-generated keys from fn.toString() are fragile: minification,
+  // whitespace changes, or closures over different variables produce
+  // different keys for the same logical fetcher.
+  if (!options?.key && isDev()) {
+    console.warn(
+      '[AstraJS] swr() called without an explicit `key` option. ' +
+      'Auto-generated keys from function source are fragile and may break ' +
+      'after minification or code changes. Provide a stable key: ' +
+      'swr(fetcher, { key: "my-resource" })'
+    );
+  }
+
   const cacheKey = CACHE_PREFIX + (options?.key ?? hashString(fetcher.toString()));
 
   let running = false;
