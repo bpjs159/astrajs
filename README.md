@@ -107,6 +107,9 @@ MIT — all packages. Branding assets (logos, images) are © AstraJS.
 
 ## 📋 Changelog
 
+- **0.1.50** (2026-10-06): fix(publish): parse --tag in both forms so publish:latest really uses the latest tag
+
+
 - **0.1.49** (2026-10-05): chore: stop version-bump hook from amending commits; pin apps to the workspace
 
 
