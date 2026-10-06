@@ -25,8 +25,14 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 const has = (f) => args.some((a) => a === f || a.startsWith(`${f}=`));
 const val = (f) => {
-  const hit = args.find((a) => a.startsWith(`${f}=`));
-  return hit ? hit.slice(f.length + 1) : null;
+  // Support both `--flag=value` and `--flag value`.
+  // (Only the `=` form used to be parsed, so `npm run publish:latest`
+  //  — which passes `--tag latest` — silently published under the `beta` tag.)
+  const eq = args.find((a) => a.startsWith(`${f}=`));
+  if (eq) return eq.slice(f.length + 1);
+  const i = args.indexOf(f);
+  if (i !== -1 && args[i + 1] && !args[i + 1].startsWith('--')) return args[i + 1];
+  return null;
 };
 const tag = val('--tag') ?? 'beta';
 const dryRun = has('--dry-run');
